@@ -1,0 +1,6 @@
+nohup: ignoring input
+ Rota /api/auth carregada.
+ Rota /api/produtos carregada.
+ Rota /api/usuarios carregada.
+ Rota /api/vendas carregada.
+ Servidor rodando em http://187.77.240.171:3001

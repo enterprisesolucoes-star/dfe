@@ -1,0 +1,741 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model bandeiras {
+  id        Int     @id @default(autoincrement())
+  tpag      String? @db.VarChar(2)
+  tband_opc String? @db.VarChar(50)
+  cnpj_opc  String? @db.VarChar(20)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model caixa_movimentos {
+  id              Int                   @id @default(autoincrement())
+  empresa_id      Int
+  financeiro_id   Int?
+  venda_id        Int?
+  compra_id       Int?
+  conta_id        Int
+  tipo            caixa_movimentos_tipo
+  valor           Decimal               @db.Decimal(15, 2)
+  data_movimento  DateTime?             @default(now()) @db.Timestamp(0)
+  forma_pagamento String?               @default("01") @db.VarChar(2)
+  historico       String?               @db.VarChar(255)
+  usuario_id      Int?
+
+  @@index([conta_id], map: "idx_conta")
+  @@index([empresa_id, data_movimento], map: "idx_empresa_data")
+}
+
+model caixas {
+  id              Int            @id @default(autoincrement())
+  usuario_id      Int
+  nome_usuario    String?        @db.VarChar(100)
+  data_abertura   DateTime       @db.DateTime(0)
+  data_fechamento DateTime?      @db.DateTime(0)
+  troco_inicial   Decimal?       @default(0.00) @db.Decimal(10, 2)
+  total_vendas    Decimal?       @default(0.00) @db.Decimal(10, 2)
+  status          caixas_status? @default(aberto)
+
+  @@index([status], map: "idx_status")
+  @@index([usuario_id], map: "idx_usuario")
+}
+
+model clientes {
+  id                     Int       @id @default(autoincrement())
+  nome                   String    @db.VarChar(255)
+  documento              String?   @db.VarChar(18)
+  email                  String?   @db.VarChar(255)
+  telefone               String?   @db.VarChar(20)
+  logradouro             String?   @db.VarChar(255)
+  numero                 String?   @db.VarChar(10)
+  complemento            String?   @db.VarChar(100)
+  bairro                 String?   @db.VarChar(100)
+  municipio              String?   @db.VarChar(100)
+  codigo_municipio       String?   @db.VarChar(10)
+  uf                     String?   @db.Char(2)
+  cep                    String?   @db.VarChar(10)
+  created_at             DateTime? @default(now()) @db.Timestamp(0)
+  ativo                  Int?      @default(1) @db.TinyInt
+  empresa_id             Int?
+  ie                     String?   @db.VarChar(20)
+  ind_ie_dest            String?   @default("9") @db.Char(1)
+  regime_tributario      String?   @default("1") @db.Char(1)
+  entidade_governamental String?   @default("0") @db.Char(1)
+  indIEDest              String?   @default("9") @db.Char(1)
+
+  @@index([empresa_id], map: "idx_empresa")
+}
+
+model compras {
+  id                Int             @id @default(autoincrement())
+  empresa_id        Int?
+  fornecedor_id     Int?
+  numero_nf         String?         @default("") @db.VarChar(60)
+  data_entrada      DateTime        @db.Date
+  chave_acesso      String?         @default("") @db.VarChar(44)
+  natureza_operacao String?         @default("COMPRA DE MERCADORIA") @db.VarChar(100)
+  valor_total       Decimal?        @default(0.00) @db.Decimal(12, 2)
+  valor_desconto    Decimal?        @default(0.00) @db.Decimal(12, 2)
+  valor_frete       Decimal?        @default(0.00) @db.Decimal(12, 2)
+  observacoes       String?         @db.Text
+  status            compras_status? @default(Confirmada)
+  created_at        DateTime?       @default(now()) @db.Timestamp(0)
+  compras_itens     compras_itens[]
+
+  @@index([data_entrada], map: "idx_data")
+  @@index([empresa_id], map: "idx_empresa")
+}
+
+model compras_itens {
+  id             Int     @id @default(autoincrement())
+  compra_id      Int
+  produto_id     Int
+  quantidade     Decimal @default(1.000) @db.Decimal(12, 3)
+  valor_unitario Decimal @default(0.0000) @db.Decimal(12, 4)
+  valor_total    Decimal @default(0.00) @db.Decimal(12, 2)
+  compras        compras @relation(fields: [compra_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "compras_itens_ibfk_1")
+
+  @@index([compra_id], map: "compra_id")
+}
+
+model contas_financeiras {
+  id            Int                      @id @default(autoincrement())
+  empresa_id    Int
+  nome          String                   @db.VarChar(100)
+  saldo_inicial Decimal?                 @default(0.00) @db.Decimal(15, 2)
+  tipo          contas_financeiras_tipo? @default(Caixa)
+  status        Int?                     @default(1) @db.TinyInt
+  created_at    DateTime?                @default(now()) @db.Timestamp(0)
+
+  @@index([empresa_id], map: "idx_empresa")
+}
+
+model dfe_admins {
+  id         Int       @id @default(autoincrement())
+  login      String    @unique(map: "login") @db.VarChar(50)
+  senha_hash String    @db.VarChar(255)
+  nome       String?   @default("") @db.VarChar(100)
+  ativo      Int?      @default(1) @db.TinyInt
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+}
+
+model dfe_documentos {
+  id            Int       @id @default(autoincrement())
+  empresa_id    Int?
+  nsu           String    @db.VarChar(20)
+  chave         String    @db.VarChar(44)
+  cnpj_emitente String?   @db.VarChar(20)
+  nome_emitente String?   @db.VarChar(255)
+  valor         Decimal?  @db.Decimal(12, 2)
+  data_emissao  DateTime? @db.Timestamp(0)
+  manifesto     Int?      @default(0)
+  situacao      String?   @default("Pendente") @db.VarChar(20)
+  xml_resumo    String?   @db.LongText
+  xml_completo  String?   @db.LongText
+  updated_at    DateTime? @default(now()) @db.Timestamp(0)
+
+  @@unique([chave, empresa_id], map: "unq_chave")
+  @@index([nsu], map: "idx_nsu")
+}
+
+model empresas {
+  id                       Int       @id @default(autoincrement())
+  razao_social             String    @db.VarChar(255)
+  cnpj                     String    @db.VarChar(18)
+  inscricao_estadual       String?   @db.VarChar(20)
+  csc_token                String?   @db.VarChar(100)
+  csc_id                   String?   @db.VarChar(10)
+  ambiente                 Int?      @default(2) @db.TinyInt
+  uf                       String?   @default("GO") @db.Char(2)
+  codigo_municipio         String?   @default("5208707") @db.VarChar(10)
+  numero_nfce              Int?      @default(0)
+  serie_nfce               Int?      @default(1)
+  certificado_pfx          Bytes?
+  certificado_senha        String?   @db.VarChar(255)
+  created_at               DateTime? @default(now()) @db.Timestamp(0)
+  emissao_contingencia     Int?      @default(0)
+  contingencia_automatica  Int?      @default(1)
+  logradouro               String?   @db.VarChar(255)
+  numero                   String?   @db.VarChar(20)
+  bairro                   String?   @db.VarChar(100)
+  municipio                String?   @db.VarChar(100)
+  cep                      String?   @db.VarChar(20)
+  telefone                 String?   @db.VarChar(20)
+  crt                      String?   @default("1") @db.Char(1)
+  certificado_file_name    String?   @db.VarChar(255)
+  numero_nfe               Int?      @default(0)
+  serie_nfe                Int?      @default(1)
+  ambiente_nfe             Int?      @default(2) @db.TinyInt
+  email_contador           String?   @db.VarChar(100)
+  smtp_host                String?   @db.VarChar(100)
+  smtp_port                Int?      @default(587)
+  smtp_user                String?   @db.VarChar(100)
+  smtp_pass                String?   @db.VarChar(100)
+  smtp_secure              String?   @default("tls") @db.VarChar(20)
+  external_id              Int?
+  logo_path                String?   @db.VarChar(255)
+  gerar_credito_simples    Int?      @default(0) @db.TinyInt
+  aliquota_credito_simples Decimal?  @default(0.00) @db.Decimal(10, 2)
+  ultimo_nsu               String?   @default("0") @db.VarChar(15)
+  data_ultima_consulta_dfe DateTime? @db.DateTime(0)
+  multa_receber            Decimal?  @default(0.00) @db.Decimal(10, 2)
+  juros_dia_receber        Decimal?  @default(0.00) @db.Decimal(10, 2)
+  carencia_dias_receber    Int?      @default(0)
+  status                   String?   @default("Ativo") @db.VarChar(20)
+  usuario_dfe              Int?      @default(2)
+  nome_fantasia            String?   @db.VarChar(255)
+  inscricao_municipal      String?   @db.VarChar(50)
+  email                    String?   @db.VarChar(100)
+  recolhe_ibscbs_fora      Int?      @default(0) @db.TinyInt
+  vendas                   vendas[]
+
+  @@index([external_id], map: "idx_external_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model financeiro {
+  id                       Int                @id @default(autoincrement())
+  empresa_id               Int
+  venda_id                 Int?
+  compra_id                Int?
+  tipo                     financeiro_tipo
+  status                   financeiro_status? @default(Pendente)
+  entidade_id              Int?
+  valor_total              Decimal            @db.Decimal(15, 2)
+  valor_pago               Decimal?           @default(0.00) @db.Decimal(15, 2)
+  vencimento               DateTime           @db.Date
+  data_baixa               DateTime?          @db.Date
+  parcela_numero           Int?               @default(1)
+  parcela_total            Int?               @default(1)
+  forma_pagamento_prevista String?            @default("01") @db.VarChar(2)
+  categoria                String?            @default("Geral") @db.VarChar(100)
+  nosso_numero             String?            @db.VarChar(50)
+  documento_id             String?            @db.VarChar(100)
+  observacoes              String?            @db.Text
+  created_at               DateTime?          @default(now()) @db.Timestamp(0)
+
+  @@index([empresa_id, vencimento], map: "idx_empresa_venc")
+  @@index([status], map: "idx_status")
+  @@index([tipo], map: "idx_tipo")
+}
+
+model formas_pagamento {
+  id           Int    @id @default(autoincrement())
+  descricao    String @db.VarChar(50)
+  codigo_sefaz String @db.VarChar(2)
+  ativo        Int?   @default(1) @db.TinyInt
+}
+
+model fornecedores {
+  id               Int       @id @default(autoincrement())
+  nome             String    @db.VarChar(150)
+  documento        String?   @default("") @db.VarChar(20)
+  email            String?   @default("") @db.VarChar(100)
+  telefone         String?   @default("") @db.VarChar(20)
+  logradouro       String?   @default("") @db.VarChar(255)
+  numero           String?   @default("") @db.VarChar(20)
+  complemento      String?   @default("") @db.VarChar(100)
+  bairro           String?   @default("") @db.VarChar(100)
+  municipio        String?   @default("") @db.VarChar(100)
+  codigo_municipio String?   @default("") @db.VarChar(10)
+  uf               String?   @default("") @db.Char(2)
+  cep              String?   @default("") @db.VarChar(10)
+  ativo            Int?      @default(1) @db.TinyInt
+  created_at       DateTime? @default(now()) @db.Timestamp(0)
+  empresa_id       Int?
+
+  @@index([empresa_id], map: "idx_empresa")
+}
+
+model medidas {
+  id         Int       @id @default(autoincrement())
+  codigo     String    @db.VarChar(10)
+  descricao  String    @db.VarChar(100)
+  fator      Decimal?  @default(1.000) @db.Decimal(10, 3)
+  pesavel    Int?      @default(0) @db.TinyInt
+  ativo      Int?      @default(1) @db.TinyInt
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+  empresa_id Int?
+
+  @@index([empresa_id], map: "idx_empresa")
+}
+
+model nfe_volumes {
+  id       Int      @id @default(autoincrement())
+  venda_id Int
+  q_vol    Int?
+  esp      String?  @db.VarChar(60)
+  marca    String?  @db.VarChar(60)
+  n_vol    String?  @db.VarChar(60)
+  peso_l   Decimal? @db.Decimal(12, 3)
+  peso_b   Decimal? @db.Decimal(12, 3)
+  vendas   vendas   @relation(fields: [venda_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "nfe_volumes_ibfk_1")
+
+  @@index([venda_id], map: "venda_id")
+}
+
+model orcamentos {
+  id                Int                @id @default(autoincrement())
+  empresa_id        Int
+  numero            Int
+  status            orcamentos_status? @default(Rascunho)
+  cliente_id        Int?
+  cliente_nome      String?            @db.VarChar(255)
+  cliente_documento String?            @db.VarChar(20)
+  cliente_telefone  String?            @db.VarChar(20)
+  cliente_email     String?            @db.VarChar(100)
+  valor_total       Decimal            @default(0.00) @db.Decimal(10, 2)
+  observacao        String?            @db.Text
+  validade          DateTime?          @db.Date
+  data_criacao      DateTime?          @default(now()) @db.DateTime(0)
+
+  @@index([empresa_id], map: "idx_empresa")
+  @@index([empresa_id, numero], map: "idx_numero")
+}
+
+model orcamentos_itens {
+  id             Int                   @id @default(autoincrement())
+  orcamento_id   Int
+  tipo           orcamentos_itens_tipo @default(produto)
+  produto_id     Int?
+  descricao      String                @db.VarChar(300)
+  unidade        String?               @default("UN") @db.VarChar(10)
+  quantidade     Decimal               @default(1.000) @db.Decimal(10, 3)
+  valor_unitario Decimal               @db.Decimal(10, 2)
+  valor_total    Decimal               @db.Decimal(10, 2)
+
+  @@index([orcamento_id], map: "idx_orc")
+}
+
+model ordens_servico {
+  id                Int                    @id @default(autoincrement())
+  empresa_id        Int
+  numero            Int
+  status            ordens_servico_status? @default(Rascunho)
+  cliente_id        Int?
+  cliente_nome      String?                @db.VarChar(255)
+  cliente_documento String?                @db.VarChar(20)
+  cliente_telefone  String?                @db.VarChar(20)
+  cliente_email     String?                @db.VarChar(100)
+  valor_total       Decimal                @default(0.00) @db.Decimal(10, 2)
+  observacao        String?                @db.Text
+  previsao          DateTime?              @db.Date
+  data_criacao      DateTime?              @default(now()) @db.DateTime(0)
+
+  @@index([empresa_id], map: "idx_empresa")
+  @@index([empresa_id, numero], map: "idx_numero")
+}
+
+model ordens_servico_itens {
+  id             Int                       @id @default(autoincrement())
+  ordem_id       Int
+  tipo           ordens_servico_itens_tipo @default(servico)
+  produto_id     Int?
+  descricao      String                    @db.VarChar(300)
+  unidade        String?                   @default("UN") @db.VarChar(10)
+  quantidade     Decimal                   @default(1.000) @db.Decimal(10, 3)
+  valor_unitario Decimal                   @db.Decimal(10, 2)
+  valor_total    Decimal                   @db.Decimal(10, 2)
+
+  @@index([ordem_id], map: "idx_ordem")
+}
+
+model pre_cadastros {
+  id             Int                   @id @default(autoincrement())
+  nome           String                @db.VarChar(100)
+  email          String                @db.VarChar(150)
+  cnpj           String                @db.VarChar(14)
+  razao_social   String                @db.VarChar(255)
+  telefone       String?               @default("") @db.VarChar(20)
+  login_desejado String                @default("") @db.VarChar(50)
+  senha_hash     String                @default("") @db.VarChar(255)
+  status         pre_cadastros_status? @default(aguardando)
+  created_at     DateTime?             @default(now()) @db.Timestamp(0)
+}
+
+model produtos {
+  id                    Int            @id @default(autoincrement())
+  codigo_interno        String?        @db.VarChar(10)
+  descricao             String         @db.VarChar(255)
+  ncm                   String         @db.VarChar(10)
+  unidade_comercial     String?        @default("UN") @db.VarChar(10)
+  valor_unitario        Decimal        @db.Decimal(10, 2)
+  cfop                  String?        @default("5102") @db.VarChar(4)
+  icms_cst_csosn        String?        @default("102") @db.VarChar(3)
+  created_at            DateTime?      @default(now()) @db.Timestamp(0)
+  codigo_barras         String?        @db.VarChar(20)
+  custo_compra          Decimal?       @default(0.00) @db.Decimal(10, 2)
+  simples_nacional      Decimal?       @default(0.00) @db.Decimal(5, 2)
+  despesas_operacionais Decimal?       @default(0.00) @db.Decimal(5, 2)
+  frete_seguro          Decimal?       @default(0.00) @db.Decimal(5, 2)
+  margem_lucro          Decimal?       @default(0.00) @db.Decimal(5, 2)
+  estoque               Decimal?       @default(0.000) @db.Decimal(10, 3)
+  cbs_cst               String?        @db.VarChar(10)
+  cbs_classtrib         String?        @db.VarChar(20)
+  ibs_cst               String?        @db.VarChar(10)
+  ibs_classtrib         String?        @db.VarChar(20)
+  ccredpres             String?        @db.VarChar(10)
+  empresa_id            Int?
+  pis_cst               String?        @db.VarChar(2)
+  pis_aliquota          Decimal?       @default(0.0000) @db.Decimal(10, 4)
+  cofins_cst            String?        @db.VarChar(2)
+  cofins_aliquota       Decimal?       @default(0.0000) @db.Decimal(10, 4)
+  origem_mercadoria     Int?           @default(0) @db.TinyInt
+  codigo_fornecedor     String?        @db.VarChar(60)
+  vendas_itens          vendas_itens[]
+
+  @@index([codigo_fornecedor], map: "idx_cod_forn")
+  @@index([empresa_id], map: "idx_empresa")
+}
+
+model rtc_aliquotas {
+  id         Int       @id @default(autoincrement())
+  imposto    String    @db.VarChar(20)
+  percentual Decimal   @default(0.0000) @db.Decimal(8, 4)
+  d_ini_vig  DateTime  @db.Date
+  d_fim_vig  DateTime? @db.Date
+  observacao String?   @default("") @db.VarChar(255)
+
+  @@index([imposto], map: "idx_imposto")
+}
+
+model rtc_ccredpres {
+  id        Int       @id @default(autoincrement())
+  ccredpres String    @db.VarChar(10)
+  descricao String?   @db.Text
+  ind_gcbs  Int?      @default(0) @db.TinyInt
+  ind_gibs  Int?      @default(0) @db.TinyInt
+  d_ini_vig DateTime? @db.Date
+  d_fim_vig DateTime? @db.Date
+
+  @@index([ccredpres], map: "idx_ccredpres")
+}
+
+model rtc_cst_classtrib {
+  id                  Int       @id @default(autoincrement())
+  cst                 String    @db.VarChar(10)
+  descricao_cst       String?   @default("") @db.VarChar(255)
+  classtrib           String    @db.VarChar(20)
+  nome_classtrib      String?   @default("") @db.VarChar(500)
+  descricao_classtrib String?   @db.Text
+  lc_redacao          String?   @db.Text
+  lc_referencia       String?   @default("") @db.VarChar(100)
+  link                String?   @default("") @db.VarChar(300)
+  tipo_aliquota       String?   @default("") @db.VarChar(50)
+  pred_ibs            Decimal?  @default(0.00) @db.Decimal(5, 2)
+  pred_cbs            Decimal?  @default(0.00) @db.Decimal(5, 2)
+  ind_nfce            Int?      @default(0) @db.TinyInt
+  ind_nfe             Int?      @default(0) @db.TinyInt
+  d_ini_vig           DateTime? @db.Date
+  d_fim_vig           DateTime? @db.Date
+
+  @@index([classtrib], map: "idx_classtrib")
+  @@index([cst], map: "idx_cst")
+}
+
+model rtc_ncm {
+  id              Int          @id @default(autoincrement())
+  tipo            rtc_ncm_tipo
+  ncm             String       @db.VarChar(20)
+  legislacao      String?      @db.VarChar(50)
+  anexo           String?      @db.VarChar(20)
+  cst             String?      @db.VarChar(10)
+  classtrib       String?      @db.VarChar(20)
+  ex              String?      @db.VarChar(5)
+  tabela          String?      @db.Char(2)
+  descricao       String?      @db.VarChar(300)
+  aliq_nacional   Decimal?     @db.Decimal(8, 4)
+  aliq_importados Decimal?     @db.Decimal(8, 4)
+  aliq_estadual   Decimal?     @db.Decimal(8, 4)
+  aliq_municipal  Decimal?     @db.Decimal(8, 4)
+  vigencia_inicio DateTime?    @db.Date
+  vigencia_fim    DateTime?    @db.Date
+  chave           String?      @db.VarChar(100)
+  versao          String?      @db.VarChar(20)
+  fonte           String?      @db.VarChar(100)
+  uf              String?      @db.Char(2)
+
+  @@index([ncm], map: "idx_ncm")
+  @@index([ncm, uf], map: "idx_ncm_uf")
+  @@index([tipo, ncm], map: "idx_tipo_ncm")
+}
+
+model smartpos {
+  id           Int       @id @default(autoincrement())
+  empresa_id   Int
+  codigo       String    @db.VarChar(50)
+  integradora  String    @db.VarChar(100)
+  numero_serie String?   @db.VarChar(50)
+  apelido      String    @db.VarChar(100)
+  created_at   DateTime? @default(now()) @db.DateTime(0)
+}
+
+model transportadores {
+  id               Int       @id @default(autoincrement())
+  nome             String    @db.VarChar(150)
+  documento        String?   @default("") @db.VarChar(20)
+  ie               String?   @default("") @db.VarChar(30)
+  email            String?   @default("") @db.VarChar(100)
+  telefone         String?   @default("") @db.VarChar(20)
+  logradouro       String?   @default("") @db.VarChar(255)
+  numero           String?   @default("") @db.VarChar(20)
+  complemento      String?   @default("") @db.VarChar(100)
+  bairro           String?   @default("") @db.VarChar(100)
+  municipio        String?   @default("") @db.VarChar(100)
+  codigo_municipio String?   @default("") @db.VarChar(10)
+  uf               String?   @default("") @db.Char(2)
+  cep              String?   @default("") @db.VarChar(10)
+  ativo            Int?      @default(1) @db.TinyInt
+  created_at       DateTime? @default(now()) @db.Timestamp(0)
+  empresa_id       Int?
+
+  @@index([empresa_id], map: "idx_empresa")
+}
+
+model usuarios {
+  id         Int              @id @default(autoincrement())
+  empresa_id Int?
+  nome       String           @db.VarChar(100)
+  login      String           @unique(map: "login") @db.VarChar(50)
+  senha_hash String           @db.VarChar(255)
+  perfil     usuarios_perfil? @default(operador)
+  ativo      Int?             @default(1) @db.TinyInt
+  created_at DateTime?        @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model vendas {
+  id                         Int                 @id @default(autoincrement())
+  empresa_id                 Int?
+  numero                     Int
+  serie                      Int?                @default(1)
+  data_emissao               DateTime?           @default(now()) @db.DateTime(0)
+  valor_total                Decimal             @db.Decimal(10, 2)
+  valor_desconto             Decimal?            @default(0.00) @db.Decimal(10, 2)
+  valor_troco                Decimal?            @default(0.00) @db.Decimal(10, 2)
+  status                     String?             @default("Pendente") @db.VarChar(30)
+  chave_acesso               String?             @db.VarChar(44)
+  protocolo                  String?             @db.VarChar(20)
+  xml_autorizado             String?             @db.LongText
+  xml_cancelamento           String?             @db.LongText
+  protocolo_cancelamento     String?             @db.VarChar(30)
+  justificativa_cancelamento String?             @db.VarChar(255)
+  data_cancelamento          DateTime?           @db.DateTime(0)
+  usuario_id                 Int?
+  caixa_id                   Int?
+  modelo                     Int?                @default(65) @db.TinyInt
+  natureza_operacao          String?             @db.VarChar(60)
+  finalidade                 Int?                @default(1) @db.TinyInt
+  consumidor_final           Int?                @default(0) @db.TinyInt
+  presenca_comprador         Int?                @default(1) @db.TinyInt
+  valor_frete                Decimal?            @default(0.00) @db.Decimal(10, 2)
+  valor_seguro               Decimal?            @default(0.00) @db.Decimal(10, 2)
+  valor_outras               Decimal?            @default(0.00) @db.Decimal(10, 2)
+  valor_ipi                  Decimal?            @default(0.00) @db.Decimal(10, 2)
+  valor_icms                 Decimal?            @default(0.00) @db.Decimal(10, 2)
+  valor_pis                  Decimal?            @default(0.00) @db.Decimal(10, 2)
+  valor_cofins               Decimal?            @default(0.00) @db.Decimal(10, 2)
+  informacoes_adicionais     String?             @db.Text
+  transportador_id           Int?
+  mod_frete                  Int?                @default(9) @db.TinyInt
+  vbc_icms                   Decimal?            @default(0.00) @db.Decimal(15, 2)
+  vbc_pis                    Decimal?            @default(0.00) @db.Decimal(15, 2)
+  vbc_cofins                 Decimal?            @default(0.00) @db.Decimal(15, 2)
+  vbc_ipi                    Decimal?            @default(0.00) @db.Decimal(15, 2)
+  cliente_id                 Int?
+  tp_nf                      Int?                @default(1) @db.TinyInt
+  devolucao_de_id            Int?
+  finalidade_compra          Int?                @default(1) @db.TinyInt
+  nfe_volumes                nfe_volumes[]
+  empresas                   empresas?           @relation(fields: [empresa_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "vendas_ibfk_1")
+  vendas_itens               vendas_itens[]
+  vendas_pagamentos          vendas_pagamentos[]
+
+  @@index([empresa_id], map: "empresa_id")
+}
+
+model vendas_itens {
+  id                           Int                @id @default(autoincrement())
+  venda_id                     Int?
+  produto_id                   Int?
+  quantidade                   Decimal            @db.Decimal(10, 3)
+  valor_unitario               Decimal            @db.Decimal(10, 2)
+  valor_total                  Decimal            @db.Decimal(10, 2)
+  percentual_tributos_nacional Decimal?           @default(0.00) @db.Decimal(5, 2)
+  percentual_tributos_estadual Decimal?           @default(0.00) @db.Decimal(5, 2)
+  vbc_icms                     Decimal?           @default(0.00) @db.Decimal(15, 2)
+  aliq_icms                    Decimal?           @default(0.00) @db.Decimal(15, 2)
+  valor_icms                   Decimal?           @default(0.00) @db.Decimal(15, 2)
+  vbc_pis                      Decimal?           @default(0.00) @db.Decimal(15, 2)
+  aliq_pis                     Decimal?           @default(0.00) @db.Decimal(15, 2)
+  valor_pis                    Decimal?           @default(0.00) @db.Decimal(15, 2)
+  vbc_cofins                   Decimal?           @default(0.00) @db.Decimal(15, 2)
+  aliq_cofins                  Decimal?           @default(0.00) @db.Decimal(15, 2)
+  valor_cofins                 Decimal?           @default(0.00) @db.Decimal(15, 2)
+  vbc_ipi                      Decimal?           @default(0.00) @db.Decimal(15, 2)
+  aliq_ipi                     Decimal?           @default(0.00) @db.Decimal(15, 2)
+  valor_ipi                    Decimal?           @default(0.00) @db.Decimal(15, 2)
+  ncm                          String?            @db.VarChar(10)
+  cfop                         String?            @db.VarChar(4)
+  unidade                      String?            @db.VarChar(6)
+  origem                       Int?               @default(0) @db.TinyInt
+  cbs_cst                      String?            @db.VarChar(2)
+  cbs_classtrib                String?            @db.VarChar(10)
+  ipi_cst                      String?            @db.VarChar(2)
+  ipi_aliquota                 Decimal?           @default(0.0000) @db.Decimal(10, 4)
+  cest                         String?            @db.VarChar(7)
+  icms_aliquota                Decimal?           @default(0.0000) @db.Decimal(10, 4)
+  icms_cst                     String?            @db.VarChar(3)
+  pis_cst                      String?            @db.VarChar(2)
+  cofins_cst                   String?            @db.VarChar(2)
+  vendas                       vendas?            @relation(fields: [venda_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "vendas_itens_ibfk_1")
+  produtos                     produtos?          @relation(fields: [produto_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "vendas_itens_ibfk_2")
+  vendas_itens_cbs             vendas_itens_cbs[]
+  vendas_itens_ibs             vendas_itens_ibs[]
+  vendas_itens_is              vendas_itens_is[]
+
+  @@index([produto_id], map: "produto_id")
+  @@index([venda_id], map: "venda_id")
+}
+
+model vendas_itens_cbs {
+  id            Int          @id @default(autoincrement())
+  venda_item_id Int
+  base_calculo  Decimal?     @default(0.00) @db.Decimal(15, 2)
+  aliquota      Decimal?     @default(0.0000) @db.Decimal(15, 4)
+  valor         Decimal?     @default(0.00) @db.Decimal(15, 2)
+  created_at    DateTime?    @default(now()) @db.DateTime(0)
+  vendas_itens  vendas_itens @relation(fields: [venda_item_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "vendas_itens_cbs_ibfk_1")
+
+  @@index([venda_item_id], map: "venda_item_id")
+}
+
+model vendas_itens_ibs {
+  id            Int          @id @default(autoincrement())
+  venda_item_id Int
+  base_calculo  Decimal?     @default(0.00) @db.Decimal(15, 2)
+  aliquota      Decimal?     @default(0.0000) @db.Decimal(15, 4)
+  valor         Decimal?     @default(0.00) @db.Decimal(15, 2)
+  created_at    DateTime?    @default(now()) @db.DateTime(0)
+  vendas_itens  vendas_itens @relation(fields: [venda_item_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "vendas_itens_ibs_ibfk_1")
+
+  @@index([venda_item_id], map: "venda_item_id")
+}
+
+model vendas_itens_is {
+  id            Int          @id @default(autoincrement())
+  venda_item_id Int
+  base_calculo  Decimal?     @default(0.00) @db.Decimal(15, 2)
+  aliquota      Decimal?     @default(0.0000) @db.Decimal(15, 4)
+  valor         Decimal?     @default(0.00) @db.Decimal(15, 2)
+  created_at    DateTime?    @default(now()) @db.DateTime(0)
+  vendas_itens  vendas_itens @relation(fields: [venda_item_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "vendas_itens_is_ibfk_1")
+
+  @@index([venda_item_id], map: "venda_item_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model vendas_pagamentos {
+  id                     Int     @id @default(autoincrement())
+  venda_id               Int
+  forma_pagamento        String  @db.VarChar(2)
+  valor_pagamento        Decimal @db.Decimal(10, 2)
+  payment_uniqueid       String? @db.VarChar(100)
+  status_pagamento       Int?    @default(0)
+  tef_nsu                String? @db.VarChar(50)
+  tef_autorizacao        String? @db.VarChar(50)
+  tef_bandeira_id        String? @default("99") @db.VarChar(2)
+  tef_bandeira_nome      String? @db.VarChar(30)
+  tef_cnpj_credenciadora String? @db.VarChar(30)
+  tef_json_retorno       String? @db.Text
+  tp_integra             Int?    @default(2) @db.TinyInt
+  t_band                 String? @db.VarChar(50)
+  c_aut                  String? @db.VarChar(50)
+  vendas                 vendas  @relation(fields: [venda_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "vendas_pagamentos_ibfk_1")
+
+  @@index([payment_uniqueid], map: "payment_uniqueid")
+  @@index([venda_id], map: "venda_id")
+}
+
+enum rtc_ncm_tipo {
+  lc214
+  ibpt
+}
+
+enum orcamentos_itens_tipo {
+  produto
+  servico
+}
+
+enum ordens_servico_itens_tipo {
+  produto
+  servico
+}
+
+enum orcamentos_status {
+  Rascunho
+  Enviado
+  Aprovado
+  Recusado
+  Expirado
+}
+
+enum ordens_servico_status {
+  Rascunho
+  Aberta
+  Em_Andamento @map("Em Andamento")
+  Conclu_da    @map("Concluída")
+  Cancelada
+}
+
+enum contas_financeiras_tipo {
+  Caixa
+  Banco
+  Digital
+}
+
+enum financeiro_tipo {
+  R
+  P
+}
+
+enum financeiro_status {
+  Pendente
+  Pago
+  Parcial
+  Cancelado
+}
+
+enum usuarios_perfil {
+  admin
+  operador
+}
+
+enum caixa_movimentos_tipo {
+  C
+  D
+}
+
+enum caixas_status {
+  aberto
+  fechado
+}
+
+enum pre_cadastros_status {
+  aguardando
+  aprovado
+  reprovado
+}
+
+enum compras_status {
+  Rascunho
+  Confirmada
+  Cancelada
+}

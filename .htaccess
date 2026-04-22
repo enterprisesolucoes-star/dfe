@@ -1,0 +1,45 @@
+# ─── Security Headers ───────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+  # HIGH: Força HTTPS por 1 ano, inclui subdomínios
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+  # MEDIUM: Bloqueia MIME sniffing
+  Header always set X-Content-Type-Options "nosniff"
+
+  # MEDIUM: Protege contra clickjacking
+  Header always set X-Frame-Options "SAMEORIGIN"
+
+  # LOW: Controla informações de referrer
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # LOW: Restringe APIs sensíveis (câmera, microfone, geolocalização)
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+
+  # LOW: Proteção XSS para browsers antigos
+  Header always set X-XSS-Protection "1; mode=block"
+
+  # LOW: Oculta informação do servidor
+  Header always unset Server
+  Header always unset X-Powered-By
+</IfModule>
+
+# ─── Bloqueia arquivos sensíveis ────────────────────────────────────────────
+<FilesMatch "^(package\.json|package-lock\.json|composer\.json|composer\.lock|\.env.*|\.git.*)$">
+  Require all denied
+</FilesMatch>
+
+# ─── SPA Rewrite ────────────────────────────────────────────────────────────
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /dfe/
+
+  # URL limpa para página de cadastro
+  RewriteRule ^cadastrar-se$ cadastrar-se.php [L]
+
+  # Redireciona todas as demais requisições para index.html (SPA React)
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-l
+  RewriteRule . /dfe/index.html [L]
+</IfModule>

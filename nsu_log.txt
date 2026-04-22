@@ -1,0 +1,19 @@
+[2026-04-14 16:34:24] Enviando consulta para NSU: 3183
+[2026-04-14 16:37:16] Enviando consulta para NSU: 0
+[2026-04-14 16:37:16] SEFAZ respondeu cStat: 656 | Motivo: Rejeicao: Consumo Indevido (Deve ser utilizado o ultNSU nas solicitacoes subsequentes. Tente apos 1 hora) | Proximo NSU: 000000000003249
+[2026-04-14 16:41:42] Enviando consulta para NSU: 0
+[2026-04-14 16:41:42] SEFAZ respondeu cStat: 656 | Motivo: Rejeicao: Consumo Indevido (Deve ser utilizado o ultNSU nas solicitacoes subsequentes. Tente apos 1 hora) | Proximo NSU: 000000000003249
+[2026-04-14 16:41:46] Enviando consulta para NSU: 0
+[2026-04-14 16:41:47] SEFAZ respondeu cStat: 656 | Motivo: Rejeicao: Consumo Indevido (Deve ser utilizado o ultNSU nas solicitacoes subsequentes. Tente apos 1 hora) | Proximo NSU: 000000000003249
+[2026-04-14 16:45:42] Enviando consulta para NSU: 0
+[2026-04-14 16:45:42] SEFAZ respondeu cStat: 656 | Motivo: Rejeicao: Consumo Indevido (Deve ser utilizado o ultNSU nas solicitacoes subsequentes. Tente apos 1 hora) | Proximo NSU: 000000000003249
+[2026-04-14 16:57:53] Enviando consulta para NSU: 0
+[2026-04-14 16:57:53] SEFAZ respondeu cStat: 656 | Motivo: Rejeicao: Consumo Indevido (Deve ser utilizado o ultNSU nas solicitacoes subsequentes. Tente apos 1 hora) | Proximo NSU: 000000000003249
+[2026-04-14 20:51:34] Enviando consulta para NSU: 0
+[2026-04-14 20:51:34] SEFAZ respondeu cStat: 656 | Motivo: Rejeicao: Consumo Indevido (Deve ser utilizado o ultNSU nas solicitacoes subsequentes. Tente apos 1 hora) | Proximo NSU: 000000000003249
+[2026-04-14 22:48:44] Enviando consulta para NSU: 3249
+[2026-04-14 22:48:44] SEFAZ respondeu cStat: 656 | Motivo: Rejeicao: Consumo Indevido (Deve ser aguardado 1 hora para efetuar nova solicitacao caso nao existam mais documentos a serem pesquisados. Tente apos 1 hora) | Proximo NSU: 000000000003249
+[2026-04-15 17:11:51] Enviando consulta para NSU: 0
+[2026-04-15 17:11:51] SEFAZ respondeu cStat: 656 | Motivo: Rejeicao: Consumo Indevido (Deve ser utilizado o ultNSU nas solicitacoes subsequentes. Tente apos 1 hora) | Proximo NSU: 000000000011557
+[2026-04-16 10:55:13] Enviando consulta para NSU: 0
+[2026-04-16 10:55:13] SEFAZ respondeu cStat: 656 | Motivo: Rejeicao: Consumo Indevido (Deve ser utilizado o ultNSU nas solicitacoes subsequentes. Tente apos 1 hora) | Proximo NSU: 000000000011558
