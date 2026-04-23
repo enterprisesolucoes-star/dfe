@@ -1,0 +1,5 @@
+{
+  "name": "ERP NFC-e Pro",
+  "description": "Sistema ERP completo para emissão de NFC-e (Modelo 65) com integração SEFAZ.",
+  "requestFramePermissions": []
+}

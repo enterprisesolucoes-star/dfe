@@ -1,0 +1,4041 @@
+[
+	{
+		"Codigo": "010000",
+		"Item": "01",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de Informática e congêneres."
+	},
+	{
+		"Codigo": "010100",
+		"Item": "01",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Análise e desenvolvimento de sistemas."
+	},
+	{
+		"Codigo": "010101",
+		"Item": "01",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Análise e desenvolvimento de sistemas."
+	},
+	{
+		"Codigo": "010200",
+		"Item": "01",
+		"Subitem": "02",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Programação."
+	},
+	{
+		"Codigo": "010201",
+		"Item": "01",
+		"Subitem": "02",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Programação."
+	},
+	{
+		"Codigo": "010300",
+		"Item": "01",
+		"Subitem": "03",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Processamento, armazenamento ou hospedagem de dados, textos, imagens, vídeos, páginas eletrônicas, aplicativos e sistemas de informação, entre outros formatos, e congêneres."
+	},
+	{
+		"Codigo": "010301",
+		"Item": "01",
+		"Subitem": "03",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Processamento de dados, textos, imagens, vídeos, páginas eletrônicas, aplicativos e sistemas de informação, entre outros formatos, e congêneres."
+	},
+	{
+		"Codigo": "010302",
+		"Item": "01",
+		"Subitem": "03",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Armazenamento ou hospedagem de dados, textos, imagens, vídeos, páginas eletrônicas, aplicativos e sistemas de informação, entre outros formatos, e congêneres."
+	},
+	{
+		"Codigo": "010400",
+		"Item": "01",
+		"Subitem": "04",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Elaboração de programas de computadores, inclusive de jogos eletrônicos, independentemente da arquitetura construtiva da máquina em que o programa será executado, incluindo tablets, smartphones e congêneres."
+	},
+	{
+		"Codigo": "010401",
+		"Item": "01",
+		"Subitem": "04",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Elaboração de programas de computadores, inclusive de jogos eletrônicos, independentemente da arquitetura construtiva da máquina em que o programa será executado, incluindo tablets, smartphones e congêneres."
+	},
+	{
+		"Codigo": "010500",
+		"Item": "01",
+		"Subitem": "05",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Licenciamento ou cessão de direito de uso de programas de computação."
+	},
+	{
+		"Codigo": "010501",
+		"Item": "01",
+		"Subitem": "05",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Licenciamento ou cessão de direito de uso de programas de computação."
+	},
+	{
+		"Codigo": "010600",
+		"Item": "01",
+		"Subitem": "06",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Assessoria e consultoria em informática."
+	},
+	{
+		"Codigo": "010601",
+		"Item": "01",
+		"Subitem": "06",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Assessoria e consultoria em informática."
+	},
+	{
+		"Codigo": "010700",
+		"Item": "01",
+		"Subitem": "07",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Suporte técnico em informática, inclusive instalação, configuração e manutenção de programas de computação e bancos de dados."
+	},
+	{
+		"Codigo": "010701",
+		"Item": "01",
+		"Subitem": "07",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Suporte técnico em informática, inclusive instalação, configuração e manutenção de programas de computação e bancos de dados."
+	},
+	{
+		"Codigo": "010800",
+		"Item": "01",
+		"Subitem": "08",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Planejamento, confecção, manutenção e atualização de páginas eletrônicas."
+	},
+	{
+		"Codigo": "010801",
+		"Item": "01",
+		"Subitem": "08",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Planejamento, confecção, manutenção e atualização de páginas eletrônicas."
+	},
+	{
+		"Codigo": "010900",
+		"Item": "01",
+		"Subitem": "09",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Disponibilização, sem cessão definitiva, de conteúdos de áudio, vídeo, imagem e texto por meio da internet, respeitada a imunidade de livros, jornais e periódicos (exceto a distribuição de conteúdos pelas prestadoras de Serviço de Acesso Condicionado, de que trata a Lei nº 12.485, de 12 de setembro de 2011, sujeita ao ICMS)."
+	},
+	{
+		"Codigo": "010901",
+		"Item": "01",
+		"Subitem": "09",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Disponibilização, sem cessão definitiva, de conteúdos de áudio por meio da internet (exceto a distribuição de conteúdos pelas prestadoras de Serviço de Acesso Condicionado, de que trata a Lei nº 12.485, de 12 de setembro de 2011, sujeita ao ICMS)."
+	},
+	{
+		"Codigo": "010902",
+		"Item": "01",
+		"Subitem": "09",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Disponibilização, sem cessão definitiva, de conteúdos de vídeo, imagem e texto por meio da internet, respeitada a imunidade de livros, jornais e periódicos (exceto a distribuição de conteúdos pelas prestadoras de Serviço de Acesso Condicionado, de que trata a Lei nº 12.485, de 12 de setembro de 2011, sujeita ao ICMS)."
+	},
+	{
+		"Codigo": "020000",
+		"Item": "02",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de pesquisas e desenvolvimento de qualquer natureza."
+	},
+	{
+		"Codigo": "020100",
+		"Item": "02",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de pesquisas e desenvolvimento de qualquer natureza."
+	},
+	{
+		"Codigo": "020101",
+		"Item": "02",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços de pesquisas e desenvolvimento de qualquer natureza."
+	},
+	{
+		"Codigo": "030000",
+		"Item": "03",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços prestados mediante locação, cessão de direito de uso e congêneres."
+	},
+	{
+		"Codigo": "030200",
+		"Item": "03",
+		"Subitem": "02",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Cessão de direito de uso de marcas e de sinais de propaganda."
+	},
+	{
+		"Codigo": "030201",
+		"Item": "03",
+		"Subitem": "02",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Cessão de direito de uso de marcas e de sinais de propaganda."
+	},
+	{
+		"Codigo": "030300",
+		"Item": "03",
+		"Subitem": "03",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Exploração de salões de festas, centro de convenções, escritórios virtuais, stands, quadras esportivas, estádios, ginásios, auditórios, casas de espetáculos, parques de diversões, canchas e congêneres, para realização de eventos ou negócios de qualquer natureza."
+	},
+	{
+		"Codigo": "030301",
+		"Item": "03",
+		"Subitem": "03",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Exploração de salões de festas, centro de convenções, stands e congêneres, para realização de eventos ou negócios de qualquer natureza."
+	},
+	{
+		"Codigo": "030302",
+		"Item": "03",
+		"Subitem": "03",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Exploração de escritórios virtuais e congêneres, para realização de eventos ou negócios de qualquer natureza."
+	},
+	{
+		"Codigo": "030303",
+		"Item": "03",
+		"Subitem": "03",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Exploração de quadras esportivas, estádios, ginásios, canchas e congêneres, para realização de eventos ou negócios de qualquer natureza."
+	},
+	{
+		"Codigo": "030304",
+		"Item": "03",
+		"Subitem": "03",
+		"Desdobro_Nacional": "04",
+		"Descricao": "Exploração de auditórios, casas de espetáculos e congêneres, para realização de eventos ou negócios de qualquer natureza."
+	},
+	{
+		"Codigo": "030305",
+		"Item": "03",
+		"Subitem": "03",
+		"Desdobro_Nacional": "05",
+		"Descricao": "Exploração de parques de diversões e congêneres, para realização de eventos ou negócios de qualquer natureza."
+	},
+	{
+		"Codigo": "030400",
+		"Item": "03",
+		"Subitem": "04",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Locação, sublocação, arrendamento, direito de passagem ou permissão de uso, compartilhado ou não, de ferrovia, rodovia, postes, cabos, dutos e condutos de qualquer natureza."
+	},
+	{
+		"Codigo": "030401",
+		"Item": "03",
+		"Subitem": "04",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Locação, sublocação, arrendamento, direito de passagem ou permissão de uso, compartilhado ou não, de ferrovia."
+	},
+	{
+		"Codigo": "030402",
+		"Item": "03",
+		"Subitem": "04",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Locação, sublocação, arrendamento, direito de passagem ou permissão de uso, compartilhado ou não, de rodovia."
+	},
+	{
+		"Codigo": "030403",
+		"Item": "03",
+		"Subitem": "04",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Locação, sublocação, arrendamento, direito de passagem ou permissão de uso, compartilhado ou não, de postes, cabos, dutos e condutos de qualquer natureza."
+	},
+	{
+		"Codigo": "030500",
+		"Item": "03",
+		"Subitem": "05",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Cessão de andaimes, palcos, coberturas e outras estruturas de uso temporário."
+	},
+	{
+		"Codigo": "030501",
+		"Item": "03",
+		"Subitem": "05",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Cessão de andaimes, palcos, coberturas e outras estruturas de uso temporário."
+	},
+	{
+		"Codigo": "040000",
+		"Item": "04",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de saúde, assistência médica e congêneres."
+	},
+	{
+		"Codigo": "040100",
+		"Item": "04",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Medicina e biomedicina."
+	},
+	{
+		"Codigo": "040101",
+		"Item": "04",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Medicina."
+	},
+	{
+		"Codigo": "040102",
+		"Item": "04",
+		"Subitem": "01",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Biomedicina."
+	},
+	{
+		"Codigo": "040200",
+		"Item": "04",
+		"Subitem": "02",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Análises clínicas, patologia, eletricidade médica, radioterapia, quimioterapia, ultra-sonografia, ressonância magnética, radiologia, tomografia e congêneres."
+	},
+	{
+		"Codigo": "040201",
+		"Item": "04",
+		"Subitem": "02",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Análises clínicas e congêneres."
+	},
+	{
+		"Codigo": "040202",
+		"Item": "04",
+		"Subitem": "02",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Patologia e congêneres."
+	},
+	{
+		"Codigo": "040203",
+		"Item": "04",
+		"Subitem": "02",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Eletricidade médica (eletroestimulação de nervos e musculos, cardioversão, etc) e congêneres."
+	},
+	{
+		"Codigo": "040204",
+		"Item": "04",
+		"Subitem": "02",
+		"Desdobro_Nacional": "04",
+		"Descricao": "Radioterapia, quimioterapia e congêneres."
+	},
+	{
+		"Codigo": "040205",
+		"Item": "04",
+		"Subitem": "02",
+		"Desdobro_Nacional": "05",
+		"Descricao": "Ultra-sonografia, ressonância magnética, radiologia, tomografia e congêneres."
+	},
+	{
+		"Codigo": "040300",
+		"Item": "04",
+		"Subitem": "03",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Hospitais, clínicas, laboratórios, sanatórios, manicômios, casas de saúde, prontos-socorros, ambulatórios e congêneres."
+	},
+	{
+		"Codigo": "040301",
+		"Item": "04",
+		"Subitem": "03",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Hospitais e congêneres."
+	},
+	{
+		"Codigo": "040302",
+		"Item": "04",
+		"Subitem": "03",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Laboratórios e congêneres."
+	},
+	{
+		"Codigo": "040303",
+		"Item": "04",
+		"Subitem": "03",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Clínicas, sanatórios, manicômios, casas de saúde, prontos-socorros, ambulatórios e congêneres."
+	},
+	{
+		"Codigo": "040400",
+		"Item": "04",
+		"Subitem": "04",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Instrumentação cirúrgica."
+	},
+	{
+		"Codigo": "040401",
+		"Item": "04",
+		"Subitem": "04",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Instrumentação cirúrgica."
+	},
+	{
+		"Codigo": "040500",
+		"Item": "04",
+		"Subitem": "05",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Acupuntura."
+	},
+	{
+		"Codigo": "040501",
+		"Item": "04",
+		"Subitem": "05",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Acupuntura."
+	},
+	{
+		"Codigo": "040600",
+		"Item": "04",
+		"Subitem": "06",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Enfermagem, inclusive serviços auxiliares."
+	},
+	{
+		"Codigo": "040601",
+		"Item": "04",
+		"Subitem": "06",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Enfermagem, inclusive serviços auxiliares."
+	},
+	{
+		"Codigo": "040700",
+		"Item": "04",
+		"Subitem": "07",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços farmacêuticos."
+	},
+	{
+		"Codigo": "040701",
+		"Item": "04",
+		"Subitem": "07",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços farmacêuticos."
+	},
+	{
+		"Codigo": "040800",
+		"Item": "04",
+		"Subitem": "08",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Terapia ocupacional, fisioterapia e fonoaudiologia."
+	},
+	{
+		"Codigo": "040801",
+		"Item": "04",
+		"Subitem": "08",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Terapia ocupacional."
+	},
+	{
+		"Codigo": "040802",
+		"Item": "04",
+		"Subitem": "08",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Fisioterapia."
+	},
+	{
+		"Codigo": "040803",
+		"Item": "04",
+		"Subitem": "08",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Fonoaudiologia."
+	},
+	{
+		"Codigo": "040900",
+		"Item": "04",
+		"Subitem": "09",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Terapias de qualquer espécie destinadas ao tratamento físico, orgânico e mental."
+	},
+	{
+		"Codigo": "040901",
+		"Item": "04",
+		"Subitem": "09",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Terapias de qualquer espécie destinadas ao tratamento físico, orgânico e mental."
+	},
+	{
+		"Codigo": "041000",
+		"Item": "04",
+		"Subitem": "10",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Nutrição."
+	},
+	{
+		"Codigo": "041001",
+		"Item": "04",
+		"Subitem": "10",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Nutrição."
+	},
+	{
+		"Codigo": "041100",
+		"Item": "04",
+		"Subitem": "11",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Obstetrícia."
+	},
+	{
+		"Codigo": "041101",
+		"Item": "04",
+		"Subitem": "11",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Obstetrícia."
+	},
+	{
+		"Codigo": "041200",
+		"Item": "04",
+		"Subitem": "12",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Odontologia."
+	},
+	{
+		"Codigo": "041201",
+		"Item": "04",
+		"Subitem": "12",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Odontologia."
+	},
+	{
+		"Codigo": "041300",
+		"Item": "04",
+		"Subitem": "13",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Ortóptica."
+	},
+	{
+		"Codigo": "041301",
+		"Item": "04",
+		"Subitem": "13",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Ortóptica."
+	},
+	{
+		"Codigo": "041400",
+		"Item": "04",
+		"Subitem": "14",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Próteses sob encomenda."
+	},
+	{
+		"Codigo": "041401",
+		"Item": "04",
+		"Subitem": "14",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Próteses sob encomenda."
+	},
+	{
+		"Codigo": "041500",
+		"Item": "04",
+		"Subitem": "15",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Psicanálise."
+	},
+	{
+		"Codigo": "041501",
+		"Item": "04",
+		"Subitem": "15",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Psicanálise."
+	},
+	{
+		"Codigo": "041600",
+		"Item": "04",
+		"Subitem": "16",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Psicologia."
+	},
+	{
+		"Codigo": "041601",
+		"Item": "04",
+		"Subitem": "16",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Psicologia."
+	},
+	{
+		"Codigo": "041700",
+		"Item": "04",
+		"Subitem": "17",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Casas de repouso e de recuperação, creches, asilos e congêneres."
+	},
+	{
+		"Codigo": "041701",
+		"Item": "04",
+		"Subitem": "17",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Casas de repouso e congêneres."
+	},
+	{
+		"Codigo": "041702",
+		"Item": "04",
+		"Subitem": "17",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Casas de recuperação e congêneres."
+	},
+	{
+		"Codigo": "041703",
+		"Item": "04",
+		"Subitem": "17",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Creches e congêneres."
+	},
+	{
+		"Codigo": "041704",
+		"Item": "04",
+		"Subitem": "17",
+		"Desdobro_Nacional": "04",
+		"Descricao": "Asilos e congêneres."
+	},
+	{
+		"Codigo": "041800",
+		"Item": "04",
+		"Subitem": "18",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Inseminação artificial, fertilização in vitro e congêneres."
+	},
+	{
+		"Codigo": "041801",
+		"Item": "04",
+		"Subitem": "18",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Inseminação artificial, fertilização in vitro e congêneres."
+	},
+	{
+		"Codigo": "041900",
+		"Item": "04",
+		"Subitem": "19",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Bancos de sangue, leite, pele, olhos, óvulos, sêmen e congêneres."
+	},
+	{
+		"Codigo": "041901",
+		"Item": "04",
+		"Subitem": "19",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Bancos de sangue, leite, pele, olhos, óvulos, sêmen e congêneres."
+	},
+	{
+		"Codigo": "042000",
+		"Item": "04",
+		"Subitem": "20",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Coleta de sangue, leite, tecidos, sêmen, órgãos e materiais biológicos de qualquer espécie."
+	},
+	{
+		"Codigo": "042001",
+		"Item": "04",
+		"Subitem": "20",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Coleta de sangue, leite, tecidos, sêmen, órgãos e materiais biológicos de qualquer espécie."
+	},
+	{
+		"Codigo": "042100",
+		"Item": "04",
+		"Subitem": "21",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Unidade de atendimento, assistência ou tratamento móvel e congêneres."
+	},
+	{
+		"Codigo": "042101",
+		"Item": "04",
+		"Subitem": "21",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Unidade de atendimento, assistência ou tratamento móvel e congêneres."
+	},
+	{
+		"Codigo": "042200",
+		"Item": "04",
+		"Subitem": "22",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Planos de medicina de grupo ou individual e convênios para prestação de assistência médica, hospitalar, odontológica e congêneres."
+	},
+	{
+		"Codigo": "042201",
+		"Item": "04",
+		"Subitem": "22",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Planos de medicina de grupo ou individual e convênios para prestação de assistência médica, hospitalar, odontológica e congêneres."
+	},
+	{
+		"Codigo": "042300",
+		"Item": "04",
+		"Subitem": "23",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Outros planos de saúde que se cumpram através de serviços de terceiros contratados, credenciados, cooperados ou apenas pagos pelo operador do plano mediante indicação do beneficiário."
+	},
+	{
+		"Codigo": "042301",
+		"Item": "04",
+		"Subitem": "23",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Outros planos de saúde que se cumpram através de serviços de terceiros contratados, credenciados, cooperados ou apenas pagos pelo operador do plano mediante indicação do beneficiário."
+	},
+	{
+		"Codigo": "050000",
+		"Item": "05",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de medicina e assistência veterinária e congêneres."
+	},
+	{
+		"Codigo": "050100",
+		"Item": "05",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Medicina veterinária e zootecnia."
+	},
+	{
+		"Codigo": "050101",
+		"Item": "05",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Medicina veterinária"
+	},
+	{
+		"Codigo": "050102",
+		"Item": "05",
+		"Subitem": "01",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Zootecnia."
+	},
+	{
+		"Codigo": "050200",
+		"Item": "05",
+		"Subitem": "02",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Hospitais, clínicas, ambulatórios, prontos-socorros e congêneres, na área veterinária."
+	},
+	{
+		"Codigo": "050201",
+		"Item": "05",
+		"Subitem": "02",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Hospitais e congêneres, na área veterinária."
+	},
+	{
+		"Codigo": "050202",
+		"Item": "05",
+		"Subitem": "02",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Clínicas, ambulatórios, prontos-socorros e congêneres, na área veterinária."
+	},
+	{
+		"Codigo": "050300",
+		"Item": "05",
+		"Subitem": "03",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Laboratórios de análise na área veterinária."
+	},
+	{
+		"Codigo": "050301",
+		"Item": "05",
+		"Subitem": "03",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Laboratórios de análise na área veterinária."
+	},
+	{
+		"Codigo": "050400",
+		"Item": "05",
+		"Subitem": "04",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Inseminação artificial, fertilização in vitro e congêneres."
+	},
+	{
+		"Codigo": "050401",
+		"Item": "05",
+		"Subitem": "04",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Inseminação artificial, fertilização in vitro e congêneres."
+	},
+	{
+		"Codigo": "050500",
+		"Item": "05",
+		"Subitem": "05",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Bancos de sangue e de órgãos e congêneres."
+	},
+	{
+		"Codigo": "050501",
+		"Item": "05",
+		"Subitem": "05",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Bancos de sangue e de órgãos e congêneres."
+	},
+	{
+		"Codigo": "050600",
+		"Item": "05",
+		"Subitem": "06",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Coleta de sangue, leite, tecidos, sêmen, órgãos e materiais biológicos de qualquer espécie."
+	},
+	{
+		"Codigo": "050601",
+		"Item": "05",
+		"Subitem": "06",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Coleta de sangue, leite, tecidos, sêmen, órgãos e materiais biológicos de qualquer espécie."
+	},
+	{
+		"Codigo": "050700",
+		"Item": "05",
+		"Subitem": "07",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Unidade de atendimento, assistência ou tratamento móvel e congêneres."
+	},
+	{
+		"Codigo": "050701",
+		"Item": "05",
+		"Subitem": "07",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Unidade de atendimento, assistência ou tratamento móvel e congêneres."
+	},
+	{
+		"Codigo": "050800",
+		"Item": "05",
+		"Subitem": "08",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Guarda, tratamento, amestramento, embelezamento, alojamento e congêneres."
+	},
+	{
+		"Codigo": "050801",
+		"Item": "05",
+		"Subitem": "08",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Guarda, tratamento, amestramento, embelezamento, alojamento e congêneres."
+	},
+	{
+		"Codigo": "050900",
+		"Item": "05",
+		"Subitem": "09",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Planos de atendimento e assistência médico-veterinária."
+	},
+	{
+		"Codigo": "050901",
+		"Item": "05",
+		"Subitem": "09",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Planos de atendimento e assistência médico-veterinária."
+	},
+	{
+		"Codigo": "060000",
+		"Item": "06",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de cuidados pessoais, estética, atividades físicas e congêneres."
+	},
+	{
+		"Codigo": "060100",
+		"Item": "06",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Barbearia, cabeleireiros, manicuros, pedicuros e congêneres."
+	},
+	{
+		"Codigo": "060101",
+		"Item": "06",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Barbearia, cabeleireiros, manicuros, pedicuros e congêneres."
+	},
+	{
+		"Codigo": "060200",
+		"Item": "06",
+		"Subitem": "02",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Esteticistas, tratamento de pele, depilação e congêneres."
+	},
+	{
+		"Codigo": "060201",
+		"Item": "06",
+		"Subitem": "02",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Esteticistas, tratamento de pele, depilação e congêneres."
+	},
+	{
+		"Codigo": "060300",
+		"Item": "06",
+		"Subitem": "03",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Banhos, duchas, sauna, massagens e congêneres."
+	},
+	{
+		"Codigo": "060301",
+		"Item": "06",
+		"Subitem": "03",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Banhos, duchas, sauna, massagens e congêneres."
+	},
+	{
+		"Codigo": "060400",
+		"Item": "06",
+		"Subitem": "04",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Ginástica, dança, esportes, natação, artes marciais e demais atividades físicas."
+	},
+	{
+		"Codigo": "060401",
+		"Item": "06",
+		"Subitem": "04",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Ginástica, dança, esportes, natação, artes marciais e demais atividades físicas."
+	},
+	{
+		"Codigo": "060500",
+		"Item": "06",
+		"Subitem": "05",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Centros de emagrecimento, spa e congêneres."
+	},
+	{
+		"Codigo": "060501",
+		"Item": "06",
+		"Subitem": "05",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Centros de emagrecimento, spa e congêneres."
+	},
+	{
+		"Codigo": "060600",
+		"Item": "06",
+		"Subitem": "06",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Aplicação de tatuagens, piercings e congêneres."
+	},
+	{
+		"Codigo": "060601",
+		"Item": "06",
+		"Subitem": "06",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Aplicação de tatuagens, piercings e congêneres."
+	},
+	{
+		"Codigo": "070000",
+		"Item": "07",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços relativos a engenharia, arquitetura, geologia, urbanismo, construção civil, manutenção, limpeza, meio ambiente, saneamento e congêneres."
+	},
+	{
+		"Codigo": "070100",
+		"Item": "07",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Engenharia, agronomia, agrimensura, arquitetura, geologia, urbanismo, paisagismo e congêneres."
+	},
+	{
+		"Codigo": "070101",
+		"Item": "07",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Engenharia e congêneres."
+	},
+	{
+		"Codigo": "070102",
+		"Item": "07",
+		"Subitem": "01",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Agronomia e congêneres."
+	},
+	{
+		"Codigo": "070103",
+		"Item": "07",
+		"Subitem": "01",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Agrimensura e congêneres."
+	},
+	{
+		"Codigo": "070104",
+		"Item": "07",
+		"Subitem": "01",
+		"Desdobro_Nacional": "04",
+		"Descricao": "Arquitetura, urbanismo e congêneres."
+	},
+	{
+		"Codigo": "070105",
+		"Item": "07",
+		"Subitem": "01",
+		"Desdobro_Nacional": "05",
+		"Descricao": "Geologia e congêneres."
+	},
+	{
+		"Codigo": "070106",
+		"Item": "07",
+		"Subitem": "01",
+		"Desdobro_Nacional": "06",
+		"Descricao": "Paisagismo e congêneres."
+	},
+	{
+		"Codigo": "070200",
+		"Item": "07",
+		"Subitem": "02",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Execução, por administração, empreitada ou subempreitada, de obras de construção civil, hidráulica ou elétrica e de outras obras semelhantes, inclusive sondagem, perfuração de poços, escavação, drenagem e irrigação, terraplanagem, pavimentação, concretagem e a instalação e montagem de produtos, peças e equipamentos (exceto o fornecimento de mercadorias produzidas pelo prestador de serviços fora do local da prestação dos serviços, que fica sujeito ao ICMS)."
+	},
+	{
+		"Codigo": "070201",
+		"Item": "07",
+		"Subitem": "02",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Execução, por administração, de obras de construção civil, hidráulica ou elétrica e de outras obras semelhantes, inclusive sondagem, perfuração de poços, escavação, drenagem e irrigação, terraplanagem, pavimentação, concretagem e a instalação e montagem de produtos, peças e equipamentos (exceto o fornecimento de mercadorias produzidas pelo prestador de serviços fora do local da prestação dos serviços, que fica sujeito ao ICMS)."
+	},
+	{
+		"Codigo": "070202",
+		"Item": "07",
+		"Subitem": "02",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Execução, por empreitada ou subempreitada, de obras de construção civil, hidráulica ou elétrica e de outras obras semelhantes, inclusive sondagem, perfuração de poços, escavação, drenagem e irrigação, terraplanagem, pavimentação, concretagem e a instalação e montagem de produtos, peças e equipamentos (exceto o fornecimento de mercadorias produzidas pelo prestador de serviços fora do local da prestação dos serviços, que fica sujeito ao ICMS)."
+	},
+	{
+		"Codigo": "070300",
+		"Item": "07",
+		"Subitem": "03",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Elaboração de planos diretores, estudos de viabilidade, estudos organizacionais e outros, relacionados com obras e serviços de engenharia; elaboração de anteprojetos, projetos básicos e projetos executivos para trabalhos de engenharia."
+	},
+	{
+		"Codigo": "070301",
+		"Item": "07",
+		"Subitem": "03",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Elaboração de planos diretores, estudos de viabilidade, estudos organizacionais e outros, relacionados com obras e serviços de engenharia."
+	},
+	{
+		"Codigo": "070302",
+		"Item": "07",
+		"Subitem": "03",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Elaboração de anteprojetos, projetos básicos e projetos executivos para trabalhos de engenharia."
+	},
+	{
+		"Codigo": "070400",
+		"Item": "07",
+		"Subitem": "04",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Demolição."
+	},
+	{
+		"Codigo": "070401",
+		"Item": "07",
+		"Subitem": "04",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Demolição."
+	},
+	{
+		"Codigo": "070500",
+		"Item": "07",
+		"Subitem": "05",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Reparação, conservação e reforma de edifícios, estradas, pontes, portos e congêneres (exceto o fornecimento de mercadorias produzidas pelo prestador dos serviços, fora do local da prestação dos serviços, que fica sujeito ao ICMS)."
+	},
+	{
+		"Codigo": "070501",
+		"Item": "07",
+		"Subitem": "05",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Reparação, conservação e reforma de edifícios e congêneres (exceto o fornecimento de mercadorias produzidas pelo prestador dos serviços, fora do local da prestação dos serviços, que fica sujeito ao ICMS)."
+	},
+	{
+		"Codigo": "070502",
+		"Item": "07",
+		"Subitem": "05",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Reparação, conservação e reforma de estradas, pontes, portos e congêneres (exceto o fornecimento de mercadorias produzidas pelo prestador dos serviços, fora do local da prestação dos serviços, que fica sujeito ao ICMS)."
+	},
+	{
+		"Codigo": "070600",
+		"Item": "07",
+		"Subitem": "06",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Colocação e instalação de tapetes, carpetes, assoalhos, cortinas, revestimentos de parede, vidros, divisórias, placas de gesso e congêneres, com material fornecido pelo tomador do serviço."
+	},
+	{
+		"Codigo": "070601",
+		"Item": "07",
+		"Subitem": "06",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Colocação e instalação de tapetes, carpetes, cortinas e congêneres, com material fornecido pelo tomador do serviço."
+	},
+	{
+		"Codigo": "070602",
+		"Item": "07",
+		"Subitem": "06",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Colocação e instalação de assoalhos, revestimentos de parede, vidros, divisórias, placas de gesso e congêneres, com material fornecido pelo tomador do serviço."
+	},
+	{
+		"Codigo": "070700",
+		"Item": "07",
+		"Subitem": "07",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Recuperação, raspagem, polimento e lustração de pisos e congêneres."
+	},
+	{
+		"Codigo": "070701",
+		"Item": "07",
+		"Subitem": "07",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Recuperação, raspagem, polimento e lustração de pisos e congêneres."
+	},
+	{
+		"Codigo": "070800",
+		"Item": "07",
+		"Subitem": "08",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Calafetação."
+	},
+	{
+		"Codigo": "070801",
+		"Item": "07",
+		"Subitem": "08",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Calafetação."
+	},
+	{
+		"Codigo": "070900",
+		"Item": "07",
+		"Subitem": "09",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Varrição, coleta, remoção, incineração, tratamento, reciclagem, separação e destinação final de lixo, rejeitos e outros resíduos quaisquer."
+	},
+	{
+		"Codigo": "070901",
+		"Item": "07",
+		"Subitem": "09",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Varrição, coleta e remoção de lixo, rejeitos e outros resíduos quaisquer."
+	},
+	{
+		"Codigo": "070902",
+		"Item": "07",
+		"Subitem": "09",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Incineração, tratamento, reciclagem, separação e destinação final de lixo, rejeitos e outros resíduos quaisquer."
+	},
+	{
+		"Codigo": "071000",
+		"Item": "07",
+		"Subitem": "10",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Limpeza, manutenção e conservação de vias e logradouros públicos, imóveis, chaminés, piscinas, parques, jardins e congêneres."
+	},
+	{
+		"Codigo": "071001",
+		"Item": "07",
+		"Subitem": "10",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Limpeza, manutenção e conservação de vias e logradouros públicos, parques, jardins e congêneres."
+	},
+	{
+		"Codigo": "071002",
+		"Item": "07",
+		"Subitem": "10",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Limpeza, manutenção e conservação de imóveis, chaminés, piscinas e congêneres."
+	},
+	{
+		"Codigo": "071100",
+		"Item": "07",
+		"Subitem": "11",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Decoração e jardinagem, inclusive corte e poda de árvores."
+	},
+	{
+		"Codigo": "071101",
+		"Item": "07",
+		"Subitem": "11",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Decoração."
+	},
+	{
+		"Codigo": "071102",
+		"Item": "07",
+		"Subitem": "11",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Jardinagem, inclusive corte e poda de árvores."
+	},
+	{
+		"Codigo": "071200",
+		"Item": "07",
+		"Subitem": "12",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Controle e tratamento de efluentes de qualquer natureza e de agentes físicos, químicos e biológicos."
+	},
+	{
+		"Codigo": "071201",
+		"Item": "07",
+		"Subitem": "12",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Controle e tratamento de efluentes de qualquer natureza e de agentes físicos, químicos e biológicos."
+	},
+	{
+		"Codigo": "071300",
+		"Item": "07",
+		"Subitem": "13",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Dedetização, desinfecção, desinsetização, imunização, higienização, desratização, pulverização e congêneres."
+	},
+	{
+		"Codigo": "071301",
+		"Item": "07",
+		"Subitem": "13",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Dedetização, desinfecção, desinsetização, imunização, higienização, desratização, pulverização e congêneres."
+	},
+	{
+		"Codigo": "071600",
+		"Item": "07",
+		"Subitem": "16",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Florestamento, reflorestamento, semeadura, adubação, reparação de solo, plantio, silagem, colheita, corte e descascamento de árvores, silvicultura, exploração florestal e dos serviços congêneres indissociáveis da formação, manutenção e colheita de florestas, para quaisquer fins e por quaisquer meios."
+	},
+	{
+		"Codigo": "071601",
+		"Item": "07",
+		"Subitem": "16",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Florestamento, reflorestamento, semeadura, adubação, reparação de solo, plantio, silagem, colheita, corte e descascamento de árvores, silvicultura, exploração florestal e dos serviços congêneres indissociáveis da formação, manutenção e colheita de florestas, para quaisquer fins e por quaisquer meios."
+	},
+	{
+		"Codigo": "071700",
+		"Item": "07",
+		"Subitem": "17",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Escoramento, contenção de encostas e serviços congêneres."
+	},
+	{
+		"Codigo": "071701",
+		"Item": "07",
+		"Subitem": "17",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Escoramento, contenção de encostas e serviços congêneres."
+	},
+	{
+		"Codigo": "071800",
+		"Item": "07",
+		"Subitem": "18",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Limpeza e dragagem de rios, portos, canais, baías, lagos, lagoas, represas, açudes e congêneres."
+	},
+	{
+		"Codigo": "071801",
+		"Item": "07",
+		"Subitem": "18",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Limpeza e dragagem de rios, portos, canais, baías, lagos, lagoas, represas, açudes e congêneres."
+	},
+	{
+		"Codigo": "071900",
+		"Item": "07",
+		"Subitem": "19",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Acompanhamento e fiscalização da execução de obras de engenharia, arquitetura e urbanismo."
+	},
+	{
+		"Codigo": "071901",
+		"Item": "07",
+		"Subitem": "19",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Acompanhamento e fiscalização da execução de obras de engenharia, arquitetura e urbanismo."
+	},
+	{
+		"Codigo": "072000",
+		"Item": "07",
+		"Subitem": "20",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Aerofotogrametria (inclusive interpretação), cartografia, mapeamento, levantamentos topográficos, batimétricos, geográficos, geodésicos, geológicos, geofísicos e congêneres."
+	},
+	{
+		"Codigo": "072001",
+		"Item": "07",
+		"Subitem": "20",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Aerofotogrametria (inclusive interpretação), cartografia, mapeamento e congêneres."
+	},
+	{
+		"Codigo": "072002",
+		"Item": "07",
+		"Subitem": "20",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Levantamentos batimétricos, geográficos, geodésicos, geológicos, geofísicos e congêneres."
+	},
+	{
+		"Codigo": "072003",
+		"Item": "07",
+		"Subitem": "20",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Levantamentos topográficos e congêneres."
+	},
+	{
+		"Codigo": "072100",
+		"Item": "07",
+		"Subitem": "21",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Pesquisa, perfuração, cimentação, mergulho, perfilagem, concretação, testemunhagem, pescaria, estimulação e outros serviços relacionados com a exploração e explotação de petróleo, gás natural e de outros recursos minerais."
+	},
+	{
+		"Codigo": "072101",
+		"Item": "07",
+		"Subitem": "21",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Pesquisa, perfuração, cimentação, mergulho, perfilagem, concretação, testemunhagem, pescaria, estimulação e outros serviços relacionados com a exploração e explotação de petróleo, gás natural e de outros recursos minerais."
+	},
+	{
+		"Codigo": "072200",
+		"Item": "07",
+		"Subitem": "22",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Nucleação e bombardeamento de nuvens e congêneres."
+	},
+	{
+		"Codigo": "072201",
+		"Item": "07",
+		"Subitem": "22",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Nucleação e bombardeamento de nuvens e congêneres."
+	},
+	{
+		"Codigo": "080000",
+		"Item": "08",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de educação, ensino, orientação pedagógica e educacional, instrução, treinamento e avaliação pessoal de qualquer grau ou natureza."
+	},
+	{
+		"Codigo": "080100",
+		"Item": "08",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Ensino regular pré-escolar, fundamental, médio e superior."
+	},
+	{
+		"Codigo": "080101",
+		"Item": "08",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Ensino regular pré-escolar, fundamental e médio."
+	},
+	{
+		"Codigo": "080102",
+		"Item": "08",
+		"Subitem": "01",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Ensino regular superior."
+	},
+	{
+		"Codigo": "080200",
+		"Item": "08",
+		"Subitem": "02",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Instrução, treinamento, orientação pedagógica e educacional, avaliação de conhecimentos de qualquer natureza."
+	},
+	{
+		"Codigo": "080201",
+		"Item": "08",
+		"Subitem": "02",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Instrução, treinamento, orientação pedagógica e educacional, avaliação de conhecimentos de qualquer natureza."
+	},
+	{
+		"Codigo": "090000",
+		"Item": "09",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços relativos a hospedagem, turismo, viagens e congêneres."
+	},
+	{
+		"Codigo": "090100",
+		"Item": "09",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Hospedagem de qualquer natureza em hotéis, apart-service condominiais, flat, apart-hotéis, hotéis residência, residence-service, suite service, hotelaria marítima, motéis, pensões e congêneres; ocupação por temporada com fornecimento de serviço (o valor da alimentação e gorjeta, quando incluído no preço da diária, fica sujeito ao Imposto Sobre Serviços)."
+	},
+	{
+		"Codigo": "090101",
+		"Item": "09",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Hospedagem em hotéis, hotelaria marítima e congêneres (o valor da alimentação e gorjeta, quando incluído no preço da diária, fica sujeito ao Imposto Sobre Serviços)."
+	},
+	{
+		"Codigo": "090102",
+		"Item": "09",
+		"Subitem": "01",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Hospedagem em pensões, albergues, pousadas, hospedarias, ocupação por temporada com fornecimento de serviços e congêneres (o valor da alimentação e gorjeta, quando incluído no preço da diária, fica sujeito ao Imposto Sobre Serviços)."
+	},
+	{
+		"Codigo": "090103",
+		"Item": "09",
+		"Subitem": "01",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Hospedagem em motéis e congêneres (o valor da alimentação e gorjeta, quando incluído no preço da diária, fica sujeito ao Imposto Sobre Serviços)."
+	},
+	{
+		"Codigo": "090104",
+		"Item": "09",
+		"Subitem": "01",
+		"Desdobro_Nacional": "04",
+		"Descricao": "Hospedagem em apart-service condominiais, flat, apart-hotéis, hotéis residência, residence-service, suite service e congêneres (o valor da alimentação e gorjeta, quando incluído no preço da diária, fica sujeito ao Imposto Sobre Serviços)."
+	},
+	{
+		"Codigo": "090200",
+		"Item": "09",
+		"Subitem": "02",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Agenciamento, organização, promoção, intermediação e execução de programas de turismo, passeios, viagens, excursões, hospedagens e congêneres."
+	},
+	{
+		"Codigo": "090201",
+		"Item": "09",
+		"Subitem": "02",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Agenciamento e intermediação de programas de turismo, passeios, viagens, excursões, hospedagens e congêneres."
+	},
+	{
+		"Codigo": "090202",
+		"Item": "09",
+		"Subitem": "02",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Organização, promoção e execução de programas de turismo, passeios, viagens, excursões, hospedagens e congêneres."
+	},
+	{
+		"Codigo": "090300",
+		"Item": "09",
+		"Subitem": "03",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Guias de turismo."
+	},
+	{
+		"Codigo": "090301",
+		"Item": "09",
+		"Subitem": "03",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Guias de turismo."
+	},
+	{
+		"Codigo": "100000",
+		"Item": "10",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de intermediação e congêneres."
+	},
+	{
+		"Codigo": "100100",
+		"Item": "10",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Agenciamento, corretagem ou intermediação de câmbio, de seguros, de cartões de crédito, de planos de saúde e de planos de previdência privada."
+	},
+	{
+		"Codigo": "100101",
+		"Item": "10",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Agenciamento, corretagem ou intermediação de câmbio."
+	},
+	{
+		"Codigo": "100102",
+		"Item": "10",
+		"Subitem": "01",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Agenciamento, corretagem ou intermediação de seguros."
+	},
+	{
+		"Codigo": "100103",
+		"Item": "10",
+		"Subitem": "01",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Agenciamento, corretagem ou intermediação de cartões de crédito."
+	},
+	{
+		"Codigo": "100104",
+		"Item": "10",
+		"Subitem": "01",
+		"Desdobro_Nacional": "04",
+		"Descricao": "Agenciamento, corretagem ou intermediação de planos de saúde."
+	},
+	{
+		"Codigo": "100105",
+		"Item": "10",
+		"Subitem": "01",
+		"Desdobro_Nacional": "05",
+		"Descricao": "Agenciamento, corretagem ou intermediação de planos de previdência privada."
+	},
+	{
+		"Codigo": "100200",
+		"Item": "10",
+		"Subitem": "02",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Agenciamento, corretagem ou intermediação de títulos em geral, valores mobiliários e contratos quaisquer."
+	},
+	{
+		"Codigo": "100201",
+		"Item": "10",
+		"Subitem": "02",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Agenciamento, corretagem ou intermediação de títulos em geral e valores mobiliários."
+	},
+	{
+		"Codigo": "100202",
+		"Item": "10",
+		"Subitem": "02",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Agenciamento, corretagem ou intermediação de contratos quaisquer."
+	},
+	{
+		"Codigo": "100300",
+		"Item": "10",
+		"Subitem": "03",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Agenciamento, corretagem ou intermediação de direitos de propriedade industrial, artística ou literária."
+	},
+	{
+		"Codigo": "100301",
+		"Item": "10",
+		"Subitem": "03",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Agenciamento, corretagem ou intermediação de direitos de propriedade industrial, artística ou literária."
+	},
+	{
+		"Codigo": "100400",
+		"Item": "10",
+		"Subitem": "04",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Agenciamento, corretagem ou intermediação de contratos de arrendamento mercantil (leasing), de franquia (franchising) e de faturização (factoring)."
+	},
+	{
+		"Codigo": "100401",
+		"Item": "10",
+		"Subitem": "04",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Agenciamento, corretagem ou intermediação de contratos de arrendamento mercantil (leasing)."
+	},
+	{
+		"Codigo": "100402",
+		"Item": "10",
+		"Subitem": "04",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Agenciamento, corretagem ou intermediação de contratos de franquia (franchising)."
+	},
+	{
+		"Codigo": "100403",
+		"Item": "10",
+		"Subitem": "04",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Agenciamento, corretagem ou intermediação de faturização (factoring)."
+	},
+	{
+		"Codigo": "100500",
+		"Item": "10",
+		"Subitem": "05",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Agenciamento, corretagem ou intermediação de bens móveis ou imóveis, não abrangidos em outros itens ou subitens, inclusive aqueles realizados no âmbito de Bolsas de Mercadorias e Futuros, por quaisquer meios."
+	},
+	{
+		"Codigo": "100501",
+		"Item": "10",
+		"Subitem": "05",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Agenciamento, corretagem ou intermediação de bens móveis ou imóveis, não abrangidos em outros itens ou subitens, por quaisquer meios."
+	},
+	{
+		"Codigo": "100502",
+		"Item": "10",
+		"Subitem": "05",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Agenciamento, corretagem ou intermediação de bens móveis ou imóveis realizados no âmbito de Bolsas de Mercadorias e Futuros, por quaisquer meios."
+	},
+	{
+		"Codigo": "100600",
+		"Item": "10",
+		"Subitem": "06",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Agenciamento marítimo."
+	},
+	{
+		"Codigo": "100601",
+		"Item": "10",
+		"Subitem": "06",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Agenciamento marítimo."
+	},
+	{
+		"Codigo": "100700",
+		"Item": "10",
+		"Subitem": "07",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Agenciamento de notícias."
+	},
+	{
+		"Codigo": "100701",
+		"Item": "10",
+		"Subitem": "07",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Agenciamento de notícias."
+	},
+	{
+		"Codigo": "100800",
+		"Item": "10",
+		"Subitem": "08",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Agenciamento de publicidade e propaganda, inclusive o agenciamento de veiculação por quaisquer meios."
+	},
+	{
+		"Codigo": "100801",
+		"Item": "10",
+		"Subitem": "08",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Agenciamento de publicidade e propaganda, inclusive o agenciamento de veiculação por quaisquer meios."
+	},
+	{
+		"Codigo": "100900",
+		"Item": "10",
+		"Subitem": "09",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Representação de qualquer natureza, inclusive comercial."
+	},
+	{
+		"Codigo": "100901",
+		"Item": "10",
+		"Subitem": "09",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Representação de qualquer natureza, inclusive comercial."
+	},
+	{
+		"Codigo": "101000",
+		"Item": "10",
+		"Subitem": "10",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Distribuição de bens de terceiros."
+	},
+	{
+		"Codigo": "101001",
+		"Item": "10",
+		"Subitem": "10",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Distribuição de bens de terceiros."
+	},
+	{
+		"Codigo": "110000",
+		"Item": "11",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de guarda, estacionamento, armazenamento, vigilância e congêneres."
+	},
+	{
+		"Codigo": "110100",
+		"Item": "11",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Guarda e estacionamento de veículos terrestres automotores, de aeronaves e de embarcações."
+	},
+	{
+		"Codigo": "110101",
+		"Item": "11",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Guarda e estacionamento de veículos terrestres automotores."
+	},
+	{
+		"Codigo": "110102",
+		"Item": "11",
+		"Subitem": "01",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Guarda e estacionamento de aeronaves e de embarcações."
+	},
+	{
+		"Codigo": "110200",
+		"Item": "11",
+		"Subitem": "02",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Vigilância, segurança ou monitoramento de bens, pessoas e semoventes."
+	},
+	{
+		"Codigo": "110201",
+		"Item": "11",
+		"Subitem": "02",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Vigilância, segurança ou monitoramento de bens, pessoas e semoventes."
+	},
+	{
+		"Codigo": "110300",
+		"Item": "11",
+		"Subitem": "03",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Escolta, inclusive de veículos e cargas."
+	},
+	{
+		"Codigo": "110301",
+		"Item": "11",
+		"Subitem": "03",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Escolta, inclusive de veículos e cargas."
+	},
+	{
+		"Codigo": "110400",
+		"Item": "11",
+		"Subitem": "04",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Armazenamento, depósito, carga, descarga, arrumação e guarda de bens de qualquer espécie."
+	},
+	{
+		"Codigo": "110401",
+		"Item": "11",
+		"Subitem": "04",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Armazenamento, depósito, guarda de bens de qualquer espécie."
+	},
+	{
+		"Codigo": "110402",
+		"Item": "11",
+		"Subitem": "04",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Carga, descarga, arrumação de bens de qualquer espécie."
+	},
+	{
+		"Codigo": "110500",
+		"Item": "11",
+		"Subitem": "05",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços relacionados ao monitoramento e rastreamento a distância, em qualquer via ou local, de veículos, cargas, pessoas e semoventes em circulação ou movimento, realizados por meio de telefonia móvel, transmissão de satélites, rádio ou qualquer outro meio, inclusive pelas empresas de Tecnologia da Informação Veicular, independentemente de o prestador de serviços ser proprietário ou não da infraestrutura de telecomunicações que utiliza. "
+	},
+	{
+		"Codigo": "110501",
+		"Item": "11",
+		"Subitem": "05",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços relacionados ao monitoramento e rastreamento a distância, em qualquer via ou local, de veículos, cargas, pessoas e semoventes em circulação ou movimento, realizados por meio de telefonia móvel, transmissão de satélites, rádio ou qualquer outro meio, inclusive pelas empresas de Tecnologia da Informação Veicular, independentemente de o prestador de serviços ser proprietário ou não da infraestrutura de telecomunicações que utiliza. "
+	},
+	{
+		"Codigo": "120000",
+		"Item": "12",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de diversões, lazer, entretenimento e congêneres."
+	},
+	{
+		"Codigo": "120100",
+		"Item": "12",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Espetáculos teatrais."
+	},
+	{
+		"Codigo": "120101",
+		"Item": "12",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Espetáculos teatrais."
+	},
+	{
+		"Codigo": "120200",
+		"Item": "12",
+		"Subitem": "02",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Exibições cinematográficas."
+	},
+	{
+		"Codigo": "120201",
+		"Item": "12",
+		"Subitem": "02",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Exibições cinematográficas."
+	},
+	{
+		"Codigo": "120300",
+		"Item": "12",
+		"Subitem": "03",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Espetáculos circenses."
+	},
+	{
+		"Codigo": "120301",
+		"Item": "12",
+		"Subitem": "03",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Espetáculos circenses."
+	},
+	{
+		"Codigo": "120400",
+		"Item": "12",
+		"Subitem": "04",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Programas de auditório."
+	},
+	{
+		"Codigo": "120401",
+		"Item": "12",
+		"Subitem": "04",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Programas de auditório."
+	},
+	{
+		"Codigo": "120500",
+		"Item": "12",
+		"Subitem": "05",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Parques de diversões, centros de lazer e congêneres."
+	},
+	{
+		"Codigo": "120501",
+		"Item": "12",
+		"Subitem": "05",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Parques de diversões, centros de lazer e congêneres."
+	},
+	{
+		"Codigo": "120600",
+		"Item": "12",
+		"Subitem": "06",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Boates, taxi-dancing e congêneres."
+	},
+	{
+		"Codigo": "120601",
+		"Item": "12",
+		"Subitem": "06",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Boates, taxi-dancing e congêneres."
+	},
+	{
+		"Codigo": "120700",
+		"Item": "12",
+		"Subitem": "07",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Shows, ballet, danças, desfiles, bailes, óperas, concertos, recitais, festivais e congêneres."
+	},
+	{
+		"Codigo": "120701",
+		"Item": "12",
+		"Subitem": "07",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Shows, ballet, danças, desfiles, bailes, óperas, concertos, recitais, festivais e congêneres."
+	},
+	{
+		"Codigo": "120800",
+		"Item": "12",
+		"Subitem": "08",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Feiras, exposições, congressos e congêneres."
+	},
+	{
+		"Codigo": "120801",
+		"Item": "12",
+		"Subitem": "08",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Feiras, exposições, congressos e congêneres."
+	},
+	{
+		"Codigo": "120900",
+		"Item": "12",
+		"Subitem": "09",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Bilhares, boliches e diversões eletrônicas ou não."
+	},
+	{
+		"Codigo": "120901",
+		"Item": "12",
+		"Subitem": "09",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Bilhares."
+	},
+	{
+		"Codigo": "120902",
+		"Item": "12",
+		"Subitem": "09",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Boliches."
+	},
+	{
+		"Codigo": "120903",
+		"Item": "12",
+		"Subitem": "09",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Diversões eletrônicas ou não."
+	},
+	{
+		"Codigo": "121000",
+		"Item": "12",
+		"Subitem": "10",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Corridas e competições de animais."
+	},
+	{
+		"Codigo": "121001",
+		"Item": "12",
+		"Subitem": "10",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Corridas e competições de animais."
+	},
+	{
+		"Codigo": "121100",
+		"Item": "12",
+		"Subitem": "11",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Competições esportivas ou de destreza física ou intelectual, com ou sem a participação do espectador."
+	},
+	{
+		"Codigo": "121101",
+		"Item": "12",
+		"Subitem": "11",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Competições esportivas ou de destreza física ou intelectual, com ou sem a participação do espectador."
+	},
+	{
+		"Codigo": "121200",
+		"Item": "12",
+		"Subitem": "12",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Execução de música."
+	},
+	{
+		"Codigo": "121201",
+		"Item": "12",
+		"Subitem": "12",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Execução de música."
+	},
+	{
+		"Codigo": "121300",
+		"Item": "12",
+		"Subitem": "13",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Produção, mediante ou sem encomenda prévia, de eventos, espetáculos, entrevistas, shows, ballet, danças, desfiles, bailes, teatros, óperas, concertos, recitais, festivais e congêneres."
+	},
+	{
+		"Codigo": "121301",
+		"Item": "12",
+		"Subitem": "13",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Produção, mediante ou sem encomenda prévia, de eventos, espetáculos, entrevistas, shows, ballet, danças, desfiles, bailes, teatros, óperas, concertos, recitais, festivais e congêneres."
+	},
+	{
+		"Codigo": "121400",
+		"Item": "12",
+		"Subitem": "14",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Fornecimento de música para ambientes fechados ou não, mediante transmissão por qualquer processo."
+	},
+	{
+		"Codigo": "121401",
+		"Item": "12",
+		"Subitem": "14",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Fornecimento de música para ambientes fechados ou não, mediante transmissão por qualquer processo."
+	},
+	{
+		"Codigo": "121500",
+		"Item": "12",
+		"Subitem": "15",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Desfiles de blocos carnavalescos ou folclóricos, trios elétricos e congêneres."
+	},
+	{
+		"Codigo": "121501",
+		"Item": "12",
+		"Subitem": "15",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Desfiles de blocos carnavalescos ou folclóricos, trios elétricos e congêneres."
+	},
+	{
+		"Codigo": "121600",
+		"Item": "12",
+		"Subitem": "16",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Exibição de filmes, entrevistas, musicais, espetáculos, shows, concertos, desfiles, óperas, competições esportivas, de destreza intelectual ou congêneres."
+	},
+	{
+		"Codigo": "121601",
+		"Item": "12",
+		"Subitem": "16",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Exibição de filmes, entrevistas, musicais, espetáculos, shows, concertos, desfiles, óperas, competições esportivas, de destreza intelectual ou congêneres."
+	},
+	{
+		"Codigo": "121700",
+		"Item": "12",
+		"Subitem": "17",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Recreação e animação, inclusive em festas e eventos de qualquer natureza."
+	},
+	{
+		"Codigo": "121701",
+		"Item": "12",
+		"Subitem": "17",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Recreação e animação, inclusive em festas e eventos de qualquer natureza."
+	},
+	{
+		"Codigo": "130000",
+		"Item": "13",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços relativos a fonografia, fotografia, cinematografia e reprografia."
+	},
+	{
+		"Codigo": "130200",
+		"Item": "13",
+		"Subitem": "02",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Fonografia ou gravação de sons, inclusive trucagem, dublagem, mixagem e congêneres."
+	},
+	{
+		"Codigo": "130201",
+		"Item": "13",
+		"Subitem": "02",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Fonografia ou gravação de sons, inclusive trucagem, dublagem, mixagem e congêneres."
+	},
+	{
+		"Codigo": "130300",
+		"Item": "13",
+		"Subitem": "03",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Fotografia e cinematografia, inclusive revelação, ampliação, cópia, reprodução, trucagem e congêneres."
+	},
+	{
+		"Codigo": "130301",
+		"Item": "13",
+		"Subitem": "03",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Fotografia e cinematografia, inclusive revelação, ampliação, cópia, reprodução, trucagem e congêneres."
+	},
+	{
+		"Codigo": "130400",
+		"Item": "13",
+		"Subitem": "04",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Reprografia, microfilmagem e digitalização."
+	},
+	{
+		"Codigo": "130401",
+		"Item": "13",
+		"Subitem": "04",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Reprografia, microfilmagem e digitalização."
+	},
+	{
+		"Codigo": "130500",
+		"Item": "13",
+		"Subitem": "05",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Composição gráfica, inclusive confecção de impressos gráficos, fotocomposição, clicheria, zincografia, litografia e fotolitografia, exceto se destinados a posterior operação de comercialização ou industrialização, ainda que incorporados, de qualquer forma, a outra mercadoria que deva ser objeto de posterior circulação, tais como bulas, rótulos, etiquetas, caixas, cartuchos, embalagens e manuais técnicos e de instrução, quando ficarão sujeitos ao ICMS."
+	},
+	{
+		"Codigo": "130501",
+		"Item": "13",
+		"Subitem": "05",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Composição gráfica, inclusive confecção de impressos gráficos, fotocomposição, clicheria, zincografia, litografia e fotolitografia, exceto se destinados a posterior operação de comercialização ou industrialização, ainda que incorporados, de qualquer forma, a outra mercadoria que deva ser objeto de posterior circulação, tais como bulas, rótulos, etiquetas, caixas, cartuchos, embalagens e manuais técnicos e de instrução, quando ficarão sujeitos ao ICMS."
+	},
+	{
+		"Codigo": "140000",
+		"Item": "14",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços relativos a bens de terceiros."
+	},
+	{
+		"Codigo": "140100",
+		"Item": "14",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Lubrificação, limpeza, lustração, revisão, carga e recarga, conserto, restauração, blindagem, manutenção e conservação de máquinas, veículos, aparelhos, equipamentos, motores, elevadores ou de qualquer objeto (exceto peças e partes empregadas, que ficam sujeitas ao ICMS)."
+	},
+	{
+		"Codigo": "140101",
+		"Item": "14",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Lubrificação, limpeza, lustração, revisão, carga e recarga, conserto, restauração, blindagem, manutenção e conservação de máquinas, veículos, aparelhos, equipamentos, motores, elevadores ou de qualquer objeto (exceto peças e partes empregadas, que ficam sujeitas ao ICMS)."
+	},
+	{
+		"Codigo": "140200",
+		"Item": "14",
+		"Subitem": "02",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Assistência técnica."
+	},
+	{
+		"Codigo": "140201",
+		"Item": "14",
+		"Subitem": "02",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Assistência técnica."
+	},
+	{
+		"Codigo": "140300",
+		"Item": "14",
+		"Subitem": "03",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Recondicionamento de motores (exceto peças e partes empregadas, que ficam sujeitas ao ICMS)."
+	},
+	{
+		"Codigo": "140301",
+		"Item": "14",
+		"Subitem": "03",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Recondicionamento de motores (exceto peças e partes empregadas, que ficam sujeitas ao ICMS)."
+	},
+	{
+		"Codigo": "140400",
+		"Item": "14",
+		"Subitem": "04",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Recauchutagem ou regeneração de pneus."
+	},
+	{
+		"Codigo": "140401",
+		"Item": "14",
+		"Subitem": "04",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Recauchutagem ou regeneração de pneus."
+	},
+	{
+		"Codigo": "140500",
+		"Item": "14",
+		"Subitem": "05",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Restauração, recondicionamento, acondicionamento, pintura, beneficiamento, lavagem, secagem, tingimento, galvanoplastia, anodização, corte, recorte, plastificação, costura, acabamento, polimento e congêneres de objetos quaisquer."
+	},
+	{
+		"Codigo": "140501",
+		"Item": "14",
+		"Subitem": "05",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Restauração, recondicionamento, acondicionamento, pintura, beneficiamento, lavagem, secagem, tingimento, galvanoplastia, anodização, corte, recorte, plastificação, costura, acabamento, polimento e congêneres de objetos quaisquer."
+	},
+	{
+		"Codigo": "140600",
+		"Item": "14",
+		"Subitem": "06",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Instalação e montagem de aparelhos, máquinas e equipamentos, inclusive montagem industrial, prestados ao usuário final, exclusivamente com material por ele fornecido."
+	},
+	{
+		"Codigo": "140601",
+		"Item": "14",
+		"Subitem": "06",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Instalação e montagem de aparelhos, máquinas e equipamentos, inclusive montagem industrial, prestados ao usuário final, exclusivamente com material por ele fornecido."
+	},
+	{
+		"Codigo": "140700",
+		"Item": "14",
+		"Subitem": "07",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Colocação de molduras e congêneres."
+	},
+	{
+		"Codigo": "140701",
+		"Item": "14",
+		"Subitem": "07",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Colocação de molduras e congêneres."
+	},
+	{
+		"Codigo": "140800",
+		"Item": "14",
+		"Subitem": "08",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Encadernação, gravação e douração de livros, revistas e congêneres."
+	},
+	{
+		"Codigo": "140801",
+		"Item": "14",
+		"Subitem": "08",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Encadernação, gravação e douração de livros, revistas e congêneres."
+	},
+	{
+		"Codigo": "140900",
+		"Item": "14",
+		"Subitem": "09",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Alfaiataria e costura, quando o material for fornecido pelo usuário final, exceto aviamento."
+	},
+	{
+		"Codigo": "140901",
+		"Item": "14",
+		"Subitem": "09",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Alfaiataria e costura, quando o material for fornecido pelo usuário final, exceto aviamento."
+	},
+	{
+		"Codigo": "141000",
+		"Item": "14",
+		"Subitem": "10",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Tinturaria e lavanderia."
+	},
+	{
+		"Codigo": "141001",
+		"Item": "14",
+		"Subitem": "10",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Tinturaria e lavanderia."
+	},
+	{
+		"Codigo": "141100",
+		"Item": "14",
+		"Subitem": "11",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Tapeçaria e reforma de estofamentos em geral."
+	},
+	{
+		"Codigo": "141101",
+		"Item": "14",
+		"Subitem": "11",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Tapeçaria e reforma de estofamentos em geral."
+	},
+	{
+		"Codigo": "141200",
+		"Item": "14",
+		"Subitem": "12",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Funilaria e lanternagem."
+	},
+	{
+		"Codigo": "141201",
+		"Item": "14",
+		"Subitem": "12",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Funilaria e lanternagem."
+	},
+	{
+		"Codigo": "141300",
+		"Item": "14",
+		"Subitem": "13",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Carpintaria e serralheria."
+	},
+	{
+		"Codigo": "141301",
+		"Item": "14",
+		"Subitem": "13",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Carpintaria."
+	},
+	{
+		"Codigo": "141302",
+		"Item": "14",
+		"Subitem": "13",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Serralheria."
+	},
+	{
+		"Codigo": "141400",
+		"Item": "14",
+		"Subitem": "14",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Guincho intramunicipal, guindaste e içamento."
+	},
+	{
+		"Codigo": "141401",
+		"Item": "14",
+		"Subitem": "14",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Guincho intramunicipal."
+	},
+	{
+		"Codigo": "141402",
+		"Item": "14",
+		"Subitem": "14",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Guindaste e içamento."
+	},
+	{
+		"Codigo": "150000",
+		"Item": "15",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços relacionados ao setor bancário ou financeiro, inclusive aqueles prestados por instituições financeiras autorizadas a funcionar pela União ou por quem de direito."
+	},
+	{
+		"Codigo": "150100",
+		"Item": "15",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Administração de fundos quaisquer, de consórcio, de cartão de crédito ou débito e congêneres, de carteira de clientes, de cheques pré-datados e congêneres."
+	},
+	{
+		"Codigo": "150101",
+		"Item": "15",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Administração de fundos quaisquer e congêneres."
+	},
+	{
+		"Codigo": "150102",
+		"Item": "15",
+		"Subitem": "01",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Administração de consórcio e congêneres."
+	},
+	{
+		"Codigo": "150103",
+		"Item": "15",
+		"Subitem": "01",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Administração de cartão de crédito ou débito e congêneres."
+	},
+	{
+		"Codigo": "150104",
+		"Item": "15",
+		"Subitem": "01",
+		"Desdobro_Nacional": "04",
+		"Descricao": "Administração de carteira de clientes e congêneres."
+	},
+	{
+		"Codigo": "150105",
+		"Item": "15",
+		"Subitem": "01",
+		"Desdobro_Nacional": "05",
+		"Descricao": "Administração de cheques pré-datados e congêneres."
+	},
+	{
+		"Codigo": "150200",
+		"Item": "15",
+		"Subitem": "02",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Abertura de contas em geral, inclusive conta-corrente, conta de investimentos e aplicação e caderneta de poupança, no País e no exterior, bem como a manutenção das referidas contas ativas e inativas."
+	},
+	{
+		"Codigo": "150201",
+		"Item": "15",
+		"Subitem": "02",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Abertura de conta-corrente no País, bem como a manutenção da referida conta ativa e inativa."
+	},
+	{
+		"Codigo": "150202",
+		"Item": "15",
+		"Subitem": "02",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Abertura de conta-corrente no exterior, bem como a manutenção da referida conta ativa e inativa."
+	},
+	{
+		"Codigo": "150203",
+		"Item": "15",
+		"Subitem": "02",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Abertura de conta de investimentos e aplicação no País, bem como a manutenção da referida conta ativa e inativa."
+	},
+	{
+		"Codigo": "150204",
+		"Item": "15",
+		"Subitem": "02",
+		"Desdobro_Nacional": "04",
+		"Descricao": "Abertura de conta de investimentos e aplicação no exterior, bem como a manutenção da referida conta ativa e inativa."
+	},
+	{
+		"Codigo": "150205",
+		"Item": "15",
+		"Subitem": "02",
+		"Desdobro_Nacional": "05",
+		"Descricao": "Abertura de caderneta de poupança no País, bem como a manutenção da referida conta ativa e inativa."
+	},
+	{
+		"Codigo": "150206",
+		"Item": "15",
+		"Subitem": "02",
+		"Desdobro_Nacional": "06",
+		"Descricao": "Abertura de caderneta de poupança no exterior, bem como a manutenção da referida conta ativa e inativa."
+	},
+	{
+		"Codigo": "150207",
+		"Item": "15",
+		"Subitem": "02",
+		"Desdobro_Nacional": "07",
+		"Descricao": "Abertura de contas em geral no País, não abrangida em outro subitem, bem como a manutenção das referidas contas ativas e inativas."
+	},
+	{
+		"Codigo": "150208",
+		"Item": "15",
+		"Subitem": "02",
+		"Desdobro_Nacional": "08",
+		"Descricao": "Abertura de contas em geral no exterior, não abrangida em outro subitem, bem como a manutenção das referidas contas ativas e inativas."
+	},
+	{
+		"Codigo": "150300",
+		"Item": "15",
+		"Subitem": "03",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Locação e manutenção de cofres particulares, de terminais eletrônicos, de terminais de atendimento e de bens e equipamentos em geral."
+	},
+	{
+		"Codigo": "150301",
+		"Item": "15",
+		"Subitem": "03",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Locação de cofres particulares."
+	},
+	{
+		"Codigo": "150302",
+		"Item": "15",
+		"Subitem": "03",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Manutenção de cofres particulares."
+	},
+	{
+		"Codigo": "150303",
+		"Item": "15",
+		"Subitem": "03",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Locação de terminais eletrônicos."
+	},
+	{
+		"Codigo": "150304",
+		"Item": "15",
+		"Subitem": "03",
+		"Desdobro_Nacional": "04",
+		"Descricao": "Manutenção de terminais eletrônicos."
+	},
+	{
+		"Codigo": "150305",
+		"Item": "15",
+		"Subitem": "03",
+		"Desdobro_Nacional": "05",
+		"Descricao": "Locação de terminais de atendimento."
+	},
+	{
+		"Codigo": "150306",
+		"Item": "15",
+		"Subitem": "03",
+		"Desdobro_Nacional": "06",
+		"Descricao": "Manutenção de terminais de atendimento."
+	},
+	{
+		"Codigo": "150307",
+		"Item": "15",
+		"Subitem": "03",
+		"Desdobro_Nacional": "07",
+		"Descricao": "Locação de bens e equipamentos em geral."
+	},
+	{
+		"Codigo": "150308",
+		"Item": "15",
+		"Subitem": "03",
+		"Desdobro_Nacional": "08",
+		"Descricao": "Manutenção de bens e equipamentos em geral."
+	},
+	{
+		"Codigo": "150400",
+		"Item": "15",
+		"Subitem": "04",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Fornecimento ou emissão de atestados em geral, inclusive atestado de idoneidade, atestado de capacidade financeira e congêneres."
+	},
+	{
+		"Codigo": "150401",
+		"Item": "15",
+		"Subitem": "04",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Fornecimento ou emissão de atestados em geral, inclusive atestado de idoneidade, atestado de capacidade financeira e congêneres."
+	},
+	{
+		"Codigo": "150500",
+		"Item": "15",
+		"Subitem": "05",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Cadastro, elaboração de ficha cadastral, renovação cadastral e congêneres, inclusão ou exclusão no Cadastro de Emitentes de Cheques sem Fundos - CCF ou em quaisquer outros bancos cadastrais."
+	},
+	{
+		"Codigo": "150501",
+		"Item": "15",
+		"Subitem": "05",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Cadastro, elaboração de ficha cadastral, renovação cadastral e congêneres."
+	},
+	{
+		"Codigo": "150502",
+		"Item": "15",
+		"Subitem": "05",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Inclusão no Cadastro de Emitentes de Cheques sem Fundos - CCF."
+	},
+	{
+		"Codigo": "150503",
+		"Item": "15",
+		"Subitem": "05",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Exclusão no Cadastro de Emitentes de Cheques sem Fundos - CCF."
+	},
+	{
+		"Codigo": "150504",
+		"Item": "15",
+		"Subitem": "05",
+		"Desdobro_Nacional": "04",
+		"Descricao": "Inclusão em quaisquer outros bancos cadastrais."
+	},
+	{
+		"Codigo": "150505",
+		"Item": "15",
+		"Subitem": "05",
+		"Desdobro_Nacional": "05",
+		"Descricao": "Exclusão em quaisquer outros bancos cadastrais."
+	},
+	{
+		"Codigo": "150600",
+		"Item": "15",
+		"Subitem": "06",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Emissão, reemissão e fornecimento de avisos, comprovantes e documentos em geral; abono de firmas; coleta e entrega de documentos, bens e valores; comunicação com outra agência ou com a administração central; licenciamento eletrônico de veículos; transferência de veículos; agenciamento fiduciário ou depositário; devolução de bens em custódia."
+	},
+	{
+		"Codigo": "150601",
+		"Item": "15",
+		"Subitem": "06",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Emissão, reemissão e fornecimento de avisos, comprovantes e documentos em geral"
+	},
+	{
+		"Codigo": "150602",
+		"Item": "15",
+		"Subitem": "06",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Abono de firmas."
+	},
+	{
+		"Codigo": "150603",
+		"Item": "15",
+		"Subitem": "06",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Coleta e entrega de documentos, bens e valores."
+	},
+	{
+		"Codigo": "150604",
+		"Item": "15",
+		"Subitem": "06",
+		"Desdobro_Nacional": "04",
+		"Descricao": "Comunicação com outra agência ou com a administração central."
+	},
+	{
+		"Codigo": "150605",
+		"Item": "15",
+		"Subitem": "06",
+		"Desdobro_Nacional": "05",
+		"Descricao": "Licenciamento eletrônico de veículos."
+	},
+	{
+		"Codigo": "150606",
+		"Item": "15",
+		"Subitem": "06",
+		"Desdobro_Nacional": "06",
+		"Descricao": "Transferência de veículos."
+	},
+	{
+		"Codigo": "150607",
+		"Item": "15",
+		"Subitem": "06",
+		"Desdobro_Nacional": "07",
+		"Descricao": "Agenciamento fiduciário ou depositário."
+	},
+	{
+		"Codigo": "150608",
+		"Item": "15",
+		"Subitem": "06",
+		"Desdobro_Nacional": "08",
+		"Descricao": "Devolução de bens em custódia."
+	},
+	{
+		"Codigo": "150700",
+		"Item": "15",
+		"Subitem": "07",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Acesso, movimentação, atendimento e consulta a contas em geral, por qualquer meio ou processo, inclusive por telefone, fac-símile, internet e telex, acesso a terminais de atendimento, inclusive vinte e quatro horas; acesso a outro banco e à rede compartilhada; fornecimento de saldo, extrato e demais informações relativas a contas em geral, por qualquer meio ou processo."
+	},
+	{
+		"Codigo": "150701",
+		"Item": "15",
+		"Subitem": "07",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Acesso, movimentação, atendimento e consulta a contas em geral, por qualquer meio ou processo, inclusive por telefone, fac-símile, internet e telex."
+	},
+	{
+		"Codigo": "150702",
+		"Item": "15",
+		"Subitem": "07",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Acesso a terminais de atendimento, inclusive vinte e quatro horas."
+	},
+	{
+		"Codigo": "150703",
+		"Item": "15",
+		"Subitem": "07",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Acesso a outro banco e à rede compartilhada."
+	},
+	{
+		"Codigo": "150704",
+		"Item": "15",
+		"Subitem": "07",
+		"Desdobro_Nacional": "04",
+		"Descricao": "Fornecimento de saldo, extrato e demais informações relativas a contas em geral, por qualquer meio ou processo."
+	},
+	{
+		"Codigo": "150800",
+		"Item": "15",
+		"Subitem": "08",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Emissão, reemissão, alteração, cessão, substituição, cancelamento e registro de contrato de crédito; estudo, análise e avaliação de operações de crédito; emissão, concessão, alteração ou contratação de aval, fiança, anuência e congêneres; serviços relativos à abertura de crédito, para quaisquer fins."
+	},
+	{
+		"Codigo": "150801",
+		"Item": "15",
+		"Subitem": "08",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Emissão, reemissão, alteração, cessão, substituição, cancelamento e registro de contrato de crédito."
+	},
+	{
+		"Codigo": "150802",
+		"Item": "15",
+		"Subitem": "08",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Estudo, análise e avaliação de operações de crédito."
+	},
+	{
+		"Codigo": "150803",
+		"Item": "15",
+		"Subitem": "08",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Emissão, concessão, alteração ou contratação de aval, fiança, anuência e congêneres."
+	},
+	{
+		"Codigo": "150804",
+		"Item": "15",
+		"Subitem": "08",
+		"Desdobro_Nacional": "04",
+		"Descricao": "Serviços relativos à abertura de crédito, para quaisquer fins."
+	},
+	{
+		"Codigo": "150900",
+		"Item": "15",
+		"Subitem": "09",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Arrendamento mercantil (leasing) de quaisquer bens, inclusive cessão de direitos e obrigações, substituição de garantia, alteração, cancelamento e registro de contrato, e demais serviços relacionados ao arrendamento mercantil (leasing)."
+	},
+	{
+		"Codigo": "150901",
+		"Item": "15",
+		"Subitem": "09",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Arrendamento mercantil (leasing) de quaisquer bens, inclusive cessão de direitos e obrigações, substituição de garantia, alteração, cancelamento e registro de contrato, e demais serviços relacionados ao arrendamento mercantil (leasing)."
+	},
+	{
+		"Codigo": "151000",
+		"Item": "15",
+		"Subitem": "10",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços relacionados a cobranças, recebimentos ou pagamentos em geral, de títulos quaisquer, de contas ou carnês, de câmbio, de tributos e por conta de terceiros, inclusive os efetuados por meio eletrônico, automático ou por máquinas de atendimento; fornecimento de posição de cobrança, recebimento ou pagamento; emissão de carnês, fichas de compensação, impressos e documentos em geral."
+	},
+	{
+		"Codigo": "151001",
+		"Item": "15",
+		"Subitem": "10",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços relacionados a cobranças em geral, de títulos quaisquer, de contas ou carnês, de câmbio, de tributos e por conta de terceiros, inclusive os efetuados por meio eletrônico, automático ou por máquinas de atendimento."
+	},
+	{
+		"Codigo": "151002",
+		"Item": "15",
+		"Subitem": "10",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Serviços relacionados a recebimentos em geral, de títulos quaisquer, de contas ou carnês, de câmbio, de tributos e por conta de terceiros, inclusive os efetuados por meio eletrônico, automático ou por máquinas de atendimento."
+	},
+	{
+		"Codigo": "151003",
+		"Item": "15",
+		"Subitem": "10",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Serviços relacionados a pagamentos em geral, de títulos quaisquer, de contas ou carnês, de câmbio, de tributos e por conta de terceiros, inclusive os efetuados por meio eletrônico, automático ou por máquinas de atendimento."
+	},
+	{
+		"Codigo": "151004",
+		"Item": "15",
+		"Subitem": "10",
+		"Desdobro_Nacional": "04",
+		"Descricao": "Serviços relacionados a fornecimento de posição de cobrança, recebimento ou pagamento."
+	},
+	{
+		"Codigo": "151005",
+		"Item": "15",
+		"Subitem": "10",
+		"Desdobro_Nacional": "05",
+		"Descricao": "Serviços relacionados a emissão de carnês, fichas de compensação, impressos e documentos em geral."
+	},
+	{
+		"Codigo": "151100",
+		"Item": "15",
+		"Subitem": "11",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Devolução de títulos, protesto de títulos, sustação de protesto, manutenção de títulos, reapresentação de títulos, e demais serviços a eles relacionados."
+	},
+	{
+		"Codigo": "151101",
+		"Item": "15",
+		"Subitem": "11",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Devolução de títulos, protesto de títulos, sustação de protesto, manutenção de títulos, reapresentação de títulos, e demais serviços a eles relacionados."
+	},
+	{
+		"Codigo": "151200",
+		"Item": "15",
+		"Subitem": "12",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Custódia em geral, inclusive de títulos e valores mobiliários."
+	},
+	{
+		"Codigo": "151201",
+		"Item": "15",
+		"Subitem": "12",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Custódia em geral, inclusive de títulos e valores mobiliários."
+	},
+	{
+		"Codigo": "151300",
+		"Item": "15",
+		"Subitem": "13",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços relacionados a operações de câmbio em geral, edição, alteração, prorrogação, cancelamento e baixa de contrato de câmbio; emissão de registro de exportação ou de crédito; cobrança ou depósito no exterior; emissão, fornecimento e cancelamento de cheques de viagem; fornecimento, transferência, cancelamento e demais serviços relativos a carta de crédito de importação, exportação e garantias recebidas; envio e recebimento de mensagens em geral relacionadas a operações de câmbio."
+	},
+	{
+		"Codigo": "151301",
+		"Item": "15",
+		"Subitem": "13",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços relacionados a operações de câmbio em geral, edição, alteração, prorrogação, cancelamento e baixa de contrato de câmbio."
+	},
+	{
+		"Codigo": "151302",
+		"Item": "15",
+		"Subitem": "13",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Serviços relacionados a emissão de registro de exportação ou de crédito."
+	},
+	{
+		"Codigo": "151303",
+		"Item": "15",
+		"Subitem": "13",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Serviços relacionados a cobrança ou depósito no exterior."
+	},
+	{
+		"Codigo": "151304",
+		"Item": "15",
+		"Subitem": "13",
+		"Desdobro_Nacional": "04",
+		"Descricao": "Serviços relacionados a emissão, fornecimento e cancelamento de cheques de viagem."
+	},
+	{
+		"Codigo": "151305",
+		"Item": "15",
+		"Subitem": "13",
+		"Desdobro_Nacional": "05",
+		"Descricao": "Serviços relacionados a fornecimento, transferência, cancelamento e demais serviços relativos a carta de crédito de importação, exportação e garantias recebidas."
+	},
+	{
+		"Codigo": "151306",
+		"Item": "15",
+		"Subitem": "13",
+		"Desdobro_Nacional": "06",
+		"Descricao": "Serviços relacionados a envio e recebimento de mensagens em geral relacionadas a operações de câmbio."
+	},
+	{
+		"Codigo": "151400",
+		"Item": "15",
+		"Subitem": "14",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Fornecimento, emissão, reemissão, renovação e manutenção de cartão magnético, cartão de crédito, cartão de débito, cartão salário e congêneres."
+	},
+	{
+		"Codigo": "151401",
+		"Item": "15",
+		"Subitem": "14",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Fornecimento, emissão, reemissão de cartão magnético, cartão de crédito, cartão de débito, cartão salário e congêneres."
+	},
+	{
+		"Codigo": "151402",
+		"Item": "15",
+		"Subitem": "14",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Renovação de cartão magnético, cartão de crédito, cartão de débito, cartão salário e congêneres."
+	},
+	{
+		"Codigo": "151403",
+		"Item": "15",
+		"Subitem": "14",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Manutenção de cartão magnético, cartão de crédito, cartão de débito, cartão salário e congêneres."
+	},
+	{
+		"Codigo": "151500",
+		"Item": "15",
+		"Subitem": "15",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Compensação de cheques e títulos quaisquer; serviços relacionados a depósito, inclusive depósito identificado, a saque de contas quaisquer, por qualquer meio ou processo, inclusive em terminais eletrônicos e de atendimento."
+	},
+	{
+		"Codigo": "151501",
+		"Item": "15",
+		"Subitem": "15",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Compensação de cheques e títulos quaisquer."
+	},
+	{
+		"Codigo": "151502",
+		"Item": "15",
+		"Subitem": "15",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Serviços relacionados a depósito, inclusive depósito identificado, a saque de contas quaisquer, por qualquer meio ou processo, inclusive em terminais eletrônicos e de atendimento."
+	},
+	{
+		"Codigo": "151600",
+		"Item": "15",
+		"Subitem": "16",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Emissão, reemissão, liquidação, alteração, cancelamento e baixa de ordens de pagamento, ordens de crédito e similares, por qualquer meio ou processo; serviços relacionados à transferência de valores, dados, fundos, pagamentos e similares, inclusive entre contas em geral."
+	},
+	{
+		"Codigo": "151601",
+		"Item": "15",
+		"Subitem": "16",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Emissão, reemissão, liquidação, alteração, cancelamento e baixa de ordens de pagamento, ordens de crédito e similares, por qualquer meio ou processo."
+	},
+	{
+		"Codigo": "151602",
+		"Item": "15",
+		"Subitem": "16",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Serviços relacionados à transferência de valores, dados, fundos, pagamentos e similares, inclusive entre contas em geral."
+	},
+	{
+		"Codigo": "151700",
+		"Item": "15",
+		"Subitem": "17",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Emissão, fornecimento, devolução, sustação, cancelamento e oposição de cheques quaisquer, avulso ou por talão."
+	},
+	{
+		"Codigo": "151701",
+		"Item": "15",
+		"Subitem": "17",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Emissão e fornecimento de cheques quaisquer, avulso ou por talão."
+	},
+	{
+		"Codigo": "151702",
+		"Item": "15",
+		"Subitem": "17",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Devolução de cheques quaisquer, avulso ou por talão."
+	},
+	{
+		"Codigo": "151703",
+		"Item": "15",
+		"Subitem": "17",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Sustação, cancelamento e oposição de cheques quaisquer, avulso ou por talão."
+	},
+	{
+		"Codigo": "151800",
+		"Item": "15",
+		"Subitem": "18",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços relacionados a crédito imobiliário, avaliação e vistoria de imóvel ou obra, análise técnica e jurídica, emissão, reemissão, alteração, transferência e renegociação de contrato, emissão e reemissão do termo de quitação e demais serviços relacionados a crédito imobiliário."
+	},
+	{
+		"Codigo": "151801",
+		"Item": "15",
+		"Subitem": "18",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços relacionados a crédito imobiliário, de avaliação e vistoria de imóvel ou obra."
+	},
+	{
+		"Codigo": "151802",
+		"Item": "15",
+		"Subitem": "18",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Serviços relacionados a crédito imobiliário, de análise técnica e jurídica."
+	},
+	{
+		"Codigo": "151803",
+		"Item": "15",
+		"Subitem": "18",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Serviços relacionados a crédito imobiliário, de emissão, reemissão, alteração, transferência e renegociação de contrato."
+	},
+	{
+		"Codigo": "151804",
+		"Item": "15",
+		"Subitem": "18",
+		"Desdobro_Nacional": "04",
+		"Descricao": "Serviços relacionados a crédito imobiliário, de emissão e reemissão do termo de quitação."
+	},
+	{
+		"Codigo": "151805",
+		"Item": "15",
+		"Subitem": "18",
+		"Desdobro_Nacional": "05",
+		"Descricao": "Demais serviços relacionados a crédito imobiliário."
+	},
+	{
+		"Codigo": "160000",
+		"Item": "16",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de transporte de natureza municipal."
+	},
+	{
+		"Codigo": "160100",
+		"Item": "16",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de transporte coletivo municipal rodoviário, metroviário, ferroviário e aquaviário de passageiros."
+	},
+	{
+		"Codigo": "160101",
+		"Item": "16",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços de transporte coletivo municipal rodoviário de passageiros."
+	},
+	{
+		"Codigo": "160102",
+		"Item": "16",
+		"Subitem": "01",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Serviços de transporte coletivo municipal metroviário de passageiros."
+	},
+	{
+		"Codigo": "160103",
+		"Item": "16",
+		"Subitem": "01",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Serviços de transporte coletivo municipal ferroviário de passageiros."
+	},
+	{
+		"Codigo": "160104",
+		"Item": "16",
+		"Subitem": "01",
+		"Desdobro_Nacional": "04",
+		"Descricao": "Serviços de transporte coletivo municipal aquaviário de passageiros."
+	},
+	{
+		"Codigo": "160200",
+		"Item": "16",
+		"Subitem": "02",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Outros serviços de transporte de natureza municipal."
+	},
+	{
+		"Codigo": "160201",
+		"Item": "16",
+		"Subitem": "02",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Outros serviços de transporte de natureza municipal."
+	},
+	{
+		"Codigo": "170000",
+		"Item": "17",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de apoio técnico, administrativo, jurídico, contábil, comercial e congêneres."
+	},
+	{
+		"Codigo": "170100",
+		"Item": "17",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Assessoria ou consultoria de qualquer natureza, não contida em outros itens desta lista; análise, exame, pesquisa, coleta, compilação e fornecimento de dados e informações de qualquer natureza, inclusive cadastro e similares."
+	},
+	{
+		"Codigo": "170101",
+		"Item": "17",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Assessoria ou consultoria de qualquer natureza, não contida em outros itens desta lista."
+	},
+	{
+		"Codigo": "170102",
+		"Item": "17",
+		"Subitem": "01",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Análise, exame, pesquisa, coleta, compilação e fornecimento de dados e informações de qualquer natureza, inclusive cadastro e similares."
+	},
+	{
+		"Codigo": "170200",
+		"Item": "17",
+		"Subitem": "02",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Datilografia, digitação, estenografia, expediente, secretaria em geral, resposta audível, redação, edição, interpretação, revisão, tradução, apoio e infra-estrutura administrativa e congêneres."
+	},
+	{
+		"Codigo": "170201",
+		"Item": "17",
+		"Subitem": "02",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Datilografia, digitação, estenografia e congêneres."
+	},
+	{
+		"Codigo": "170202",
+		"Item": "17",
+		"Subitem": "02",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Expediente, secretaria em geral, apoio e infra-estrutura administrativa e congêneres."
+	},
+	{
+		"Codigo": "170203",
+		"Item": "17",
+		"Subitem": "02",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Resposta audível e congêneres."
+	},
+	{
+		"Codigo": "170204",
+		"Item": "17",
+		"Subitem": "02",
+		"Desdobro_Nacional": "04",
+		"Descricao": "Redação, edição, revisão e congêneres."
+	},
+	{
+		"Codigo": "170205",
+		"Item": "17",
+		"Subitem": "02",
+		"Desdobro_Nacional": "05",
+		"Descricao": "Interpretação, tradução e congêneres."
+	},
+	{
+		"Codigo": "170300",
+		"Item": "17",
+		"Subitem": "03",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Planejamento, coordenação, programação ou organização técnica, financeira ou administrativa."
+	},
+	{
+		"Codigo": "170301",
+		"Item": "17",
+		"Subitem": "03",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Planejamento, coordenação, programação ou organização técnica."
+	},
+	{
+		"Codigo": "170302",
+		"Item": "17",
+		"Subitem": "03",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Planejamento, coordenação, programação ou organização financeira."
+	},
+	{
+		"Codigo": "170303",
+		"Item": "17",
+		"Subitem": "03",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Planejamento, coordenação, programação ou organização administrativa."
+	},
+	{
+		"Codigo": "170400",
+		"Item": "17",
+		"Subitem": "04",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Recrutamento, agenciamento, seleção e colocação de mão-de-obra."
+	},
+	{
+		"Codigo": "170401",
+		"Item": "17",
+		"Subitem": "04",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Recrutamento, agenciamento, seleção e colocação de mão-de-obra."
+	},
+	{
+		"Codigo": "170500",
+		"Item": "17",
+		"Subitem": "05",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Fornecimento de mão-de-obra, mesmo em caráter temporário, inclusive de empregados ou trabalhadores, avulsos ou temporários, contratados pelo prestador de serviço."
+	},
+	{
+		"Codigo": "170501",
+		"Item": "17",
+		"Subitem": "05",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Fornecimento de mão-de-obra, mesmo em caráter temporário, inclusive de empregados ou trabalhadores, avulsos ou temporários, contratados pelo prestador de serviço."
+	},
+	{
+		"Codigo": "170600",
+		"Item": "17",
+		"Subitem": "06",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Propaganda e publicidade, inclusive promoção de vendas, planejamento de campanhas ou sistemas de publicidade, elaboração de desenhos, textos e demais materiais publicitários."
+	},
+	{
+		"Codigo": "170601",
+		"Item": "17",
+		"Subitem": "06",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Propaganda e publicidade, inclusive promoção de vendas, planejamento de campanhas ou sistemas de publicidade, elaboração de desenhos, textos e demais materiais publicitários."
+	},
+	{
+		"Codigo": "170800",
+		"Item": "17",
+		"Subitem": "08",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Franquia (franchising)."
+	},
+	{
+		"Codigo": "170801",
+		"Item": "17",
+		"Subitem": "08",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Franquia (franchising)."
+	},
+	{
+		"Codigo": "170900",
+		"Item": "17",
+		"Subitem": "09",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Perícias, laudos, exames técnicos e análises técnicas."
+	},
+	{
+		"Codigo": "170901",
+		"Item": "17",
+		"Subitem": "09",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Perícias, laudos, exames técnicos e análises técnicas."
+	},
+	{
+		"Codigo": "171000",
+		"Item": "17",
+		"Subitem": "10",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Planejamento, organização e administração de feiras, exposições, congressos e congêneres."
+	},
+	{
+		"Codigo": "171001",
+		"Item": "17",
+		"Subitem": "10",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Planejamento, organização e administração de feiras, exposições, e congêneres."
+	},
+	{
+		"Codigo": "171002",
+		"Item": "17",
+		"Subitem": "10",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Planejamento, organização e administração de congressos e congêneres."
+	},
+	{
+		"Codigo": "171100",
+		"Item": "17",
+		"Subitem": "11",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Organização de festas e recepções; bufê (exceto o fornecimento de alimentação e bebidas, que fica sujeito ao ICMS)."
+	},
+	{
+		"Codigo": "171101",
+		"Item": "17",
+		"Subitem": "11",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Organização de festas e recepções."
+	},
+	{
+		"Codigo": "171102",
+		"Item": "17",
+		"Subitem": "11",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Bufê (exceto o fornecimento de alimentação e bebidas, que fica sujeito ao ICMS)."
+	},
+	{
+		"Codigo": "171200",
+		"Item": "17",
+		"Subitem": "12",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Administração em geral, inclusive de bens e negócios de terceiros."
+	},
+	{
+		"Codigo": "171201",
+		"Item": "17",
+		"Subitem": "12",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Administração em geral, inclusive de bens e negócios de terceiros."
+	},
+	{
+		"Codigo": "171300",
+		"Item": "17",
+		"Subitem": "13",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Leilão e congêneres."
+	},
+	{
+		"Codigo": "171301",
+		"Item": "17",
+		"Subitem": "13",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Leilão e congêneres."
+	},
+	{
+		"Codigo": "171400",
+		"Item": "17",
+		"Subitem": "14",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Advocacia"
+	},
+	{
+		"Codigo": "171401",
+		"Item": "17",
+		"Subitem": "14",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Advocacia"
+	},
+	{
+		"Codigo": "171500",
+		"Item": "17",
+		"Subitem": "15",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Arbitragem de qualquer espécie, inclusive jurídica."
+	},
+	{
+		"Codigo": "171501",
+		"Item": "17",
+		"Subitem": "15",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Arbitragem de qualquer espécie, inclusive jurídica."
+	},
+	{
+		"Codigo": "171600",
+		"Item": "17",
+		"Subitem": "16",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Auditoria."
+	},
+	{
+		"Codigo": "171601",
+		"Item": "17",
+		"Subitem": "16",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Auditoria."
+	},
+	{
+		"Codigo": "171700",
+		"Item": "17",
+		"Subitem": "17",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Análise de Organização e Métodos."
+	},
+	{
+		"Codigo": "171701",
+		"Item": "17",
+		"Subitem": "17",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Análise de Organização e Métodos."
+	},
+	{
+		"Codigo": "171800",
+		"Item": "17",
+		"Subitem": "18",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Atuária e cálculos técnicos de qualquer natureza."
+	},
+	{
+		"Codigo": "171801",
+		"Item": "17",
+		"Subitem": "18",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Atuária e cálculos técnicos de qualquer natureza."
+	},
+	{
+		"Codigo": "171900",
+		"Item": "17",
+		"Subitem": "19",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Contabilidade, inclusive serviços técnicos e auxiliares."
+	},
+	{
+		"Codigo": "171901",
+		"Item": "17",
+		"Subitem": "19",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Contabilidade, inclusive serviços técnicos e auxiliares."
+	},
+	{
+		"Codigo": "172000",
+		"Item": "17",
+		"Subitem": "20",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Consultoria e assessoria econômica ou financeira."
+	},
+	{
+		"Codigo": "172001",
+		"Item": "17",
+		"Subitem": "20",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Consultoria e assessoria econômica ou financeira."
+	},
+	{
+		"Codigo": "172100",
+		"Item": "17",
+		"Subitem": "21",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Estatística."
+	},
+	{
+		"Codigo": "172101",
+		"Item": "17",
+		"Subitem": "21",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Estatística."
+	},
+	{
+		"Codigo": "172200",
+		"Item": "17",
+		"Subitem": "22",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Cobrança em geral."
+	},
+	{
+		"Codigo": "172201",
+		"Item": "17",
+		"Subitem": "22",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Cobrança em geral."
+	},
+	{
+		"Codigo": "172300",
+		"Item": "17",
+		"Subitem": "23",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Assessoria, análise, avaliação, atendimento, consulta, cadastro, seleção, gerenciamento de informações, administração de contas a receber ou a pagar e em geral, relacionados a operações de faturização (factoring)."
+	},
+	{
+		"Codigo": "172301",
+		"Item": "17",
+		"Subitem": "23",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Assessoria, análise, avaliação, atendimento, consulta, cadastro, seleção, gerenciamento de informações, administração de contas a receber ou a pagar e em geral, relacionados a operações de faturização (factoring)."
+	},
+	{
+		"Codigo": "172400",
+		"Item": "17",
+		"Subitem": "24",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Apresentação de palestras, conferências, seminários e congêneres."
+	},
+	{
+		"Codigo": "172401",
+		"Item": "17",
+		"Subitem": "24",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Apresentação de palestras, conferências, seminários e congêneres."
+	},
+	{
+		"Codigo": "172500",
+		"Item": "17",
+		"Subitem": "25",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Inserção de textos, desenhos e outros materiais de propaganda e publicidade, em qualquer meio (exceto em livros, jornais, periódicos e nas modalidades de serviços de radiodifusão sonora e de sons e imagens de recepção livre e gratuita)."
+	},
+	{
+		"Codigo": "172501",
+		"Item": "17",
+		"Subitem": "25",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Inserção de textos, desenhos e outros materiais de propaganda e publicidade, em qualquer meio (exceto em livros, jornais, periódicos e nas modalidades de serviços de radiodifusão sonora e de sons e imagens de recepção livre e gratuita)."
+	},
+	{
+		"Codigo": "180000",
+		"Item": "18",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de regulação de sinistros vinculados a contratos de seguros; inspeção e avaliação de riscos para cobertura de contratos de seguros; prevenção e gerência de riscos seguráveis e congêneres."
+	},
+	{
+		"Codigo": "180100",
+		"Item": "18",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de regulação de sinistros vinculados a contratos de seguros; inspeção e avaliação de riscos para cobertura de contratos de seguros; prevenção e gerência de riscos seguráveis e congêneres."
+	},
+	{
+		"Codigo": "180101",
+		"Item": "18",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços de regulação de sinistros vinculados a contratos de seguros e congêneres."
+	},
+	{
+		"Codigo": "180102",
+		"Item": "18",
+		"Subitem": "01",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Serviços de inspeção e avaliação de riscos para cobertura de contratos de seguros e congêneres."
+	},
+	{
+		"Codigo": "180103",
+		"Item": "18",
+		"Subitem": "01",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Serviços de prevenção e gerência de riscos seguráveis e congêneres."
+	},
+	{
+		"Codigo": "190000",
+		"Item": "19",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de distribuição e venda de bilhetes e demais produtos de loteria, bingos, cartões, pules ou cupons de apostas, sorteios, prêmios, inclusive os decorrentes de títulos de capitalização e congêneres."
+	},
+	{
+		"Codigo": "190100",
+		"Item": "19",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de distribuição e venda de bilhetes e demais produtos de loteria, bingos, cartões, pules ou cupons de apostas, sorteios, prêmios, inclusive os decorrentes de títulos de capitalização e congêneres."
+	},
+	{
+		"Codigo": "190101",
+		"Item": "19",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços de distribuição e venda de bilhetes e demais produtos de loteria, cartões, pules ou cupons de apostas, sorteios, prêmios, inclusive os decorrentes de títulos de capitalização e congêneres."
+	},
+	{
+		"Codigo": "190102",
+		"Item": "19",
+		"Subitem": "01",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Serviços de distribuição e venda de bingos e congêneres."
+	},
+	{
+		"Codigo": "200000",
+		"Item": "20",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços portuários, aeroportuários, ferroportuários, de terminais rodoviários, ferroviários e metroviários."
+	},
+	{
+		"Codigo": "200100",
+		"Item": "20",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços portuários, ferroportuários, utilização de porto, movimentação de passageiros, reboque de embarcações, rebocador escoteiro, atracação, desatracação, serviços de praticagem, capatazia, armazenagem de qualquer natureza, serviços acessórios, movimentação de mercadorias, serviços de apoio marítimo, de movimentação ao largo, serviços de armadores, estiva, conferência, logística e congêneres."
+	},
+	{
+		"Codigo": "200101",
+		"Item": "20",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços portuários, ferroportuários, utilização de porto, movimentação de passageiros, reboque de embarcações, rebocador escoteiro, atracação, desatracação, serviços de praticagem, capatazia, armazenagem de qualquer natureza, serviços acessórios, movimentação de mercadorias, serviços de apoio marítimo, de movimentação ao largo, serviços de armadores, estiva, conferência, logística e congêneres."
+	},
+	{
+		"Codigo": "200200",
+		"Item": "20",
+		"Subitem": "02",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços aeroportuários, utilização de aeroporto, movimentação de passageiros, armazenagem de qualquer natureza, capatazia, movimentação de aeronaves, serviços de apoio aeroportuários, serviços acessórios, movimentação de mercadorias, logística e congêneres."
+	},
+	{
+		"Codigo": "200201",
+		"Item": "20",
+		"Subitem": "02",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços aeroportuários, utilização de aeroporto, movimentação de passageiros, armazenagem de qualquer natureza, capatazia, movimentação de aeronaves, serviços de apoio aeroportuários, serviços acessórios, movimentação de mercadorias, logística e congêneres."
+	},
+	{
+		"Codigo": "200300",
+		"Item": "20",
+		"Subitem": "03",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de terminais rodoviários, ferroviários, metroviários, movimentação de passageiros, mercadorias, inclusive suas operações, logística e congêneres."
+	},
+	{
+		"Codigo": "200301",
+		"Item": "20",
+		"Subitem": "03",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços de terminais rodoviários, ferroviários, metroviários, movimentação de passageiros, mercadorias, inclusive suas operações, logística e congêneres."
+	},
+	{
+		"Codigo": "210000",
+		"Item": "21",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de registros públicos, cartorários e notariais."
+	},
+	{
+		"Codigo": "210100",
+		"Item": "21",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de registros públicos, cartorários e notariais."
+	},
+	{
+		"Codigo": "210101",
+		"Item": "21",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços de registros públicos, cartorários e notariais."
+	},
+	{
+		"Codigo": "220000",
+		"Item": "22",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de exploração de rodovia."
+	},
+	{
+		"Codigo": "220100",
+		"Item": "22",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de exploração de rodovia mediante cobrança de preço ou pedágio dos usuários, envolvendo execução de serviços de conservação, manutenção, melhoramentos para adequação de capacidade e segurança de trânsito, operação, monitoração, assistência aos usuários e outros serviços definidos em contratos, atos de concessão ou de permissão ou em normas oficiais."
+	},
+	{
+		"Codigo": "220101",
+		"Item": "22",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços de exploração de rodovia mediante cobrança de preço ou pedágio dos usuários, envolvendo execução de serviços de conservação, manutenção, melhoramentos para adequação de capacidade e segurança de trânsito, operação, monitoração, assistência aos usuários e outros serviços definidos em contratos, atos de concessão ou de permissão ou em normas oficiais."
+	},
+	{
+		"Codigo": "230000",
+		"Item": "23",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de programação e comunicação visual, desenho industrial e congêneres."
+	},
+	{
+		"Codigo": "230100",
+		"Item": "23",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de programação e comunicação visual, desenho industrial e congêneres."
+	},
+	{
+		"Codigo": "230101",
+		"Item": "23",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços de programação e comunicação visual e congêneres."
+	},
+	{
+		"Codigo": "230102",
+		"Item": "23",
+		"Subitem": "01",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Serviços de desenho industrial e congêneres."
+	},
+	{
+		"Codigo": "240000",
+		"Item": "24",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de chaveiros, confecção de carimbos, placas, sinalização visual, banners, adesivos e congêneres."
+	},
+	{
+		"Codigo": "240100",
+		"Item": "24",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de chaveiros, confecção de carimbos, placas, sinalização visual, banners, adesivos e congêneres."
+	},
+	{
+		"Codigo": "240101",
+		"Item": "24",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços de chaveiros, confecção de carimbos e congêneres."
+	},
+	{
+		"Codigo": "240102",
+		"Item": "24",
+		"Subitem": "01",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Serviços de placas, sinalização visual, banners, adesivos e congêneres."
+	},
+	{
+		"Codigo": "250000",
+		"Item": "25",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços funerários."
+	},
+	{
+		"Codigo": "250100",
+		"Item": "25",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Funerais, inclusive fornecimento de caixão, urna ou esquifes; aluguel de capela; transporte do corpo cadavérico; fornecimento de flores, coroas e outros paramentos; desembaraço de certidão de óbito; fornecimento de véu, essa e outros adornos; embalsamento, embelezamento, conservação ou restauração de cadáveres."
+	},
+	{
+		"Codigo": "250101",
+		"Item": "25",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Funerais, inclusive fornecimento de caixão, urna ou esquifes; aluguel de capela; transporte do corpo cadavérico; fornecimento de flores, coroas e outros paramentos; desembaraço de certidão de óbito; fornecimento de véu, essa e outros adornos; embalsamento, embelezamento, conservação ou restauração de cadáveres."
+	},
+	{
+		"Codigo": "250200",
+		"Item": "25",
+		"Subitem": "02",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Translado intramunicipal e cremação de corpos e partes de corpos cadavéricos."
+	},
+	{
+		"Codigo": "250201",
+		"Item": "25",
+		"Subitem": "02",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Translado intramunicipal de corpos e partes de corpos cadavéricos."
+	},
+	{
+		"Codigo": "250202",
+		"Item": "25",
+		"Subitem": "02",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Cremação de corpos e partes de corpos cadavéricos."
+	},
+	{
+		"Codigo": "250300",
+		"Item": "25",
+		"Subitem": "03",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Planos ou convênio funerários."
+	},
+	{
+		"Codigo": "250301",
+		"Item": "25",
+		"Subitem": "03",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Planos ou convênio funerários."
+	},
+	{
+		"Codigo": "250400",
+		"Item": "25",
+		"Subitem": "04",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Manutenção e conservação de jazigos e cemitérios."
+	},
+	{
+		"Codigo": "250401",
+		"Item": "25",
+		"Subitem": "04",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Manutenção e conservação de jazigos e cemitérios."
+	},
+	{
+		"Codigo": "250500",
+		"Item": "25",
+		"Subitem": "05",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Cessão de uso de espaços em cemitérios para sepultamento."
+	},
+	{
+		"Codigo": "250501",
+		"Item": "25",
+		"Subitem": "05",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Cessão de uso de espaços em cemitérios para sepultamento."
+	},
+	{
+		"Codigo": "260000",
+		"Item": "26",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de coleta, remessa ou entrega de correspondências, documentos, objetos, bens ou valores, inclusive pelos correios e suas agências franqueadas; courrier e congêneres."
+	},
+	{
+		"Codigo": "260100",
+		"Item": "26",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de coleta, remessa ou entrega de correspondências, documentos, objetos, bens ou valores, inclusive pelos correios e suas agências franqueadas; courrier e congêneres."
+	},
+	{
+		"Codigo": "260101",
+		"Item": "26",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços de coleta, remessa ou entrega de correspondências, documentos, objetos, bens ou valores, inclusive pelos correios e suas agências franqueadas."
+	},
+	{
+		"Codigo": "260102",
+		"Item": "26",
+		"Subitem": "01",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Serviços de courrier e congêneres."
+	},
+	{
+		"Codigo": "270000",
+		"Item": "27",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de assistência social."
+	},
+	{
+		"Codigo": "270100",
+		"Item": "27",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de assistência social."
+	},
+	{
+		"Codigo": "270101",
+		"Item": "27",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços de assistência social."
+	},
+	{
+		"Codigo": "280000",
+		"Item": "28",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de avaliação de bens e serviços de qualquer natureza."
+	},
+	{
+		"Codigo": "280100",
+		"Item": "28",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de avaliação de bens e serviços de qualquer natureza."
+	},
+	{
+		"Codigo": "280101",
+		"Item": "28",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços de avaliação de bens e serviços de qualquer natureza."
+	},
+	{
+		"Codigo": "290000",
+		"Item": "29",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de biblioteconomia."
+	},
+	{
+		"Codigo": "290100",
+		"Item": "29",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de biblioteconomia."
+	},
+	{
+		"Codigo": "290101",
+		"Item": "29",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços de biblioteconomia."
+	},
+	{
+		"Codigo": "300000",
+		"Item": "30",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de biologia, biotecnologia e química."
+	},
+	{
+		"Codigo": "300100",
+		"Item": "30",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de biologia, biotecnologia e química."
+	},
+	{
+		"Codigo": "300101",
+		"Item": "30",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços de biologia e biotecnologia."
+	},
+	{
+		"Codigo": "300102",
+		"Item": "30",
+		"Subitem": "01",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Serviços de química."
+	},
+	{
+		"Codigo": "310000",
+		"Item": "31",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços técnicos em edificações, eletrônica, eletrotécnica, mecânica, telecomunicações e congêneres."
+	},
+	{
+		"Codigo": "310100",
+		"Item": "31",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços técnicos em edificações, eletrônica, eletrotécnica, mecânica, telecomunicações e congêneres."
+	},
+	{
+		"Codigo": "310101",
+		"Item": "31",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços técnicos em edificações e congêneres."
+	},
+	{
+		"Codigo": "310102",
+		"Item": "31",
+		"Subitem": "01",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Serviços técnicos em eletrônica, eletrotécnica e congêneres."
+	},
+	{
+		"Codigo": "310103",
+		"Item": "31",
+		"Subitem": "01",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Serviços técnicos em mecânica e congêneres."
+	},
+	{
+		"Codigo": "310104",
+		"Item": "31",
+		"Subitem": "01",
+		"Desdobro_Nacional": "04",
+		"Descricao": "Serviços técnicos em telecomunicações e congêneres."
+	},
+	{
+		"Codigo": "320000",
+		"Item": "32",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de desenhos técnicos."
+	},
+	{
+		"Codigo": "320100",
+		"Item": "32",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de desenhos técnicos."
+	},
+	{
+		"Codigo": "320101",
+		"Item": "32",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços de desenhos técnicos."
+	},
+	{
+		"Codigo": "330000",
+		"Item": "33",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de desembaraço aduaneiro, comissários, despachantes e congêneres."
+	},
+	{
+		"Codigo": "330100",
+		"Item": "33",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de desembaraço aduaneiro, comissários, despachantes e congêneres."
+	},
+	{
+		"Codigo": "330101",
+		"Item": "33",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços de desembaraço aduaneiro, comissários, despachantes e congêneres."
+	},
+	{
+		"Codigo": "340000",
+		"Item": "34",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de investigações particulares, detetives e congêneres."
+	},
+	{
+		"Codigo": "340100",
+		"Item": "34",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de investigações particulares, detetives e congêneres."
+	},
+	{
+		"Codigo": "340101",
+		"Item": "34",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços de investigações particulares, detetives e congêneres."
+	},
+	{
+		"Codigo": "350000",
+		"Item": "35",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de reportagem, assessoria de imprensa, jornalismo e relações públicas."
+	},
+	{
+		"Codigo": "350100",
+		"Item": "35",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de reportagem, assessoria de imprensa, jornalismo e relações públicas."
+	},
+	{
+		"Codigo": "350101",
+		"Item": "35",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços de reportagem e jornalismo."
+	},
+	{
+		"Codigo": "350102",
+		"Item": "35",
+		"Subitem": "01",
+		"Desdobro_Nacional": "02",
+		"Descricao": "Serviços de assessoria de imprensa."
+	},
+	{
+		"Codigo": "350103",
+		"Item": "35",
+		"Subitem": "01",
+		"Desdobro_Nacional": "03",
+		"Descricao": "Serviços de relações públicas."
+	},
+	{
+		"Codigo": "360000",
+		"Item": "36",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de meteorologia."
+	},
+	{
+		"Codigo": "360100",
+		"Item": "36",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de meteorologia."
+	},
+	{
+		"Codigo": "360101",
+		"Item": "36",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços de meteorologia."
+	},
+	{
+		"Codigo": "370000",
+		"Item": "37",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de artistas, atletas, modelos e manequins."
+	},
+	{
+		"Codigo": "370100",
+		"Item": "37",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de artistas, atletas, modelos e manequins."
+	},
+	{
+		"Codigo": "370101",
+		"Item": "37",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços de artistas, atletas, modelos e manequins."
+	},
+	{
+		"Codigo": "380000",
+		"Item": "38",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de museologia."
+	},
+	{
+		"Codigo": "380100",
+		"Item": "38",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de museologia."
+	},
+	{
+		"Codigo": "380101",
+		"Item": "38",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços de museologia."
+	},
+	{
+		"Codigo": "390000",
+		"Item": "39",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de ourivesaria e lapidação."
+	},
+	{
+		"Codigo": "390100",
+		"Item": "39",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços de ourivesaria e lapidação (quando o material for fornecido pelo tomador do serviço)."
+	},
+	{
+		"Codigo": "390101",
+		"Item": "39",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços de ourivesaria e lapidação (quando o material for fornecido pelo tomador do serviço)."
+	},
+	{
+		"Codigo": "400000",
+		"Item": "40",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços relativos a obras de arte sob encomenda."
+	},
+	{
+		"Codigo": "400100",
+		"Item": "40",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Obras de arte sob encomenda."
+	},
+	{
+		"Codigo": "400101",
+		"Item": "40",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Obras de arte sob encomenda."
+	},
+	{
+		"Codigo": "990000",
+		"Item": "99",
+		"Subitem": "00",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços sem a incidência de ISSQN e ICMS"
+	},
+	{
+		"Codigo": "990100",
+		"Item": "99",
+		"Subitem": "01",
+		"Desdobro_Nacional": "00",
+		"Descricao": "Serviços sem a incidência de ISSQN e ICMS"
+	},
+	{
+		"Codigo": "990101",
+		"Item": "99",
+		"Subitem": "01",
+		"Desdobro_Nacional": "01",
+		"Descricao": "Serviços sem a incidência de ISSQN e ICMS"
+	}
+]

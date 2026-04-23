@@ -1,0 +1,77 @@
+"Aja como um Desenvolvedor Senior Full-stack especialista em sistemas ERP e tributação brasileira (NFC-e).
+Objetivo: Criar a estrutura base de um sistema de emissão de NFC-e utilizando PHP e a biblioteca nfephp-org/sped-nfe (github.com).
+Requisitos do Sistema:
+Banco de Dados: Modele tabelas para:
+Emitente: Dados da empresa, certificado digital (caminho/senha) e CSC (Token de autenticação).
+Clientes: CPF/CNPJ, Nome, Endereço completo.
+Produtos: Descrição, NCM, CEST, Unidade, Valor Unitário, CFOP.
+Impostos: Campos para ICMS (CST/CSOSN), PIS, COFINS e alíquotas.
+Integração SPED-NFe:
+Implemente uma classe de serviço que utilize a nfephp-org/sped-nfe para:
+Gerar o XML da NFC-e (modelo 65).
+Assinar o XML digitalmente (A1).
+Transmitir para o WebService da SEFAZ (Ambiente de Homologação).
+Tratar o retorno (Protocolo de Autorização ou Erros de Rejeição).
+Funcionalidades:
+Endpoint para cadastrar um novo produto com validação de campos tributários obrigatórios.
+Função para gerar a DANFE NFC-e (QR Code) após a autorização.
+Diretrizes Técnicas:
+Utilize Composer para gerenciar as dependências.
+Siga os padrões PSR-12 de codificação.
+Separe a lógica de negócio (Business Logic) da camada de infraestrutura da biblioteca SPED.
+
+***************
+
+"Aja como um Arquiteto de Dados especialista em sistemas tributários brasileiros. Com base na biblioteca nfephp-org/sped-nfe, projete o esquema do banco de dados (SQL) para um sistema de emissão de NFC-e.
+Entidades e Atributos Obrigatórios:
+Empresa (Emitente): Razão Social, Nome Fantasia, CNPJ, IE, IM, CRT (Regime Tributário), Endereço completo (Logradouro, Número, Bairro, Código Município IBGE, UF, CEP), Telefone, Caminho do Certificado A1 (.pfx), Senha do Certificado, CSC (Token) e CSC_ID (Identificador do Token).
+Clientes (Destinatários): Nome/Razão Social, CPF/CNPJ (opcional para NFC-e abaixo de determinado valor), E-mail e Endereço.
+Produtos: Descrição, Código Interno, EAN (GTIN), NCM, CEST, Unidade Comercial (UN, KG, etc.), Valor Unitário.
+Tributação (Regras de Imposto): Vincule aos produtos os campos: CFOP, Origem da Mercadoria, CST ou CSOSN de ICMS, Alíquota ICMS, CST de PIS/COFINS e suas respectivas alíquotas.
+Vendas e NFC-e: Cabeçalho da nota (Série, Número, Data/Hora de Emissão), Itens da nota (FK Produto, Quantidade, Valor Total, Desconto), Formas de Pagamento (Dinheiro, Cartão, PIX - conforme tabela SEFAZ), XML de Envio, XML de Retorno, Protocolo de Autorização e Status (Pendente, Autorizada, Cancelada, Rejeitada).
+Diretrizes:
+Utilize MySQL ou PostgreSQL.
+Garanta o uso de chaves estrangeiras (FKs) para integridade.
+Utilize tipos decimais precisos (DECIMAL(15,4)) para valores e alíquotas.
+Crie as migrações (Migrations) ou o script SQL de criação inicial."
+
+*************************************
+
+"Aja como Desenvolvedor Backend Senior. Implemente a Service Class em PHP para integração com a biblioteca nfephp-org/sped-nfe (versão 5.0+), focada em NFC-e (Modelo 65).
+Fluxo de Trabalho da Service:
+Configuração (Tools): Crie um método getConfig() que carregue os dados da tabela empresa (JSON de configuração exigido pela biblioteca, incluindo tpAmb, razaosocial, siglaUF, cnpj, etc.).
+Assinatura Digital: Implemente a carga do certificado A1 (.pfx) do banco de dados/disco usando a classe Certificate da biblioteca.
+Mapeamento de Dados (Make): Crie um método gerarXml(Venda $venda) que:
+Instancie a classe Make.
+Mapeie as tags ide (identificação), emit (emitente), dest (destinatário), det (itens/produtos com NCM e CFOP).
+Configure as tags de imposto ICMS, PIS e COFINS com base nos dados da tabela de produtos/tributação.
+Adicione a tag pag (formas de pagamento) e o infAdic.
+Geração e Assinatura: O método deve gerar o XML, assinar e validar contra os Schemas (XSD) da SEFAZ.
+Transmissão (Sefaz): Implemente o envio assíncrono ou síncrono e capture o nProt (protocolo), o cStat (status) e a mensagem de erro/rejeição para salvar no banco.
+QR Code: Utilize a classe Complements para gerar o link do QR Code da NFC-e usando o CSC e CSC_ID do emitente.
+Requisitos de Código:
+Use Try/Catch robusto para capturar exceções da biblioteca e erros de comunicação (SoapFault).
+Retorne um objeto estruturado contendo: sucesso (bool), xml_assinado, protocolo e mensagem_erro.
+Utilize Injeção de Dependência para as classes da biblioteca."
+
+*******
+
+"Aja como Desenvolvedor Backend Senior. Implemente as rotinas de Cancelamento de NFC-e e Inutilização de Numeração utilizando a biblioteca nfephp-org/sped-nfe.
+1. Cancelamento de Evento (NFC-e):
+Crie um método cancelarNfce(int $vendaId, string $justificativa) que:
+Recupere a Chave de Acesso e o Protocolo de Autorização da venda no banco.
+Valide se o cancelamento está dentro do prazo legal (geralmente 30 minutos a 2 horas para NFC-e, dependendo do estado).
+Utilize a classe EvCancNFe para gerar o XML do evento de cancelamento.
+Transmita para a SEFAZ, assine e trate o retorno (cStat 135 - Evento registrado e vinculado).
+Atualize o status da nota no banco para 'Cancelada' e armazene o XML do evento.
+2. Inutilização de Faixa:
+Implemente o método inutilizarNumeracao(int $serie, int $numero, string $justificativa) para casos onde a numeração foi saltada devido a erros técnicos ou rejeições não corrigíveis.
+Utilize a classe InutNFe da biblioteca.
+Envie a solicitação à SEFAZ e armazene o protocolo de inutilização para evitar problemas em futuras auditorias fiscais.
+3. Regras de Negócio e Segurança:
+Adicione travas: impeça o cancelamento de notas que já possuem mais tempo que o permitido pela SEFAZ local.
+Garanta que a justificativa tenha o tamanho mínimo exigido (15 caracteres).
+Implemente o registro de logs para cada tentativa de operação, registrando o IP e o usuário que solicitou o cancelamento.
+4. Interface de Retorno:
+O Controller deve retornar uma resposta clara: 'Nota Cancelada com Sucesso' ou o motivo específico da rejeição do cancelamento (ex: 'Prazo de cancelamento expirado')."
+
