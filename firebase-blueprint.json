@@ -1,0 +1,87 @@
+{
+  "entities": {
+    "emitente": {
+      "title": "Emitente",
+      "description": "Dados da empresa emissora",
+      "type": "object",
+      "properties": {
+        "cnpj": { "type": "string" },
+        "razaoSocial": { "type": "string" },
+        "nomeFantasia": { "type": "string" },
+        "inscricaoEstadual": { "type": "string" },
+        "certificadoP12": { "type": "string" },
+        "certificadoSenha": { "type": "string" },
+        "csc": { "type": "string" },
+        "cscId": { "type": "string" },
+        "ambiente": { "type": "string", "enum": ["1", "2"] }
+      },
+      "required": ["cnpj", "razaoSocial", "certificadoP12", "certificadoSenha"]
+    },
+    "cliente": {
+      "title": "Cliente",
+      "description": "Dados do destinatário",
+      "type": "object",
+      "properties": {
+        "documento": { "type": "string" },
+        "nome": { "type": "string" },
+        "email": { "type": "string", "format": "email" }
+      },
+      "required": ["documento", "nome"]
+    },
+    "produto": {
+      "title": "Produto",
+      "description": "Dados do produto e tributação",
+      "type": "object",
+      "properties": {
+        "codigoInterno": { "type": "string" },
+        "descricao": { "type": "string" },
+        "ean": { "type": "string" },
+        "ncm": { "type": "string" },
+        "cest": { "type": "string" },
+        "unidadeComercial": { "type": "string" },
+        "valorUnitario": { "type": "number" },
+        "cfop": { "type": "string" },
+        "origemMercadoria": { "type": "string" },
+        "icmsCstCsosn": { "type": "string" },
+        "icmsAliquota": { "type": "number" },
+        "pisCst": { "type": "string" },
+        "pisAliquota": { "type": "number" },
+        "cofinsCst": { "type": "string" },
+        "cofinsAliquota": { "type": "number" }
+      },
+      "required": ["codigoInterno", "descricao", "ncm", "unidadeComercial", "valorUnitario", "cfop"]
+    },
+    "nfce": {
+      "title": "NFC-e",
+      "description": "Dados da nota fiscal emitida",
+      "type": "object",
+      "properties": {
+        "numero": { "type": "integer" },
+        "serie": { "type": "integer" },
+        "dataEmissao": { "type": "string", "format": "date-time" },
+        "valorTotal": { "type": "number" },
+        "status": { "type": "string" },
+        "chaveAcesso": { "type": "string" }
+      },
+      "required": ["numero", "serie", "dataEmissao", "valorTotal", "status"]
+    }
+  },
+  "firestore": {
+    "/emitentes/{emitenteId}": {
+      "schema": "emitente",
+      "description": "Configurações do emitente"
+    },
+    "/clientes/{clienteId}": {
+      "schema": "cliente",
+      "description": "Cadastro de clientes"
+    },
+    "/produtos/{produtoId}": {
+      "schema": "produto",
+      "description": "Catálogo de produtos"
+    },
+    "/nfces/{nfceId}": {
+      "schema": "nfce",
+      "description": "Histórico de notas emitidas"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+https://dfe.esolucoesia.com/db.php
+
+***
+
+uptimerobot.com
+heliomaralves@msn.com
+NaoSei@123
+
+***
+Para a VPS, o equivalente é o Gerenciador Docker que já está no painel da Hostinger VPS, mas para arquivos o mais fácil é usar o WinSCP (Windows) que é gratuito e simples como o gerenciador da Hostinger.
+
+ssh-ed25519 255 tJ+G7i3358h3mADUoPPCwLOI4WRcRwAZrtHzl2e3QtY
+ssh-ed25519 255 14:88:d5:13:bf:8f:14:e3:d4:7d:39:16:e8:1f:39:c8

@@ -1,0 +1,18 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Tbcliente {
+  id             Int     @id @map("ID")
+  ativo          Int?    @map("ATIVO")
+  mensagem       String? @map("MENSAGEM")
+  razaoSocial    String? @map("RAZAO_SOCIAL")
+  cnpj           String? @map("CNPJ")
+  idClienteLong  Int?    @map("ID_CLIENTE_LON")
+  
+  @@map("TBCLIENTES")
+}
