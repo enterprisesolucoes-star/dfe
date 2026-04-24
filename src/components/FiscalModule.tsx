@@ -8,58 +8,81 @@ import { FileText, Search, RefreshCw, X, Printer,
 import { StatCard, Input } from './UIComponents';
 import { Nfce, Nfe, Produto, Cliente, Medida } from '../types/nfce';
 
-// ─── Utility ────────────────────────────────────────────────────────────────
 const getLocalToday = () => {
     const d = new Date();
     d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
     return d.toISOString().split('T')[0];
 };
 
-// ─── VendasTab (NFC-e Emissão) ─────────────────────────────────────────────
-export const VendasTab = ({ vendas, onCancelar, onSincronizar, onRetryTef, onExcluir, onEmailDoc, onDevolucao }: { 
-    vendas: Nfce[], 
-    onCancelar: (id: number) => void, 
-    onSincronizar: (id: number) => void, 
-    onRetryTef: (id: number) => void, 
-    onExcluir: (id: number) => void, 
-    onEmailDoc: (id: number, modelo: number, defaultEmail?: string) => void, 
-    onDevolucao?: (id: number, modelo: number) => void 
+export const VendasTab = ({ vendas, onCancelar, onSincronizar, onRetryTef, onExcluir, onEmailDoc, onDevolucao }: {
+    vendas: Nfce[],
+    onCancelar: (id: number) => void,
+    onSincronizar: (id: number) => void,
+    onRetryTef: (id: number) => void,
+    onExcluir: (id: number) => void,
+    onEmailDoc: (id: number, modelo: number, defaultEmail?: string) => void,
+    onDevolucao?: (id: number, modelo: number) => void
 }) => {
-  const dataHoje = getLocalToday();
-  const vendasHoje = vendas.filter(v => v.dataEmissao && v.dataEmissao.startsWith(dataHoje));
-  const [busca, setBusca] = useState('');
-
-  const vendasFiltradas = vendasHoje.filter(v => {
-    const q = busca.toLowerCase().trim();
-    if (!q) return true;
-    return String(v.numero).includes(q) || String(v.clienteId || '').toLowerCase().includes(q);
-  });
-
-  const totalHoje = vendasHoje
-    .filter(v => v.status === 'Autorizada')
-    .reduce((acc, v) => acc + (Number(v.valorTotal) || 0), 0);
-
-  const emitidasCard = vendasHoje.filter(v => v.status === 'Autorizada').length;
-
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Total Hoje" value={totalHoje.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} icon={DollarSign} color="blue" />
-        <StatCard label="Autorizadas" value={emitidasCard.toString()} icon={CheckCircle} color="green" />
-        <StatCard label="Canceladas" value={vendasHoje.filter(v => v.status === 'Cancelada').length.toString()} icon={XCircle} color="red" />
-        <StatCard label="Contingência" value={vendasHoje.filter(v => v.status === 'Contingencia' || v.status === 'Contingência').length.toString()} icon={AlertCircle} color="orange" />
-      </div>
-
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-        <div className="p-4 border-b border-gray-100 bg-gray-50/30">
-          <div className="relative max-w-xs">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar Nº cupom ou cliente..." className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all" />
+    const dataHoje = getLocalToday();
+    const vendasHoje = vendas.filter(v => v.dataEmissao && v.dataEmissao.startsWith(dataHoje));
+    const [busca, setBusca] = useState('');
+    const vendasFiltradas = vendasHoje.filter(v => {
+        const q = busca.toLowerCase().trim();
+        if (!q) return true;
+        return String(v.numero).includes(q) || String(v.clienteId || '').toLowerCase().includes(q);
+    });
+    const totalHoje = vendasHoje.filter(v => v.status === 'Autorizada').reduce((acc, v) => acc + (Number(v.valorTotal) || 0), 0);
+    const emitidasCard = vendasHoje.filter(v => v.status === 'Autorizada').length;
+    return (
+        <div className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <StatCard label="Total Hoje" value={totalHoje.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} icon={DollarSign} color="blue" />
+                <StatCard label="Autorizadas" value={emitidasCard.toString()} icon={CheckCircle} color="green" />
+                <StatCard label="Canceladas" value={vendasHoje.filter(v => v.status === 'Cancelada').length.toString()} icon={XCircle} color="red" />
+                <StatCard label="Contingência" value={vendasHoje.filter(v => v.status === 'Contingencia' || v.status === 'Contingência').length.toString()} icon={AlertCircle} color="orange" />
+            </div>
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+                <div className="p-4 border-b border-gray-100 bg-gray-50/30">
+                    <div className="relative max-w-xs">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar Nº cupom ou cliente..." className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all" />
+                    </div>
+                </div>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                        <thead className="bg-gray-50/50 border-b border-gray-200">
+                            <tr>
+                                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Nº/Série</th>
+                                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Data/Hora</th>
+                                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Cliente</th>
+                                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-right">Valor</th>
+                                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                            {vendasFiltradas.length === 0 ? (
+                                <tr><td colSpan={5} className="px-6 py-12 text-center text-gray-400 italic">
+                                    {busca ? 'Nenhum resultado.' : 'Nenhuma venda hoje.'}
+                                </td></tr>
+                            ) : vendasFiltradas.map((v, i) => (
+                                <tr key={v.id ?? i} className="hover:bg-gray-50/50 transition-all">
+                                    <td className="px-6 py-4 text-xs font-bold text-gray-700">{v.numero}/{v.serie || 1}</td>
+                                    <td className="px-6 py-4 text-xs text-gray-600">{v.dataEmissao ? new Date(v.dataEmissao).toLocaleString('pt-BR') : '-'}</td>
+                                    <td className="px-6 py-4 text-xs text-gray-600">{v.clienteNome || '-'}</td>
+                                    <td className="px-6 py-4 text-xs font-bold text-right">{Number(v.valorTotal || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                                    <td className="px-6 py-4 text-center">
+                                        <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${v.status === 'Autorizada' ? 'bg-green-100 text-green-700' : v.status === 'Cancelada' ? 'bg-red-100 text-red-600' : 'bg-yellow-100 text-yellow-700'}`}>{v.status}</span>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     );
 };
 
-// ─── GeralNfeTab ─────────────────────────────────────────────────────────────
 export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, onDevolucao }: any) => {
     const [cceModal, setCceModal] = React.useState<{open: boolean, nfe: any}>({open: false, nfe: null});
     const [nfeList, setNfeList] = useState<any[]>([]);
@@ -67,7 +90,6 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
     const [di, setDi] = useState(() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`; });
     const [df, setDf] = useState(() => new Date().toISOString().split('T')[0]);
     const [busca, setBusca] = useState('');
-
     const fetchNfeList = async () => {
         setLoading(true);
         try {
@@ -76,35 +98,32 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
             if (Array.isArray(data)) setNfeList(data);
         } catch {} finally { setLoading(false); }
     };
-
     useEffect(() => { fetchNfeList(); }, [di, df]);
-
     const lista = nfeList.filter(n => !busca || String(n.numero || '').includes(busca) || (n.natureza_operacao || '').toLowerCase().includes(busca.toLowerCase()));
     const totAutorizado = lista.filter(n => n.status === 'Autorizada').reduce((a, n) => a + Number(n.valor_total || 0), 0);
     const qtdAutorizadas = lista.filter(n => n.status === 'Autorizada').length;
     const qtdCanceladas = lista.filter(n => n.status === 'Cancelada').length;
     const qtdPendentes = lista.filter(n => !['Autorizada','Cancelada'].includes(n.status)).length;
-
     return (
         <div className="space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
                     <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Total Autorizado</p>
                     <p className="text-xl font-bold text-gray-800">{totAutorizado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-        </div>
+                </div>
                 <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
                     <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Autorizadas</p>
                     <p className="text-xl font-bold text-gray-800">{qtdAutorizadas}</p>
-        </div>
+                </div>
                 <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
                     <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Canceladas</p>
                     <p className="text-xl font-bold text-gray-800">{qtdCanceladas}</p>
-        </div>
+                </div>
                 <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
                     <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Pendentes</p>
                     <p className="text-xl font-bold text-gray-800">{qtdPendentes}</p>
-        </div>
-        </div>
+                </div>
+            </div>
             <div className="flex flex-wrap items-center gap-2 bg-white p-4 rounded-3xl shadow-sm border border-gray-100">
                 <span className="text-[10px] text-gray-400 font-bold uppercase">Data Início</span>
                 <input type="date" value={di} onChange={e => setDi(e.target.value)} className="border border-gray-200 rounded-xl px-2 py-1.5 text-xs outline-none" />
@@ -114,8 +133,8 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
                 <div className="relative ml-auto">
                     <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input type="text" placeholder="Buscar..." value={busca} onChange={e => setBusca(e.target.value)} className="border border-gray-200 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none w-40" />
-        </div>
-        </div>
+                </div>
+            </div>
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
                 <table className="w-full text-left text-sm">
                     <thead className="bg-gray-50 text-gray-500">
@@ -147,25 +166,23 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
                                         {n.status === 'Autorizada' && <button onClick={() => window.open(`./api.php?action=nfe_download_xml&id=${n.id}`, '_blank')} className="p-1.5 text-gray-400 hover:text-green-600" title="XML"><Download className="w-3.5 h-3.5" /></button>}
                                         {onDevolucao && n.status === 'Autorizada' && <button onClick={() => onDevolucao(n.id)} className="p-1.5 text-gray-400 hover:text-orange-500" title="Devolução"><RefreshCw className="w-3.5 h-3.5" /></button>}
                                         {n.status === 'Autorizada' && <button onClick={() => setCceModal({open: true, nfe: n})} className="p-1.5 text-gray-400 hover:text-blue-600" title="Carta de Correção"><Edit3 className="w-3.5 h-3.5" /></button>}
-        </div>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
-        </div>
+            </div>
             {cceModal.open && <CceModal nfe={cceModal.nfe} showAlert={showAlert} onClose={() => setCceModal({open: false, nfe: null})} />}
+        </div>
     );
 };
 
-
-// ─── CceModal ─────────────────────────────────────────────────────────────
 const CceModal = ({ nfe, showAlert, onClose }: any) => {
     const [cceList, setCceList] = React.useState<any[]>([]);
     const [correcao, setCorrecao] = React.useState('');
     const [loading, setLoading] = React.useState(true);
     const [enviando, setEnviando] = React.useState(false);
-
     const fetchCce = async () => {
         setLoading(true);
         const r = await fetch(`./api.php?action=nfe_listar_cce&id=${nfe.id}`);
@@ -173,9 +190,7 @@ const CceModal = ({ nfe, showAlert, onClose }: any) => {
         setCceList(Array.isArray(d) ? d : []);
         setLoading(false);
     };
-
     React.useEffect(() => { fetchCce(); }, []);
-
     const enviar = async () => {
         if (correcao.trim().length < 15) {
             showAlert('Correção curta', 'A correção deve ter no mínimo 15 caracteres.');
@@ -197,10 +212,8 @@ const CceModal = ({ nfe, showAlert, onClose }: any) => {
             showAlert('Erro ao enviar CCe', d.message || 'Não foi possível enviar.');
         }
     };
-
     const cceAutorizadas = cceList.filter(c => c.status === 'Autorizada').length;
     const restantes = 20 - cceAutorizadas;
-
     return (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
             <div className="bg-white rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col" style={{height: 'calc(100vh - 4rem)', maxHeight: '750px'}}>
@@ -208,9 +221,9 @@ const CceModal = ({ nfe, showAlert, onClose }: any) => {
                     <div>
                         <h2 className="text-lg font-bold text-gray-800">Carta de Correção Eletrônica</h2>
                         <p className="text-xs text-gray-400 mt-0.5">NFe {nfe.numero}/{nfe.serie || 1} — {restantes} de 20 disponíveis</p>
-        </div>
+                    </div>
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
-        </div>
+                </div>
                 <div className="flex-1 overflow-y-auto p-6 space-y-5">
                     <div>
                         <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Nova Correção (mín. 15 e máx. 1000 caracteres)</label>
@@ -223,8 +236,8 @@ const CceModal = ({ nfe, showAlert, onClose }: any) => {
                                 className={`px-5 py-2 text-white font-bold text-xs uppercase rounded-xl transition-colors ${enviando || restantes <= 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}>
                                 {enviando ? 'Enviando...' : 'Enviar CCe'}
                             </button>
-        </div>
-        </div>
+                        </div>
+                    </div>
                     <div>
                         <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Histórico</p>
                         {loading ? (
@@ -238,7 +251,7 @@ const CceModal = ({ nfe, showAlert, onClose }: any) => {
                                         <div className="flex items-center justify-between mb-1">
                                             <span className="text-xs font-bold text-gray-700">CCe #{c.numero_sequencia}</span>
                                             <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${c.status === 'Autorizada' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>{c.status}</span>
-        </div>
+                                        </div>
                                         <p className="text-xs text-gray-600 mb-1">{c.correcao}</p>
                                         <div className="flex items-center justify-between">
                                             <span className="text-[10px] text-gray-400">Protocolo: {c.protocolo || '-'}</span>
@@ -250,22 +263,22 @@ const CceModal = ({ nfe, showAlert, onClose }: any) => {
                                                     </button>
                                                 )}
                                                 <span className="text-[10px] text-gray-400">{c.created_at ? new Date(c.created_at).toLocaleString('pt-BR') : ''}</span>
-        </div>
-        </div>
-        </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 ))}
-        </div>
+                            </div>
                         )}
-        </div>
-        </div>
+                    </div>
+                </div>
                 <div className="p-4 border-t border-gray-100 flex justify-end">
                     <button onClick={onClose} className="px-5 py-2 text-gray-500 font-bold text-xs uppercase hover:bg-gray-100 rounded-xl transition-colors">Fechar</button>
-        </div>
+                </div>
+            </div>
         </div>
     );
 };
 
-// ─── NfeDashboardTab ────────────────────────────────────────────────────────
 export const NfeDashboardTab = ({ nfeList, showAlert, showPrompt, onNovaNfe, onCancelarNfe, onExcluirNfe, onRefresh, onEmailDoc, onDevolucao, onRetryTef }: any) => {
     const [cceModalNfe, setCceModalNfe] = React.useState<{open: boolean, nfe: any}>({open: false, nfe: null});
     const [busca, setBusca] = useState('');
@@ -276,34 +289,33 @@ export const NfeDashboardTab = ({ nfeList, showAlert, showPrompt, onNovaNfe, onC
     const qtdAutorizadas = lista.filter((n: any) => n.status === 'Autorizada').length;
     const qtdCanceladas = lista.filter((n: any) => n.status === 'Cancelada').length;
     const qtdPendentes = lista.filter((n: any) => !['Autorizada','Cancelada'].includes(n.status)).length;
-
     return (
         <div className="space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
                     <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Total Autorizado</p>
                     <p className="text-xl font-bold text-gray-800">{totAutorizado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-        </div>
+                </div>
                 <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
                     <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Autorizadas</p>
                     <p className="text-xl font-bold text-gray-800">{qtdAutorizadas}</p>
-        </div>
+                </div>
                 <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
                     <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Canceladas</p>
                     <p className="text-xl font-bold text-gray-800">{qtdCanceladas}</p>
-        </div>
+                </div>
                 <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
                     <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Pendentes</p>
                     <p className="text-xl font-bold text-gray-800">{qtdPendentes}</p>
-        </div>
-        </div>
+                </div>
+            </div>
             <div className="flex items-center gap-2 bg-white p-4 rounded-3xl shadow-sm border border-gray-100">
                 <div className="relative flex-1 max-w-xs">
                     <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input type="text" placeholder="Buscar Nº ou natureza..." value={busca} onChange={e => setBusca(e.target.value)} className="w-full border border-gray-200 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none" />
-        </div>
+                </div>
                 <button onClick={onRefresh} className="p-2 bg-gray-100 text-gray-500 hover:bg-gray-200 rounded-xl transition-all"><RefreshCw className="w-4 h-4" /></button>
-        </div>
+            </div>
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
                 <table className="w-full text-left text-sm">
                     <thead className="bg-gray-50 text-gray-500">
@@ -343,6 +355,103 @@ export const NfeDashboardTab = ({ nfeList, showAlert, showPrompt, onNovaNfe, onC
                 </table>
             </div>
             {cceModalNfe.open && <CceModal nfe={cceModalNfe.nfe} showAlert={showAlert} onClose={() => setCceModalNfe({open: false, nfe: null})} />}
+        </div>
+    );
+};
+
+// ─── GeralNfceTab ─────────────────────────────────────────────────────────────
+export const GeralNfceTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, onDevolucao }: any) => {
+    const [nfceList, setNfceList] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [di, setDi] = useState(() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`; });
+    const [df, setDf] = useState(() => new Date().toISOString().split('T')[0]);
+    const [busca, setBusca] = useState('');
+
+    const fetchList = async () => {
+        setLoading(true);
+        try {
+            const resp = await fetch(`./api.php?action=nfce_listar&data_inicio=${di}&data_fim=${df}`);
+            const data = await resp.json();
+            if (Array.isArray(data)) setNfceList(data);
+        } catch {} finally { setLoading(false); }
+    };
+
+    useEffect(() => { fetchList(); }, [di, df]);
+
+    const lista = nfceList.filter(n => !busca || String(n.numero || '').includes(busca) || (n.clienteNome || '').toLowerCase().includes(busca.toLowerCase()));
+    const totAutorizado = lista.filter(n => n.status === 'Autorizada').reduce((a, n) => a + Number(n.valorTotal || 0), 0);
+    const qtdAutorizadas = lista.filter(n => n.status === 'Autorizada').length;
+    const qtdCanceladas = lista.filter(n => n.status === 'Cancelada').length;
+    const qtdPendentes = lista.filter(n => !['Autorizada','Cancelada'].includes(n.status)).length;
+
+    return (
+        <div className="space-y-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Total Autorizado</p>
+                    <p className="text-xl font-bold text-gray-800">{totAutorizado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                </div>
+                <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Autorizadas</p>
+                    <p className="text-xl font-bold text-gray-800">{qtdAutorizadas}</p>
+                </div>
+                <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Canceladas</p>
+                    <p className="text-xl font-bold text-gray-800">{qtdCanceladas}</p>
+                </div>
+                <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Pendentes</p>
+                    <p className="text-xl font-bold text-gray-800">{qtdPendentes}</p>
+                </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 bg-white p-4 rounded-3xl shadow-sm border border-gray-100">
+                <span className="text-[10px] text-gray-400 font-bold uppercase">Data Início</span>
+                <input type="date" value={di} onChange={e => setDi(e.target.value)} className="border border-gray-200 rounded-xl px-2 py-1.5 text-xs outline-none" />
+                <span className="text-[10px] text-gray-400 font-bold uppercase">Data Fim</span>
+                <input type="date" value={df} onChange={e => setDf(e.target.value)} className="border border-gray-200 rounded-xl px-2 py-1.5 text-xs outline-none" />
+                <button onClick={fetchList} className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all flex items-center gap-1"><RefreshCw className="w-3 h-3" /> Atualizar</button>
+                <div className="relative ml-auto">
+                    <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input type="text" placeholder="Buscar..." value={busca} onChange={e => setBusca(e.target.value)} className="border border-gray-200 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none w-40" />
+                </div>
+            </div>
+            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                    <thead className="bg-gray-50 text-gray-500">
+                        <tr>
+                            <th className="px-6 py-4 font-bold uppercase text-[10px]">Nº/Série</th>
+                            <th className="px-6 py-4 font-bold uppercase text-[10px]">Data</th>
+                            <th className="px-6 py-4 font-bold uppercase text-[10px]">Cliente</th>
+                            <th className="px-6 py-4 font-bold uppercase text-[10px] text-right">Valor</th>
+                            <th className="px-6 py-4 font-bold uppercase text-[10px]">Status</th>
+                            <th className="px-6 py-4 font-bold uppercase text-[10px] text-right">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                        {loading && <tr><td colSpan={6} className="px-6 py-8 text-center text-xs text-gray-400">Carregando...</td></tr>}
+                        {!loading && lista.length === 0 && <tr><td colSpan={6} className="px-6 py-8 text-center text-xs text-gray-400">Nenhuma NFC-e encontrada.</td></tr>}
+                        {!loading && lista.map((n: any) => (
+                            <tr key={n.id} className="hover:bg-gray-50/50 transition-all">
+                                <td className="px-6 py-4 text-xs font-bold text-gray-700">{n.numero}/{n.serie || 1}</td>
+                                <td className="px-6 py-4 text-xs text-gray-600">{n.dataEmissao ? new Date(n.dataEmissao).toLocaleDateString('pt-BR') : '-'}</td>
+                                <td className="px-6 py-4 text-xs text-gray-600">{n.clienteNome || 'Consumidor Final'}</td>
+                                <td className="px-6 py-4 text-xs font-bold text-gray-700 text-right">{Number(n.valorTotal || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                                <td className="px-6 py-4">
+                                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${n.status === 'Autorizada' ? 'bg-green-100 text-green-700' : n.status === 'Cancelada' ? 'bg-red-100 text-red-600' : 'bg-yellow-100 text-yellow-700'}`}>{n.status}</span>
+                                </td>
+                                <td className="px-6 py-4 text-right">
+                                    <div className="flex items-center justify-end gap-1">
+                                        <button onClick={() => window.open(`./api.php?action=nfce_danfe&id=${n.id}`, '_blank')} className="p-1.5 text-gray-400 hover:text-blue-600" title="DANFE"><FileText className="w-3.5 h-3.5" /></button>
+                                        {onEmailDoc && <button onClick={() => onEmailDoc(n.id, 65)} className="p-1.5 text-gray-400 hover:text-blue-500" title="Email"><Send className="w-3.5 h-3.5" /></button>}
+                                        {n.status === 'Autorizada' && <button onClick={() => window.open(`./api.php?action=nfce_download_xml&id=${n.id}`, '_blank')} className="p-1.5 text-gray-400 hover:text-green-600" title="XML"><Download className="w-3.5 h-3.5" /></button>}
+                                        {onDevolucao && n.status === 'Autorizada' && <button onClick={() => onDevolucao(n.id, 65)} className="p-1.5 text-gray-400 hover:text-orange-500" title="Devolução"><RefreshCw className="w-3.5 h-3.5" /></button>}
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };
