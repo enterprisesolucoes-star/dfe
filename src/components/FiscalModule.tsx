@@ -106,23 +106,11 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
     const qtdPendentes = lista.filter(n => !['Autorizada','Cancelada'].includes(n.status)).length;
     return (
         <div className="space-y-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Total Autorizado</p>
-                    <p className="text-xl font-bold text-gray-800">{totAutorizado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                </div>
-                <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Autorizadas</p>
-                    <p className="text-xl font-bold text-gray-800">{qtdAutorizadas}</p>
-                </div>
-                <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Canceladas</p>
-                    <p className="text-xl font-bold text-gray-800">{qtdCanceladas}</p>
-                </div>
-                <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Pendentes</p>
-                    <p className="text-xl font-bold text-gray-800">{qtdPendentes}</p>
-                </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <StatCard label="Total Autorizado" value={totAutorizado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} icon={DollarSign} color="blue" />
+                <StatCard label="Autorizadas" value={qtdAutorizadas.toString()} icon={CheckCircle} color="green" />
+                <StatCard label="Canceladas" value={qtdCanceladas.toString()} icon={XCircle} color="red" />
+                <StatCard label="Pendentes" value={qtdPendentes.toString()} icon={AlertCircle} color="orange" />
             </div>
             <div className="flex flex-wrap items-center gap-2 bg-white p-4 rounded-3xl shadow-sm border border-gray-100">
                 <span className="text-[10px] text-gray-400 font-bold uppercase">Data Início</span>
@@ -154,7 +142,7 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
                             <tr key={n.id} className="hover:bg-gray-50/50 transition-all">
                                 <td className="px-6 py-4 text-xs font-bold text-gray-700">{n.numero}/{n.serie || 1}</td>
                                 <td className="px-6 py-4 text-xs text-gray-600">{n.data_emissao ? new Date(n.data_emissao).toLocaleDateString('pt-BR') : '-'}</td>
-                                <td className="px-6 py-4 text-xs text-gray-600">{n.natureza_operacao || '-'}</td>
+                                <td className="px-6 py-4 text-xs text-gray-600"><div>{n.natureza_operacao || '-'}</div><div className="text-[10px] text-gray-400 mt-0.5">{n.cliente_nome || ''}{n.cliente_documento ? ` · ${n.cliente_documento}` : ''}</div></td>
                                 <td className="px-6 py-4 text-xs font-bold text-gray-700 text-right">{Number(n.valor_total || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                                 <td className="px-6 py-4">
                                     <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${n.status === 'Autorizada' ? 'bg-green-100 text-green-700' : n.status === 'Cancelada' ? 'bg-red-100 text-red-600' : 'bg-yellow-100 text-yellow-700'}`}>{n.status}</span>
@@ -291,23 +279,11 @@ export const NfeDashboardTab = ({ nfeList, showAlert, showPrompt, onNovaNfe, onC
     const qtdPendentes = lista.filter((n: any) => !['Autorizada','Cancelada'].includes(n.status)).length;
     return (
         <div className="space-y-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Total Autorizado</p>
-                    <p className="text-xl font-bold text-gray-800">{totAutorizado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                </div>
-                <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Autorizadas</p>
-                    <p className="text-xl font-bold text-gray-800">{qtdAutorizadas}</p>
-                </div>
-                <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Canceladas</p>
-                    <p className="text-xl font-bold text-gray-800">{qtdCanceladas}</p>
-                </div>
-                <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Pendentes</p>
-                    <p className="text-xl font-bold text-gray-800">{qtdPendentes}</p>
-                </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <StatCard label="Total Autorizado" value={totAutorizado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} icon={DollarSign} color="blue" />
+                <StatCard label="Autorizadas" value={qtdAutorizadas.toString()} icon={CheckCircle} color="green" />
+                <StatCard label="Canceladas" value={qtdCanceladas.toString()} icon={XCircle} color="red" />
+                <StatCard label="Pendentes" value={qtdPendentes.toString()} icon={AlertCircle} color="orange" />
             </div>
             <div className="flex items-center gap-2 bg-white p-4 rounded-3xl shadow-sm border border-gray-100">
                 <div className="relative flex-1 max-w-xs">
@@ -334,7 +310,7 @@ export const NfeDashboardTab = ({ nfeList, showAlert, showPrompt, onNovaNfe, onC
                             <tr key={n.id} className="hover:bg-gray-50/50 transition-all">
                                 <td className="px-6 py-4 text-xs font-bold text-gray-700">{n.numero}/{n.serie || 1}</td>
                                 <td className="px-6 py-4 text-xs text-gray-600">{n.data_emissao ? new Date(n.data_emissao).toLocaleDateString('pt-BR') : '-'}</td>
-                                <td className="px-6 py-4 text-xs text-gray-600">{n.natureza_operacao || '-'}</td>
+                                <td className="px-6 py-4 text-xs text-gray-600"><div>{n.natureza_operacao || '-'}</div><div className="text-[10px] text-gray-400 mt-0.5">{n.cliente_nome || ''}{n.cliente_documento ? ` · ${n.cliente_documento}` : ''}</div></td>
                                 <td className="px-6 py-4 text-xs font-bold text-gray-700 text-right">{Number(n.valor_total || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                                 <td className="px-6 py-4">
                                     <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${n.status === 'Autorizada' ? 'bg-green-100 text-green-700' : n.status === 'Cancelada' ? 'bg-red-100 text-red-600' : 'bg-yellow-100 text-yellow-700'}`}>{n.status}</span>
@@ -386,23 +362,11 @@ export const GeralNfceTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, o
 
     return (
         <div className="space-y-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Total Autorizado</p>
-                    <p className="text-xl font-bold text-gray-800">{totAutorizado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                </div>
-                <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Autorizadas</p>
-                    <p className="text-xl font-bold text-gray-800">{qtdAutorizadas}</p>
-                </div>
-                <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Canceladas</p>
-                    <p className="text-xl font-bold text-gray-800">{qtdCanceladas}</p>
-                </div>
-                <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Pendentes</p>
-                    <p className="text-xl font-bold text-gray-800">{qtdPendentes}</p>
-                </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <StatCard label="Total Autorizado" value={totAutorizado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} icon={DollarSign} color="blue" />
+                <StatCard label="Autorizadas" value={qtdAutorizadas.toString()} icon={CheckCircle} color="green" />
+                <StatCard label="Canceladas" value={qtdCanceladas.toString()} icon={XCircle} color="red" />
+                <StatCard label="Pendentes" value={qtdPendentes.toString()} icon={AlertCircle} color="orange" />
             </div>
             <div className="flex flex-wrap items-center gap-2 bg-white p-4 rounded-3xl shadow-sm border border-gray-100">
                 <span className="text-[10px] text-gray-400 font-bold uppercase">Data Início</span>

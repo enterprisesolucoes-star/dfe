@@ -117,8 +117,8 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm }: { tip
   const [totPago, setTotPago] = useState(0);
   const [loading, setLoading] = useState(true);
   const [filtroStatus, setFiltroStatus] = useState<'Pendente' | 'Pago' | ''>('');
-  const [di, setDi] = useState('');
-  const [df, setDf] = useState('');
+  const [di, setDi] = useState(() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`; });
+  const [df, setDf] = useState(() => new Date().toISOString().split('T')[0]);
   const [busca, setBusca] = useState('');
   const [baixaTitulo, setBaixaTitulo] = useState<any | null>(null);
 
@@ -289,8 +289,8 @@ export const CaixaView = ({ emitente, showAlert, showConfirm }: { emitente: any,
   const [saldo, setSaldo] = useState(0);
   const [totEntradas, setTotEntradas] = useState(0);
   const [totSaidas, setTotSaidas] = useState(0);
-  const [di, setDi] = useState('');
-  const [df, setDf] = useState('');
+  const [di, setDi] = useState(() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`; });
+  const [df, setDf] = useState(() => new Date().toISOString().split('T')[0]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [descricao, setDescricao] = useState('');
