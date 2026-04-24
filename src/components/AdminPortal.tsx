@@ -1,630 +1,592 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { 
-    Building, Lock, LogOut, Plus, Edit2, Trash2, ShieldCheck, 
-    Search, MapPin, Mail, Phone, Globe, Info, CheckCircle, Smartphone, AlertTriangle
+import { motion } from 'motion/react';
+import {
+  FileText, Lock, User, LogOut, Plus, Edit, Trash2,
+  Search, CheckCircle, X, Smartphone, Shield, RefreshCw
 } from 'lucide-react';
 
-const ESTADOS_BR = [
-  { sigla: 'AC', nome: 'Acre' }, { sigla: 'AL', nome: 'Alagoas' }, { sigla: 'AP', nome: 'Amapá' },
-  { sigla: 'AM', nome: 'Amazonas' }, { sigla: 'BA', nome: 'Bahia' }, { sigla: 'CE', nome: 'Ceará' },
-  { sigla: 'DF', nome: 'Distrito Federal' }, { sigla: 'ES', nome: 'Espírito Santo' }, { sigla: 'GO', nome: 'Goiás' },
-  { sigla: 'MA', nome: 'Maranhão' }, { sigla: 'MT', nome: 'Mato Grosso' }, { sigla: 'MS', nome: 'Mato Grosso do Sul' },
-  { sigla: 'MG', nome: 'Minas Gerais' }, { sigla: 'PA', nome: 'Pará' }, { sigla: 'PB', nome: 'Paraíba' },
-  { sigla: 'PR', nome: 'Paraná' }, { sigla: 'PE', nome: 'Pernambuco' }, { sigla: 'PI', nome: 'Piauí' },
-  { sigla: 'RJ', nome: 'Rio de Janeiro' }, { sigla: 'RN', nome: 'Rio Grande do Norte' }, { sigla: 'RS', nome: 'Rio Grande do Sul' },
-  { sigla: 'RO', nome: 'Rondônia' }, { sigla: 'RR', nome: 'Roraima' }, { sigla: 'SC', nome: 'Santa Catarina' },
-  { sigla: 'SP', nome: 'São Paulo' }, { sigla: 'SE', nome: 'Sergipe' }, { sigla: 'TO', nome: 'Tocantins' }
-];
+const ESTADOS = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
+const RECURSOS: Record<number, string> = { 0: 'S/ Recurso', 1: 'NFe', 2: 'NFe + NFCe', 3: 'PDV Offline', 4: 'BLOQUEADO' };
 
 const AdminPortal = () => {
-    const [loggedIn, setLoggedIn] = useState(false);
-    const [login, setLogin] = useState('');
-    const [senha, setSenha] = useState('');
-    const [empresas, setEmpresas] = useState<any[]>([]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-    const [editing, setEditing] = useState<any>(null);
-    const [deleting, setDeleting] = useState<number | null>(null);
-    const [userModal, setUserModal] = useState<{ open: boolean; empresaId: number; empresaNome: string }>({ open: false, empresaId: 0, empresaNome: '' });
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [login, setLogin] = useState('');
+  const [senha, setSenha] = useState('');
+  const [erro, setErro] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [adminToken, setAdminToken] = useState(() => {
+    // Sempre exigir novo login ao acessar /admin
+    localStorage.removeItem('dfe_admin_token');
+    return '';
+  });
+  const [municipios, setMunicipios] = useState<string[]>([]);
+  const [empresas, setEmpresas] = useState<any[]>([]);
+  const [busca, setBusca] = useState('');
+  const [modal, setModal] = useState(false);
+  const [tab, setTab] = useState<'dados'|'smartpos'>('dados');
+  const [form, setForm] = useState<any>({});
+  const [smartPosList, setSmartPosList] = useState<any[]>([]);
+  const [spForm, setSpForm] = useState({ codigo: '', numero_serie: '', integradora: '', apelido: '' });
+  const [editingSp, setEditingSp] = useState<number|null>(null);
+  const [empresaId, setEmpresaId] = useState<number|null>(null);
+  const [confirmModal, setConfirmModal] = useState<{open: boolean, id: number|null, nome: string, tipo: 'inativar'|'bloquear'|'desbloquear'}>({open: false, id: null, nome: '', tipo: 'inativar'});
+  const [alertModal, setAlertModal] = useState<{open: boolean, tipo: 'error'|'warning'|'info'|'success', titulo: string, msg: string}>({open: false, tipo: 'info', titulo: '', msg: ''});
+  const [confirmSmartPos, setConfirmSmartPos] = useState<{open: boolean, id: number|null}>({open: false, id: null});
 
-    const handleLogin = async (e: any) => {
-        e.preventDefault();
-        setLoading(true);
-        const res = await fetch('api.php?action=login_admin', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ login, senha })
-        });
-        const data = await res.json();
-        if (data.success) {
-            setLoggedIn(true);
-            fetchEmpresas();
-        } else {
-            setError(data.message);
-        }
-        setLoading(false);
-    };
+  const api = async (action: string, method = 'GET', body?: any) => {
+    const token = adminToken || localStorage.getItem('dfe_admin_token') || '';
+    const url = `./api.php?action=${action}&adm_token=${token}`;
+    const opts: any = { method, headers: { 'Content-Type': 'application/json' } };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(url, opts);
+    return res.json();
+  };
 
-    const fetchEmpresas = async () => {
-        setLoading(true);
-        try {
-            const res = await fetch('api.php?action=listar_empresas_admin');
-            const data = await res.json();
-            if (Array.isArray(data)) { setEmpresas(data); } else { setEmpresas([]); }
-        } catch { setEmpresas([]); }
-        finally { setLoading(false); }
-    };
+  const apiWithToken = async (action: string, token: string, method = 'GET', body?: any) => {
+    const url = `./api.php?action=${action}&adm_token=${token}`;
+    const opts: any = { method, headers: { 'Content-Type': 'application/json' } };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(url, opts);
+    return res.json();
+  };
 
-    const handleSave = async (e: any) => {
-        e.preventDefault();
-        const res = await fetch('api.php?action=salvar_empresa_admin', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(editing)
-        });
-        const data = await res.json();
-        if (data.success) {
-            setEditing(null);
-            fetchEmpresas();
-            if (data.id) {
-                setUserModal({ open: true, empresaId: data.id, empresaNome: editing.razao_social || 'Nova Empresa' });
-            }
-        }
-    };
+  // useEffect removido - sempre exigir login
 
-    const handleExcluirConfirm = async () => {
-        if (!deleting) return;
-        await fetch(`./api.php?action=excluir_empresa_admin&id=${deleting}`);
-        setDeleting(null);
-        fetchEmpresas();
-    };
+  const handleLogin = async (e: any) => {
+    e.preventDefault();
+    setLoading(true); setErro('');
+    try {
+      const data = await apiWithToken('login_admin', '', 'POST', { login, senha });
+      if (data.success) {
+        const tok = data.token || '';
+        localStorage.setItem('dfe_admin_token', tok);
+        setAdminToken(tok);
+        setLoggedIn(true);
+        const empresasData = await apiWithToken('listar_empresas_admin', tok);
+        if (Array.isArray(empresasData)) setEmpresas(empresasData);
+      } else { setErro(data.message || 'Erro ao autenticar.'); }
+    } catch { setErro('Erro de comunicação.'); }
+    setLoading(false);
+  };
 
-    const filteredEmpresas = empresas.filter(emp => 
-        emp.razao_social?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        emp.cnpj?.includes(searchTerm)
-    );
+  const fetchEmpresas = async (tok?: string) => {
+    const token = tok || adminToken;
+    const data = await apiWithToken('listar_empresas_admin', token);
+    if (Array.isArray(data)) setEmpresas(data);
+  };
 
-    if (!loggedIn) {
-        return (
-            <div
-                className="min-h-screen flex items-center justify-center p-4 bg-cover bg-center bg-no-repeat relative font-sans"
-                style={{ backgroundImage: 'url("bg_login.png")' }}
-            >
-                <div className="absolute inset-0 bg-blue-900/70 mix-blend-multiply"></div>
-                <div className="absolute inset-0 bg-black/40"></div>
-                <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-sm p-8 relative z-10 border border-white/20">
-                    <div className="text-center mb-8">
-                        <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-2xl mb-4">
-                            <ShieldCheck className="w-8 h-8 text-blue-600" />
-                        </div>
-                        <h1 className="text-2xl font-bold text-gray-800">Admin DFe</h1>
-                        <p className="text-sm text-gray-500 mt-1">Área Restrita</p>
-                    </div>
-                    <form onSubmit={handleLogin} className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Login</label>
-                            <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                <input type="text" value={login} onChange={e => setLogin(e.target.value)} placeholder="admin" className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
-                            <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                <input type="password" value={senha} onChange={e => setSenha(e.target.value)} placeholder="••••••" className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
-                            </div>
-                        </div>
-                        {error && <p className="text-xs text-red-500 text-center px-4 py-2 bg-red-50 rounded-lg border border-red-100">{error}</p>}
-                        <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
-                            {loading ? 'Autenticando...' : 'Entrar'}
-                        </button>
-                    </form>
-                    <p className="text-center text-xs mt-6 text-gray-400">
-                        <a href="https://esolucoesia.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors cursor-pointer">
-                            Enterprise Soluções
-                        </a>
-                    </p>
-                </div>
-            </div>
-        );
+  const handleLogout = () => {
+    localStorage.removeItem('dfe_admin_token');
+    setAdminToken(''); setLoggedIn(false); setEmpresas([]);
+  };
+
+  const abrirModal = async (emp?: any) => {
+    setTab('dados');
+    setSpForm({ codigo: '', numero_serie: '', integradora: '', apelido: '' });
+    if (emp) {
+      setForm({ ...emp });
+      if (emp.uf) buscarMunicipios(emp.uf);
+      setEmpresaId(emp.id);
+      const sps = await api(`listar_smartpos_admin&empresa_id=${emp.id}`);
+      setSmartPosList(Array.isArray(sps) ? sps : []);
+    } else {
+      setForm({ status: 'Ativo', usuario_dfe: 2, ambiente: 2, crt: 1, tem_tef: 0 });
+      setEmpresaId(null);
+      setSmartPosList([]);
     }
+    setModal(true);
+  };
 
-    return (
-        <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-8 font-sans text-slate-600">
-            <style>{`b, strong, h1, h2, h3 { font-weight: 600 !important; color: #334155; }`}</style>
-            <div className="max-w-7xl mx-auto">
-                <div className="flex flex-col md:flex-row justify-between items-center mb-8 bg-white p-6 rounded-[2rem] shadow-sm border border-white gap-4">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center border border-blue-100">
-                            <ShieldCheck className="w-6 h-6 text-blue-600" />
-                        </div>
-                        <div>
-                            <h2 className="text-xl font-bold text-slate-800">Gerenciamento Central</h2>
-                            <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">Status e Licenciamento das Empresas</p>
-                        </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-4 w-full md:w-auto">
-                        <div className="relative flex-1 md:w-80">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                            <input 
-                                type="text" 
-                                placeholder="Busca rápida por empresa..." 
-                                value={searchTerm}
-                                onChange={e => setSearchTerm(e.target.value)}
-                                className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                            />
-                        </div>
-                        <button onClick={() => setLoggedIn(false)} className="p-3 text-slate-400 hover:text-red-600 bg-white shadow-sm rounded-2xl border border-slate-100 transition-all"><LogOut className="w-5 h-5" /></button>
-                    </div>
-                </div>
+  const salvar = async () => {
+    // Garantir valores padrão antes de enviar
+    const payload: any = {
+      ...form,
+      usuario_dfe: Number(form.usuario_dfe ?? 2),
+      status: form.status || 'Ativo',
+      tem_tef: Number(form.tem_tef) || 0,
+    };
+    // Valores padrão apenas para novos cadastros
+    if (!empresaId) {
+      payload.ambiente = 2;  // Homologação
+      payload.crt = '1';     // Simples Nacional
+    }
+    const data = await api('salvar_empresa_admin', 'POST', payload);
+    if (data.success) { setModal(false); fetchEmpresas(); }
+    else setAlertModal({open: true, tipo: 'error', titulo: 'Erro ao salvar', msg: data.message || 'Tente novamente.'});
+  };
 
-                <div className="flex justify-end mb-6">
-                    <button onClick={() => setEditing({ status: 'Ativo', usuario_dfe: 2 })} className="bg-blue-600 text-white px-8 py-3.5 rounded-2xl font-bold flex items-center gap-2 shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all text-sm">
-                        <Plus className="w-5 h-5" /> Adicionar Empresa
-                    </button>
-                </div>
+  const excluir = (id: number, nome: string) => {
+    setConfirmModal({ open: true, id, nome, tipo: 'inativar' });
+  };
 
-                <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-white">
-                    <table className="w-full text-left">
-                        <thead className="bg-slate-50 text-slate-400 text-[10px] font-bold uppercase tracking-[0.15em] border-b border-slate-50">
-                            <tr>
-                                <th className="px-8 py-6">Empresa / CNPJ</th>
-                                <th className="px-8 py-6">Cidade</th>
-                                <th className="px-8 py-6 text-center">Status</th>
-                                <th className="px-8 py-6">Tipo Licença</th>
-                                <th className="px-8 py-6 text-right">Opções</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-50/50">
-                            {filteredEmpresas.map(emp => (
-                                <tr key={emp.id} className="hover:bg-slate-50/30 transition-colors group">
-                                    <td className="px-8 py-6">
-                                        <div className="font-bold text-slate-700 group-hover:text-blue-600 transition-colors">{emp.razao_social}</div>
-                                        <div className="text-[10px] text-slate-400 font-bold mt-1 tracking-wider">{emp.cnpj}</div>
-                                    </td>
-                                    <td className="px-8 py-6">
-                                        <div className="text-xs font-bold text-slate-600">{emp.municipio || '---'}</div>
-                                        <div className="text-[10px] text-slate-400 font-bold uppercase">{emp.uf}</div>
-                                    </td>
-                                    <td className="px-8 py-6 text-center">
-                                        <span className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-tight ${
-                                            emp.status === 'Ativo' ? 'bg-emerald-50 text-emerald-600' :
-                                            emp.status === 'Inativo' ? 'bg-slate-100 text-slate-400' : 'bg-red-50 text-red-600'
-                                        }`}>
-                                            {emp.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-8 py-6">
-                                        <div className="flex items-center gap-2">
-                                            <div className={`w-2 h-2 rounded-full ${emp.usuario_dfe === 0 || emp.usuario_dfe === 4 ? 'bg-slate-300' : 'bg-blue-600'}`}></div>
-                                            <div className="text-xs font-bold text-slate-700">
-                                                {emp.usuario_dfe === 0 && 'S/ Recurso Fiscal'}
-                                                {emp.usuario_dfe === 1 && 'NFe'}
-                                                {emp.usuario_dfe === 2 && 'NFe + NFCe'}
-                                                {emp.usuario_dfe === 3 && 'PDV Offline'}
-                                                {emp.usuario_dfe === 4 && 'DFe BLOQUEADO'}
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-8 py-6 text-right">
-                                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button onClick={() => setEditing(emp)} className="p-3 text-slate-400 hover:text-blue-600 bg-white shadow-sm rounded-xl border border-slate-100 transition-all"><Edit2 className="w-4 h-4" /></button>
-                                            <button onClick={() => setDeleting(emp.id)} className="p-3 text-slate-400 hover:text-red-600 bg-white shadow-sm rounded-xl border border-slate-100 transition-all"><Trash2 className="w-4 h-4" /></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+  const bloquear = (id: number, nome: string, status: string) => {
+    const tipo = status === 'Bloqueado' ? 'desbloquear' : 'bloquear';
+    setConfirmModal({ open: true, id, nome, tipo });
+  };
 
-            {/* Modal de Configuração */}
-            <AnimatePresence>
-                {editing && (
-                    <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center z-[500] p-4 backdrop-blur-sm overflow-y-auto">
-                        <motion.form 
-                            initial={{ scale: 0.98, opacity: 0 }} 
-                            animate={{ scale: 1, opacity: 1 }} 
-                            exit={{ scale: 0.98, opacity: 0 }}
-                            onSubmit={handleSave} 
-                            className="bg-white rounded-[2.5rem] p-10 w-full max-w-4xl shadow-2xl my-8 relative border border-white"
-                        >
-                            <div className="flex items-center gap-4 mb-10 border-b border-slate-100 pb-6">
-                                <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center border border-blue-100">
-                                    <Building className="w-6 h-6 text-blue-600" />
-                                </div>
-                                <div>
-                                    <h3 className="text-xl font-bold text-slate-800">Dados da Empresa</h3>
-                                    <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Gerencie os detalhes cadastrais</p>
-                                </div>
-                            </div>
+  const confirmarAcao = async () => {
+    if (!confirmModal.id) return;
+    const novoStatus = confirmModal.tipo === 'inativar' ? 'Inativo' : confirmModal.tipo === 'bloquear' ? 'Bloqueado' : 'Ativo';
+    await api('alterar_status_empresa', 'POST', { id: confirmModal.id, status: novoStatus });
+    setConfirmModal({ open: false, id: null, nome: '', tipo: 'inativar' });
+    fetchEmpresas();
+  };
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-slate-500 ml-1">CNPJ *</label>
-                                    <input type="text" value={editing.cnpj || ''} onChange={e => setEditing({...editing, cnpj: e.target.value})} className="w-full px-5 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm font-bold text-slate-700" />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-slate-500 ml-1">Inscrição Estadual *</label>
-                                    <input type="text" value={editing.ie || ''} onChange={e => setEditing({...editing, ie: e.target.value})} className="w-full px-5 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm font-bold text-slate-700" />
-                                </div>
+  const addSmartPos = async () => {
+    if (!spForm.codigo || !spForm.numero_serie || !spForm.integradora) {
+      setAlertModal({open: true, tipo: 'warning', titulo: 'Campos obrigatórios', msg: 'Preencha ID, Nº Série e Integradora.'});
+      return;
+    }
+    const payload: any = { ...spForm, empresa_id: empresaId };
+    if (editingSp) payload.id = editingSp;
+    const data = await api('salvar_smartpos_admin', 'POST', payload);
+    if (data.success) {
+      const sps = await api(`listar_smartpos_admin&empresa_id=${empresaId}`);
+      setSmartPosList(Array.isArray(sps) ? sps : []);
+      setSpForm({ codigo: '', numero_serie: '', integradora: '', apelido: '' });
+      setEditingSp(null);
+    }
+  };
 
-                                <div className="md:col-span-2 space-y-1.5">
-                                    <label className="text-xs font-bold text-slate-500 ml-1">Razão Social *</label>
-                                    <input type="text" value={editing.razao_social || ''} onChange={e => setEditing({...editing, razao_social: e.target.value})} className="w-full px-5 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm font-bold text-slate-700" />
-                                </div>
+  const editSmartPos = (sp: any) => {
+    setSpForm({ codigo: sp.codigo || '', numero_serie: sp.numero_serie || '', integradora: sp.integradora || '', apelido: sp.apelido || '' });
+    setEditingSp(sp.id);
+  };
 
-                                <div className="md:col-span-2 pt-6 border-t border-slate-50 mt-2">
-                                    <h4 className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.3em] mb-6 flex items-center gap-2">
-                                        <MapPin className="w-3 h-3 text-blue-500" /> Informações de Endereço
-                                    </h4>
-                                </div>
+  const cancelarEditSp = () => {
+    setSpForm({ codigo: '', numero_serie: '', integradora: '', apelido: '' });
+    setEditingSp(null);
+  };
 
-                                <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
-                                    <div className="md:col-span-2 space-y-1.5">
-                                        <label className="text-xs font-bold text-slate-500 ml-1">Logradouro *</label>
-                                        <input type="text" value={editing.logradouro || ''} onChange={e => setEditing({...editing, logradouro: e.target.value})} className="w-full px-5 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm font-bold text-slate-700" />
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-xs font-bold text-slate-500 ml-1">Número *</label>
-                                        <input type="text" value={editing.numero || ''} onChange={e => setEditing({...editing, numero: e.target.value})} className="w-full px-5 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm font-bold text-slate-700" />
-                                    </div>
-                                </div>
+  const delSmartPos = (id: number) => {
+    setConfirmSmartPos({open: true, id});
+  };
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 md:col-span-2 gap-6">
-                                    <div className="space-y-1.5">
-                                        <label className="text-xs font-bold text-slate-500 ml-1">Bairro *</label>
-                                        <input type="text" value={editing.bairro || ''} onChange={e => setEditing({...editing, bairro: e.target.value})} className="w-full px-5 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm font-bold text-slate-700" />
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-xs font-bold text-slate-500 ml-1">CEP *</label>
-                                        <input type="text" value={editing.cep || ''} onChange={e => setEditing({...editing, cep: e.target.value})} className="w-full px-5 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm font-bold text-slate-700" />
-                                    </div>
-                                </div>
+  const confirmarDelSmartPos = async () => {
+    if (!confirmSmartPos.id) return;
+    await api('excluir_smartpos_admin', 'POST', { id: confirmSmartPos.id });
+    const sps = await api(`listar_smartpos_admin&empresa_id=${empresaId}`);
+    setSmartPosList(Array.isArray(sps) ? sps : []);
+    setConfirmSmartPos({open: false, id: null});
+  };
 
-                                <MunicipioSelectSection editing={editing} setEditing={setEditing} />
+  const set = (f: string, v: any) => setForm((p: any) => ({ ...p, [f]: v }));
 
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-slate-500 ml-1">Regime Tributário (CRT) *</label>
-                                    <select value={editing.crt || '1'} onChange={e => setEditing({...editing, crt: e.target.value})} className="w-full px-5 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm font-bold text-slate-600">
-                                        <option value="1">1 - Simples Nacional</option>
-                                        <option value="2">2 - Simples (Sublimite)</option>
-                                        <option value="3">3 - Regime Normal</option>
-                                    </select>
-                                </div>
+  const buscarMunicipios = async (uf: string) => {
+    try {
+      const res = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios?orderBy=nome`);
+      const data = await res.json();
+      setMunicipios(data.map((m: any) => m.nome));
+    } catch { setMunicipios([]); }
+  };
 
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-slate-500 ml-1">Telefone Comercial *</label>
-                                    <input type="text" value={editing.telefone || ''} onChange={e => setEditing({...editing, telefone: e.target.value})} className="w-full px-5 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm font-bold text-slate-700" />
-                                </div>
+  const handleUfChange = (uf: string) => { set('uf', uf); buscarMunicipios(uf); };
 
-                                <div className="md:col-span-2 pt-6 border-t border-slate-50 mt-2">
-                                    <h4 className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.3em] mb-6 flex items-center gap-2">
-                                        <ShieldCheck className="w-3 h-3 text-emerald-500" /> Parâmetros de Licenciamento
-                                    </h4>
-                                </div>
+  const lista = empresas.filter(e =>
+    e.status !== 'Inativo' &&
+    (!busca || (e.razao_social || '').toLowerCase().includes(busca.toLowerCase()) ||
+    (e.cnpj || '').includes(busca) || (e.nome_fantasia || '').toLowerCase().includes(busca.toLowerCase()))
+  );
 
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-slate-500 ml-1">Status Operacional</label>
-                                    <select value={editing.status || 'Ativo'} onChange={e => setEditing({...editing, status: e.target.value})} className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm font-bold text-slate-600">
-                                        <option value="Ativo">Ativo</option>
-                                        <option value="Inativo">Inativo</option>
-                                        <option value="Bloqueado">Bloqueado</option>
-                                    </select>
-                                </div>
-
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-slate-500 ml-1">Nível de Licença DFe</label>
-                                    <select value={editing.usuario_dfe || 0} onChange={e => setEditing({...editing, usuario_dfe: Number(e.target.value)})} className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm font-bold text-slate-600">
-                                        <option value={0}>0 - Sem Recursos Fiscais</option>
-                                        <option value={1}>1 - Emissão de NF-e</option>
-                                        <option value={2}>2 - NF-e e NFC-e</option>
-                                        <option value={3}>3 - PDV Offline</option>
-                                        <option value={4}>4 - Bloqueio de DFe</option>
-                                    </select>
-                                </div>
-
-                                {(editing.usuario_dfe === 1 || editing.usuario_dfe === 2) && (
-                                    <div className="md:col-span-2 bg-blue-50/30 p-5 rounded-2xl border border-blue-100/50 flex items-center justify-between">
-                                        <div>
-                                            <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-1">Estratégia Reforma Tributária (LC 214)</p>
-                                            <p className="text-xs text-slate-500 font-bold">Recolher IBS e CBS "Por Fora" do Simples Nacional?</p>
-                                        </div>
-                                        <button
-                                            type="button"
-                                            onClick={() => setEditing({ ...editing, recolhe_ibscbs_fora: editing.recolhe_ibscbs_fora === 1 ? 0 : 1 })}
-                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${editing.recolhe_ibscbs_fora === 1 ? 'bg-blue-600' : 'bg-slate-200'}`}
-                                        >
-                                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${editing.recolhe_ibscbs_fora === 1 ? 'translate-x-6' : 'translate-x-1'}`} />
-                                        </button>
-                                    </div>
-                                )}
-
-                                {/* TEF */}
-                                <div className="md:col-span-2 bg-slate-50/60 p-5 rounded-2xl border border-slate-100 flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <Smartphone className="w-4 h-4 text-slate-400" />
-                                        <div>
-                                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">TEF — Transferência Eletrônica de Fundos</p>
-                                            <p className="text-xs text-slate-500 font-bold">Esta empresa utiliza integração TEF / SmartPOS?</p>
-                                        </div>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => setEditing({ ...editing, usa_tef: editing.usa_tef === 1 ? 0 : 1 })}
-                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${editing.usa_tef === 1 ? 'bg-blue-600' : 'bg-slate-200'}`}
-                                    >
-                                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${editing.usa_tef === 1 ? 'translate-x-6' : 'translate-x-1'}`} />
-                                    </button>
-                                </div>
-
-                                {editing.usa_tef === 1 && editing.id && (
-                                    <div className="md:col-span-2">
-                                        <SmartPosAdminSection empresaId={editing.id} />
-                                    </div>
-                                )}
-                                {editing.usa_tef === 1 && !editing.id && (
-                                    <div className="md:col-span-2 text-xs text-slate-400 italic px-1">
-                                        Salve a empresa primeiro para cadastrar as máquinas SmartPOS.
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="flex items-center justify-end gap-10 pt-10 mt-6 border-t border-slate-100">
-                                <button type="button" onClick={() => setEditing(null)} className="text-xs font-bold uppercase text-slate-500 hover:text-slate-800 transition-colors tracking-widest">Cancelar</button>
-                                <button type="submit" className="px-12 py-3 bg-blue-600 text-white font-bold uppercase text-sm rounded-full shadow-2xl shadow-blue-100 hover:bg-blue-700 transition-all tracking-widest">Salvar</button>
-                            </div>
-                        </motion.form>
-                    </div>
-                )}
-            </AnimatePresence>
-
-            {/* Modal de Confirmação de Exclusão */}
-            <AnimatePresence>
-                {deleting && (
-                    <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center z-[600] p-4 backdrop-blur-sm">
-                        <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl text-center border border-white">
-                            <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                                <AlertTriangle className="w-8 h-8 text-red-500" />
-                            </div>
-                            <h3 className="text-lg font-bold text-slate-800">Deseja Inativar?</h3>
-                            <p className="text-sm text-slate-400 mt-2">A empresa selecionada perderá o acesso ao sistema imediatamente.</p>
-                            <div className="flex gap-4 mt-8">
-                                <button onClick={() => setDeleting(null)} className="flex-1 py-3 text-slate-400 font-bold uppercase text-[10px] tracking-widest">Voltar</button>
-                                <button onClick={handleExcluirConfirm} className="flex-1 py-3 bg-red-500 text-white font-bold uppercase text-[10px] rounded-xl shadow-xl shadow-red-100 tracking-widest hover:bg-red-600">Sim, Inativar</button>
-                            </div>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
-
-            {userModal.open && (
-                <UserRegistrationModal 
-                    empresaId={userModal.empresaId}
-                    empresaNome={userModal.empresaNome}
-                    onClose={() => setUserModal({ open: false, empresaId: 0, empresaNome: '' })}
-                />
-            )}
+  // ─── LOGIN ───────────────────────────────────────────────────────────────
+  if (!loggedIn) return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-700 p-4">
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-2xl mb-4">
+            <FileText className="w-8 h-8 text-blue-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-800">DFe IA</h1>
+          <p className="text-sm text-gray-500 mt-1">Painel Administrativo</p>
         </div>
-    );
-};
-
-// Componente Sincronizado com codigo_municipio do Banco
-const MunicipioSelectSection = ({ editing, setEditing }: any) => {
-    const [municipios, setMunicipios] = useState<{ id: number, nome: string }[]>([]);
-    const [loadingMun, setLoadingMun] = useState(false);
-
-    const handleUfChange = async (uf: string) => {
-        setEditing({ ...editing, uf, municipio: '', codigo_municipio: '' });
-        if (!uf) { setMunicipios([]); return; }
-        await fetchCidades(uf);
-    };
-
-    const fetchCidades = async (uf: string) => {
-        setLoadingMun(true);
-        try {
-            const res = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios?orderBy=nome`);
-            const data = await res.json();
-            const list = data.map((m: any) => ({ id: m.id, nome: m.nome }));
-            setMunicipios(list);
-            return list;
-        } catch { 
-            setMunicipios([]); 
-            return [];
-        } finally { 
-            setLoadingMun(false); 
-        }
-    };
-
-    const handleMunicipioChange = (id: string) => {
-        const mun = municipios.find(m => String(m.id) === id);
-        if (mun) {
-            setEditing({ ...editing, municipio: mun.nome, codigo_municipio: String(mun.id) });
-        }
-    };
-
-    useEffect(() => {
-        if (editing.uf) {
-            fetchCidades(editing.uf);
-        }
-    }, [editing.uf]);
-
-    return (
-        <>
-            <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 ml-1">UF (Estado) *</label>
-                <select value={editing.uf || ''} onChange={e => handleUfChange(e.target.value)} className="w-full px-5 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm font-bold text-slate-600">
-                    <option value="">Selecione o estado...</option>
-                    {ESTADOS_BR.map(s => <option key={s.sigla} value={s.sigla}>{s.sigla} — {s.nome}</option>)}
-                </select>
+        {erro && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm mb-4">{erro}</div>}
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div>
+            <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Login</label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input type="text" value={login} onChange={e => setLogin(e.target.value)} placeholder="admin"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-400" />
             </div>
-            
-            <div className="grid grid-cols-5 gap-4">
-                <div className="col-span-3 space-y-1.5">
-                    <label className="text-xs font-bold text-slate-500 ml-1">Município *</label>
-                    <select 
-                        value={editing.codigo_municipio || ''} 
-                        onChange={e => handleMunicipioChange(e.target.value)}
-                        disabled={loadingMun || !editing.uf}
-                        className="w-full px-5 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm font-bold text-slate-700 disabled:opacity-50"
-                    >
-                        {loadingMun ? (
-                            <option value="">Buscando cidades...</option>
-                        ) : (
-                            <>
-                                <option value="">Selecione a cidade...</option>
-                                {municipios.map(m => (
-                                    <option key={m.id} value={String(m.id)}>{m.nome}</option>
-                                ))}
-                            </>
-                        )}
-                    </select>
-                </div>
-                <div className="col-span-2 space-y-1.5">
-                    <label className="text-xs font-bold text-slate-500 ml-1 font-mono">IBGE</label>
-                    <input 
-                        readOnly 
-                        value={editing.codigo_municipio || ''} 
-                        className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold text-slate-400 cursor-not-allowed text-center" 
-                    />
-                </div>
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Senha</label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input type="password" value={senha} onChange={e => setSenha(e.target.value)} placeholder="••••••"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-400" />
             </div>
-        </>
-    );
-};
+          </div>
+          <button type="submit" disabled={loading}
+            className="w-full bg-blue-600 text-white py-2.5 rounded-xl font-bold text-sm hover:bg-blue-700 disabled:opacity-50 transition-colors">
+            {loading ? 'Autenticando...' : 'Entrar'}
+          </button>
+        </form>
+        <p className="text-center text-xs mt-6 text-gray-400">Enterprise Soluções</p>
+      </motion.div>
+    </div>
+  );
 
-const UserRegistrationModal = ({ empresaId, empresaNome, onClose }: { empresaId: number; empresaNome: string; onClose: () => void }) => {
-    const [form, setForm] = useState({ nome: '', login: '', senha: '' });
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-
-    const handleSubmit = async (e: any) => {
-        e.preventDefault();
-        if (!form.login || !form.senha) { setError('Acesso requer usuário e senha.'); return; }
-        setLoading(true);
-        try {
-            const res = await fetch('api.php?action=salvar_usuario_admin', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...form, empresa_id: empresaId })
-            });
-            const data = await res.json();
-            if (data.success) { onClose(); } else { setError(data.message || 'Erro no processamento.'); }
-        } catch { setError('Erro de conexão.'); }
-        setLoading(false);
-    };
-
-    return (
-        <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-[700] p-4 backdrop-blur-md text-slate-600">
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-[2rem] p-10 w-full max-w-sm shadow-2xl border border-white">
-                <style>{`b, strong, h1, h2, h3 { font-weight: 600 !important; color: #334155; }`}</style>
-                <div className="text-center mb-8">
-                    <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-emerald-100">
-                        <CheckCircle className="w-10 h-10 text-emerald-600" />
-                    </div>
-                    <h3 className="text-xl font-bold">Ativar Acesso</h3>
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">{empresaNome}</p>
-                </div>
-                
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <input type="text" placeholder="Nome Completo" value={form.nome} onChange={e => setForm({...form, nome: e.target.value})} className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-sm" />
-                    <input type="text" placeholder="Usuário Principal" value={form.login} onChange={e => setForm({...form, login: e.target.value})} className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-sm" />
-                    <input type="password" placeholder="Definição de Senha" value={form.senha} onChange={e => setForm({...form, senha: e.target.value})} className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-sm" />
-                    {error && <p className="text-[10px] text-red-500 font-bold text-center px-4 py-2 bg-red-50 rounded-lg">{error}</p>}
-                    <div className="flex gap-4 pt-6">
-                        <button type="button" onClick={onClose} className="flex-1 py-3 text-slate-400 font-bold uppercase text-[10px] tracking-widest">Pular</button>
-                        <button type="submit" disabled={loading} className="flex-2 py-4 bg-emerald-600 text-white font-bold uppercase text-[10px] rounded-2xl shadow-xl shadow-emerald-100 tracking-widest hover:bg-emerald-700 transition-all">Ativar Acesso</button>
-                    </div>
-                </form>
-            </motion.div>
+  // ─── PAINEL ──────────────────────────────────────────────────────────────
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
+            <FileText className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h1 className="font-bold text-gray-800 text-sm">DFe IA — Admin</h1>
+            <p className="text-xs text-gray-400">Gerenciamento de Empresas</p>
+          </div>
         </div>
-    );
-};
+        <button onClick={handleLogout} className="flex items-center gap-2 text-xs text-gray-500 hover:text-red-600 font-bold transition-colors">
+          <LogOut className="w-4 h-4" /> Sair
+        </button>
+      </header>
 
-const SmartPosAdminSection = ({ empresaId }: { empresaId: number }) => {
-    const [list, setList] = useState<any[]>([]);
-    const [form, setForm] = useState({ codigo: '', numero_serie: '', integradora: '', apelido: '' });
-    const [editingId, setEditingId] = useState<number | null>(null);
-    const [erro, setErro] = useState('');
-
-    useEffect(() => {
-        fetch(`api.php?action=listar_smartpos_admin&empresa_id=${empresaId}`)
-            .then(r => r.json()).then(d => { if (Array.isArray(d)) setList(d); }).catch(() => {});
-    }, [empresaId]);
-
-    const handleSalvar = async () => {
-        if (!form.codigo || !form.numero_serie || !form.integradora || !form.apelido) {
-            setErro('Preencha todos os campos.'); return;
-        }
-        setErro('');
-        const payload = { ...form, empresa_id: empresaId, ...(editingId ? { id: editingId } : {}) };
-        const res = await fetch('api.php?action=salvar_smartpos_admin', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
-        });
-        const data = await res.json();
-        if (data.success) {
-            setList(editingId ? list.map(s => s.id === editingId ? { ...s, ...form } : s) : [...list, { ...form, id: data.id }]);
-            setForm({ codigo: '', numero_serie: '', integradora: '', apelido: '' });
-            setEditingId(null);
-        }
-    };
-
-    const handleExcluir = async (id: number) => {
-        await fetch(`api.php?action=excluir_smartpos_admin&id=${id}`);
-        setList(list.filter(s => s.id !== id));
-    };
-
-    const inp = "w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm font-bold text-slate-700";
-
-    return (
-        <div className="pt-4 border-t border-slate-100 mt-2">
-            <h4 className="text-[10px] font-bold uppercase text-slate-400 tracking-[0.3em] mb-4 flex items-center gap-2">
-                <Smartphone className="w-3 h-3 text-blue-500" /> Máquinas SmartPOS
-            </h4>
-            <div className="grid grid-cols-4 gap-3 mb-2">
-                {[['ID *', 'codigo'], ['Nº Série *', 'numero_serie'], ['Integradora *', 'integradora'], ['Apelido *', 'apelido']].map(([label, key]) => (
-                    <div key={key} className="space-y-1">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase">{label}</label>
-                        <input value={(form as any)[key]} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} className={inp} />
-                    </div>
-                ))}
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        {/* Toolbar */}
+        <div class="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-bold text-gray-800">Empresas Cadastradas</h2>
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input type="text" placeholder="Buscar empresa..." value={busca} onChange={e => setBusca(e.target.value)}
+                className="border border-gray-200 rounded-xl pl-9 pr-4 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-400 w-56" />
             </div>
-            {erro && <p className="text-xs text-red-500 mb-2">{erro}</p>}
-            <button type="button" onClick={handleSalvar} className="mb-4 px-5 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-colors">
-                {editingId ? 'Salvar Alteração' : '+ Adicionar Máquina'}
+            <button onClick={() => fetchEmpresas()} className="p-2 bg-gray-100 text-gray-500 hover:bg-gray-200 rounded-xl transition-colors">
+              <RefreshCw className="w-4 h-4" />
             </button>
-            {list.length > 0 && (
-                <table className="w-full text-xs border border-slate-100 rounded-xl overflow-hidden">
-                    <thead className="bg-slate-50 text-slate-400 uppercase text-[10px] tracking-wider">
-                        <tr>
-                            {['ID', 'Nº Série', 'Integradora', 'Apelido', ''].map(h => (
-                                <th key={h} className="px-4 py-2 text-left font-bold">{h}</th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-50">
-                        {list.map(s => (
-                            <tr key={s.id} className="hover:bg-slate-50/50">
-                                <td className="px-4 py-2 font-mono">{s.codigo}</td>
-                                <td className="px-4 py-2 font-mono">{s.numero_serie}</td>
-                                <td className="px-4 py-2">{s.integradora}</td>
-                                <td className="px-4 py-2">{s.apelido}</td>
-                                <td className="px-4 py-2 text-right">
-                                    <button type="button" onClick={() => { setForm({ codigo: s.codigo, numero_serie: s.numero_serie, integradora: s.integradora, apelido: s.apelido }); setEditingId(s.id); }} className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-lg mr-1"><Edit2 className="w-3 h-3" /></button>
-                                    <button type="button" onClick={() => handleExcluir(s.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 className="w-3 h-3" /></button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            )}
+            <button onClick={() => abrirModal()}
+              className="bg-blue-600 text-white px-5 py-2 rounded-xl text-xs font-bold hover:bg-blue-700 transition-colors flex items-center gap-2">
+              <Plus className="w-4 h-4" /> Nova Empresa
+            </button>
+          </div>
         </div>
-    );
+
+        {/* Tabela */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-gray-50 text-gray-400 text-[10px] uppercase">
+              <tr>
+                <th className="px-6 py-4 font-bold">Empresa</th>
+                <th className="px-6 py-4 font-bold">CNPJ</th>
+                <th className="px-6 py-4 font-bold">UF</th>
+                <th className="px-6 py-4 font-bold">Recurso DFe</th>
+                <th className="px-6 py-4 font-bold">Status</th>
+                <th className="px-6 py-4 font-bold text-center">Ações</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {lista.length === 0 && (
+                <tr><td colSpan={6} className="px-6 py-8 text-center text-xs text-gray-400">Nenhuma empresa encontrada.</td></tr>
+              )}
+              {lista.map(e => (
+                <tr key={e.id} className="hover:bg-gray-50/50 transition-colors">
+                  <td className="px-6 py-4">
+                    <p className="text-xs font-bold text-gray-800">{e.razao_social || '—'}</p>
+                    <p className="text-[10px] text-gray-400">{e.nome_fantasia || ''}</p>
+                  </td>
+                  <td className="px-6 py-4 text-xs text-gray-600">{e.cnpj ? e.cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5') : '—'}</td>
+                  <td className="px-6 py-4 text-xs text-gray-600">{e.uf || '—'}</td>
+                  <td className="px-6 py-4">
+                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${e.usuario_dfe == 4 ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
+                      {RECURSOS[e.usuario_dfe] || '—'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${e.status === 'Ativo' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                      {e.status || 'Ativo'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center justify-center gap-1">
+                      <button onClick={() => abrirModal(e)} className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors" title="Editar">
+                        <Edit className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => bloquear(e.id, e.razao_social || e.cnpj, e.status)}
+                        className={`p-1.5 transition-colors ${e.status === 'Bloqueado' ? 'text-green-500 hover:text-green-700' : 'text-orange-400 hover:text-orange-600'}`}
+                        title={e.status === 'Bloqueado' ? 'Desbloquear' : 'Bloquear'}>
+                        <Shield className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => excluir(e.id, e.razao_social || e.cnpj)} className="p-1.5 text-gray-400 hover:text-red-600 transition-colors" title="Inativar">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </main>
+
+      {/* Modal */}
+      {modal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+            className="bg-white rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col" style={{height: 'calc(100vh - 4rem)', maxHeight: '750px'}}>
+            {/* Modal Header */}
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50 rounded-t-2xl">
+              <h3 className="font-bold text-gray-800">{empresaId ? 'Editar Empresa' : 'Nova Empresa'}</h3>
+              <button onClick={() => setModal(false)} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+
+            {/* Tabs */}
+            <div className="grid grid-cols-2 border-b border-gray-100">
+              {([['dados','Dados'],['smartpos','SmartPOS / TEF']] as const).map(([t,l]) => (
+                <button key={t} onClick={() => setTab(t as any)}
+                  className={`py-3 text-[11px] font-bold uppercase tracking-wider border-b-2 transition-all text-center w-full ${tab === t ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}>
+                  {l}
+                </button>
+              ))}
+            </div>
+
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto p-6 min-h-[400px]">
+
+              {/* Tab Dados */}
+              {tab === 'dados' && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="col-span-2">
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Razão Social</label>
+                      <input value={form.razao_social || ''} onChange={e => set('razao_social', e.target.value)}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Nome Fantasia</label>
+                      <input value={form.nome_fantasia || ''} onChange={e => set('nome_fantasia', e.target.value)}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">CNPJ</label>
+                      <input value={form.cnpj || ''} onChange={e => set('cnpj', e.target.value)}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Inscrição Estadual</label>
+                      <input value={form.ie || form.inscricao_estadual || ''} onChange={e => set('inscricao_estadual', e.target.value)}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">UF</label>
+                      <select value={form.uf || 'GO'} onChange={e => handleUfChange(e.target.value)}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400">
+                        {ESTADOS.map(u => <option key={u} value={u}>{u}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Município</label>
+                      <select value={form.municipio || ''} onChange={e => set('municipio', e.target.value)}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400">
+                        <option value="">Selecione...</option>
+                        {municipios.map(m => <option key={m} value={m}>{m}</option>)}
+                        {form.municipio && !municipios.includes(form.municipio) && <option value={form.municipio}>{form.municipio}</option>}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">CEP</label>
+                      <input value={form.cep || ''} onChange={e => set('cep', e.target.value)}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Logradouro</label>
+                      <input value={form.logradouro || ''} onChange={e => set('logradouro', e.target.value)}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Número</label>
+                      <input value={form.numero || ''} onChange={e => set('numero', e.target.value)}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Bairro</label>
+                      <input value={form.bairro || ''} onChange={e => set('bairro', e.target.value)}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Telefone</label>
+                      <input value={form.telefone || ''} onChange={e => set('telefone', e.target.value)}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">E-mail</label>
+                      <input type="email" value={form.email || ''} onChange={e => set('email', e.target.value)}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Recurso DFe</label>
+                      <select value={form.usuario_dfe ?? 2} onChange={e => set('usuario_dfe', Number(e.target.value))}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400">
+                        <option value={0}>S/ Recurso Fiscal</option>
+                        <option value={1}>NFe</option>
+                        <option value={2}>NFe + NFCe</option>
+                        <option value={3}>PDV Offline</option>
+                        <option value={4}>DFe BLOQUEADO</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Status</label>
+                      <select value={form.status || 'Ativo'} onChange={e => set('status', e.target.value)}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400">
+                        <option value="Ativo">Ativo</option>
+                        <option value="Bloqueado">Bloqueado (Inadimplente)</option>
+                        <option value="Suspenso">Suspenso</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+
+
+              {/* Tab SmartPOS */}
+              {tab === 'smartpos' && (
+                <div className="space-y-6">
+                  <div className="border border-gray-100 rounded-2xl p-4 bg-gray-50/50">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input type="checkbox" checked={Number(form.tem_tef) === 1}
+                        onChange={e => set('tem_tef', e.target.checked ? 1 : 0)}
+                        className="w-4 h-4 rounded text-blue-600" />
+                      <div>
+                        <p className="text-sm font-bold text-gray-700">Integração TEF ativa</p>
+                        <p className="text-xs text-gray-400">Empresa utiliza terminal SmartPOS para pagamentos</p>
+                      </div>
+                    </label>
+                  </div>
+
+                  {empresaId && Number(form.tem_tef) === 1 && (
+                    <div>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase mb-3">Máquinas SmartPOS</p>
+                      <div className="grid grid-cols-4 gap-2 mb-3">
+                        {[['codigo','ID *'],['numero_serie','Nº Série *'],['integradora','Integradora *'],['apelido','Apelido']].map(([f,l]) => (
+                          <div key={f}>
+                            <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">{l}</label>
+                            <input value={(spForm as any)[f]} onChange={e => setSpForm(p => ({ ...p, [f]: e.target.value }))}
+                              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-400" />
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={addSmartPos}
+                          className="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-blue-700 transition-colors flex items-center gap-2">
+                          <Plus className="w-3.5 h-3.5" /> {editingSp ? 'Salvar Alteração' : 'Adicionar Máquina'}
+                        </button>
+                        {editingSp && (
+                          <button onClick={cancelarEditSp}
+                            className="bg-gray-100 text-gray-600 px-4 py-2 rounded-xl text-xs font-bold hover:bg-gray-200 transition-colors">
+                            Cancelar
+                          </button>
+                        )}
+                      </div>
+                      <div className="mt-4 border border-gray-100 rounded-xl overflow-hidden">
+                        <table className="w-full text-xs text-left">
+                          <thead className="bg-gray-50 text-gray-400">
+                            <tr>
+                              <th className="px-4 py-3 font-bold uppercase text-[10px]">ID</th>
+                              <th className="px-4 py-3 font-bold uppercase text-[10px]">Nº Série</th>
+                              <th className="px-4 py-3 font-bold uppercase text-[10px]">Integradora</th>
+                              <th className="px-4 py-3 font-bold uppercase text-[10px]">Apelido</th>
+                              <th className="px-4 py-3 text-center font-bold uppercase text-[10px]">Ação</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-50">
+                            {smartPosList.length === 0 && (
+                              <tr><td colSpan={5} className="px-4 py-4 text-center text-gray-400">Nenhuma máquina cadastrada.</td></tr>
+                            )}
+                            {smartPosList.map(sp => (
+                              <tr key={sp.id} className="hover:bg-gray-50">
+                                <td className="px-4 py-3">{sp.codigo}</td>
+                                <td className="px-4 py-3">{sp.numero_serie}</td>
+                                <td className="px-4 py-3">{sp.integradora}</td>
+                                <td className="px-4 py-3">{sp.apelido}</td>
+                                <td className="px-4 py-3 text-center">
+                                  <div className="flex items-center justify-center gap-2">
+                                    <button onClick={() => editSmartPos(sp)} className="text-gray-400 hover:text-blue-600 transition-colors" title="Editar">
+                                      <Edit className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button onClick={() => delSmartPos(sp.id)} className="text-gray-400 hover:text-red-600 transition-colors" title="Excluir">
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+                  {!empresaId && <p className="text-xs text-gray-400 text-center py-4">Salve a empresa primeiro para cadastrar máquinas SmartPOS.</p>}
+                  {empresaId && Number(form.tem_tef) !== 1 && <p className="text-xs text-gray-400 text-center py-4">Ative a Integração TEF acima para cadastrar máquinas SmartPOS.</p>}
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-6 bg-gray-50/50 border-t border-gray-100 flex justify-end gap-3 rounded-b-2xl">
+              <button onClick={() => setModal(false)} className="px-6 py-2.5 text-gray-500 font-bold text-xs uppercase hover:bg-gray-100 rounded-xl transition-colors">Cancelar</button>
+              <button onClick={salvar} className="px-8 py-2.5 bg-blue-600 text-white font-bold text-xs uppercase rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-100">Salvar</button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+      {/* Modal Confirmação */}
+      {confirmModal.open && (() => {
+        const cfg = {
+          inativar:   { titulo: 'Inativar Empresa',     subtitulo: 'A empresa não aparecerá mais na lista', acao: 'Inativar',     cor: 'red',    icon: Trash2 },
+          bloquear:   { titulo: 'Bloquear Empresa',     subtitulo: 'Uso por inadimplência',                  acao: 'Bloquear',     cor: 'orange', icon: Shield },
+          desbloquear:{ titulo: 'Desbloquear Empresa',  subtitulo: 'Liberar acesso ao sistema',              acao: 'Desbloquear',  cor: 'green',  icon: CheckCircle },
+        }[confirmModal.tipo];
+        const Icon = cfg.icon;
+        const cores: Record<string,string> = {
+          red:    'bg-red-100 text-red-600',
+          orange: 'bg-orange-100 text-orange-600',
+          green:  'bg-green-100 text-green-600',
+        };
+        const btnCores: Record<string,string> = {
+          red:    'bg-red-600 hover:bg-red-700',
+          orange: 'bg-orange-600 hover:bg-orange-700',
+          green:  'bg-green-600 hover:bg-green-700',
+        };
+        return (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+              className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${cores[cfg.cor]}`}>
+                  <Icon className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="font-bold text-gray-800 text-sm">{cfg.titulo}</p>
+                  <p className="text-xs text-gray-400">{cfg.subtitulo}</p>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 mb-6">
+                Deseja {cfg.acao.toLowerCase()} <span className="font-bold text-gray-800">{confirmModal.nome}</span>?
+              </p>
+              <div className="flex gap-3">
+                <button onClick={() => setConfirmModal({ open: false, id: null, nome: '', tipo: 'inativar' })}
+                  className="flex-1 py-2.5 text-gray-500 font-bold text-xs uppercase hover:bg-gray-100 rounded-xl transition-colors">
+                  Cancelar
+                </button>
+                <button onClick={confirmarAcao}
+                  className={`flex-1 py-2.5 text-white font-bold text-xs uppercase rounded-xl transition-colors ${btnCores[cfg.cor]}`}>
+                  {cfg.acao}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        );
+      })()}
+    </div>
+  );
 };
 
 export default AdminPortal;

@@ -3,7 +3,7 @@ import {
   Monitor, DollarSign, ChevronDown, ChevronRight, ArrowUpCircle, 
   ArrowDownCircle, History, FileText, Send, QrCode, Package, 
   Users, Store, ShoppingCart, ClipboardList, Wrench, FolderOpen, 
-  Hash, Ruler, CreditCard, Truck, ShieldCheck, Building, Settings, LogOut
+  Hash, Ruler, CreditCard, Truck, ShieldCheck, Building, Settings, LogOut, Zap
 } from 'lucide-react';
 
 export const SidebarItem = ({ icon: Icon, label, active, onClick }: any) => (
@@ -137,18 +137,18 @@ export const Sidebar = ({
         <SidebarItem icon={Store} label="Fornecedores" active={activeTab === 'fornecedores'} onClick={() => handleSetActiveTab('fornecedores')} />
         <SidebarItem icon={ShoppingCart} label="Compras" active={activeTab === 'compras'} onClick={() => handleSetActiveTab('compras')} />
         <SidebarItem icon={ClipboardList} label="Orçamentos" active={activeTab === 'orcamentos'} onClick={() => handleSetActiveTab('orcamentos')} />
-        <SidebarItem icon={Wrench} label="OS" active={activeTab === 'ordens_servico'} onClick={() => handleSetActiveTab('ordens_servico')} />
+        <SidebarItem icon={Wrench} label="Ordem Serviços" active={activeTab === 'ordens_servico'} onClick={() => handleSetActiveTab('ordens_servico')} />
 
         {/* Cadastros */}
         <div>
           <button
             onClick={() => setCadastrosOpen(!cadastrosOpen)}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-              cadastrosOpen || ['ncm', 'usuarios', 'medidas', 'bandeiras', 'transportadores'].includes(activeTab) ? 'text-blue-600 font-bold bg-blue-50/50' : 'text-gray-500 hover:bg-gray-50'
+              cadastrosOpen || ['ncm', 'usuarios', 'medidas', 'bandeiras', 'transportadores', 'config_integracao', 'dfe_config', 'dfe_nfe_dados', 'dfe_nfce_dados', 'dfe_provedor'].includes(activeTab) ? 'text-blue-600 font-bold bg-blue-50/50' : 'text-gray-500 hover:bg-gray-50'
             }`}
           >
             <FolderOpen className="w-5 h-5" />
-            <span className="flex-1 text-left text-sm">Configuração</span>
+            <span className="flex-1 text-left text-sm">Configurações</span>
             {cadastrosOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
           </button>
           {cadastrosOpen && (
@@ -157,7 +157,9 @@ export const Sidebar = ({
                 { id: 'ncm', label: 'NCM/IBPT', icon: Hash },
                 { id: 'medidas', label: 'Medidas', icon: Ruler },
                 { id: 'bandeiras', label: 'Bandeiras', icon: CreditCard },
-                { id: 'transportadores', label: 'Transp.', icon: Truck },
+                { id: 'transportadores', label: 'Transportadores', icon: Truck },
+                { id: 'config_integracao', label: 'Integração', icon: Zap },
+                { id: 'dfe_config', label: 'DFe', icon: Settings },
                 { id: 'usuarios', label: 'Usuários', icon: ShieldCheck },
               ].map(sub => (
                 <button
@@ -178,15 +180,13 @@ export const Sidebar = ({
           active={['empresa','config','config_empresa','config_email','config_smartpos'].includes(activeTab)}
           onClick={() => handleSetActiveTab('empresa')} />
         
-        <SidebarItem icon={Settings} label="Configurações DFe"
-          active={['dfe_config','dfe_nfe_dados','dfe_nfce_dados','dfe_provedor'].includes(activeTab)}
-          onClick={() => handleSetActiveTab('dfe_config')} />
+
       </nav>
 
       <div className="p-4 border-t border-gray-50">
         <div className="bg-gray-50 rounded-2xl p-4">
-          <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Caminho</p>
-          <p className="text-[11px] text-gray-600 font-medium truncate">{session.empresa}</p>
+          
+          <p className="text-[11px] text-gray-600 font-medium truncate">{session?.nome || ""}</p>
         </div>
       </div>
     </aside>

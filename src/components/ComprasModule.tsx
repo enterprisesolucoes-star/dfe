@@ -57,7 +57,7 @@ export const ComprasTab = ({
   const fetchCompras = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`.http://187.77.240?action=listar_compras&data_inicio=${di}&data_fim=${df}`);
+      const res = await fetch(`./api.php?action=listar_compras&data_inicio=${di}&data_fim=${df}`);
       const data = await res.json();
       if (Array.isArray(data)) setCompras(data);
     } catch { /* silent */ }
@@ -186,7 +186,7 @@ export const ImportXmlModal = ({
         }))
       };
 
-      const res = await fetch('.http://187.77.240?action=salvar_compra', {
+      const res = await fetch('./api.php?action=salvar_compra', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -219,7 +219,7 @@ export const ImportXmlModal = ({
           icmsCstCsosn: '102'
         };
 
-        const res = await fetch('.http://187.77.240?action=salvar_produto', {
+        const res = await fetch('./api.php?action=salvar_produto', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(prodData)
@@ -499,7 +499,7 @@ export const CompraModal = ({
 
   useEffect(() => {
     if (lancamento === 'caixa' && contas.length === 0) {
-      fetch('.http://187.77.240?action=fin_listar_contas')
+      fetch('./api.php?action=fin_listar_contas')
         .then(r => r.json())
         .then(d => { if (Array.isArray(d)) { setContas(d); if (d[0]) setFinContaId(d[0].id); } })
         .catch(() => {});

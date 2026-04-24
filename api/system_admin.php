@@ -34,14 +34,25 @@ switch ($action) {
         if ($adm && password_verify($pass, $adm['senha_hash'])) {
             $_SESSION['system_admin_id'] = $adm['id'];
             $_SESSION['system_admin_nome'] = $adm['nome'];
-            echo json_encode(['success' => true, 'nome' => $adm['nome']]);
+            $token = bin2hex(random_bytes(32));
+            $pdo->prepare("UPDATE dfe_admins SET token=?, token_exp=DATE_ADD(NOW(), INTERVAL 8 HOUR) WHERE id=?")->execute([$token, $adm['id']]);
+            echo json_encode(['success' => true, 'nome' => $adm['nome'], 'token' => $token]);
         } else {
             echo json_encode(['success' => false, 'message' => 'Login administrativo inválido.']);
         }
         break;
 
     case 'listar_empresas_admin':
-        if (!isset($_SESSION['system_admin_id'])) { exit; }
+        $tok = $_GET['adm_token'] ?? $_SERVER['HTTP_X_ADM_TOKEN'] ?? '';
+        if (!isset($_SESSION['system_admin_id'])) {
+            if ($tok) {
+                $chk = $pdo->prepare("SELECT id FROM dfe_admins WHERE token=? AND token_exp > NOW() AND ativo=1");
+                $chk->execute([$tok]);
+                $row = $chk->fetch();
+                if (!$row) { echo json_encode([]); exit; }
+                $_SESSION['system_admin_id'] = $row['id'];
+            } else { exit; }
+        }
         try {
             $cols = $pdo->query("DESCRIBE empresas")->fetchAll(PDO::FETCH_COLUMN);
             $select_fields = ["id", "razao_social", "cnpj"];
@@ -62,7 +73,9 @@ switch ($action) {
                 'uf' => 'uf',
                 'status' => 'status',
                 'usuario_dfe' => 'usuario_dfe',
-                'codigo_municipio' => 'codigo_municipio'
+                'codigo_municipio' => 'codigo_municipio',
+                'ambiente' => 'ambiente',
+                'tem_tef' => 'tem_tef'
             ];
 
             foreach ($map as $db => $fr) {
@@ -79,13 +92,44 @@ switch ($action) {
         }
         break;
 
+    case 'alterar_status_empresa':
+        $tok = $_GET['adm_token'] ?? '';
+        if (!isset($_SESSION['system_admin_id'])) {
+            if ($tok) {
+                $chk = $pdo->prepare("SELECT id FROM dfe_admins WHERE token=? AND token_exp > NOW() AND ativo=1");
+                $chk->execute([$tok]);
+                $row = $chk->fetch();
+                if (!$row) { echo json_encode([]); exit; }
+                $_SESSION['system_admin_id'] = $row['id'];
+            } else { exit; }
+        }
+        $data = json_decode(file_get_contents('php://input'), true);
+        $id = (int)($data['id'] ?? 0);
+        $status = $data['status'] ?? '';
+        if ($id > 0 && in_array($status, ['Ativo','Bloqueado','Inativo','Suspenso'])) {
+            $pdo->prepare("UPDATE empresas SET status=? WHERE id=?")->execute([$status, $id]);
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Dados inválidos']);
+        }
+        break;
     case 'salvar_empresa_admin':
-        if (!isset($_SESSION['system_admin_id'])) { exit; }
+        $tok = $_GET['adm_token'] ?? $_SERVER['HTTP_X_ADM_TOKEN'] ?? '';
+        if (!isset($_SESSION['system_admin_id'])) {
+            if ($tok) {
+                $chk = $pdo->prepare("SELECT id FROM dfe_admins WHERE token=? AND token_exp > NOW() AND ativo=1");
+                $chk->execute([$tok]);
+                $row = $chk->fetch();
+                if (!$row) { echo json_encode([]); exit; }
+                $_SESSION['system_admin_id'] = $row['id'];
+            } else { exit; }
+        }
         $data = json_decode(file_get_contents('php://input'), true);
         
         $fields_map = [
             'razao_social', 'nome_fantasia', 'cnpj', 'crt', 'email', 'telefone', 'cep', 
-            'logradouro', 'numero', 'bairro', 'municipio', 'uf', 'status', 'usuario_dfe', 'codigo_municipio'
+            'logradouro', 'numero', 'bairro', 'municipio', 'uf', 'status', 'usuario_dfe', 
+            'codigo_municipio', 'ambiente', 'tem_tef'
         ];
         // Campos com nomes diferentes entre frontend e banco
         $special = [
@@ -97,8 +141,10 @@ switch ($action) {
         $sets = [];
         $values = [];
 
+        $isUpdate = isset($data['id']) && $data['id'] > 0;
         foreach ($fields_map as $f) {
             if (in_array($f, $real_cols)) {
+                if ($isUpdate && !array_key_exists($f, $data)) continue;
                 $sets[] = "$f = ?";
                 $val = $data[$f] ?? null;
                 if ($f === 'usuario_dfe') $val = (int)$val;
@@ -107,6 +153,7 @@ switch ($action) {
         }
         foreach ($special as $fr => $db) {
             if (in_array($db, $real_cols)) {
+                if ($isUpdate && !array_key_exists($fr, $data)) continue;
                 $sets[] = "$db = ?";
                 $values[] = $data[$fr] ?? null;
             }
@@ -122,8 +169,10 @@ switch ($action) {
             $cols_to_ins = [];
             $placeholders = [];
             $ins_vals = [];
-            foreach ($fields_map as $f) {
+            $isUpdate = isset($data['id']) && $data['id'] > 0;
+        foreach ($fields_map as $f) {
                 if (in_array($f, $real_cols)) {
+                if ($isUpdate && !array_key_exists($f, $data)) continue;
                     $cols_to_ins[] = $f;
                     $placeholders[] = "?";
                     $ins_vals[] = $data[$f] ?? null;
@@ -131,6 +180,7 @@ switch ($action) {
             }
             foreach ($special as $fr => $db) {
                 if (in_array($db, $real_cols)) {
+                if ($isUpdate && !array_key_exists($fr, $data)) continue;
                     $cols_to_ins[] = $db;
                     $placeholders[] = "?";
                     $ins_vals[] = $data[$fr] ?? null;
@@ -143,7 +193,16 @@ switch ($action) {
         break;
 
     case 'excluir_empresa_admin':
-        if (!isset($_SESSION['system_admin_id'])) { exit; }
+        $tok = $_GET['adm_token'] ?? $_SERVER['HTTP_X_ADM_TOKEN'] ?? '';
+        if (!isset($_SESSION['system_admin_id'])) {
+            if ($tok) {
+                $chk = $pdo->prepare("SELECT id FROM dfe_admins WHERE token=? AND token_exp > NOW() AND ativo=1");
+                $chk->execute([$tok]);
+                $row = $chk->fetch();
+                if (!$row) { echo json_encode([]); exit; }
+                $_SESSION['system_admin_id'] = $row['id'];
+            } else { exit; }
+        }
         $id = (int)($_GET['id'] ?? 0);
         if ($id) {
             $pdo->prepare("UPDATE empresas SET status='Inativo' WHERE id=?")->execute([$id]);
@@ -152,7 +211,16 @@ switch ($action) {
         break;
 
     case 'salvar_usuario_admin':
-        if (!isset($_SESSION['system_admin_id'])) { exit; }
+        $tok = $_GET['adm_token'] ?? $_SERVER['HTTP_X_ADM_TOKEN'] ?? '';
+        if (!isset($_SESSION['system_admin_id'])) {
+            if ($tok) {
+                $chk = $pdo->prepare("SELECT id FROM dfe_admins WHERE token=? AND token_exp > NOW() AND ativo=1");
+                $chk->execute([$tok]);
+                $row = $chk->fetch();
+                if (!$row) { echo json_encode([]); exit; }
+                $_SESSION['system_admin_id'] = $row['id'];
+            } else { exit; }
+        }
         $data = json_decode(file_get_contents('php://input'), true);
         $empresaId = (int)($data['empresa_id'] ?? 0);
         $login = trim($data['login'] ?? '');
@@ -162,4 +230,60 @@ switch ($action) {
         $success = $stmt->execute([$empresaId, $data['nome'] ?? 'Administrador', $login, $hash]);
         echo json_encode(['success' => $success]);
         break;
+    case 'listar_smartpos_admin':
+        $tok = $_GET['adm_token'] ?? '';
+        if (!isset($_SESSION['system_admin_id'])) {
+            if ($tok) {
+                $chk = $pdo->prepare("SELECT id FROM dfe_admins WHERE token=? AND token_exp > NOW() AND ativo=1");
+                $chk->execute([$tok]);
+                $row = $chk->fetch();
+                if (!$row) { echo json_encode([]); exit; }
+                $_SESSION['system_admin_id'] = $row['id'];
+            } else { exit; }
+        }
+        $empresaId = (int)($_GET['empresa_id'] ?? 0);
+        $stmt = $pdo->prepare("SELECT * FROM smartpos WHERE empresa_id = ? ORDER BY id");
+        $stmt->execute([$empresaId]);
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        break;
+    case 'salvar_smartpos_admin':
+        $tok = $_GET['adm_token'] ?? '';
+        if (!isset($_SESSION['system_admin_id'])) {
+            if ($tok) {
+                $chk = $pdo->prepare("SELECT id FROM dfe_admins WHERE token=? AND token_exp > NOW() AND ativo=1");
+                $chk->execute([$tok]);
+                $row = $chk->fetch();
+                if (!$row) { echo json_encode([]); exit; }
+                $_SESSION['system_admin_id'] = $row['id'];
+            } else { exit; }
+        }
+        $data = json_decode(file_get_contents('php://input'), true);
+        $id = (int)($data['id'] ?? 0);
+        if ($id > 0) {
+            $pdo->prepare("UPDATE smartpos SET codigo=?, integradora=?, numero_serie=?, apelido=? WHERE id=?")
+                ->execute([$data['codigo'], $data['integradora'], $data['numero_serie'], $data['apelido'], $id]);
+        } else {
+            $pdo->prepare("INSERT INTO smartpos (empresa_id, codigo, integradora, numero_serie, apelido) VALUES (?,?,?,?,?)")
+                ->execute([(int)$data['empresa_id'], $data['codigo'], $data['integradora'], $data['numero_serie'], $data['apelido']]);
+        }
+        echo json_encode(['success' => true]);
+        break;
+    case 'excluir_smartpos_admin':
+        $tok = $_GET['adm_token'] ?? '';
+        if (!isset($_SESSION['system_admin_id'])) {
+            if ($tok) {
+                $chk = $pdo->prepare("SELECT id FROM dfe_admins WHERE token=? AND token_exp > NOW() AND ativo=1");
+                $chk->execute([$tok]);
+                $row = $chk->fetch();
+                if (!$row) { echo json_encode([]); exit; }
+                $_SESSION['system_admin_id'] = $row['id'];
+            } else { exit; }
+        }
+        $data = json_decode(file_get_contents('php://input'), true);
+        $pdo->prepare("DELETE FROM smartpos WHERE id = ?")->execute([(int)$data['id']]);
+        echo json_encode(['success' => true]);
+        break;
+
 }
+
+

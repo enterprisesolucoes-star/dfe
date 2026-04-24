@@ -9,9 +9,9 @@ define('IBPT_CNPJ', '00952147000181'); // CNPJ registrado no portal IBPT (difere
 
 
 define('DB_HOST', '127.0.0.1');
-define('DB_NAME', 'dfe_db'); // Substitua pelo nome do banco criado na Hostinger
+define('DB_NAME', 'dfe_db');   // Substitua pelo nome do banco criado na Hostinger
 define('DB_USER', 'dfe_user'); // Substitua pelo usuário do banco
-define('DB_PASS', 'NQ45piif213NybUJJ3SsA'); // Substitua pela senha do banco
+define('DB_PASS', '123456');   // Substitua pela senha do banco
 
 try {
     $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4", DB_USER, DB_PASS);

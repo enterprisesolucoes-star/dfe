@@ -95,7 +95,7 @@ export const IdentificarModal = ({ onClose, onConfirm }: { onClose: () => void; 
   const selClass = 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500';
 
   useEffect(() => {
-    fetch('.http://187.77.240?action=clientes').then(r => r.json()).then(d => setClientes(Array.isArray(d) ? d : []));
+    fetch('./api.php?action=clientes').then(r => r.json()).then(d => setClientes(Array.isArray(d) ? d : []));
   }, []);
 
   const fetchMunicipios = async (uf: string) => {
@@ -224,7 +224,7 @@ export const TefModal = ({ pagamentoId, vendaId, numero, uniqueid: initialUnique
         return;
       }
       try {
-        const resp = await fetch('.http://187.77.240?action=tef_solicitar', {
+        const resp = await fetch('./api.php?action=tef_solicitar', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id_pagamento: pagamentoId })
@@ -250,7 +250,7 @@ export const TefModal = ({ pagamentoId, vendaId, numero, uniqueid: initialUnique
     if (status !== 'aguardando' || !uniqueId) return;
     const interval = setInterval(async () => {
       try {
-        const resp = await fetch(`.http://187.77.240?action=tef_consultar&uniqueid=${uniqueId}`);
+        const resp = await fetch(`./api.php?action=tef_consultar&uniqueid=${uniqueId}`);
         const d = await resp.json();
         if (d.status === 4) {
           setStatus('aprovado');
@@ -332,7 +332,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
   const buscaProdutoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    fetch('.http://187.77.240?action=bandeiras').then(r => r.json()).then(d => { if (Array.isArray(d)) setBandeiras(d); else setBandeiras([]); }).catch(() => setBandeiras([]));
+    fetch('./api.php?action=bandeiras').then(r => r.json()).then(d => { if (Array.isArray(d)) setBandeiras(d); else setBandeiras([]); }).catch(() => setBandeiras([]));
   }, []);
 
   useEffect(() => {
@@ -366,7 +366,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
     let nac = 0, est = 0;
     try {
       const ncmLimpo = p.ncm?.replace(/\D/g, '') || '';
-      const resIbpt = await fetch(`.http://187.77.240?action=ibpt_consultar&ncm=${ncmLimpo}&descricao=${encodeURIComponent(p.descricao)}&unidade=${encodeURIComponent(p.unidadeComercial || 'UN')}&valor=${valorAtual.toFixed(2)}&gtin=${encodeURIComponent(p.codigoBarras || '')}`).then(r => r.json());
+      const resIbpt = await fetch(`./api.php?action=ibpt_consultar&ncm=${ncmLimpo}&descricao=${encodeURIComponent(p.descricao)}&unidade=${encodeURIComponent(p.unidadeComercial || 'UN')}&valor=${valorAtual.toFixed(2)}&gtin=${encodeURIComponent(p.codigoBarras || '')}`).then(r => r.json());
       if (resIbpt.success) { nac = resIbpt.nacional || 0; est = resIbpt.estadual || 0; }
     } catch { }
 
@@ -406,32 +406,32 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
     };
     try {
       if (pagamentos.some(p => ['03', '04', '17'].includes(p.formaPagamento))) {
-        const spResp = await fetch('.http://187.77.240?action=tem_smartpos');
+        const spResp = await fetch('./api.php?action=tem_smartpos');
         const spData = await spResp.json();
         if (spData.tem) {
-          const resp = await fetch('.http://187.77.240?action=salvar_pendente', { method: 'POST', body: JSON.stringify({ venda: payload }) });
+          const resp = await fetch('./api.php?action=salvar_pendente', { method: 'POST', body: JSON.stringify({ venda: payload }) });
           const d = await resp.json();
           if (!d.success) { showAlert("Erro", d.message); return; }
           setTefState({ pagamentosIds: d.pagamentosIds, currentIndex: 0, vendaId: d.vendaId, numero: d.numero });
           return;
         }
       }
-      const response = await fetch('.http://187.77.240?action=emitir', { method: 'POST', body: JSON.stringify({ venda: payload, emitente }) });
+      const response = await fetch('./api.php?action=emitir', { method: 'POST', body: JSON.stringify({ venda: payload, emitente }) });
       const result = await response.json();
       if (result.success) {
         onSave({ id: result.id, numero: result.numero || proximoNumero, status: result.status } as any);
-        showConfirm("NFC-e Autorizada!", "Deseja imprimir o DANFE?", () => window.open(`.http://187.77.240?action=danfe&id=${result.id}`, '_blank'));
+        showConfirm("NFC-e Autorizada!", "Deseja imprimir o DANFE?", () => window.open(`./api.php?action=danfe&id=${result.id}`, '_blank'));
       } else showAlert("Erro na Emissão", result.message);
     } catch { showAlert("Erro", "Erro de conexão."); } finally { setIsEmitting(false); }
   };
 
   const handleTefComplete = async (vId: number) => {
     try {
-      const r = await fetch(`.http://187.77.240?action=emitir_pendente&id=${vId}`).then(res => res.json());
+      const r = await fetch(`./api.php?action=emitir_pendente&id=${vId}`).then(res => res.json());
       setTefState(null);
       if (r.success) {
         onSave({ id: r.id, numero: proximoNumero, status: r.status } as any);
-        showConfirm("NFC-e Autorizada!", "Deseja imprimir o DANFE?", () => window.open(`.http://187.77.240?action=danfe&id=${r.id}`, '_blank'));
+        showConfirm("NFC-e Autorizada!", "Deseja imprimir o DANFE?", () => window.open(`./api.php?action=danfe&id=${r.id}`, '_blank'));
       } else showAlert("Erro", r.message);
     } catch { setTefState(null); }
   };

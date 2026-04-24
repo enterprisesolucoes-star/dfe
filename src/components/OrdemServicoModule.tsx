@@ -49,7 +49,7 @@ export const OrdemServicoTab = ({
   const fetchOrdens = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`.http://187.77.240?action=listar_os&data_inicio=${di}&data_fim=${df}`);
+      const res = await fetch(`./api.php?action=listar_os&data_inicio=${di}&data_fim=${df}`);
       const data = await res.json();
       if (Array.isArray(data)) setOrdens(data);
     } catch { /* silent */ }
@@ -60,19 +60,19 @@ export const OrdemServicoTab = ({
 
   const handleExcluir = (id: number) => {
     showConfirm('Excluir OS', 'Confirma exclusão desta ordem de serviço?', async () => {
-      await fetch(`.http://187.77.240?action=excluir_os&id=${id}`);
+      await fetch(`./api.php?action=excluir_os&id=${id}`);
       fetchOrdens();
     });
   };
 
-  const handlePrint = (id: number) => window.open(`.http://187.77.240?action=os_pdf&id=${id}`, '_blank');
+  const handlePrint = (id: number) => window.open(`./api.php?action=os_pdf&id=${id}`, '_blank');
 
   const handleWhatsApp = (os: OrdemServico) => {
     const num = String(os.numero ?? '').padStart(4, '0');
     const val = 'R$ ' + Number(os.valor_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
     const prev = os.previsao ? new Date(os.previsao + 'T12:00:00').toLocaleDateString('pt-BR') : 'Sem prazo';
     const base = window.location.origin + window.location.pathname.replace(/\/$/, '');
-    const linkPdf = `${base}/.http://187.77.240?action=os_pdf&id=${os.id}`;
+    const linkPdf = `${base}/./api.php?action=os_pdf&id=${os.id}`;
     let msg = `*Ordem de Serviço Nº ${num}*\nCliente: ${os.cliente_nome || '-'}\nTotal: ${val}\nPrevisão: ${prev}\n`;
     if (os.observacao) msg += `\n${os.observacao}\n`;
     msg += `\n📄 *Visualize sua OS em PDF clicando abaixo:*\n${linkPdf}`;
@@ -83,7 +83,7 @@ export const OrdemServicoTab = ({
   const handleEnviarEmail = async () => {
     if (!emailOs || !emailDest) return;
     setEmailSending(true);
-    const res = await fetch('.http://187.77.240?action=os_email', {
+    const res = await fetch('./api.php?action=os_email', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: emailOs.id, email: emailDest }),
     });
@@ -267,7 +267,7 @@ const OrdemServicoModal = ({ ordem, clientes, produtos, onClose, onSaved, showAl
     if (form.itens.length === 0) { showAlert('Atenção', 'Adicione pelo menos um item.'); return; }
     setSaving(true);
     try {
-      const res = await fetch('.http://187.77.240?action=salvar_os', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
+      const res = await fetch('./api.php?action=salvar_os', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
       const data = await res.json();
       if (data.success) onSaved(); else showAlert('Erro', data.message || 'Falha ao salvar.');
     } catch { showAlert('Erro', 'Falha na requisição.'); }

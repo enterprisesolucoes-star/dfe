@@ -4,6 +4,7 @@ namespace App\Services;
 
 use NFePHP\DA\NFe\Danfce;
 use NFePHP\DA\NFe\Danfe;
+use NFePHP\DA\NFe\Daevento;
 use Exception;
 
 /**
@@ -63,7 +64,34 @@ class PrinterService
             // render('', 'S') retorna o PDF como string binária
             return $danfe->render('', 'S');
         } catch (\Throwable $e) {
-            throw new Exception("Erro ao gerar DANFE NFe: " . $e->getMessage() . " / " . $e->getFile() . ":" . $e->getLine());
+            throw new Exception("Erro ao gerar DANFE NFe: " . $e->getMessage() . " / " . $e->getFile() . ":" . $e->getLine() . " / TRACE: " . $e->getTraceAsString());
         }
     }
+
+    public function imprimirCce(string $xmlCCe, string $xmlNFe = ''): string
+    {
+        try {
+            $dados = [
+                'razao' => $this->config['razao_social'] ?? '',
+                'logradouro' => $this->config['logradouro'] ?? '',
+                'numero' => $this->config['numero'] ?? '',
+                'bairro' => $this->config['bairro'] ?? '',
+                'CEP' => $this->config['cep'] ?? '',
+                'municipio' => $this->config['municipio'] ?? '',
+                'UF' => $this->config['uf'] ?? '',
+                'telefone' => $this->config['telefone'] ?? '',
+                'email' => $this->config['email'] ?? '',
+                'IE' => $this->config['inscricao_estadual'] ?? ''
+            ];
+            $daevento = new Daevento($xmlCCe, $dados);
+            $daevento->debugMode(false);
+            if (!empty($this->logoPath) && file_exists($this->logoPath)) {
+                $daevento->logoParameters($this->logoPath, 'L');
+            }
+            return $daevento->render();
+        } catch (\Throwable $e) {
+            throw new Exception("Erro ao gerar CCe PDF: " . $e->getMessage());
+        }
+    }
+
 }

@@ -37,31 +37,77 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-// Rate limiting para login
-const loginAttempts = new Map();
-const RATE_LIMIT = 5; // tentativas
-const RATE_WINDOW = 15 * 60 * 1000; // 15 minutos
+// ─── Rate Limit Inteligente ──────────────────────────────────────────────────
+// Duas proteções independentes:
+//   1. Por login: 10 tentativas erradas consecutivas → bloqueia só aquele login
+//      Reset automático ao logar com sucesso
+//   2. Por IP:    30 tentativas em 15 min (genérico contra ataques em massa)
+// Sucesso em qualquer tentativa zera o contador daquele login
 
-function checkRateLimit(ip) {
+const loginFailsByUser = new Map<string, { count: number, until: number }>();
+const loginAttemptsByIP = new Map<string, { count: number, resetAt: number }>();
+const MAX_FAILS_PER_USER = 10;
+const BLOCK_USER_TIME = 10 * 60 * 1000;   // 10 min bloqueio por login
+const MAX_IP = 30;                         // 30 req/IP em 15 min
+const IP_WINDOW = 15 * 60 * 1000;
+
+function checkLimits(ip: string, loginName: string): { ok: boolean, reason?: string, waitMin?: number } {
   const now = Date.now();
-  const attempts = loginAttempts.get(ip) || { count: 0, resetAt: now + RATE_WINDOW };
-  if (now > attempts.resetAt) {
-    attempts.count = 0;
-    attempts.resetAt = now + RATE_WINDOW;
+
+  // 1. Checar bloqueio por login
+  const userBlock = loginFailsByUser.get(loginName);
+  if (userBlock && userBlock.count >= MAX_FAILS_PER_USER && now < userBlock.until) {
+    const wait = Math.ceil((userBlock.until - now) / 60000);
+    return { ok: false, reason: `Login bloqueado temporariamente. Tente novamente em ${wait} min.`, waitMin: wait };
   }
-  attempts.count++;
-  loginAttempts.set(ip, attempts);
-  return attempts.count <= RATE_LIMIT;
+
+  // 2. Checar rate limit por IP
+  let ipData = loginAttemptsByIP.get(ip);
+  if (!ipData || now > ipData.resetAt) {
+    ipData = { count: 0, resetAt: now + IP_WINDOW };
+  }
+  ipData.count++;
+  loginAttemptsByIP.set(ip, ipData);
+  if (ipData.count > MAX_IP) {
+    const wait = Math.ceil((ipData.resetAt - now) / 60000);
+    return { ok: false, reason: `Muitas requisições. Aguarde ${wait} min.`, waitMin: wait };
+  }
+
+  return { ok: true };
 }
+
+function registerFailure(loginName: string) {
+  const now = Date.now();
+  const data = loginFailsByUser.get(loginName) || { count: 0, until: now + BLOCK_USER_TIME };
+  data.count++;
+  data.until = now + BLOCK_USER_TIME;
+  loginFailsByUser.set(loginName, data);
+}
+
+function registerSuccess(loginName: string) {
+  loginFailsByUser.delete(loginName);
+}
+
+// Limpeza periódica (evita vazamento de memória)
+setInterval(() => {
+  const now = Date.now();
+  loginFailsByUser.forEach((v, k) => { if (now > v.until) loginFailsByUser.delete(k); });
+  loginAttemptsByIP.forEach((v, k) => { if (now > v.resetAt) loginAttemptsByIP.delete(k); });
+}, 5 * 60 * 1000);
 
 app.all("/api.php", async (req, res) => {
   const action = (req.body && req.body.action) || req.query.action;
 
   if (action === "login") {
-    const ip = req.headers['x-forwarded-for'] as string || req.socket.remoteAddress || '';
-    if (!checkRateLimit(ip)) {
-      return res.status(429).json({ success: false, error: 'Muitas tentativas. Aguarde 15 minutos.' });
+    const ip = (req.headers['x-forwarded-for'] as string || req.socket.remoteAddress || '').split(',')[0].trim();
+    const loginName = (req.body.login || req.query.login || '').toString().trim().toLowerCase();
+
+    // Rate limit
+    const limit = checkLimits(ip, loginName);
+    if (!limit.ok) {
+      return res.status(429).json({ success: false, error: limit.reason });
     }
+
     req.body.login = req.body.login || req.query.login;
     req.body.senha = req.body.senha || req.query.senha;
     const loginRes = await new Promise<any>((resolve) => {
@@ -78,8 +124,13 @@ app.all("/api.php", async (req, res) => {
       login(req, fakeRes);
     });
     const data = loginRes._data;
-    if (data && data.success && data.empresaId) {
-      res.setHeader("Set-Cookie", `empresa_id=${data.empresaId}; Path=/; HttpOnly`);
+    if (data && data.success) {
+      registerSuccess(loginName);
+      if (data.empresaId) {
+        res.setHeader("Set-Cookie", `empresa_id=${data.empresaId}; Path=/; HttpOnly`);
+      }
+    } else if (loginName) {
+      registerFailure(loginName);
     }
     return res.json(data);
   }

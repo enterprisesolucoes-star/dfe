@@ -499,8 +499,8 @@ switch ($action) {
         break;
 
     case 'nfe_enviar_email_doc':
-        $id = (int)($_POST['id'] ?? 0);
-        $emailCliente = $_POST['email'] ?? '';
+        $id = (int)($_POST['id'] ?? $_GET['id'] ?? 0);
+        $emailCliente = $_POST['email'] ?? $_GET['email'] ?? '';
         
         if ($id <= 0 || empty($emailCliente)) {
             echo json_encode(['success' => false, 'message' => 'E-mail inválido']);
@@ -562,6 +562,152 @@ switch ($action) {
             echo json_encode(['success' => true]);
         } catch (\Exception $e) {
              echo json_encode(['success' => false, 'message' => 'Erro interno ao enviar e-mail: ' . $e->getMessage()]);
+        }
+        break;
+
+    case 'nfe_listar_cce':
+        $id = (int)($_GET['id'] ?? 0);
+        $stmt = $pdo->prepare("SELECT id, numero_sequencia, correcao, protocolo, status, created_at FROM nfe_cce WHERE venda_id = ? AND empresa_id = ? ORDER BY numero_sequencia DESC");
+        $stmt->execute([$id, $empresaId]);
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        break;
+
+    case 'nfe_enviar_cce':
+        $id = (int)($_POST['id'] ?? $_GET['id'] ?? 0);
+        $data = json_decode(file_get_contents('php://input'), true);
+        $correcao = trim($data['correcao'] ?? '');
+        
+        if ($id <= 0 || strlen($correcao) < 15) {
+            echo json_encode(['success' => false, 'message' => 'Correcao deve ter no minimo 15 caracteres.']);
+            break;
+        }
+        if (strlen($correcao) > 1000) {
+            echo json_encode(['success' => false, 'message' => 'Correcao deve ter no maximo 1000 caracteres.']);
+            break;
+        }
+        
+        $stmt = $pdo->prepare("SELECT numero, serie, chave_acesso, status, data_emissao FROM vendas WHERE id = ? AND modelo = 55 AND empresa_id = ?");
+        $stmt->execute([$id, $empresaId]);
+        $venda = $stmt->fetch();
+        
+        if (!$venda || $venda['status'] !== 'Autorizada') {
+            echo json_encode(['success' => false, 'message' => 'NFe nao esta autorizada.']);
+            break;
+        }
+        
+        if (!empty($venda['data_emissao'])) {
+            $dataAut = strtotime($venda['data_emissao']);
+            $horasPassadas = (time() - $dataAut) / 3600;
+            if ($horasPassadas > 720) {
+                echo json_encode(['success' => false, 'message' => 'Prazo de 720 horas (30 dias) para CCe expirado.']);
+                break;
+            }
+        }
+        
+        $cnt = $pdo->prepare("SELECT COUNT(*) as qtd, MAX(numero_sequencia) as max_seq FROM nfe_cce WHERE venda_id = ? AND status = 'Autorizada'");
+        $cnt->execute([$id]);
+        $info = $cnt->fetch();
+        $qtdCce = (int)$info['qtd'];
+        $proxSeq = (int)$info['max_seq'] + 1;
+        
+        if ($qtdCce >= 20) {
+            echo json_encode(['success' => false, 'message' => 'Limite de 20 CCe por NFe atingido.']);
+            break;
+        }
+        
+        try {
+            $empresaDb = fetchEmpresaNfe($pdo, $empresaId);
+            $pfxContent = $empresaDb['certificado_pfx'];
+            $senha = $empresaDb['certificado_senha'];
+            if (strpos($pfxContent, 'base64,') !== false) {
+                $pfxContent = base64_decode(explode('base64,', $pfxContent)[1]);
+            }
+            
+            $configJson = json_encode([
+                "atualizacao" => date('Y-m-d H:i:s'),
+                "tpAmb" => (int)($empresaDb['ambiente_nfe'] ?? 2),
+                "razaosocial" => $empresaDb['razao_social'],
+                "siglaUF" => $empresaDb['uf'],
+                "cnpj" => $empresaDb['cnpj'],
+                "schemes" => "PL_009_V4",
+                "versao" => "4.00",
+                "tokenIBGE" => $empresaDb['codigo_municipio'],
+                "proxyConf" => ["proxy" => "", "port" => "", "user" => "", "pass" => ""]
+            ]);
+            
+            $certificate = \NFePHP\Common\Certificate::readPfx($pfxContent, $senha);
+            $tools = new \NFePHP\NFe\Tools($configJson, $certificate);
+            $tools->model('55');
+            
+            $resp = $tools->sefazCCe($venda['chave_acesso'], $correcao, $proxSeq);
+            
+            $st = new \NFePHP\NFe\Common\Standardize($resp);
+            $retorno = $st->toArray();
+            
+            $cStat = $retorno['infEvento']['cStat'] ?? $retorno['retEvento']['infEvento']['cStat'] ?? '';
+            $xMotivo = $retorno['infEvento']['xMotivo'] ?? $retorno['retEvento']['infEvento']['xMotivo'] ?? 'Erro ao processar';
+            $nProt = $retorno['infEvento']['nProt'] ?? $retorno['retEvento']['infEvento']['nProt'] ?? '';
+            
+            if (in_array($cStat, ['135', '136'])) {
+                // Montar procEventoNFe (envio + retorno) para permitir geração do PDF
+                try {
+                    $dom = new \DOMDocument('1.0', 'UTF-8');
+                    $dom->preserveWhiteSpace = false;
+                    $dom->formatOutput = false;
+                    $dom->loadXML($resp);
+                    $retEvento = $dom->getElementsByTagName('retEvento')->item(0);
+                    $evento = $tools->lastRequest ?? null;
+                    
+                    // Tenta extrair o evento enviado do lastRequest
+                    $domEnvio = new \DOMDocument('1.0', 'UTF-8');
+                    if ($evento) {
+                        $domEnvio->loadXML($evento);
+                        $eventoXML = $domEnvio->getElementsByTagName('evento')->item(0);
+                    }
+                    
+                    $procXml = '<?xml version="1.0" encoding="UTF-8"?>';
+                    $procXml .= '<procEventoNFe versao="1.00" xmlns="http://www.portalfiscal.inf.br/nfe">';
+                    if (isset($eventoXML)) {
+                        $procXml .= $dom->saveXML($dom->importNode($eventoXML, true));
+                    }
+                    if ($retEvento) {
+                        $procXml .= $dom->saveXML($retEvento);
+                    }
+                    $procXml .= '</procEventoNFe>';
+                    
+                    $xmlFinal = $procXml;
+                } catch (\Throwable $ex) {
+                    $xmlFinal = $resp;
+                }
+                
+                $pdo->prepare("INSERT INTO nfe_cce (empresa_id, venda_id, numero_sequencia, correcao, protocolo, xml_cce, status) VALUES (?, ?, ?, ?, ?, ?, 'Autorizada')")
+                    ->execute([$empresaId, $id, $proxSeq, $correcao, $nProt, $xmlFinal]);
+                echo json_encode(['success' => true, 'message' => "CCe #{$proxSeq} autorizada (Protocolo: {$nProt})", 'protocolo' => $nProt, 'sequencia' => $proxSeq]);
+            } else {
+                echo json_encode(['success' => false, 'message' => "SEFAZ: [{$cStat}] {$xMotivo}"]);
+            }
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Erro ao emitir CCe: ' . $e->getMessage()]);
+        }
+        break;
+
+    case 'nfe_cce_pdf':
+        $cceId = (int)($_GET['id'] ?? 0);
+        $stmt = $pdo->prepare("SELECT c.*, v.xml_autorizado FROM nfe_cce c JOIN vendas v ON v.id = c.venda_id WHERE c.id = ? AND c.empresa_id = ?");
+        $stmt->execute([$cceId, $empresaId]);
+        $cce = $stmt->fetch();
+        if (!$cce || empty($cce['xml_cce'])) {
+            echo "CCe não encontrada"; break;
+        }
+        try {
+            $empresaDb = fetchEmpresaNfe($pdo, $empresaId);
+            $printer = new \App\Services\PrinterService($empresaDb, $empresaDb['logo_url'] ?? '');
+            $pdf = $printer->imprimirCce($cce['xml_cce'], $cce['xml_autorizado']);
+            header("Content-Type: application/pdf");
+            header("Content-Disposition: inline; filename=\"CCe_{$cce['venda_id']}_{$cce['numero_sequencia']}.pdf\"");
+            echo $pdf;
+        } catch (\Exception $e) {
+            echo "Erro ao gerar CCe PDF: " . $e->getMessage();
         }
         break;
 

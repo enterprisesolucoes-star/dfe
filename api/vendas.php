@@ -1664,8 +1664,8 @@ switch ($action) {
 
     // ── Enviar Documento por E-mail (PDF + XML) ────────────────────────────────
     case 'enviar_email_doc':
-        $id = (int)($_POST['id'] ?? 0);
-        $emailCliente = $_POST['email'] ?? '';
+        $id = (int)($_POST['id'] ?? $_GET['id'] ?? 0);
+        $emailCliente = $_POST['email'] ?? $_GET['email'] ?? '';
         
         if ($id <= 0 || empty($emailCliente)) {
             echo json_encode(['success' => false, 'message' => 'E-mail inválido']);

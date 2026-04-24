@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import LoginScreen from './components/LoginScreen';
 import NfceDashboard from './components/NfceDashboard';
+import AdminPortal from './components/AdminPortal';
 
 export type Session = {
   usuarioId: number;
@@ -38,6 +39,11 @@ export default function App() {
       localStorage.setItem('dfe_session', JSON.stringify(s));
     }
   };
+
+  // Rota /admin
+  if (window.location.pathname.startsWith('/admin')) {
+    return <AdminPortal />;
+  }
 
   if (!session) {
     return <LoginScreen onLogin={handleLogin} />;

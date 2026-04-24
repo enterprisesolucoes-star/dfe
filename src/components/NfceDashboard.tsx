@@ -569,7 +569,12 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       } else {
         showAlert('Configurações salvas', 'As configurações foram salvas com sucesso.');
       }
-      handleSetActiveTab('vendas');
+      // Voltar para a aba correta após salvar
+      if (['dfe_config','dfe_nfe_dados','dfe_nfce_dados','dfe_provedor'].includes(activeTab)) {
+        handleSetActiveTab('dfe_config');
+      } else {
+        handleSetActiveTab('empresa');
+      }
       if (!session.empresaConfigurada && emitente.razaoSocial && emitente.cnpj) {
         onUpdateSession({ ...session, empresaConfigurada: true });
       }
@@ -637,16 +642,18 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
     }
   };
 
-  const handleEmailDoc = async (id: number, modelo: number, defaultEmail = '') => {
+  const handleEmailDoc = async (id: number, modelo: number | string, defaultEmail = '') => {
+    const isNfe = modelo === 55 || modelo === '55' || modelo === 'nfe';
     showPrompt("Enviar E-mail", "Digite o e-mail do destinatário:", async (email) => {
       if (!email || email.trim() === '') return;
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+        showAlert("E-mail inválido", "Digite um e-mail válido.");
+        return;
+      }
       showAlert("Enviando", "Aguarde, enviando e-mail...");
       try {
-        const formData = new FormData();
-        formData.append('id', String(id));
-        formData.append('email', email);
-        const action = modelo === 55 ? 'nfe_enviar_email_doc' : 'enviar_email_doc';
-        const res = await fetch(`./api.php?action=${action}`, { method: 'POST', body: formData });
+        const action = isNfe ? 'nfe_enviar_email_doc' : 'enviar_email_doc';
+        const res = await fetch(`./api.php?action=${action}&id=${id}&email=${encodeURIComponent(email.trim())}`, { method: 'POST' });
         const d = await res.json();
         if(d.success) showAlert("Sucesso", "E-mail enviado com sucesso!");
         else showAlert("Erro", d.message || "Não foi possível enviar o e-mail");
@@ -680,7 +687,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       case 'dashboard': return <DashboardTab isFiscal={isFiscal} />;
       case 'fin_receber': return <FinanceiroView tipo="R" emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} />;
       case 'fin_pagar': return <FinanceiroView tipo="P" emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} />;
-      case 'fin_caixa': return <CaixaView emitente={emitente} />;
+      case 'fin_caixa': return <CaixaView emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} />;
       case 'vendas_geral': return <GeralNfceTab showAlert={showAlert} showConfirm={showConfirm} showPrompt={showPrompt} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} />;
       case 'vendas': return <VendasTab vendas={vendas} onCancelar={handleCancelar} onSincronizar={handleSincronizarContingencia} onRetryTef={handleRetryTef} onExcluir={handleExcluirVenda} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} />;
       case 'produtos': return (
@@ -714,12 +721,12 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       case 'empresa':
       case 'config':
       case 'config_empresa':
-      case 'config_email':      return <EmpresaPage emitente={emitente} onUpdate={setEmitente} onSave={handleSalvarEmpresa} onCancel={() => handleSetActiveTab('vendas')} showAlert={showAlert} usuarioDfe={session.usuarioDfe} />;
+      case 'config_email':      return <EmpresaPage emitente={emitente} onUpdate={setEmitente} onSave={handleSalvarEmpresa} onCancel={() => handleSetActiveTab('empresa')} showAlert={showAlert} usuarioDfe={session.usuarioDfe} />;
       case 'config_integracao': return <IntegracaoPage emitente={emitente} onUpdate={setEmitente} showAlert={showAlert} />;
       case 'dfe_config':
       case 'dfe_nfce_dados':
       case 'dfe_nfe_dados':
-      case 'dfe_provedor':   return <DfeConfigPage emitente={emitente} onUpdate={setEmitente} onSave={handleSalvarEmpresa} showAlert={showAlert} />;
+      case 'dfe_provedor':   return <DfeConfigPage emitente={emitente} onUpdate={setEmitente} onSave={handleSalvarEmpresa} onCancel={() => handleSetActiveTab('dfe_config')} showAlert={showAlert} />;
       case 'ncm':       return <NcmTab ufEmpresa={emitente.uf} />;
       case 'usuarios':  return <UsuariosTab session={session} showAlert={showAlert} showConfirm={showConfirm} />;
       case 'medidas': return (
@@ -4218,28 +4225,9 @@ const IntegracaoPage = ({
 
         <div className="border-t border-gray-100" />
 
-        {/* SmartPOS */}
-        <SmartPosSection emitente={emitente} onUpdate={onUpdate} showAlert={showAlert} />
 
-        {/* TEF */}
-        <div className="pt-4 border-t border-gray-100">
-          <h4 className="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <CreditCard className="w-4 h-4 text-blue-600" /> TEF (Transferência Eletrônica de Fundos)
-          </h4>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Estados que exigem TEF (separados por vírgula, ex: SP,RJ)
-            </label>
-            <input
-              type="text"
-              value={emitente.tef_required_states || ''}
-              onChange={e => handleChange('tef_required_states', e.target.value)}
-              placeholder="Ex: SP,RJ,MG"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
-            />
-            <p className="text-xs text-gray-400 mt-1">Deixe em branco para não exigir TEF em nenhum estado.</p>
-          </div>
-        </div>
+
+
 
         <div className="pt-4">
           <button onClick={handleSalvar} className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm">

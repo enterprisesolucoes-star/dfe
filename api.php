@@ -65,10 +65,12 @@ if (isset($pdo)) {
 if (file_exists(__DIR__ . '/.env')) {
     $lines = file(__DIR__ . '/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line) {
-        if (strpos(trim($line), '#') === 0) continue;
+        $line = trim($line);
+        if ($line === '' || strpos($line, '#') === 0) continue;
+        if (strpos($line, '=') === false) continue;
         list($name, $value) = explode('=', $line, 2);
-        $name = trim($name);
-        $value = trim($value);
+        $name = trim($name ?? '');
+        $value = trim($value ?? '');
         if (!defined($name)) define($name, $value);
         $_ENV[$name] = $value;
     }
@@ -263,7 +265,7 @@ $modules = [
     'tem_smartpos' => 'vendas', 'tef_solicitar' => 'vendas', 'tef_consultar' => 'vendas',
     'listar_smartpos' => 'vendas', 'salvar_smartpos' => 'vendas', 'excluir_smartpos' => 'vendas',
     // NF-e Modelo 55
-    'nfe_listar' => 'nfe', 'nfe_emitir' => 'nfe', 'nfe_cancelar' => 'nfe', 'nfe_excluir' => 'nfe', 'nfe_download_xml' => 'nfe',
+    'nfe_listar' => 'nfe', 'nfe_emitir' => 'nfe', 'nfe_cancelar' => 'nfe', 'nfe_enviar_cce' => 'nfe', 'nfe_cce_pdf' => 'nfe', 'nfe_listar_cce' => 'nfe', 'nfe_excluir' => 'nfe', 'nfe_download_xml' => 'nfe',
     'nfe_danfe' => 'nfe', 'nfe_baixar_xml_lote' => 'nfe', 'nfe_enviar_xml_contador' => 'nfe', 'nfe_enviar_email_doc' => 'nfe',
     'nfe_devolucao' => 'nfe', 'nfe_buscar_para_devolucao' => 'nfe',
     'nfe_salvar_pendente' => 'nfe', 'nfe_emitir_pendente' => 'nfe',
@@ -278,7 +280,7 @@ $modules = [
     'rtc_atualizar_online' => 'rtc', 'rtc_aliquotas_listar' => 'rtc', 'rtc_aliquota_salvar' => 'rtc', 'rtc_aliquota_excluir' => 'rtc',
     'check_vendor' => 'check_vendor',
     'dashboard_vendas' => 'dashboard', 'dashboard_financeiro' => 'dashboard',
-    'system_admin' => 'system_admin', 'login_admin' => 'system_admin', 'listar_empresas_admin' => 'system_admin', 'salvar_empresa_admin' => 'system_admin', 'excluir_empresa_admin' => 'system_admin', 'salvar_usuario_admin' => 'system_admin',
+    'system_admin' => 'system_admin', 'login_admin' => 'system_admin', 'alterar_status_empresa' => 'system_admin', 'listar_smartpos_admin' => 'system_admin', 'salvar_smartpos_admin' => 'system_admin', 'excluir_smartpos_admin' => 'system_admin', 'listar_empresas_admin' => 'system_admin', 'salvar_empresa_admin' => 'system_admin', 'excluir_empresa_admin' => 'system_admin', 'salvar_usuario_admin' => 'system_admin',
     'fin_listar_contas' => 'financeiro',
     'fin_listar_titulos' => 'financeiro',
     'fin_baixar_titulo' => 'financeiro',
