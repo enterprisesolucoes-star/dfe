@@ -268,8 +268,8 @@ switch ($action) {
                     $fPag, 
                     $vPag,
                     $pag['tp_integra'] ?? ($isTefRequired ? 1 : 2),
-                    $pag['t_band'] ?? $pag['tBand'] ?? null,
-                    $pag['c_aut'] ?? $pag['cAut'] ?? null
+                    in_array($pag['formaPagamento'] ?? $pag['forma_pagamento'] ?? '', ['17']) ? null : ($pag['t_band'] ?? $pag['tBand'] ?? null),
+                    in_array($pag['formaPagamento'] ?? $pag['forma_pagamento'] ?? '', ['17']) ? null : ($pag['c_aut'] ?? $pag['cAut'] ?? null)
                 ]);
             }
 
