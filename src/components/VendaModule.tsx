@@ -410,7 +410,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
     };
     try {
       if (pagamentos.some(p => ['03', '04', '17'].includes(p.formaPagamento))) {
-        const spResp = await fetch('./api.php?action=tem_smartpos');
+        const spResp = await fetch('./api.php?action=tem_smartpos&_=' + Date.now());
         const spData = await spResp.json();
         if (!spData.tem) {
           showAlert('TEF não disponível', spData.message || 'Integração TEF não configurada. Verifique as configurações da empresa.');
