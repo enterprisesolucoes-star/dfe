@@ -425,9 +425,9 @@ switch ($action) {
         readfile($zipPath); unlink($zipPath); exit;
 
     case 'nfe_enviar_xml_contador':
-        $di = $_POST['data_inicio'] ?? '';
-        $df = $_POST['data_fim'] ?? '';
-        $emailContador = $_POST['email'] ?? '';
+        $di = $_POST['data_inicio'] ?? $_GET['data_inicio'] ?? '';
+        $df = $_POST['data_fim'] ?? $_GET['data_fim'] ?? '';
+        $emailContador = $_POST['email'] ?? $_GET['email'] ?? '';
 
         if (empty($emailContador) || !filter_var($emailContador, FILTER_VALIDATE_EMAIL)) {
             echo json_encode(['success' => false, 'message' => 'E-mail do contador inválido.']);
