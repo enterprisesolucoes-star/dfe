@@ -55,7 +55,7 @@ export const ProdutosTab = ({ produtos, onEdit, onDelete, onRefresh }: { produto
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar Código ou Nome..." className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
           </div>
-          {onRefresh && <button onClick={onRefresh} className="p-2 bg-gray-100 text-gray-500 hover:bg-gray-200 rounded-xl transition-all" title="Atualizar"><RefreshCw className="w-4 h-4" /></button>}
+          {onRefresh && <button onClick={onRefresh} className="px-3 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all flex items-center gap-1"><RefreshCw className="w-3.5 h-3.5" /> Atualizar</button>}
         </div>
       </div>
       <div className="overflow-x-auto">

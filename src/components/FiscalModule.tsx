@@ -123,7 +123,7 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
     };
     useEffect(() => { fetchNfeList(); }, [di, df]);
     const lista = nfeList.filter(n => !busca || String(n.numero || '').includes(busca) || (n.natureza_operacao || '').toLowerCase().includes(busca.toLowerCase()));
-    const totAutorizado = lista.filter(n => n.status === 'Autorizada' && (n.natureza_operacao || '').toUpperCase().includes('VENDA')).reduce((a, n) => a + Number(n.valor_total || 0), 0);
+    const totAutorizado = lista.filter(n => n.status === 'Autorizada' && n.finalidade !== '4' && n.finalidade !== 4 && !(n.natureza_operacao || '').toUpperCase().includes('DEVOL')).reduce((a, n) => a + Number(n.valor_total || 0), 0);
     const qtdAutorizadas = lista.filter(n => n.status === 'Autorizada').length;
     const qtdCanceladas = lista.filter(n => n.status === 'Cancelada').length;
     const qtdPendentes = lista.filter(n => !['Autorizada','Cancelada'].includes(n.status)).length;
@@ -141,8 +141,8 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
                 <span className="text-[10px] text-gray-400 font-bold uppercase">Data Fim</span>
                 <input type="date" value={df} onChange={e => setDf(e.target.value)} className="border border-gray-200 rounded-xl px-2 py-1.5 text-xs outline-none" />
                 <button onClick={fetchNfeList} className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all flex items-center gap-1"><RefreshCw className="w-3 h-3" /> Atualizar</button>
-                <button onClick={() => window.open(`./api.php?action=nfe_baixar_xml_lote&data_inicio=${di}&data_fim=${df}`, '_blank')} className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-bold rounded-xl hover:bg-gray-200 transition-all flex items-center gap-1"><Download className="w-3 h-3" /> XML Lote</button>
-                <button onClick={() => window.open(`./api.php?action=nfe_enviar_xml_contador&data_inicio=${di}&data_fim=${df}`, '_blank')} className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-bold rounded-xl hover:bg-gray-200 transition-all flex items-center gap-1"><Send className="w-3 h-3" /> Enviar Contador</button>
+                <button onClick={() => window.open(`./api.php?action=nfe_baixar_xml_lote&data_inicio=${di}&data_fim=${df}`, '_blank')} className="px-3 py-1.5 bg-green-600 text-white text-xs font-bold rounded-xl hover:bg-green-700 transition-all flex items-center gap-1"><Download className="w-3 h-3" /> XML Lote</button>
+                <button onClick={() => showPrompt && showPrompt('Enviar XML ao Contador', 'Informe o e-mail do contador:', async (email: string) => { if (!email) return; const r = await fetch(`./api.php?action=nfe_enviar_xml_contador`, {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`data_inicio=${di}&data_fim=${df}&email=${encodeURIComponent(email)}`}); const d = await r.json(); showAlert && showAlert(d.success ? 'Enviado' : 'Erro', d.message || ''); })} className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all flex items-center gap-1"><Send className="w-3 h-3" /> Enviar Contador</button>
                 <div className="relative ml-auto flex-1 max-w-xs">
                     <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input type="text" placeholder="Buscar Nº Nota, Cliente ou Natureza..." value={busca} onChange={e => setBusca(e.target.value)} className="w-full border border-gray-200 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none" />
@@ -300,7 +300,7 @@ export const NfeDashboardTab = ({ nfeList, showAlert, showPrompt, onNovaNfe, onC
     const lista = listaHoje.filter((n: any) =>
         !busca || String(n.numero || '').includes(busca) || (n.natureza_operacao || '').toLowerCase().includes(busca.toLowerCase()) || (n.cliente_nome || '').toLowerCase().includes(busca.toLowerCase())
     );
-    const totAutorizado = lista.filter((n: any) => n.status === 'Autorizada' && (n.natureza_operacao || '').toUpperCase().includes('VENDA')).reduce((a: number, n: any) => a + Number(n.valor_total || 0), 0);
+    const totAutorizado = lista.filter((n: any) => n.status === 'Autorizada' && n.finalidade !== '4' && n.finalidade !== 4 && !(n.natureza_operacao || '').toUpperCase().includes('DEVOL')).reduce((a: number, n: any) => a + Number(n.valor_total || 0), 0);
     const qtdAutorizadas = lista.filter((n: any) => n.status === 'Autorizada').length;
     const qtdCanceladas = lista.filter((n: any) => n.status === 'Cancelada').length;
     const qtdPendentes = lista.filter((n: any) => !['Autorizada','Cancelada'].includes(n.status)).length;
@@ -401,8 +401,8 @@ export const GeralNfceTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, o
                 <span className="text-[10px] text-gray-400 font-bold uppercase">Data Fim</span>
                 <input type="date" value={df} onChange={e => setDf(e.target.value)} className="border border-gray-200 rounded-xl px-2 py-1.5 text-xs outline-none" />
                 <button onClick={fetchList} className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all flex items-center gap-1"><RefreshCw className="w-3 h-3" /> Atualizar</button>
-                <button onClick={() => window.open(`./api.php?action=baixar_xml_lote&data_inicio=${di}&data_fim=${df}`, '_blank')} className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-bold rounded-xl hover:bg-gray-200 transition-all flex items-center gap-1"><Download className="w-3 h-3" /> XML Lote</button>
-                <button onClick={() => window.open(`./api.php?action=enviar_xml_contador&data_inicio=${di}&data_fim=${df}`, '_blank')} className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-bold rounded-xl hover:bg-gray-200 transition-all flex items-center gap-1"><Send className="w-3 h-3" /> Enviar Contador</button>
+                <button onClick={() => window.open(`./api.php?action=baixar_xml_lote&data_inicio=${di}&data_fim=${df}`, '_blank')} className="px-3 py-1.5 bg-green-600 text-white text-xs font-bold rounded-xl hover:bg-green-700 transition-all flex items-center gap-1"><Download className="w-3 h-3" /> XML Lote</button>
+                <button onClick={() => showPrompt && showPrompt('Enviar XML ao Contador', 'Informe o e-mail do contador:', async (email: string) => { if (!email) return; const r = await fetch(`./api.php?action=enviar_xml_contador`, {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`data_inicio=${di}&data_fim=${df}&email=${encodeURIComponent(email)}`}); const d = await r.json(); showAlert && showAlert(d.success ? 'Enviado' : 'Erro', d.message || ''); })} className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all flex items-center gap-1"><Send className="w-3 h-3" /> Enviar Contador</button>
                 <div className="relative ml-auto flex-1 max-w-xs">
                     <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input type="text" placeholder="Buscar Nº Cupom ou Cliente..." value={busca} onChange={e => setBusca(e.target.value)} className="w-full border border-gray-200 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none" />

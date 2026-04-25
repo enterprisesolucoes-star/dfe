@@ -391,6 +391,39 @@ switch ($action) {
                 echo json_encode(['success' => false, 'message' => ($resultado->mensagem_erro ?? 'Erro desconhecido')]);
             }
         } catch (Exception $e) { echo json_encode(['success' => false, 'message' => $e->getMessage()]); }
+    case 'nfe_baixar_xml_lote':
+        $di = $_GET['data_inicio'] ?? '';
+        $df = $_GET['data_fim'] ?? '';
+        $where = ["status IN ('Autorizada', 'Cancelada')", "modelo = 55"];
+        if ($empresaId) { $where[] = "empresa_id = $empresaId"; }
+        $params = [];
+        if ($di) { $where[] = "DATE(data_emissao) >= ?"; $params[] = $di; }
+        if ($df) { $where[] = "DATE(data_emissao) <= ?"; $params[] = $df; }
+        $sqlWhere = implode(" AND ", $where);
+        $stmt = $pdo->prepare("SELECT id, numero, chave_acesso, status, xml_autorizado, xml_cancelamento FROM vendas WHERE $sqlWhere");
+        $stmt->execute($params);
+        $vendas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (empty($vendas)) { die("Nenhum XML encontrado para este período."); }
+        $zipFilename = 'NFe_XMLs_' . date('Y-m-d') . '_' . time() . '.zip';
+        $zipPath = sys_get_temp_dir() . '/' . $zipFilename;
+        $zip = new ZipArchive();
+        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) { die("Erro ao criar ZIP."); }
+        $xmlsAdded = 0;
+        foreach ($vendas as $v) {
+            $chave = $v['chave_acesso'] ?: ('NFe_' . $v['numero'] . '_' . $v['id']);
+            if ($v['status'] === 'Autorizada' && !empty($v['xml_autorizado'])) {
+                $zip->addFromString("Autorizadas/{$chave}-nfe.xml", $v['xml_autorizado']); $xmlsAdded++;
+            } elseif ($v['status'] === 'Cancelada' && !empty($v['xml_cancelamento'])) {
+                $zip->addFromString("Canceladas/{$chave}-nfe.xml", $v['xml_cancelamento']); $xmlsAdded++;
+            }
+        }
+        $zip->close();
+        if ($xmlsAdded === 0) { unlink($zipPath); die("Nenhum XML gravado."); }
+        header('Content-Type: application/zip');
+        header('Content-Disposition: attachment; filename="' . $zipFilename . '"');
+        header('Content-Length: ' . filesize($zipPath));
+        readfile($zipPath); unlink($zipPath); exit;
+
     case 'nfe_enviar_xml_contador':
         $di = $_POST['data_inicio'] ?? '';
         $df = $_POST['data_fim'] ?? '';
