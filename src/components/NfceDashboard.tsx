@@ -1382,7 +1382,9 @@ const DevolucaoModal = ({ loading, data, vendaId, modeloOrigem, onClose, onSucce
   const [submitting, setSubmitting] = React.useState(false);
   // NFC-e (65) choice: null = pending choice, 'empresa' = própria empresa, 'identificar' = cliente manual
   const [tipoDestinatario, setTipoDestinatario] = React.useState<null | 'empresa' | 'identificar'>(null);
-  const [clienteManual, setClienteManual] = React.useState({ nome: '', documento: '', logradouro: '', numero: '', bairro: '', municipio: '', uf: '', cep: '' });
+  const [clienteManual, setClienteManual] = React.useState({ nome: '', documento: '', logradouro: '', numero: '', bairro: '', municipio: '', codigoMunicipio: '', uf: '', cep: '' });
+  const [municipiosList, setMunicipiosList] = React.useState<{nome: string, id: number}[]>([]);
+  const [loadingMunicipios, setLoadingMunicipios] = React.useState(false);
   const [editingItemIdx, setEditingItemIdx] = React.useState<number | null>(null);
   const [informacoesAdicionais, setInformacoesAdicionais] = React.useState('');
 
@@ -1392,6 +1394,17 @@ const DevolucaoModal = ({ loading, data, vendaId, modeloOrigem, onClose, onSucce
     setEditingItemIdx(null);
   };
 
+
+  const fetchMunicipios = async (uf: string) => {
+    if (!uf || uf.length !== 2) return;
+    setLoadingMunicipios(true);
+    try {
+      const r = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios?orderBy=nome`);
+      const d = await r.json();
+      setMunicipiosList(Array.isArray(d) ? d : []);
+    } catch { setMunicipiosList([]); }
+    setLoadingMunicipios(false);
+  };
 
   React.useEffect(() => {
     if (!data) return;
@@ -1428,6 +1441,7 @@ const DevolucaoModal = ({ loading, data, vendaId, modeloOrigem, onClose, onSucce
     // Reset choice when data loads
     if (data.cliente) {
       setTipoDestinatario('identificar');
+      const ufCliente = data.cliente.uf || '';
       setClienteManual({
         nome: data.cliente.nome || '',
         documento: data.cliente.documento || '',
@@ -1436,8 +1450,10 @@ const DevolucaoModal = ({ loading, data, vendaId, modeloOrigem, onClose, onSucce
         numero: data.cliente.numero || '',
         bairro: data.cliente.bairro || '',
         municipio: data.cliente.municipio || '',
-        uf: data.cliente.uf || '',
+        codigoMunicipio: data.cliente.codigo_municipio || '',
+        uf: ufCliente,
       });
+      if (ufCliente) fetchMunicipios(ufCliente);
     } else if (modeloOrigem === 55) {
       setTipoDestinatario('empresa'); 
     } else {
@@ -1499,7 +1515,7 @@ const DevolucaoModal = ({ loading, data, vendaId, modeloOrigem, onClose, onSucce
             numero: clienteManual.numero || 'SN',
             complemento: '',
             bairro: clienteManual.bairro,
-            codigoMunicipio: '',
+            codigoMunicipio: clienteManual.codigoMunicipio,
             municipio: clienteManual.municipio,
             uf: clienteManual.uf,
             cep: clienteManual.cep,
@@ -1721,17 +1737,21 @@ const DevolucaoModal = ({ loading, data, vendaId, modeloOrigem, onClose, onSucce
                     placeholder="Bairro" />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 mb-1 block">Município</label>
-                  <input value={clienteManual.municipio} onChange={e => setClienteManual(p => ({ ...p, municipio: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-                    placeholder="Cidade" />
+                  <label className="text-xs text-gray-500 mb-1 block">UF *</label>
+                  <select value={clienteManual.uf} onChange={e => { const uf = e.target.value; setClienteManual(p => ({ ...p, uf, municipio: '', codigoMunicipio: '' })); fetchMunicipios(uf); }}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                    <option value="">Selecione</option>
+                    {['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'].map(uf => <option key={uf} value={uf}>{uf}</option>)}
+                  </select>
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 mb-1 block">UF</label>
-                  <input value={clienteManual.uf} onChange={e => setClienteManual(p => ({ ...p, uf: e.target.value.toUpperCase().slice(0, 2) }))}
-                    maxLength={2}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-                    placeholder="SP" />
+                  <label className="text-xs text-gray-500 mb-1 block">Município *</label>
+                  <select value={clienteManual.codigoMunicipio} onChange={e => { const opt = municipiosList.find(m => String(m.id) === e.target.value); setClienteManual(p => ({ ...p, codigoMunicipio: e.target.value, municipio: opt?.nome || '' })); }}
+                    disabled={!clienteManual.uf || loadingMunicipios}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white disabled:opacity-50">
+                    <option value="">{loadingMunicipios ? 'Carregando...' : 'Selecione a UF primeiro'}</option>
+                    {municipiosList.map(m => <option key={m.id} value={String(m.id)}>{m.nome}</option>)}
+                  </select>
                 </div>
               </div>
             </div>
@@ -1842,59 +1862,106 @@ const DevolucaoModal = ({ loading, data, vendaId, modeloOrigem, onClose, onSucce
           </button>
         </div>
 
-        {/* Modal de Edição de Item */}
-        {editingItemIdx !== null && (
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-            <motion.div initial={{scale:0.9, opacity:0}} animate={{scale:1, opacity:1}} className="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden">
-              <div className="p-6 space-y-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-bold text-gray-800 text-lg">Editar Item</h3>
-                  <button onClick={() => setEditingItemIdx(null)} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5"/></button>
-                </div>
-                
-                <p className="text-sm text-gray-500 font-medium">{itens[editingItemIdx].descricao}</p>
-
-                <div className="space-y-3">
-                   <div>
-                    <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">CFOP</label>
-                    <input 
-                      type="text" 
-                      defaultValue={itens[editingItemIdx].cfop}
-                      onBlur={e => handleUpdateItemDetail({ cfop: e.target.value })}
-                      className="w-full border border-gray-100 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50" 
-                    />
-                  </div>
+        {/* Modal de Ajuste Fiscal do Item */}
+        {editingItemIdx !== null && (() => {
+          const it = itens[editingItemIdx];
+          const upd = (field: string, val: any) => setItens(prev => prev.map((x, i) => i === editingItemIdx ? { ...x, [field]: val } : x));
+          return (
+            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+              <motion.div initial={{scale:0.9, opacity:0}} animate={{scale:1, opacity:1}} className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+                <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
                   <div>
-                    <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">NCM</label>
-                    <input 
-                      type="text" 
-                      defaultValue={itens[editingItemIdx].ncm}
-                      onBlur={e => handleUpdateItemDetail({ ncm: e.target.value })}
-                      className="w-full border border-gray-100 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50" 
-                    />
+                    <h3 className="text-lg font-semibold flex items-center gap-2"><Edit2 className="w-5 h-5" /> Ajuste Fiscal do Item</h3>
+                    <p className="text-blue-100 text-sm mt-0.5">{it.descricao}</p>
                   </div>
-                  <div>
-                    <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">Valor Unitário</label>
-                    <input 
-                      type="number" 
-                      step="0.01"
-                      defaultValue={itens[editingItemIdx].valorUnitario}
-                      onBlur={e => handleUpdateItemDetail({ valorUnitario: parseFloat(e.target.value) || 0 })}
-                      className="w-full border border-gray-100 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50" 
-                    />
-                  </div>
+                  <button onClick={() => setEditingItemIdx(null)} className="p-2 hover:bg-white/20 rounded-full transition-colors"><X className="w-5 h-5" /></button>
                 </div>
-
-                <button 
-                   onClick={() => setEditingItemIdx(null)}
-                   className="w-full py-3 bg-blue-600 text-white rounded-2xl font-bold shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all mt-2"
-                >
-                  Concluir
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
+                <div className="p-6 overflow-y-auto flex-1">
+                  {/* Tabs */}
+                  <div className="flex gap-1 p-1 bg-gray-100 rounded-xl mb-6">
+                    {['Produto','ICMS','IPI','PIS','COFINS'].map(tab => (
+                      <button key={tab} onClick={() => { const el = document.getElementById('devol-tab-' + tab); el?.scrollIntoView(); }}
+                        className="flex-1 py-2.5 text-xs font-semibold rounded-lg text-gray-500 hover:text-gray-700 hover:bg-white transition-all">
+                        {tab}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Produto */}
+                  <div id="devol-tab-Produto" className="mb-6">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-3">Produto</p>
+                    <div className="grid grid-cols-2 gap-4">
+                      {[
+                        {label:'NCM', field:'ncm', ph:'00000000', max:8},
+                        {label:'CFOP', field:'cfop', ph:'1202', max:4},
+                        {label:'CST/CSOSN (ICMS)', field:'icmsCstCsosn', ph:'102', max:3},
+                        {label:'CST PIS', field:'pisCst', ph:'07', max:2},
+                        {label:'CST COFINS', field:'cofinsCst', ph:'07', max:2},
+                        {label:'Unidade Comercial', field:'unidadeComercial', ph:'UN', max:6},
+                      ].map(f => (
+                        <div key={f.field} className="space-y-1">
+                          <label className="text-[10px] font-medium text-gray-400 uppercase">{f.label}</label>
+                          <input type="text" value={it[f.field] ?? ''} maxLength={f.max}
+                            onChange={e => upd(f.field, e.target.value)}
+                            className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none transition-all"
+                            placeholder={f.ph} />
+                        </div>
+                      ))}
+                      <div className="col-span-2 space-y-1">
+                        <label className="text-[10px] font-medium text-gray-400 uppercase">Origem da Mercadoria</label>
+                        <select value={it.origemMercadoria ?? '0'} onChange={e => upd('origemMercadoria', e.target.value)}
+                          className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none transition-all">
+                          <option value="0">0 – Nacional</option>
+                          <option value="1">1 – Estrangeira (imp. direta)</option>
+                          <option value="2">2 – Estrangeira (merc. interno)</option>
+                          <option value="3">3 – Nacional c/ 40-70% importado</option>
+                          <option value="5">5 – Nacional c/ importação inferior a 40%</option>
+                          <option value="8">8 – Nacional, importação superior a 70%</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  {/* ICMS / IPI / PIS / COFINS */}
+                  {[
+                    {tab:'ICMS', bcField:'vbc_icms', aliqField:'icmsAliquota', valField:'valor_icms'},
+                    {tab:'IPI',  bcField:'vbc_ipi',  aliqField:'ipiAliquota',  valField:'valor_ipi'},
+                    {tab:'PIS',  bcField:'vbc_pis',  aliqField:'pisAliquota',  valField:'valor_pis'},
+                    {tab:'COFINS',bcField:'vbc_cofins',aliqField:'cofinsAliquota',valField:'valor_cofins'},
+                  ].map(({tab, bcField, aliqField, valField}) => (
+                    <div key={tab} id={'devol-tab-' + tab} className="mb-6">
+                      <p className="text-[10px] font-bold text-gray-400 uppercase mb-3">{tab}</p>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-medium text-gray-400 uppercase">Base de Cálculo</label>
+                          <input type="number" step="0.01" value={it[bcField] ?? 0}
+                            onChange={e => { const bc = parseFloat(e.target.value)||0; upd(bcField, bc); upd(valField, parseFloat((bc * ((it[aliqField]||0)/100)).toFixed(2))); }}
+                            className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none transition-all" />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-medium text-gray-400 uppercase">Alíquota (%)</label>
+                          <input type="number" step="0.01" value={it[aliqField] ?? 0}
+                            onChange={e => { const aliq = parseFloat(e.target.value)||0; upd(aliqField, aliq); upd(valField, parseFloat(((it[bcField]||0) * (aliq/100)).toFixed(2))); }}
+                            className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-blue-600 outline-none transition-all text-center" />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-medium text-gray-400 uppercase">Valor</label>
+                          <input type="number" step="0.01" value={it[valField] ?? 0}
+                            onChange={e => upd(valField, parseFloat(e.target.value)||0)}
+                            className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none transition-all" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="px-6 py-4 border-t border-gray-100">
+                  <button onClick={() => setEditingItemIdx(null)}
+                    className="w-full py-3 bg-blue-600 text-white rounded-2xl font-bold shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all">
+                    Concluir
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          );
+        })()}
       </motion.div>
     </div>
   );
