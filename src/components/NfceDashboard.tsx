@@ -677,7 +677,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
   const handleDevolucao = async (id: number, modeloOrigem = 55) => {
     setDevolucaoModal({ isOpen: true, vendaId: id, modeloOrigem, loading: true, data: null });
     try {
-      const res = await fetch(`./api/nfe.php?action=nfe_buscar_para_devolucao&id=${id}&modelo=${modeloOrigem}`);
+      const res = await fetch(`./api.php?action=nfe_buscar_para_devolucao&id=${id}&modelo=${modeloOrigem}`);
       const d = await res.json();
       if (d.success) {
         setDevolucaoModal(prev => ({ ...prev, loading: false, data: d }));

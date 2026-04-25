@@ -1504,6 +1504,16 @@ switch ($action) {
         }
         break;
 
+    case 'nfce_download_xml':
+        $id = (int)$_GET['id'];
+        $v = $pdo->query("SELECT xml_autorizado, chave_acesso FROM vendas WHERE id = $id")->fetch();
+        if ($v && $v['xml_autorizado']) {
+            header('Content-Type: application/xml');
+            header('Content-Disposition: attachment; filename="'.$v['chave_acesso'].'.xml"');
+            echo $v['xml_autorizado'];
+        }
+        break;
+
     case 'baixar_xml_lote':
         $di = $_GET['data_inicio'] ?? '';
         $df = $_GET['data_fim'] ?? '';
