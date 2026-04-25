@@ -92,6 +92,8 @@ export const VendasTab = ({ vendas, onCancelar, onSincronizar, onRetryTef, onExc
                                             {onEmailDoc && <button onClick={() => onEmailDoc(v.id, 65)} className="p-1.5 text-gray-400 hover:text-blue-500" title="Email"><Send className="w-3.5 h-3.5" /></button>}
                                             {v.status === 'Autorizada' && <button onClick={() => downloadXml(`./api.php?action=nfce_download_xml&id=${v.id}`, `nfce_${v.numero}.xml`)} className="p-1.5 text-gray-400 hover:text-green-600" title="XML"><Download className="w-3.5 h-3.5" /></button>}
                                             {onDevolucao && v.status === 'Autorizada' && <button onClick={() => onDevolucao(v.id, 65)} className="p-1.5 text-gray-400 hover:text-orange-500" title="Devolução"><RefreshCw className="w-3.5 h-3.5" /></button>}
+                                            {v.status === 'Autorizada' && onCancelar && <button onClick={() => onCancelar(v.id)} className="p-1.5 text-gray-400 hover:text-red-500" title="Cancelar"><X className="w-3.5 h-3.5" /></button>}
+                                            {v.status !== 'Autorizada' && onExcluir && <button onClick={() => onExcluir(v.id)} className="p-1.5 text-gray-400 hover:text-red-600" title="Excluir"><Trash2 className="w-3.5 h-3.5" /></button>}
                                         </div>
                                     </td>
                                 </tr>
@@ -344,7 +346,7 @@ export const NfeDashboardTab = ({ nfeList, showAlert, showPrompt, onNovaNfe, onC
                                         {n.status === 'Autorizada' && onDevolucao && <button onClick={() => onDevolucao(n.id)} className="p-1.5 text-gray-400 hover:text-orange-500" title="Devolução"><RefreshCw className="w-3.5 h-3.5" /></button>}
                                         {n.status === 'Autorizada' && <button onClick={() => setCceModalNfe({open: true, nfe: n})} className="p-1.5 text-gray-400 hover:text-blue-600" title="Carta de Correção"><Edit3 className="w-3.5 h-3.5" /></button>}
                                         {n.status === 'Autorizada' && onCancelarNfe && <button onClick={() => onCancelarNfe(n.id)} className="p-1.5 text-gray-400 hover:text-red-500" title="Cancelar"><X className="w-3.5 h-3.5" /></button>}
-                                        {n.status === 'Cancelada' && onExcluirNfe && <button onClick={() => onExcluirNfe(n.id)} className="p-1.5 text-gray-400 hover:text-red-600" title="Excluir"><Trash2 className="w-3.5 h-3.5" /></button>}
+                                        {n.status !== 'Autorizada' && onExcluirNfe && <button onClick={() => onExcluirNfe(n.id)} className="p-1.5 text-gray-400 hover:text-red-600" title="Excluir"><Trash2 className="w-3.5 h-3.5" /></button>}
                                     </div>
                                 </td>
                             </tr>

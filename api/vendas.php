@@ -1145,15 +1145,7 @@ switch ($action) {
             echo json_encode(['success' => false, 'message' => 'NFC-e autorizada não pode ser excluída. Cancele-a na SEFAZ primeiro.']);
             break;
         }
-        // Se for Contingência, estorna estoque antes de excluir
-        if ($vRow['status'] === 'Contingencia') {
-            $itensExc = $pdo->prepare("SELECT produto_id, quantidade FROM vendas_itens WHERE venda_id = ?");
-            $itensExc->execute([$id]);
-            foreach ($itensExc->fetchAll() as $ie) {
-                $pdo->prepare("UPDATE produtos SET estoque = estoque + ? WHERE id = ?")
-                    ->execute([$ie['quantidade'], $ie['produto_id']]);
-            }
-        }
+        // Excluir nunca estorna estoque — baixa só ocorre na autorização
 
         $pdo->prepare("DELETE FROM vendas_pagamentos WHERE venda_id = ?")->execute([$id]);
         $pdo->prepare("DELETE FROM vendas_itens WHERE venda_id = ?")->execute([$id]);
