@@ -237,10 +237,7 @@ export const TefModal = ({ pagamentoId, vendaId, numero, uniqueid: initialUnique
         } else {
           setStatus('erro');
           const msgTef = d.message || 'Erro ao solicitar transação.';
-          const msgTraduzida = msgTef.toLowerCase().includes('not found') || msgTef.toLowerCase().includes('não configurado') || msgTef.toLowerCase().includes('unavailable')
-            ? 'Aplicativo SmartPOS não está aberto na maquininha. Abra o app no terminal e tente novamente.'
-            : msgTef;
-          setMensagem(msgTraduzida);
+          setMensagem(msgTef);
         }
       } catch {
         setStatus('erro');
