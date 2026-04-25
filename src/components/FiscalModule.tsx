@@ -368,7 +368,7 @@ export const GeralNfceTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, o
     const fetchList = async () => {
         setLoading(true);
         try {
-            const resp = await fetch(`./api.php?action=nfce_listar&data_inicio=${di}&data_fim=${df}`);
+            const resp = await fetch(`./api.php?action=vendas&data_inicio=${di}&data_fim=${df}`);
             const data = await resp.json();
             if (Array.isArray(data)) setNfceList(data);
         } catch {} finally { setLoading(false); }
@@ -376,8 +376,8 @@ export const GeralNfceTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, o
 
     useEffect(() => { fetchList(); }, [di, df]);
 
-    const lista = nfceList.filter(n => !busca || String(n.numero || '').includes(busca) || (n.clienteNome || '').toLowerCase().includes(busca.toLowerCase()));
-    const totAutorizado = lista.filter(n => n.status === 'Autorizada').reduce((a, n) => a + Number(n.valorTotal || 0), 0);
+    const lista = nfceList.filter(n => !busca || String(n.numero || '').includes(busca) || (n.cliente_nome || n.clienteNome || '').toLowerCase().includes(busca.toLowerCase()));
+    const totAutorizado = lista.filter(n => n.status === 'Autorizada').reduce((a, n) => a + Number(n.valor_total || n.valorTotal || 0), 0);
     const qtdAutorizadas = lista.filter(n => n.status === 'Autorizada').length;
     const qtdCanceladas = lista.filter(n => n.status === 'Cancelada').length;
     const qtdPendentes = lista.filter(n => !['Autorizada','Cancelada'].includes(n.status)).length;
@@ -419,9 +419,9 @@ export const GeralNfceTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, o
                         {!loading && lista.map((n: any) => (
                             <tr key={n.id} className="hover:bg-gray-50/50 transition-all">
                                 <td className="px-6 py-4 text-xs font-bold text-gray-700">{n.numero}/{n.serie || 1}</td>
-                                <td className="px-6 py-4 text-xs text-gray-600">{n.dataEmissao ? new Date(n.dataEmissao).toLocaleDateString('pt-BR') : '-'}</td>
-                                <td className="px-6 py-4 text-xs text-gray-600">{n.clienteNome || 'Consumidor Final'}</td>
-                                <td className="px-6 py-4 text-xs font-bold text-gray-700 text-right">{Number(n.valorTotal || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                                <td className="px-6 py-4 text-xs text-gray-600">{(n.data_emissao || n.dataEmissao) ? new Date(n.data_emissao || n.dataEmissao).toLocaleDateString('pt-BR') : '-'}</td>
+                                <td className="px-6 py-4 text-xs text-gray-600">{n.cliente_nome || n.clienteNome || 'Consumidor Final'}</td>
+                                <td className="px-6 py-4 text-xs font-bold text-gray-700 text-right">{Number(n.valor_total || n.valorTotal || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                                 <td className="px-6 py-4">
                                     <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${n.status === 'Autorizada' ? 'bg-green-100 text-green-700' : n.status === 'Cancelada' ? 'bg-red-100 text-red-600' : 'bg-yellow-100 text-yellow-700'}`}>{n.status}</span>
                                 </td>
