@@ -38,6 +38,7 @@
 
   # Redireciona todas as demais requisições para index.html (SPA React)
   RewriteRule ^index\.html$ - [L]
+  RewriteRule ^logo\.php$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{REQUEST_FILENAME} !-l
