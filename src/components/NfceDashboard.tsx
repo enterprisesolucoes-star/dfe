@@ -708,6 +708,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           produtos={produtos} 
           onEdit={(p) => { setEditingProduto(p); setIsProdutoModalOpen(true); }} 
           onDelete={handleExcluirProduto}
+          onRefresh={fetchProdutos}
         />
       );
       case 'clientes': return (

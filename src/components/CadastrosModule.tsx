@@ -39,7 +39,7 @@ const useMunicipios = (ufInicial?: string) => {
 };
 
 // ── Listagem: Produtos ───────────────────────────────────────────────────────
-export const ProdutosTab = ({ produtos, onEdit, onDelete }: { produtos: Produto[]; onEdit: (p: Produto) => void; onDelete: (id: number) => void }) => {
+export const ProdutosTab = ({ produtos, onEdit, onDelete, onRefresh }: { produtos: Produto[]; onEdit: (p: Produto) => void; onDelete: (id: number) => void; onRefresh?: () => void }) => {
   const [busca, setBusca] = useState('');
   const filtrados = produtos.filter(p =>
     p.descricao.toLowerCase().includes(busca.toLowerCase()) ||
@@ -50,9 +50,12 @@ export const ProdutosTab = ({ produtos, onEdit, onDelete }: { produtos: Produto[
   return (
     <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
       <div className="p-4 border-b border-gray-50 bg-gray-50/30">
-        <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar produto..." className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar Código ou Nome..." className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+          </div>
+          {onRefresh && <button onClick={onRefresh} className="p-2 bg-gray-100 text-gray-500 hover:bg-gray-200 rounded-xl transition-all" title="Atualizar"><RefreshCw className="w-4 h-4" /></button>}
         </div>
       </div>
       <div className="overflow-x-auto">

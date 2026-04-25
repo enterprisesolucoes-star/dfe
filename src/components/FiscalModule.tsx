@@ -123,7 +123,7 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
     };
     useEffect(() => { fetchNfeList(); }, [di, df]);
     const lista = nfeList.filter(n => !busca || String(n.numero || '').includes(busca) || (n.natureza_operacao || '').toLowerCase().includes(busca.toLowerCase()));
-    const totAutorizado = lista.filter(n => n.status === 'Autorizada').reduce((a, n) => a + Number(n.valor_total || 0), 0);
+    const totAutorizado = lista.filter(n => n.status === 'Autorizada' && (n.natureza_operacao || '').toUpperCase().includes('VENDA')).reduce((a, n) => a + Number(n.valor_total || 0), 0);
     const qtdAutorizadas = lista.filter(n => n.status === 'Autorizada').length;
     const qtdCanceladas = lista.filter(n => n.status === 'Cancelada').length;
     const qtdPendentes = lista.filter(n => !['Autorizada','Cancelada'].includes(n.status)).length;
@@ -141,9 +141,11 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
                 <span className="text-[10px] text-gray-400 font-bold uppercase">Data Fim</span>
                 <input type="date" value={df} onChange={e => setDf(e.target.value)} className="border border-gray-200 rounded-xl px-2 py-1.5 text-xs outline-none" />
                 <button onClick={fetchNfeList} className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all flex items-center gap-1"><RefreshCw className="w-3 h-3" /> Atualizar</button>
-                <div className="relative ml-auto">
+                <button onClick={() => window.open(`./api.php?action=nfe_baixar_xml_lote&data_inicio=${di}&data_fim=${df}`, '_blank')} className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-bold rounded-xl hover:bg-gray-200 transition-all flex items-center gap-1"><Download className="w-3 h-3" /> XML Lote</button>
+                <button onClick={() => window.open(`./api.php?action=nfe_enviar_xml_contador&data_inicio=${di}&data_fim=${df}`, '_blank')} className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-bold rounded-xl hover:bg-gray-200 transition-all flex items-center gap-1"><Send className="w-3 h-3" /> Enviar Contador</button>
+                <div className="relative ml-auto flex-1 max-w-xs">
                     <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input type="text" placeholder="Buscar..." value={busca} onChange={e => setBusca(e.target.value)} className="border border-gray-200 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none w-40" />
+                    <input type="text" placeholder="Buscar Nº Nota, Cliente ou Natureza..." value={busca} onChange={e => setBusca(e.target.value)} className="w-full border border-gray-200 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none" />
                 </div>
             </div>
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
@@ -293,10 +295,12 @@ const CceModal = ({ nfe, showAlert, onClose }: any) => {
 export const NfeDashboardTab = ({ nfeList, showAlert, showPrompt, onNovaNfe, onCancelarNfe, onExcluirNfe, onRefresh, onEmailDoc, onDevolucao, onRetryTef }: any) => {
     const [cceModalNfe, setCceModalNfe] = React.useState<{open: boolean, nfe: any}>({open: false, nfe: null});
     const [busca, setBusca] = useState('');
-    const lista = (nfeList || []).filter((n: any) =>
-        !busca || String(n.numero || '').includes(busca) || (n.natureza_operacao || '').toLowerCase().includes(busca.toLowerCase())
+    const hoje = new Date().toISOString().split('T')[0];
+    const listaHoje = (nfeList || []).filter((n: any) => n.data_emissao && n.data_emissao.startsWith(hoje));
+    const lista = listaHoje.filter((n: any) =>
+        !busca || String(n.numero || '').includes(busca) || (n.natureza_operacao || '').toLowerCase().includes(busca.toLowerCase()) || (n.cliente_nome || '').toLowerCase().includes(busca.toLowerCase())
     );
-    const totAutorizado = lista.filter((n: any) => n.status === 'Autorizada').reduce((a: number, n: any) => a + Number(n.valor_total || 0), 0);
+    const totAutorizado = lista.filter((n: any) => n.status === 'Autorizada' && (n.natureza_operacao || '').toUpperCase().includes('VENDA')).reduce((a: number, n: any) => a + Number(n.valor_total || 0), 0);
     const qtdAutorizadas = lista.filter((n: any) => n.status === 'Autorizada').length;
     const qtdCanceladas = lista.filter((n: any) => n.status === 'Cancelada').length;
     const qtdPendentes = lista.filter((n: any) => !['Autorizada','Cancelada'].includes(n.status)).length;
@@ -309,11 +313,10 @@ export const NfeDashboardTab = ({ nfeList, showAlert, showPrompt, onNovaNfe, onC
                 <StatCard label="Pendentes" value={qtdPendentes.toString()} icon={AlertCircle} color="orange" />
             </div>
             <div className="flex items-center gap-2 bg-white p-4 rounded-3xl shadow-sm border border-gray-100">
-                <div className="relative flex-1 max-w-xs">
+                <div className="relative flex-1">
                     <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input type="text" placeholder="Buscar Nº ou natureza..." value={busca} onChange={e => setBusca(e.target.value)} className="w-full border border-gray-200 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none" />
+                    <input type="text" placeholder="Buscar Nº Nota, Cliente ou Natureza..." value={busca} onChange={e => setBusca(e.target.value)} className="w-full border border-gray-200 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none" />
                 </div>
-                <button onClick={onRefresh} className="p-2 bg-gray-100 text-gray-500 hover:bg-gray-200 rounded-xl transition-all"><RefreshCw className="w-4 h-4" /></button>
             </div>
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
                 <table className="w-full text-left text-sm">
@@ -398,9 +401,11 @@ export const GeralNfceTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, o
                 <span className="text-[10px] text-gray-400 font-bold uppercase">Data Fim</span>
                 <input type="date" value={df} onChange={e => setDf(e.target.value)} className="border border-gray-200 rounded-xl px-2 py-1.5 text-xs outline-none" />
                 <button onClick={fetchList} className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all flex items-center gap-1"><RefreshCw className="w-3 h-3" /> Atualizar</button>
-                <div className="relative ml-auto">
+                <button onClick={() => window.open(`./api.php?action=baixar_xml_lote&data_inicio=${di}&data_fim=${df}`, '_blank')} className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-bold rounded-xl hover:bg-gray-200 transition-all flex items-center gap-1"><Download className="w-3 h-3" /> XML Lote</button>
+                <button onClick={() => window.open(`./api.php?action=enviar_xml_contador&data_inicio=${di}&data_fim=${df}`, '_blank')} className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-bold rounded-xl hover:bg-gray-200 transition-all flex items-center gap-1"><Send className="w-3 h-3" /> Enviar Contador</button>
+                <div className="relative ml-auto flex-1 max-w-xs">
                     <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input type="text" placeholder="Buscar..." value={busca} onChange={e => setBusca(e.target.value)} className="border border-gray-200 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none w-40" />
+                    <input type="text" placeholder="Buscar Nº Cupom ou Cliente..." value={busca} onChange={e => setBusca(e.target.value)} className="w-full border border-gray-200 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none" />
                 </div>
             </div>
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
