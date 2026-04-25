@@ -251,7 +251,7 @@ $modules = [
     'clientes' => 'clientes', 'salvar_cliente' => 'clientes', 'excluir_cliente' => 'clientes',
     'fornecedores' => 'fornecedores', 'salvar_fornecedor' => 'fornecedores', 'excluir_fornecedor' => 'fornecedores',
     'transportadores' => 'transportadores', 'salvar_transportador' => 'transportadores', 'excluir_transportador' => 'transportadores',
-    'empresa' => 'empresa', 'salvar_empresa' => 'empresa', 'upload_logo_empresa' => 'empresa', 'plugnotas_sincronizar' => 'empresa', 'bandeiras' => 'empresa', 'salvar_bandeira' => 'empresa', 'excluir_bandeira' => 'empresa',
+    'empresa' => 'empresa', 'salvar_empresa' => 'empresa', 'logo_base64' => 'empresa', 'upload_logo_empresa' => 'empresa', 'plugnotas_sincronizar' => 'empresa', 'bandeiras' => 'empresa', 'salvar_bandeira' => 'empresa', 'excluir_bandeira' => 'empresa',
     'listar_orcamentos' => 'orcamentos', 'salvar_orcamento' => 'orcamentos',
     'excluir_orcamento' => 'orcamentos', 'orcamento_pdf' => 'orcamentos', 'orcamento_email' => 'orcamentos',
     'listar_os' => 'ordens_servico', 'salvar_os' => 'ordens_servico',

@@ -363,7 +363,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           smtpPass: data.smtp_pass || '',
           smtpSecure: data.smtp_secure || 'tls',
           fiscalApi: 'nfephp', // Forçar NFePHP como padrão no frontend
-          logoPath: data.logo_url ? './logo.php?t=' + Date.now() : '',
+          logoPath: '',
           gerarCreditoSimples: Number(data.gerar_credito_simples) === 1,
           aliquotaCreditoSimples: Number(data.aliquota_credito_simples || 0),
           recolhe_ibscbs_fora: Number(data.recolhe_ibscbs_fora) === 1,
@@ -373,6 +373,11 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           ultimoNsu: data.ultimo_nsu || '0',
           dataUltimaConsultaDfe: data.data_ultima_consulta_dfe || ''
         }));
+        if (data.logo_url) {
+          fetch('./api.php?action=logo_base64')
+            .then(r => r.json())
+            .then(d => { if (d.success) setEmitente(prev => ({ ...prev, logoPath: d.data })); });
+        }
       }
     } catch (error) {
       console.error("Erro ao buscar empresa:", error);
@@ -2874,7 +2879,7 @@ const LogoUploadSection = ({ emitente, onUpdate, showAlert }: { emitente: Emiten
       const res  = await fetch('./api.php?action=upload_logo_empresa', { method: 'POST', body: fd });
       const data = await res.json();
       if (data.success) {
-        onUpdate({ ...emitente, logoPath: './logo.php?t=' + Date.now() });
+        fetch('./api.php?action=logo_base64').then(r=>r.json()).then(d=>{ if(d.success) onUpdate({ ...emitente, logoPath: d.data }); });
         showAlert('Logo', 'Logo atualizada com sucesso!');
       } else {
         showAlert('Erro', data.message || 'Falha ao enviar logo.');

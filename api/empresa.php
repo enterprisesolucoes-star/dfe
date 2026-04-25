@@ -481,6 +481,19 @@ switch ($action) {
         }
         break;
 
+    case 'logo_base64':
+        $stmt = $pdo->prepare("SELECT logo_path FROM empresas WHERE id = ?");
+        $stmt->execute([$empresaId ?: 1]);
+        $row = $stmt->fetch();
+        if (!$row || empty($row['logo_path'])) { echo json_encode(['success' => false]); break; }
+        $file = __DIR__ . '/../' . ltrim($row['logo_path'], '/');
+        if (!file_exists($file)) { echo json_encode(['success' => false]); break; }
+        $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+        $mime = $ext === 'png' ? 'image/png' : 'image/jpeg';
+        $b64 = base64_encode(file_get_contents($file));
+        echo json_encode(['success' => true, 'data' => "data:$mime;base64,$b64"]);
+        break;
+
     case 'upload_logo_empresa':
         if (empty($_FILES['logo']) || $_FILES['logo']['error'] !== UPLOAD_ERR_OK) {
             echo json_encode(['success' => false, 'message' => 'Arquivo não recebido.']);
