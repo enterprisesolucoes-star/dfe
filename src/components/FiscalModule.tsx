@@ -364,7 +364,7 @@ export const NfeDashboardTab = ({ nfeList, showAlert, showPrompt, onNovaNfe, onC
 };
 
 // ─── GeralNfceTab ─────────────────────────────────────────────────────────────
-export const GeralNfceTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, onDevolucao, emitente }: any) => {
+export const GeralNfceTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, onDevolucao, onCancelar, onRetryTef, onExcluir, emitente }: any) => {
     const [nfceList, setNfceList] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [di, setDi] = useState(() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`; });
@@ -439,6 +439,9 @@ export const GeralNfceTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, o
                                         {onEmailDoc && <button onClick={() => onEmailDoc(n.id, 65)} className="p-1.5 text-gray-400 hover:text-blue-500" title="Email"><Send className="w-3.5 h-3.5" /></button>}
                                         {n.status === 'Autorizada' && <button onClick={() => downloadXml(`./api.php?action=nfce_download_xml&id=${n.id}`, `nfce_${n.numero}.xml`)} className="p-1.5 text-gray-400 hover:text-green-600" title="XML"><Download className="w-3.5 h-3.5" /></button>}
                                         {onDevolucao && n.status === 'Autorizada' && <button onClick={() => onDevolucao(n.id, 65)} className="p-1.5 text-gray-400 hover:text-orange-500" title="Devolução"><RefreshCw className="w-3.5 h-3.5" /></button>}
+                                        {onCancelar && n.status === 'Autorizada' && <button onClick={() => onCancelar(n.id)} className="p-1.5 text-gray-400 hover:text-red-500" title="Cancelar"><X className="w-3.5 h-3.5" /></button>}
+                                        {onRetryTef && n.status === 'PendenteTEF' && <button onClick={() => onRetryTef(n.id)} className="p-1.5 text-amber-400 hover:text-amber-600" title="Tentar TEF novamente"><RefreshCw className="w-3.5 h-3.5" /></button>}
+                                        {onExcluir && n.status !== 'Autorizada' && <button onClick={() => onExcluir(n.id)} className="p-1.5 text-gray-400 hover:text-red-600" title="Excluir"><Trash2 className="w-3.5 h-3.5" /></button>}
                                     </div>
                                 </td>
                             </tr>
