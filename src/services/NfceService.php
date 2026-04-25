@@ -322,8 +322,8 @@ class NfceService
                     'vPag' => number_format($vPagItem, 2, '.', '')
                 ]);
 
-                // Coleta dados de <card> para cartão crédito/débito (PIX=17 não usa <card>)
-                if (in_array($tPag, ['03', '04'])) {
+                // Coleta dados de <card> para cartão crédito/débito e PIX (SEFAZ exige card para tPag 03, 04 e 17)
+                if (in_array($tPag, ['03', '04', '17'])) {
                     if (!empty($pag['tef_autorizacao'])) {
                         $cnpjCredenciadora = preg_replace('/\D/', '', $pag['tef_cnpj_credenciadora'] ?? '');
                         if (strlen($cnpjCredenciadora) === 14) {

@@ -88,11 +88,12 @@ export const VendasTab = ({ vendas, onCancelar, onSincronizar, onRetryTef, onExc
                                     </td>
                                     <td className="px-4 py-3 text-right">
                                         <div className="flex items-center justify-end gap-1">
-                                            <button onClick={() => window.open(`./api.php?action=danfe&id=${v.id}`, '_blank')} className="p-1.5 text-gray-400 hover:text-blue-600" title="DANFE"><FileText className="w-3.5 h-3.5" /></button>
-                                            {onEmailDoc && <button onClick={() => onEmailDoc(v.id, 65)} className="p-1.5 text-gray-400 hover:text-blue-500" title="Email"><Send className="w-3.5 h-3.5" /></button>}
+                                            {v.status === 'Autorizada' && <button onClick={() => window.open(`./api.php?action=danfe&id=${v.id}`, '_blank')} className="p-1.5 text-gray-400 hover:text-blue-600" title="DANFE"><FileText className="w-3.5 h-3.5" /></button>}
+                                            {v.status === 'Autorizada' && onEmailDoc && <button onClick={() => onEmailDoc(v.id, 65)} className="p-1.5 text-gray-400 hover:text-blue-500" title="Email"><Send className="w-3.5 h-3.5" /></button>}
                                             {v.status === 'Autorizada' && <button onClick={() => downloadXml(`./api.php?action=nfce_download_xml&id=${v.id}`, `nfce_${v.numero}.xml`)} className="p-1.5 text-gray-400 hover:text-green-600" title="XML"><Download className="w-3.5 h-3.5" /></button>}
-                                            {onDevolucao && v.status === 'Autorizada' && <button onClick={() => onDevolucao(v.id, 65)} className="p-1.5 text-gray-400 hover:text-orange-500" title="Devolução"><RefreshCw className="w-3.5 h-3.5" /></button>}
+                                            {v.status === 'Autorizada' && onDevolucao && <button onClick={() => onDevolucao(v.id, 65)} className="p-1.5 text-gray-400 hover:text-orange-500" title="Devolução"><RefreshCw className="w-3.5 h-3.5" /></button>}
                                             {v.status === 'Autorizada' && onCancelar && <button onClick={() => onCancelar(v.id)} className="p-1.5 text-gray-400 hover:text-red-500" title="Cancelar"><X className="w-3.5 h-3.5" /></button>}
+                                            {v.status === 'Contingencia' && onSincronizar && <button onClick={() => onSincronizar(v.id)} className="p-1.5 text-blue-400 hover:text-blue-600" title="Sincronizar"><RefreshCw className="w-3.5 h-3.5" /></button>}
                                             {v.status === 'PendenteTEF' && onRetryTef && <button onClick={() => onRetryTef(v.id)} className="p-1.5 text-amber-400 hover:text-amber-600" title="Tentar TEF novamente"><RefreshCw className="w-3.5 h-3.5" /></button>}
                                             {v.status !== 'Autorizada' && onExcluir && <button onClick={() => onExcluir(v.id)} className="p-1.5 text-gray-400 hover:text-red-600" title="Excluir"><Trash2 className="w-3.5 h-3.5" /></button>}
                                         </div>
@@ -175,11 +176,12 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
                                 </td>
                                 <td className="px-6 py-4 text-right">
                                     <div className="flex items-center justify-end gap-1">
-                                        <button onClick={() => window.open(`./api.php?action=nfe_danfe&id=${n.id}`, '_blank')} className="p-1.5 text-gray-400 hover:text-blue-600" title="DANFE"><FileText className="w-3.5 h-3.5" /></button>
-                                        {onEmailDoc && <button onClick={() => onEmailDoc(n.id, 'nfe')} className="p-1.5 text-gray-400 hover:text-blue-500" title="Email"><Send className="w-3.5 h-3.5" /></button>}
+                                        {n.status === 'Autorizada' && <button onClick={() => window.open(`./api.php?action=nfe_danfe&id=${n.id}`, '_blank')} className="p-1.5 text-gray-400 hover:text-blue-600" title="DANFE"><FileText className="w-3.5 h-3.5" /></button>}
+                                        {n.status === 'Autorizada' && onEmailDoc && <button onClick={() => onEmailDoc(n.id, 'nfe')} className="p-1.5 text-gray-400 hover:text-blue-500" title="Email"><Send className="w-3.5 h-3.5" /></button>}
                                         {n.status === 'Autorizada' && <button onClick={() => downloadXml(`./api.php?action=nfe_download_xml&id=${n.id}`, `nfe_${n.numero}.xml`)} className="p-1.5 text-gray-400 hover:text-green-600" title="XML"><Download className="w-3.5 h-3.5" /></button>}
-                                        {onDevolucao && n.status === 'Autorizada' && <button onClick={() => onDevolucao(n.id)} className="p-1.5 text-gray-400 hover:text-orange-500" title="Devolução"><RefreshCw className="w-3.5 h-3.5" /></button>}
+                                        {n.status === 'Autorizada' && onDevolucao && <button onClick={() => onDevolucao(n.id)} className="p-1.5 text-gray-400 hover:text-orange-500" title="Devolução"><RefreshCw className="w-3.5 h-3.5" /></button>}
                                         {n.status === 'Autorizada' && <button onClick={() => setCceModal({open: true, nfe: n})} className="p-1.5 text-gray-400 hover:text-blue-600" title="Carta de Correção"><Edit3 className="w-3.5 h-3.5" /></button>}
+                                        {n.status !== 'Autorizada' && <button onClick={() => {}} className="p-1.5 text-gray-400 hover:text-red-600" title="Excluir"><Trash2 className="w-3.5 h-3.5" /></button>}
                                     </div>
                                 </td>
                             </tr>
@@ -344,8 +346,8 @@ export const NfeDashboardTab = ({ nfeList, showAlert, showPrompt, onNovaNfe, onC
                                 </td>
                                 <td className="px-6 py-4 text-right">
                                     <div className="flex items-center justify-end gap-1">
-                                        <button onClick={() => window.open(`./api.php?action=nfe_danfe&id=${n.id}`, '_blank')} className="p-1.5 text-gray-400 hover:text-blue-600" title="DANFE"><FileText className="w-3.5 h-3.5" /></button>
-                                        {onEmailDoc && <button onClick={() => onEmailDoc(n.id, 'nfe')} className="p-1.5 text-gray-400 hover:text-blue-500" title="Email"><Send className="w-3.5 h-3.5" /></button>}
+                                        {n.status === 'Autorizada' && <button onClick={() => window.open(`./api.php?action=nfe_danfe&id=${n.id}`, '_blank')} className="p-1.5 text-gray-400 hover:text-blue-600" title="DANFE"><FileText className="w-3.5 h-3.5" /></button>}
+                                        {n.status === 'Autorizada' && onEmailDoc && <button onClick={() => onEmailDoc(n.id, 'nfe')} className="p-1.5 text-gray-400 hover:text-blue-500" title="Email"><Send className="w-3.5 h-3.5" /></button>}
                                         {n.status === 'Autorizada' && <button onClick={() => downloadXml(`./api.php?action=nfe_download_xml&id=${n.id}`, `nfe_${n.numero}.xml`)} className="p-1.5 text-gray-400 hover:text-green-600" title="Baixar XML"><Download className="w-3.5 h-3.5" /></button>}
                                         {n.status === 'Autorizada' && onDevolucao && <button onClick={() => onDevolucao(n.id)} className="p-1.5 text-gray-400 hover:text-orange-500" title="Devolução"><RefreshCw className="w-3.5 h-3.5" /></button>}
                                         {n.status === 'Autorizada' && <button onClick={() => setCceModalNfe({open: true, nfe: n})} className="p-1.5 text-gray-400 hover:text-blue-600" title="Carta de Correção"><Edit3 className="w-3.5 h-3.5" /></button>}
@@ -435,13 +437,13 @@ export const GeralNfceTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, o
                                 </td>
                                 <td className="px-6 py-4 text-right">
                                     <div className="flex items-center justify-end gap-1">
-                                        <button onClick={() => window.open(`./api.php?action=danfe&id=${n.id}`, '_blank')} className="p-1.5 text-gray-400 hover:text-blue-600" title="DANFE"><FileText className="w-3.5 h-3.5" /></button>
-                                        {onEmailDoc && <button onClick={() => onEmailDoc(n.id, 65)} className="p-1.5 text-gray-400 hover:text-blue-500" title="Email"><Send className="w-3.5 h-3.5" /></button>}
+                                        {n.status === 'Autorizada' && <button onClick={() => window.open(`./api.php?action=danfe&id=${n.id}`, '_blank')} className="p-1.5 text-gray-400 hover:text-blue-600" title="DANFE"><FileText className="w-3.5 h-3.5" /></button>}
+                                        {n.status === 'Autorizada' && onEmailDoc && <button onClick={() => onEmailDoc(n.id, 65)} className="p-1.5 text-gray-400 hover:text-blue-500" title="Email"><Send className="w-3.5 h-3.5" /></button>}
                                         {n.status === 'Autorizada' && <button onClick={() => downloadXml(`./api.php?action=nfce_download_xml&id=${n.id}`, `nfce_${n.numero}.xml`)} className="p-1.5 text-gray-400 hover:text-green-600" title="XML"><Download className="w-3.5 h-3.5" /></button>}
-                                        {onDevolucao && n.status === 'Autorizada' && <button onClick={() => onDevolucao(n.id, 65)} className="p-1.5 text-gray-400 hover:text-orange-500" title="Devolução"><RefreshCw className="w-3.5 h-3.5" /></button>}
-                                        {onCancelar && n.status === 'Autorizada' && <button onClick={() => onCancelar(n.id)} className="p-1.5 text-gray-400 hover:text-red-500" title="Cancelar"><X className="w-3.5 h-3.5" /></button>}
-                                        {onRetryTef && n.status === 'PendenteTEF' && <button onClick={() => onRetryTef(n.id)} className="p-1.5 text-amber-400 hover:text-amber-600" title="Tentar TEF novamente"><RefreshCw className="w-3.5 h-3.5" /></button>}
-                                        {onExcluir && n.status !== 'Autorizada' && <button onClick={() => onExcluir(n.id)} className="p-1.5 text-gray-400 hover:text-red-600" title="Excluir"><Trash2 className="w-3.5 h-3.5" /></button>}
+                                        {n.status === 'Autorizada' && onDevolucao && <button onClick={() => onDevolucao(n.id, 65)} className="p-1.5 text-gray-400 hover:text-orange-500" title="Devolução"><RefreshCw className="w-3.5 h-3.5" /></button>}
+                                        {n.status === 'Autorizada' && onCancelar && <button onClick={() => onCancelar(n.id)} className="p-1.5 text-gray-400 hover:text-red-500" title="Cancelar"><X className="w-3.5 h-3.5" /></button>}
+                                        {n.status === 'PendenteTEF' && onRetryTef && <button onClick={() => onRetryTef(n.id)} className="p-1.5 text-amber-400 hover:text-amber-600" title="Tentar TEF"><RefreshCw className="w-3.5 h-3.5" /></button>}
+                                        {n.status !== 'Autorizada' && onExcluir && <button onClick={() => onExcluir(n.id)} className="p-1.5 text-gray-400 hover:text-red-600" title="Excluir"><Trash2 className="w-3.5 h-3.5" /></button>}
                                     </div>
                                 </td>
                             </tr>
