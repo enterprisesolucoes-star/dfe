@@ -782,13 +782,15 @@ switch ($action) {
 
     // Verifica se existe ao menos um SmartPOS configurado (usado pelo frontend antes de abrir TefModal)
     case 'tem_smartpos':
-        $stmtEmp = $empresaId ? $pdo->prepare("SELECT id FROM empresas WHERE id=?") : $pdo->query("SELECT id FROM empresas LIMIT 1");
+        $stmtEmp = $empresaId ? $pdo->prepare("SELECT id, tem_tef FROM empresas WHERE id=?") : $pdo->query("SELECT id, tem_tef FROM empresas LIMIT 1");
         if ($empresaId) $stmtEmp->execute([$empresaId]);
         $emp = $stmtEmp->fetch();
         $empId = $emp['id'] ?? 0;
+        $temTef = !empty($emp['tem_tef']) && $emp['tem_tef'] == 1;
         $stmtSP = $pdo->prepare("SELECT COUNT(*) FROM smartpos WHERE empresa_id = ?");
         $stmtSP->execute([$empId]);
-        echo json_encode(['tem' => (int)$stmtSP->fetchColumn() > 0]);
+        $temSmartpos = (int)$stmtSP->fetchColumn() > 0;
+        echo json_encode(['tem' => $temTef && $temSmartpos]);
         break;
 
     // Solicita transação TEF na SuperTEF e salva uniqueid

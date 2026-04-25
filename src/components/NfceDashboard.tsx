@@ -363,7 +363,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           smtpPass: data.smtp_pass || '',
           smtpSecure: data.smtp_secure || 'tls',
           fiscalApi: 'nfephp', // Forçar NFePHP como padrão no frontend
-          logoPath: data.logo_url || data.logo_path || '',
+          logoPath: data.logo_url ? './logo.php?t=' + Date.now() : '',
           gerarCreditoSimples: Number(data.gerar_credito_simples) === 1,
           aliquotaCreditoSimples: Number(data.aliquota_credito_simples || 0),
           recolhe_ibscbs_fora: Number(data.recolhe_ibscbs_fora) === 1,
@@ -2874,7 +2874,7 @@ const LogoUploadSection = ({ emitente, onUpdate, showAlert }: { emitente: Emiten
       const res  = await fetch('./api.php?action=upload_logo_empresa', { method: 'POST', body: fd });
       const data = await res.json();
       if (data.success) {
-        onUpdate({ ...emitente, logoPath: data.logo_url });
+        onUpdate({ ...emitente, logoPath: './logo.php?t=' + Date.now() });
         showAlert('Logo', 'Logo atualizada com sucesso!');
       } else {
         showAlert('Erro', data.message || 'Falha ao enviar logo.');
