@@ -920,7 +920,11 @@ switch ($action) {
             ")->fetchAll();
             
             $empresaDb = fetchEmpresaNfe($pdo, $empresaId);
-            echo json_encode(['success' => true, 'venda' => $venda, 'cliente' => $cliente, 'itens' => $itens, 'empresa' => $empresaDb]);
+            // Remove campos binarios/grandes que nao sao necessarios para devolucao
+            if ($empresaDb) {
+                unset($empresaDb['certificado_pfx'], $empresaDb['certificado_senha'], $empresaDb['logo']);
+            }
+            echo json_encode(['success' => true, 'venda' => $venda, 'cliente' => $cliente, 'itens' => $itens, 'empresa' => $empresaDb], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
         } catch (Exception $e) { echo json_encode(['success' => false, 'message' => $e->getMessage()]); }
         break;
 
