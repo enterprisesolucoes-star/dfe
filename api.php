@@ -290,7 +290,7 @@ $modules = [
     'fin_listar_movimentos' => 'financeiro',
     'fin_salvar_movimento'  => 'financeiro',
     'fin_excluir_movimento' => 'financeiro',
-    'status_sefaz' => 'vendas'
+    'relatorio_tef' => 'vendas', 'status_sefaz' => 'vendas'
 ];
 
 if (isset($modules[$action])) {

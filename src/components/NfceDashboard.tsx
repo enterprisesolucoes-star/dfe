@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, BarChart, Bar } from 'recharts';
 import { ComprasTab, ImportXmlModal, CompraModal } from './ComprasModule';
 import { OrdemServicoTab } from './OrdemServicoModule';
+import { RelatorioTefTab } from './RelatorioTefModule';
+import { RelatorioTefTab } from './RelatorioTefModule';
 import { StatCard, Input } from './UIComponents';
 import { FinanceiroView, CaixaView, BaixaModal, ParcelamentoModal } from './FinanceiroModule';
 import { Sidebar } from './SidebarModule';
@@ -114,7 +116,7 @@ const NfceDashboard: React.FC<{ session: Session; onLogout: () => void; onUpdate
   const isFiscal = Number(session.usuarioDfe) !== 0 && Number(session.usuarioDfe) !== 4;
 
 // Se empresa não está configurada, força aba de configurações e bloqueia as demais
-const [activeTab, setActiveTab] = useState<'dashboard' | 'vendas' | 'vendas_geral' | 'produtos' | 'clientes' | 'fornecedores' | 'compras' | 'orcamentos' | 'transportadores' | 'config' | 'ncm' | 'usuarios' | 'medidas' | 'bandeiras' | 'dfe_nfe' | 'dfe_nfe_geral' | 'dfe_nfe_parametros' | 'dfe_nfce_parametros' | 'reforma_tributaria' | 'config_empresa' | 'config_email' | 'config_smartpos' | 'config_integracao' | 'dfe_nfe_dados' | 'dfe_nfce_dados' | 'dfe_provedor' | 'empresa' | 'dfe_config' | 'fin_receber' | 'fin_pagar' | 'fin_caixa'>(
+const [activeTab, setActiveTab] = useState<'dashboard' | 'vendas' | 'vendas_geral' | 'produtos' | 'clientes' | 'fornecedores' | 'compras' | 'orcamentos' | 'transportadores' | 'config' | 'ncm' | 'usuarios' | 'medidas' | 'bandeiras' | 'dfe_nfe' | 'dfe_nfe_geral' | 'dfe_nfe_parametros' | 'dfe_nfce_parametros' | 'reforma_tributaria' | 'config_empresa' | 'config_email' | 'config_smartpos' | 'config_integracao' | 'dfe_nfe_dados' | 'dfe_nfce_dados' | 'dfe_provedor' | 'empresa' | 'dfe_config' | 'fin_receber' | 'fin_pagar' | 'fin_caixa' | 'relatorios_tef'>(
   session.empresaConfigurada ? 'dashboard' : 'empresa'
 );
 const empresaBloqueada = !session.empresaConfigurada;
@@ -802,6 +804,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           }}
         />
       );
+      case 'relatorios_tef': return <RelatorioTefTab showAlert={showAlert} />;
       case 'ordens_servico': return (
         <OrdemServicoTab
           clientes={clientes}
@@ -1008,7 +1011,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
         )}
         <header className="bg-white h-16 border-b border-gray-200 flex items-center justify-between px-8">
           <h2 className="text-lg font-semibold text-gray-800 capitalize">
-            {{ dashboard: 'Dashboard', fin_receber: 'Financeiro - Contas à Receber', fin_pagar: 'Financeiro - Contas à Pagar', fin_caixa: 'Financeiro - Movimento de Caixa', vendas: 'DFe - NFCe - Emissão', vendas_geral: 'DFe - NFCe - Geral', produtos: 'Produtos', clientes: 'Clientes', fornecedores: 'Fornecedores', compras: 'Compras', orcamentos: 'Orçamentos', ordens_servico: 'Ordem de Serviços', config: 'Empresa', config_empresa: 'Empresa', config_email: 'Empresa', config_smartpos: 'Empresa', config_integracao: 'Integração', ncm: 'NCM / Tabela IBPT', usuarios: 'Usuários', medidas: 'Medidas', bandeiras: 'Bandeiras de Cartão', dfe_nfe: 'DFe - NFe - Emissão', dfe_nfe_geral: 'DFe - NFe - Geral', dfe_nfce_parametros: 'DFe - NFCe - Parâmetros', dfe_nfe_parametros: 'DFe - NFe - Parâmetros', dfe_nfe_dados: 'DFe Configurações', dfe_nfce_dados: 'DFe Configurações', dfe_provedor: 'DFe Configurações', reforma_tributaria: 'Reforma Tributária', transportadores: 'Transportadores', empresa: 'Empresa', dfe_config: 'DFe Configurações' }[activeTab]}
+            {{ dashboard: 'Dashboard', fin_receber: 'Financeiro - Contas à Receber', fin_pagar: 'Financeiro - Contas à Pagar', fin_caixa: 'Financeiro - Movimento de Caixa', vendas: 'DFe - NFCe - Emissão', vendas_geral: 'DFe - NFCe - Geral', produtos: 'Produtos', clientes: 'Clientes', fornecedores: 'Fornecedores', compras: 'Compras', orcamentos: 'Orçamentos', ordens_servico: 'Ordem de Serviços', relatorios_tef: 'Relatórios - SmartPOS', config: 'Empresa', config_empresa: 'Empresa', config_email: 'Empresa', config_smartpos: 'Empresa', config_integracao: 'Integração', ncm: 'NCM / Tabela IBPT', usuarios: 'Usuários', medidas: 'Medidas', bandeiras: 'Bandeiras de Cartão', dfe_nfe: 'DFe - NFe - Emissão', dfe_nfe_geral: 'DFe - NFe - Geral', dfe_nfce_parametros: 'DFe - NFCe - Parâmetros', dfe_nfe_parametros: 'DFe - NFe - Parâmetros', dfe_nfe_dados: 'DFe Configurações', dfe_nfce_dados: 'DFe Configurações', dfe_provedor: 'DFe Configurações', reforma_tributaria: 'Reforma Tributária', transportadores: 'Transportadores', empresa: 'Empresa', dfe_config: 'DFe Configurações' }[activeTab]}
           </h2>
           <div className="flex items-center gap-4">
             {activeTab === 'dfe_nfe' && (

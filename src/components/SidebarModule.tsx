@@ -2,7 +2,7 @@ import React from 'react';
 import { 
   Monitor, DollarSign, ChevronDown, ChevronRight, ArrowUpCircle, 
   ArrowDownCircle, History, FileText, Send, QrCode, Package, 
-  Users, Store, ShoppingCart, ClipboardList, Wrench, FolderOpen, 
+  Users, Store, ShoppingCart, ClipboardList, Wrench, FolderOpen, BarChart2, 
   Hash, Ruler, CreditCard, Truck, ShieldCheck, Building, Settings, LogOut, Zap
 } from 'lucide-react';
 
@@ -138,6 +138,7 @@ export const Sidebar = ({
         <SidebarItem icon={ShoppingCart} label="Compras" active={activeTab === 'compras'} onClick={() => handleSetActiveTab('compras')} />
         <SidebarItem icon={ClipboardList} label="Orçamentos" active={activeTab === 'orcamentos'} onClick={() => handleSetActiveTab('orcamentos')} />
         <SidebarItem icon={Wrench} label="Ordem Serviços" active={activeTab === 'ordens_servico'} onClick={() => handleSetActiveTab('ordens_servico')} />
+        <SidebarItem icon={BarChart2} label="Relatórios" active={activeTab === 'relatorios_tef'} onClick={() => handleSetActiveTab('relatorios_tef')} />
 
         {/* Cadastros */}
         <div>
