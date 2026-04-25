@@ -498,6 +498,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
         if (data.success) {
           showAlert("Cancelada", `NFC-e #${id} cancelada com sucesso na SEFAZ. Protocolo: ${data.protocolo}`);
           setVendas(vendas.map((v: Nfce) => v.id === id ? { ...v, status: 'Cancelada' } : v));
+          fetchProdutos();
         } else {
           showAlert("Falha no Cancelamento", data.message || "Erro desconhecido.");
         }
@@ -525,6 +526,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
         if (data.success) {
           showAlert('Cancelada', `NF-e #${id} cancelada com sucesso. Protocolo: ${data.protocolo}`);
           setNfeList(prev => prev.map(v => v.id === id ? { ...v, status: 'Cancelada' } : v));
+          fetchProdutos();
         } else { showAlert('Falha', data.message || 'Erro desconhecido.'); }
       } catch { showAlert('Erro de Conexão', 'Não foi possível comunicar com o servidor.'); }
     });
@@ -594,6 +596,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
         showAlert("Falha na Sefaz", data.message || "Rejeitada pela Sefaz.");
       }
       fetchVendas();
+      fetchProdutos();
     } catch(err) {
        showAlert("Erro de Conexão", "Falha ao se comunicar com a Sefaz para re-transmitir.");
     }
@@ -623,6 +626,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       const data = await resp.json();
       if (data.success) {
         fetchNfeList();
+        fetchProdutos();
         showAlert('Sucesso!', 'NFe Autorizada.');
       } else {
         showAlert('Erro na Emissão', data.message || 'Falha ao emitir NF-e pendente.');
