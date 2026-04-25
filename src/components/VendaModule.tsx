@@ -443,7 +443,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
 
   return (
     <>
-      {tefState && <TefModal {...tefState} onComplete={handleTefComplete} onCancel={() => setTefState(null)} />}
+      {tefState && <TefModal pagamentoId={tefState.pagamentosIds[tefState.currentIndex]} vendaId={tefState.vendaId} numero={tefState.numero} pagamentoAtual={tefState.currentIndex + 1} totalPagamentos={tefState.pagamentosIds.length} onComplete={handleTefComplete} onCancel={() => setTefState(null)} />}
       {showIdentificar && <IdentificarModal onClose={() => setShowIdentificar(false)} onConfirm={(d) => { setDestinatario(d); setShowIdentificar(false); }} />}
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[200] p-4">
         <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden flex flex-col">
