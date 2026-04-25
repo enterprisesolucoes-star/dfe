@@ -1386,6 +1386,7 @@ const DevolucaoModal = ({ loading, data, vendaId, modeloOrigem, onClose, onSucce
   const [municipiosList, setMunicipiosList] = React.useState<{nome: string, id: number}[]>([]);
   const [loadingMunicipios, setLoadingMunicipios] = React.useState(false);
   const [editingItemIdx, setEditingItemIdx] = React.useState<number | null>(null);
+  const [devolTab, setDevolTab] = React.useState<'PRODUTO'|'ICMS'|'IPI'|'PIS'|'COFINS'>('PRODUTO');
   const [informacoesAdicionais, setInformacoesAdicionais] = React.useState('');
 
   const handleUpdateItemDetail = (updated: any) => {
@@ -1876,19 +1877,18 @@ const DevolucaoModal = ({ loading, data, vendaId, modeloOrigem, onClose, onSucce
                   </div>
                   <button onClick={() => setEditingItemIdx(null)} className="p-2 hover:bg-white/20 rounded-full transition-colors"><X className="w-5 h-5" /></button>
                 </div>
-                <div className="p-6 overflow-y-auto flex-1">
-                  {/* Tabs */}
-                  <div className="flex gap-1 p-1 bg-gray-100 rounded-xl mb-6">
-                    {['Produto','ICMS','IPI','PIS','COFINS'].map(tab => (
-                      <button key={tab} onClick={() => { const el = document.getElementById('devol-tab-' + tab); el?.scrollIntoView(); }}
-                        className="flex-1 py-2.5 text-xs font-semibold rounded-lg text-gray-500 hover:text-gray-700 hover:bg-white transition-all">
-                        {tab}
+                <div className="px-6 pt-4">
+                  <div className="flex gap-1 p-1 bg-gray-100 rounded-xl">
+                    {(['PRODUTO','ICMS','IPI','PIS','COFINS'] as const).map(tab => (
+                      <button key={tab} onClick={() => setDevolTab(tab)}
+                        className={`flex-1 py-2.5 text-xs font-semibold rounded-lg transition-all ${devolTab === tab ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
+                        {tab === 'PRODUTO' ? 'Produto' : tab}
                       </button>
                     ))}
                   </div>
-                  {/* Produto */}
-                  <div id="devol-tab-Produto" className="mb-6">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-3">Produto</p>
+                </div>
+                <div className="p-6 overflow-y-auto flex-1">
+                  {devolTab === 'PRODUTO' && (
                     <div className="grid grid-cols-2 gap-4">
                       {[
                         {label:'NCM', field:'ncm', ph:'00000000', max:8},
@@ -1898,16 +1898,16 @@ const DevolucaoModal = ({ loading, data, vendaId, modeloOrigem, onClose, onSucce
                         {label:'CST COFINS', field:'cofinsCst', ph:'07', max:2},
                         {label:'Unidade Comercial', field:'unidadeComercial', ph:'UN', max:6},
                       ].map(f => (
-                        <div key={f.field} className="space-y-1">
-                          <label className="text-[10px] font-medium text-gray-400 uppercase">{f.label}</label>
+                        <div key={f.field} className="space-y-1.5">
+                          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">{f.label}</label>
                           <input type="text" value={it[f.field] ?? ''} maxLength={f.max}
                             onChange={e => upd(f.field, e.target.value)}
                             className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none transition-all"
                             placeholder={f.ph} />
                         </div>
                       ))}
-                      <div className="col-span-2 space-y-1">
-                        <label className="text-[10px] font-medium text-gray-400 uppercase">Origem da Mercadoria</label>
+                      <div className="col-span-2 space-y-1.5">
+                        <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">Origem da Mercadoria</label>
                         <select value={it.origemMercadoria ?? '0'} onChange={e => upd('origemMercadoria', e.target.value)}
                           className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none transition-all">
                           <option value="0">0 – Nacional</option>
@@ -1919,38 +1919,38 @@ const DevolucaoModal = ({ loading, data, vendaId, modeloOrigem, onClose, onSucce
                         </select>
                       </div>
                     </div>
-                  </div>
-                  {/* ICMS / IPI / PIS / COFINS */}
-                  {[
-                    {tab:'ICMS', bcField:'vbc_icms', aliqField:'icmsAliquota', valField:'valor_icms'},
-                    {tab:'IPI',  bcField:'vbc_ipi',  aliqField:'ipiAliquota',  valField:'valor_ipi'},
-                    {tab:'PIS',  bcField:'vbc_pis',  aliqField:'pisAliquota',  valField:'valor_pis'},
-                    {tab:'COFINS',bcField:'vbc_cofins',aliqField:'cofinsAliquota',valField:'valor_cofins'},
-                  ].map(({tab, bcField, aliqField, valField}) => (
-                    <div key={tab} id={'devol-tab-' + tab} className="mb-6">
-                      <p className="text-[10px] font-bold text-gray-400 uppercase mb-3">{tab}</p>
-                      <div className="grid grid-cols-3 gap-4">
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-medium text-gray-400 uppercase">Base de Cálculo</label>
-                          <input type="number" step="0.01" value={it[bcField] ?? 0}
-                            onChange={e => { const bc = parseFloat(e.target.value)||0; upd(bcField, bc); upd(valField, parseFloat((bc * ((it[aliqField]||0)/100)).toFixed(2))); }}
-                            className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none transition-all" />
+                  )}
+                  {(['ICMS','IPI','PIS','COFINS'] as const).includes(devolTab as any) && (() => {
+                    const map: Record<string,{bc:string,aliq:string,val:string}> = {
+                      ICMS:   {bc:'vbc_icms',   aliq:'icmsAliquota',   val:'valor_icms'},
+                      IPI:    {bc:'vbc_ipi',    aliq:'ipiAliquota',    val:'valor_ipi'},
+                      PIS:    {bc:'vbc_pis',    aliq:'pisAliquota',    val:'valor_pis'},
+                      COFINS: {bc:'vbc_cofins', aliq:'cofinsAliquota', val:'valor_cofins'},
+                    };
+                    const {bc, aliq, val} = map[devolTab];
+                    return (
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">Base de Cálculo</label>
+                          <input type="number" step="0.01" value={it[bc] ?? 0}
+                            onChange={e => { const v = parseFloat(e.target.value)||0; upd(bc, v); upd(val, parseFloat((v * ((it[aliq]||0)/100)).toFixed(2))); }}
+                            className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3.5 text-gray-700 font-semibold outline-none transition-all" />
                         </div>
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-medium text-gray-400 uppercase">Alíquota (%)</label>
-                          <input type="number" step="0.01" value={it[aliqField] ?? 0}
-                            onChange={e => { const aliq = parseFloat(e.target.value)||0; upd(aliqField, aliq); upd(valField, parseFloat(((it[bcField]||0) * (aliq/100)).toFixed(2))); }}
-                            className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-blue-600 outline-none transition-all text-center" />
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">Alíquota (%)</label>
+                          <input type="number" step="0.01" value={it[aliq] ?? 0}
+                            onChange={e => { const v = parseFloat(e.target.value)||0; upd(aliq, v); upd(val, parseFloat(((it[bc]||0) * (v/100)).toFixed(2))); }}
+                            className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3.5 text-blue-600 font-semibold outline-none transition-all text-center" />
                         </div>
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-medium text-gray-400 uppercase">Valor</label>
-                          <input type="number" step="0.01" value={it[valField] ?? 0}
-                            onChange={e => upd(valField, parseFloat(e.target.value)||0)}
-                            className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none transition-all" />
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">Valor do Imposto</label>
+                          <input type="number" step="0.01" value={it[val] ?? 0}
+                            onChange={e => upd(val, parseFloat(e.target.value)||0)}
+                            className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3.5 text-gray-700 font-semibold outline-none transition-all" />
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })()}
                 </div>
                 <div className="px-6 py-4 border-t border-gray-100">
                   <button onClick={() => setEditingItemIdx(null)}
