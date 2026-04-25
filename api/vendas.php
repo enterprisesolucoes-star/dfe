@@ -436,6 +436,17 @@ switch ($action) {
             $stmt->execute($empresaId ? [$empresaId] : []);
             $empresaLocked = $stmt->fetch();
 
+            // Verificar se já existe PendenteTEF recente (últimos 10 min) para evitar duplicatas
+            $stmtChk = $pdo->prepare("SELECT id, numero, serie FROM vendas WHERE empresa_id = ? AND status = 'PendenteTEF' AND data_emissao >= DATE_SUB(NOW(), INTERVAL 10 MINUTE) ORDER BY id DESC LIMIT 1");
+            $stmtChk->execute([$empresaLocked['id']]);
+            $vendaExistente = $stmtChk->fetch();
+            if ($vendaExistente) {
+                $vendaId = $vendaExistente['id'];
+                $venda['numero'] = $vendaExistente['numero'];
+                $venda['serie']  = $vendaExistente['serie'];
+                $pdo->prepare("DELETE FROM vendas_pagamentos WHERE venda_id = ?")->execute([$vendaId]);
+                $pdo->prepare("DELETE FROM vendas_itens WHERE venda_id = ?")->execute([$vendaId]);
+            } else {
             $venda['numero'] = (int)$empresaLocked['numero_nfce'] + 1;
             $venda['serie']  = (int)$empresaLocked['serie_nfce'] > 0 ? (int)$empresaLocked['serie_nfce'] : 1;
 
@@ -445,6 +456,7 @@ switch ($action) {
             $stmt = $pdo->prepare("INSERT INTO vendas (empresa_id, modelo, numero, serie, valor_total, valor_desconto, natureza_operacao, status, data_emissao) VALUES (?, 65, ?, ?, ?, ?, 'VENDA CONSUMIDOR - NFCE', 'PendenteTEF', ?)");
             $stmt->execute([$empresaLocked['id'], $venda['numero'], $venda['serie'], $venda['valorTotal'], $venda['valorDesconto'] ?? 0, $dataEmissaoSql]);
             $vendaId = $pdo->lastInsertId();
+            } // fim else PendenteTEF
 
             foreach ($venda['itens'] as $item) {
                 $stmt = $pdo->prepare("
