@@ -790,7 +790,11 @@ switch ($action) {
         $stmtSP = $pdo->prepare("SELECT COUNT(*) FROM smartpos WHERE empresa_id = ?");
         $stmtSP->execute([$empId]);
         $temSmartpos = (int)$stmtSP->fetchColumn() > 0;
-        echo json_encode(['tem' => $temTef && $temSmartpos]);
+        if (!$temTef || !$temSmartpos) {
+            echo json_encode(['tem' => false, 'message' => !$temTef ? 'Integração TEF não está ativa para esta empresa.' : 'Nenhuma máquina SmartPOS cadastrada para esta empresa.']);
+        } else {
+            echo json_encode(['tem' => true]);
+        }
         break;
 
     // Solicita transação TEF na SuperTEF e salva uniqueid

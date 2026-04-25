@@ -412,6 +412,10 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
       if (pagamentos.some(p => ['03', '04', '17'].includes(p.formaPagamento))) {
         const spResp = await fetch('./api.php?action=tem_smartpos');
         const spData = await spResp.json();
+        if (!spData.tem) {
+          showAlert('TEF não disponível', spData.message || 'Integração TEF não configurada. Verifique as configurações da empresa.');
+          return;
+        }
         if (spData.tem) {
           const resp = await fetch('./api.php?action=salvar_pendente', { method: 'POST', body: JSON.stringify({ venda: payload }) });
           const d = await resp.json();
