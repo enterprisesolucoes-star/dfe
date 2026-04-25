@@ -644,6 +644,15 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
 
   const handleEmailDoc = async (id: number, modelo: number | string, defaultEmail = '') => {
     const isNfe = modelo === 55 || modelo === '55' || modelo === 'nfe';
+    let emailSugerido = defaultEmail;
+    if (!emailSugerido) {
+      try {
+        const action = isNfe ? 'nfe_buscar_email_cliente' : 'nfce_buscar_email_cliente';
+        const res = await fetch(`./api.php?action=${action}&id=${id}`);
+        const d = await res.json();
+        if (d.email) emailSugerido = d.email;
+      } catch {}
+    }
     showPrompt("Enviar E-mail", "Digite o e-mail do destinatário:", async (email) => {
       if (!email || email.trim() === '') return;
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
@@ -660,7 +669,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       } catch (e) {
         showAlert("Erro", "Falha de comunicação.");
       }
-    }, defaultEmail);
+    }, emailSugerido);
   };
 
   const [devolucaoModal, setDevolucaoModal] = useState<{ isOpen: boolean; vendaId: number; modeloOrigem: number; loading: boolean; data: any | null }>({ isOpen: false, vendaId: 0, modeloOrigem: 55, loading: false, data: null });
@@ -668,7 +677,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
   const handleDevolucao = async (id: number, modeloOrigem = 55) => {
     setDevolucaoModal({ isOpen: true, vendaId: id, modeloOrigem, loading: true, data: null });
     try {
-      const res = await fetch(`./api.php?action=nfe_buscar_para_devolucao&id=${id}&modelo=${modeloOrigem}`);
+      const res = await fetch(`./api/nfe.php?action=nfe_buscar_para_devolucao&id=${id}&modelo=${modeloOrigem}`);
       const d = await res.json();
       if (d.success) {
         setDevolucaoModal(prev => ({ ...prev, loading: false, data: d }));

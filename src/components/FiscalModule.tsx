@@ -52,11 +52,12 @@ export const VendasTab = ({ vendas, onCancelar, onSincronizar, onRetryTef, onExc
                     <table className="w-full text-left">
                         <thead className="bg-gray-50/50 border-b border-gray-200">
                             <tr>
-                                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Nº/Série</th>
-                                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Data/Hora</th>
-                                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Cliente</th>
-                                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-right">Valor</th>
-                                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-center">Status</th>
+                                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase">Nº/Série</th>
+                                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase">Data/Hora</th>
+                                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase">Cliente</th>
+                                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase text-right">Valor</th>
+                                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase text-center">Status</th>
+                                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase text-right">Ações</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -66,12 +67,20 @@ export const VendasTab = ({ vendas, onCancelar, onSincronizar, onRetryTef, onExc
                                 </td></tr>
                             ) : vendasFiltradas.map((v, i) => (
                                 <tr key={v.id ?? i} className="hover:bg-gray-50/50 transition-all">
-                                    <td className="px-6 py-4 text-xs font-bold text-gray-700">{v.numero}/{v.serie || 1}</td>
-                                    <td className="px-6 py-4 text-xs text-gray-600">{v.dataEmissao ? new Date(v.dataEmissao).toLocaleString('pt-BR') : '-'}</td>
-                                    <td className="px-6 py-4 text-xs text-gray-600">{v.clienteNome || '-'}</td>
-                                    <td className="px-6 py-4 text-xs font-bold text-right">{Number(v.valorTotal || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-                                    <td className="px-6 py-4 text-center">
+                                    <td className="px-4 py-3 text-xs font-bold text-gray-700">{v.numero}/{v.serie || 1}</td>
+                                    <td className="px-4 py-3 text-xs text-gray-600">{v.dataEmissao ? new Date(v.dataEmissao).toLocaleDateString('pt-BR') + ' ' + new Date(v.dataEmissao).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}) : '-'}</td>
+                                    <td className="px-4 py-3 text-xs text-gray-600">{v.clienteNome || 'Consumidor Final'}</td>
+                                    <td className="px-4 py-3 text-xs font-bold text-right">{Number(v.valorTotal || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                                    <td className="px-4 py-3 text-center">
                                         <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${v.status === 'Autorizada' ? 'bg-green-100 text-green-700' : v.status === 'Cancelada' ? 'bg-red-100 text-red-600' : 'bg-yellow-100 text-yellow-700'}`}>{v.status}</span>
+                                    </td>
+                                    <td className="px-4 py-3 text-right">
+                                        <div className="flex items-center justify-end gap-1">
+                                            <button onClick={() => window.open(`./api.php?action=nfce_danfe&id=${v.id}`, '_blank')} className="p-1.5 text-gray-400 hover:text-blue-600" title="DANFE"><FileText className="w-3.5 h-3.5" /></button>
+                                            {onEmailDoc && <button onClick={() => onEmailDoc(v.id, 65)} className="p-1.5 text-gray-400 hover:text-blue-500" title="Email"><Send className="w-3.5 h-3.5" /></button>}
+                                            {v.status === 'Autorizada' && <button onClick={() => window.open(`./api.php?action=nfce_download_xml&id=${v.id}`, '_blank')} className="p-1.5 text-gray-400 hover:text-green-600" title="XML"><Download className="w-3.5 h-3.5" /></button>}
+                                            {onDevolucao && v.status === 'Autorizada' && <button onClick={() => onDevolucao(v.id, 65)} className="p-1.5 text-gray-400 hover:text-orange-500" title="Devolução"><RefreshCw className="w-3.5 h-3.5" /></button>}
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

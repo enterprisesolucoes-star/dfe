@@ -498,6 +498,14 @@ switch ($action) {
         }
         break;
 
+    case 'nfe_buscar_email_cliente':
+        $id = (int)($_GET['id'] ?? 0);
+        $stmt = $pdo->prepare("SELECT c.email FROM vendas v LEFT JOIN clientes c ON c.id = v.cliente_id WHERE v.id = ? LIMIT 1");
+        $stmt->execute([$id]);
+        $row = $stmt->fetch();
+        echo json_encode(['email' => $row['email'] ?? '']);
+        break;
+
     case 'nfe_enviar_email_doc':
         $id = (int)($_POST['id'] ?? $_GET['id'] ?? 0);
         $emailCliente = $_POST['email'] ?? $_GET['email'] ?? '';

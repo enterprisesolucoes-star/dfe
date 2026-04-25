@@ -258,7 +258,7 @@ $modules = [
     'excluir_os' => 'ordens_servico', 'os_pdf' => 'ordens_servico', 'os_email' => 'ordens_servico',
     'vendas' => 'vendas', 'emitir' => 'vendas', 'cancelar' => 'vendas', 'excluir_venda' => 'vendas',
     'transmitir_contingencia' => 'vendas', 'danfe' => 'vendas', 'danfe_contingencia' => 'vendas',
-    'transmitir_lote_contingencia' => 'vendas', 'baixar_xml_lote' => 'vendas', 'enviar_xml_contador' => 'vendas', 'enviar_email_doc' => 'vendas',
+    'transmitir_lote_contingencia' => 'vendas', 'baixar_xml_lote' => 'vendas', 'enviar_xml_contador' => 'vendas', 'nfce_buscar_email_cliente' => 'vendas', 'enviar_email_doc' => 'vendas',
     'salvar_pendente' => 'vendas', 'emitir_pendente' => 'vendas', 'verificar_tef_pendente' => 'vendas',
     'tef_retry' => 'vendas', 'tef_status' => 'vendas', 'tef_cancelar' => 'vendas', 'tef_confirmar' => 'vendas',
     'ibpt_consultar' => 'vendas',
@@ -266,7 +266,7 @@ $modules = [
     'listar_smartpos' => 'vendas', 'salvar_smartpos' => 'vendas', 'excluir_smartpos' => 'vendas',
     // NF-e Modelo 55
     'nfe_listar' => 'nfe', 'nfe_emitir' => 'nfe', 'nfe_cancelar' => 'nfe', 'nfe_enviar_cce' => 'nfe', 'nfe_cce_pdf' => 'nfe', 'nfe_listar_cce' => 'nfe', 'nfe_excluir' => 'nfe', 'nfe_download_xml' => 'nfe',
-    'nfe_danfe' => 'nfe', 'nfe_baixar_xml_lote' => 'nfe', 'nfe_enviar_xml_contador' => 'nfe', 'nfe_enviar_email_doc' => 'nfe',
+    'nfe_danfe' => 'nfe', 'nfe_baixar_xml_lote' => 'nfe', 'nfe_enviar_xml_contador' => 'nfe', 'nfe_buscar_email_cliente' => 'nfe', 'nfe_enviar_email_doc' => 'nfe',
     'nfe_devolucao' => 'nfe', 'nfe_buscar_para_devolucao' => 'nfe',
     'nfe_salvar_pendente' => 'nfe', 'nfe_emitir_pendente' => 'nfe',
     'ncm_listar' => 'ncm', 'ncm_ufs' => 'ncm', 'ncm_importar' => 'ncm',
