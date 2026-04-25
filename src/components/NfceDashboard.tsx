@@ -701,7 +701,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       case 'fin_receber': return <FinanceiroView tipo="R" emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} />;
       case 'fin_pagar': return <FinanceiroView tipo="P" emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} />;
       case 'fin_caixa': return <CaixaView emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} />;
-      case 'vendas_geral': return <GeralNfceTab showAlert={showAlert} showConfirm={showConfirm} showPrompt={showPrompt} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} />;
+      case 'vendas_geral': return <GeralNfceTab showAlert={showAlert} showConfirm={showConfirm} showPrompt={showPrompt} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} emitente={emitente} />;
       case 'vendas': return <VendasTab vendas={vendas} onCancelar={handleCancelar} onSincronizar={handleSincronizarContingencia} onRetryTef={handleRetryTef} onExcluir={handleExcluirVenda} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} />;
       case 'produtos': return (
         <ProdutosTab 
@@ -771,7 +771,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           onRetryTef={handleRetryNfeTef}
         />
       );
-      case 'dfe_nfe_geral': return <GeralNfeTab showAlert={showAlert} showConfirm={showConfirm} showPrompt={showPrompt} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} />;
+      case 'dfe_nfe_geral': return <GeralNfeTab showAlert={showAlert} showConfirm={showConfirm} showPrompt={showPrompt} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} emitente={emitente} />;
       case 'compras': return (
         <ComprasTab
           onImportXml={() => fileInputRef.current?.click()}
