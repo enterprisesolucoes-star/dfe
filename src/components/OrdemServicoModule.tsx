@@ -26,7 +26,7 @@ const STATUS_OS_COLORS: Record<string, string> = {
 };
 
 export const OrdemServicoTab = ({
-  clientes, produtos, emitente, showAlert, showConfirm
+  clientes, produtos, emitente, showAlert, showConfirm, onAfterSave
 }: {
   clientes: Cliente[];
   produtos: Produto[];
@@ -269,7 +269,7 @@ const OrdemServicoModal = ({ ordem, clientes, produtos, onClose, onSaved, showAl
     try {
       const res = await fetch('./api.php?action=salvar_os', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
       const data = await res.json();
-      if (data.success) onSaved(); else showAlert('Erro', data.message || 'Falha ao salvar.');
+      if (data.success) { onSaved(); onAfterSave?.(); } else showAlert('Erro', data.message || 'Falha ao salvar.');
     } catch { showAlert('Erro', 'Falha na requisição.'); }
     setSaving(false);
   };

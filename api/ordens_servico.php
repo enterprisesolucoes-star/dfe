@@ -255,6 +255,11 @@ switch ($action) {
                     $pdo->rollBack();
                     echo json_encode(['success' => false, 'message' => 'Não autorizado.']); break;
                 }
+                // Busca status anterior para controle de estoque
+                $stmtOld = $pdo->prepare("SELECT status FROM ordens_servico WHERE id=?");
+                $stmtOld->execute([$id]);
+                $statusAnterior = $stmtOld->fetchColumn();
+
                 $pdo->prepare("UPDATE ordens_servico SET status=?, cliente_id=?, cliente_nome=?,
                     cliente_documento=?, cliente_telefone=?, cliente_email=?,
                     valor_total=?, observacao=?, previsao=? WHERE id=?")
@@ -290,6 +295,28 @@ switch ($action) {
                     (float)($item['valor_unitario'] ?? 0),
                     (float)($item['valor_total']    ?? 0),
                 ]);
+            }
+
+            // Controle de estoque baseado na transição de status
+            $itensParaEstoque = array_filter($itens, fn($i) => ($i['tipo'] ?? '') !== 'servico' && !empty($i['produto_id']));
+
+            // Nova OS concluída diretamente (sem id anterior = criação)
+            $eraConcluidaAntes = isset($statusAnterior) && $statusAnterior === 'Concluída';
+            $ficouConcluida    = $status === 'Concluída';
+            $ficouCancelada    = $status === 'Cancelada';
+
+            if ($ficouConcluida && !$eraConcluidaAntes) {
+                // Baixa estoque das peças
+                foreach ($itensParaEstoque as $item) {
+                    $pdo->prepare("UPDATE produtos SET estoque = GREATEST(0, estoque - ?) WHERE id = ?")
+                        ->execute([(float)($item['quantidade'] ?? 1), (int)$item['produto_id']]);
+                }
+            } elseif ($ficouCancelada && $eraConcluidaAntes) {
+                // Estorna estoque (era concluída e foi cancelada)
+                foreach ($itensParaEstoque as $item) {
+                    $pdo->prepare("UPDATE produtos SET estoque = estoque + ? WHERE id = ?")
+                        ->execute([(float)($item['quantidade'] ?? 1), (int)$item['produto_id']]);
+                }
             }
 
             $pdo->commit();

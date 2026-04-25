@@ -803,6 +803,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           emitente={emitente}
           showAlert={showAlert}
           showConfirm={showConfirm}
+          onAfterSave={fetchProdutos}
         />
       );
     }
