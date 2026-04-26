@@ -1803,25 +1803,3 @@ switch ($action) {
         break;
 }
 
-    case 'relatorio_tef':
-        $di = $_GET['data_inicio'] ?? '';
-        $df = $_GET['data_fim'] ?? '';
-        $clienteChave = $_GET['cliente_chave'] ?? '';
-        if (!$clienteChave) { echo json_encode(['success' => false, 'message' => 'cliente_chave obrigatório']); break; }
-        $url = 'https://api.supertef.com.br/api/pagamentos?per_page=500';
-        if ($di) $url .= '&data_inicio=' . urlencode($di . ' 00:00:00');
-        if ($df) $url .= '&data_fim=' . urlencode($df . ' 23:59:59');
-        $ch = curl_init($url);
-        curl_setopt_array($ch, [
-            CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . SUPERTEF_TOKEN],
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 15,
-            CURLOPT_SSL_VERIFYPEER => false,
-        ]);
-        $raw = curl_exec($ch);
-        curl_close($ch);
-        $res = json_decode($raw, true);
-        $all = $res['data'] ?? [];
-        $filtered = array_values(array_filter($all, fn($t) => ($t['cliente_chave'] ?? '') === $clienteChave));
-        echo json_encode(['success' => true, 'data' => $filtered]);
-        break;
