@@ -259,7 +259,7 @@ $modules = [
     'vendas' => 'vendas', 'emitir' => 'vendas', 'cancelar' => 'vendas', 'excluir_venda' => 'vendas',
     'transmitir_contingencia' => 'vendas', 'danfe' => 'vendas', 'danfe_contingencia' => 'vendas',
     'transmitir_lote_contingencia' => 'vendas', 'baixar_xml_lote' => 'vendas', 'enviar_xml_contador' => 'vendas', 'nfce_buscar_email_cliente' => 'vendas', 'nfce_download_xml' => 'vendas', 'enviar_email_doc' => 'vendas',
-    'salvar_pendente' => 'vendas', 'emitir_pendente' => 'vendas', 'verificar_tef_pendente' => 'vendas',
+    'salvar_pendente' => 'vendas', 'emitir_pendente' => 'vendas', 'verificar_tef_pendente' => 'vendas', 'salvar_pedido' => 'vendas',
     'tef_retry' => 'vendas', 'tef_status' => 'vendas', 'tef_cancelar' => 'vendas', 'tef_confirmar' => 'vendas',
     'ibpt_consultar' => 'vendas',
     'tem_smartpos' => 'vendas', 'tef_solicitar' => 'vendas', 'tef_consultar' => 'vendas',

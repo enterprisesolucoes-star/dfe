@@ -328,6 +328,8 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
   const [showParcelamento, setShowParcelamento] = useState(false);
   const [parcelasCredito, setParcelasCredito] = useState<{ numero: number; valor: number; vencimento: string }[]>([]);
   const [pendingCreditoValor, setPendingCreditoValor] = useState(0);
+  const [showPedidoModal, setShowPedidoModal] = useState(false);
+  const [pedidoGerado, setPedidoGerado] = useState<{ numero: number; itens: any[]; total: number; pagamentos: any[]; data: string } | null>(null);
   const [destinatario, setDestinatario] = useState<any>(null);
   const [searchIndex, setSearchIndex] = useState(-1);
 
@@ -351,6 +353,18 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
       })));
     }
     if (initialDestinatario) setDestinatario(initialDestinatario);
+  }, []);
+
+  // Listener F8: finalizar como pedido (sem emitir NFC-e)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'F8') {
+        e.preventDefault();
+        setShowPedidoModal(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const isTefRequired = emitente.tef_required_states?.split(',').map(s => s.trim().toUpperCase()).includes(emitente.uf?.trim().toUpperCase());
@@ -419,6 +433,39 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
     setValorPagamentoInput(parseFloat(Math.max(0, totalDevido - novos.reduce((acc, p) => acc + p.valorPagamento, 0)).toFixed(2)));
   };
 
+  const handleFinalizarPedido = async () => {
+    if (itens.length === 0) { showAlert("Aviso", "Adicione ao menos um item."); return; }
+    const formasPermitidas = ['01', '05'];
+    const formasInvalidas = pagamentos.filter(p => !formasPermitidas.includes(p.formaPagamento));
+    if (formasInvalidas.length > 0) {
+      showAlert("Atenção", "Pedido sem NFC-e só é permitido para pagamento em Dinheiro ou Crédito Loja.");
+      setShowPedidoModal(false);
+      return;
+    }
+    if (pagamentos.length === 0 || totalPago < totalDevido) {
+      showAlert("Atenção", "Adicione os pagamentos antes de finalizar o pedido.");
+      setShowPedidoModal(false);
+      return;
+    }
+    try {
+      const payload = {
+        valorTotal: totalDevido, valorDesconto, valorTroco: troco,
+        usuarioId: session?.usuarioId, caixaId: session?.caixaId, destinatario,
+        itens: itens.map((it, idx) => ({ id: idx + 1, produtoId: it.produtoId, quantidade: it.quantidade, valorUnitario: it.valorUnitario, valorTotal: it.quantidade * it.valorUnitario })),
+        pagamentos: pagamentos.map((p, idx) => ({ id: idx + 1, formaPagamento: p.formaPagamento, valorPagamento: p.valorPagamento, tpIntegra: '2', tBand: '99', cAut: '', parcelas: p.parcelas || [] }))
+      };
+      const resp = await fetch('./api.php?action=salvar_pedido', { method: 'POST', body: JSON.stringify({ venda: payload, emitente }) });
+      const data = await resp.json();
+      if (data.success) {
+        setPedidoGerado({ numero: data.numero, itens, total: totalDevido, pagamentos, data: new Date().toLocaleString('pt-BR') });
+        setShowPedidoModal(false);
+      } else {
+        showAlert("Erro", data.message || "Erro ao salvar pedido.");
+        setShowPedidoModal(false);
+      }
+    } catch { showAlert("Erro", "Erro de conexão."); setShowPedidoModal(false); }
+  };
+
   const handleFinalizar = async () => {
     if (itens.length === 0) { showAlert("Aviso", "Adicione ao menos um item."); return; }
 
@@ -483,6 +530,69 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
     <>
       {tefState && <TefModal pagamentoId={tefState.pagamentosIds[tefState.currentIndex]} vendaId={tefState.vendaId} numero={tefState.numero} pagamentoAtual={tefState.currentIndex + 1} totalPagamentos={tefState.pagamentosIds.length} onComplete={handleTefComplete} onCancel={() => setTefState(null)} />}
       {showIdentificar && <IdentificarModal onClose={() => setShowIdentificar(false)} onConfirm={(d) => { setDestinatario(d); setShowIdentificar(false); }} />}
+      {showPedidoModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000]">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center">
+            <div className="w-14 h-14 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-7 h-7 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+            </div>
+            <h3 className="text-lg font-bold text-gray-800 mb-1">Finalizar como Pedido</h3>
+            <p className="text-sm text-gray-500 mb-2">A venda será salva <strong>sem emitir NFC-e</strong>. Um comprovante sem valor fiscal será gerado.</p>
+            <p className="text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2 mb-5">Disponível apenas para pagamento em <strong>Dinheiro</strong> ou <strong>Crédito Loja</strong>.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setShowPedidoModal(false)} className="flex-1 px-4 py-2 rounded-xl border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50">Cancelar</button>
+              <button onClick={handleFinalizarPedido} className="flex-1 px-4 py-2 rounded-xl bg-orange-500 text-white text-sm font-bold hover:bg-orange-600 shadow">Confirmar</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {pedidoGerado && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000]">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xs">
+            <div className="p-4 border-b text-center">
+              <p className="font-bold text-gray-700 text-sm">{emitente?.razaoSocial}</p>
+              <p className="text-xs text-gray-400">{emitente?.cnpj}</p>
+              <p className="text-xs text-gray-400 mt-1">{pedidoGerado.data}</p>
+              <div className="mt-2 bg-orange-50 rounded px-2 py-1">
+                <p className="text-xs font-bold text-orange-600">*** SEM VALOR FISCAL ***</p>
+                <p className="text-xs text-orange-500">PEDIDO #{pedidoGerado.numero}</p>
+              </div>
+            </div>
+            <div className="p-4 font-mono text-xs space-y-1">
+              <div className="flex justify-between border-b pb-1 mb-1 text-gray-500">
+                <span>ITEM</span><span>QTD</span><span>TOTAL</span>
+              </div>
+              {pedidoGerado.itens.map((it, i) => {
+                const prod = produtos.find(p => p.id === it.produtoId);
+                return (
+                  <div key={i} className="flex justify-between">
+                    <span className="flex-1 truncate">{prod?.descricao || 'Produto'}</span>
+                    <span className="w-8 text-center">{it.quantidade}</span>
+                    <span className="w-16 text-right">R${(it.quantidade * it.valorUnitario).toFixed(2)}</span>
+                  </div>
+                );
+              })}
+              <div className="border-t pt-2 mt-2 space-y-1">
+                <div className="flex justify-between font-bold"><span>TOTAL</span><span>R$ {pedidoGerado.total.toFixed(2)}</span></div>
+                {pedidoGerado.pagamentos.map((p, i) => (
+                  <div key={i} className="flex justify-between text-gray-500">
+                    <span>{p.formaPagamento === '01' ? 'Dinheiro' : 'Crédito Loja'}</span>
+                    <span>R$ {p.valorPagamento.toFixed(2)}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="text-center mt-3 text-gray-400 border-t pt-2">
+                <p>*** SEM VALOR FISCAL ***</p>
+                <p>Obrigado pela preferência!</p>
+              </div>
+            </div>
+            <div className="p-4 flex gap-2">
+              <button onClick={() => window.print()} className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200">Imprimir</button>
+              <button onClick={() => { setPedidoGerado(null); onSave({ id: 0, numero: 0, status: 'Pedido' } as any); }} className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-700">Fechar</button>
+            </div>
+          </div>
+        </div>
+      )}
       {showParcelamento && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000]">
           <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">

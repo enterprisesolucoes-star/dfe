@@ -363,7 +363,8 @@ switch ($action) {
                         $totalParts = count($parcelas);
                         foreach ($parcelas as $p) {
                             $stmtFin = $pdo->prepare("INSERT INTO financeiro (empresa_id, venda_id, tipo, status, valor_total, vencimento, parcela_numero, parcela_total, forma_pagamento_prevista, entidade_id, categoria) VALUES (?, ?, 'R', 'Pendente', ?, ?, ?, ?, ?, ?, 'Venda NFC-e')");
-                            $stmtFin->execute([$empresaDb['id'], $vendaId, $p['valor'], $p['vencimento'], $p['numero'], $totalParts, $fPag, $venda['clienteId'] ?? null]);
+                            $clienteIdFin = $venda['clienteId'] ?? $venda['destinatario']['id'] ?? null;
+                            $stmtFin->execute([$empresaDb['id'], $vendaId, $p['valor'], $p['vencimento'], $p['numero'], $totalParts, $fPag, $clienteIdFin]);
                         }
                     } elseif ($contaIdFin) {
                         $hist = "Venda NFC-e #" . $venda['numero'];
@@ -411,6 +412,63 @@ switch ($action) {
         break;
 
     // Salva venda + itens + pagamentos sem emitir NFC-e (para fluxo TEF)
+    case 'salvar_pedido':
+        try {
+            $data    = json_decode(file_get_contents('php://input'), true);
+            $venda   = $data['venda'] ?? [];
+            $emitente = $data['emitente'] ?? [];
+            $pdo->beginTransaction();
+            // Buscar próximo número de pedido
+            $stmtNum = $pdo->prepare("SELECT COALESCE(MAX(numero),0)+1 FROM vendas WHERE empresa_id=? AND status='Pedido'");
+            $stmtNum->execute([$empresaId]);
+            $numPedido = (int)$stmtNum->fetchColumn();
+            // Inserir venda com status Pedido
+            $stmtV = $pdo->prepare("INSERT INTO vendas (empresa_id, numero, serie, modelo, status, valor_total, valor_desconto, valor_troco, usuario_id, caixa_id, cliente_id, created_at) VALUES (?, ?, '001', 65, 'Pedido', ?, ?, ?, ?, ?, ?, NOW())");
+            $stmtV->execute([
+                $empresaId, $numPedido,
+                (float)($venda['valorTotal'] ?? 0),
+                (float)($venda['valorDesconto'] ?? 0),
+                (float)($venda['valorTroco'] ?? 0),
+                $venda['usuarioId'] ?? null,
+                $venda['caixaId'] ?? null,
+                $venda['destinatario']['id'] ?? null,
+            ]);
+            $vendaId = $pdo->lastInsertId();
+            // Inserir itens
+            foreach (($venda['itens'] ?? []) as $item) {
+                $pdo->prepare("INSERT INTO vendas_itens (venda_id, produto_id, quantidade, valor_unitario, valor_total) VALUES (?,?,?,?,?)")
+                    ->execute([$vendaId, $item['produtoId'], $item['quantidade'], $item['valorUnitario'], $item['valorTotal']]);
+                $pdo->prepare("UPDATE produtos SET estoque = GREATEST(0, estoque - ?) WHERE id = ?")
+                    ->execute([$item['quantidade'], $item['produtoId']]);
+            }
+            // Inserir pagamentos e parcelas financeiras
+            foreach (($venda['pagamentos'] ?? []) as $pag) {
+                $fPag = $pag['formaPagamento'] ?? '01';
+                $vPag = (float)($pag['valorPagamento'] ?? 0);
+                $pdo->prepare("INSERT INTO vendas_pagamentos (venda_id, forma_pagamento, valor_pagamento, tp_integra, t_band, c_aut) VALUES (?,?,?,'2','99','')")
+                    ->execute([$vendaId, $fPag, $vPag]);
+                // Crédito Loja: gerar parcelas financeiras
+                if ($fPag === '05') {
+                    $parcelas = $pag['parcelas'] ?? [];
+                    if (empty($parcelas)) {
+                        $parcelas = [['numero'=>1,'valor'=>$vPag,'vencimento'=>date('Y-m-d',strtotime('+30 days'))]];
+                    }
+                    $totalParts = count($parcelas);
+                    $clienteIdFin = $venda['destinatario']['id'] ?? null;
+                    foreach ($parcelas as $p) {
+                        $pdo->prepare("INSERT INTO financeiro (empresa_id, venda_id, tipo, status, valor_total, vencimento, parcela_numero, parcela_total, forma_pagamento_prevista, entidade_id, categoria) VALUES (?,?,'R','Pendente',?,?,?,?,?,?,'Pedido')")
+                            ->execute([$empresaId, $vendaId, $p['valor'], $p['vencimento'], $p['numero'], $totalParts, $fPag, $clienteIdFin]);
+                    }
+                }
+            }
+            $pdo->commit();
+            echo json_encode(['success'=>true,'numero'=>$numPedido,'vendaId'=>$vendaId]);
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            echo json_encode(['success'=>false,'message'=>$e->getMessage()]);
+        }
+        break;
+
     case 'salvar_pendente':
         try { $pdo->query("SELECT valor_desconto FROM vendas LIMIT 1"); } catch (PDOException $e) {
             $pdo->exec("ALTER TABLE vendas ADD COLUMN valor_desconto DECIMAL(10,2) DEFAULT 0");
