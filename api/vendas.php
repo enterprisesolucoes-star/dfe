@@ -1784,7 +1784,24 @@ switch ($action) {
         curl_close($ch);
         $res = json_decode($raw, true);
         $all = $res['data'] ?? [];
-        $filtered = array_values(array_filter($all, fn($t) => ($t['cliente_chave'] ?? '') === $clienteChave));
+
+        // Filtrar por cliente_chave e por data (SuperTEF armazena em UTC, comparar com SP)
+        $tzSP = new DateTimeZone('America/Sao_Paulo');
+        $diTs = $di ? (new DateTime($di . ' 00:00:00', $tzSP))->getTimestamp() : 0;
+        $dfTs = $df ? (new DateTime($df . ' 23:59:59', $tzSP))->getTimestamp() : PHP_INT_MAX;
+
+        $filtered = array_values(array_filter($all, function($t) use ($clienteChave, $diTs, $dfTs, $tzSP) {
+            if (($t['cliente_chave'] ?? '') !== $clienteChave) return false;
+            $dataStr = $t['created_at'] ?? $t['data_criacao'] ?? '';
+            if (!$dataStr) return true;
+            try {
+                $dt = new DateTime($dataStr, new DateTimeZone('UTC'));
+                $dt->setTimezone($tzSP);
+                $ts = $dt->getTimestamp();
+                return $ts >= $diTs && $ts <= $dfTs;
+            } catch (Exception $e) { return true; }
+        }));
+
         echo json_encode(['success' => true, 'data' => $filtered]);
         break;
 
