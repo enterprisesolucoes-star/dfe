@@ -423,7 +423,12 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
                 : p
             );
           }
-          // PIX sem TEF: finaliza direto sem modal
+          // PIX sem TEF: remove tpIntegra/cAut para não gerar <card> no XML
+          payload.pagamentos = payload.pagamentos.map((p: any) =>
+            p.formaPagamento === '17'
+              ? { ...p, tpIntegra: '2', tBand: null, cAut: null }
+              : p
+          );
         } else {
           const resp = await fetch('./api.php?action=salvar_pendente', { method: 'POST', body: JSON.stringify({ venda: payload }) });
           const d = await resp.json();

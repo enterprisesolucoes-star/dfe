@@ -160,8 +160,9 @@ switch ($action) {
                 $vPag = (float)($pag['valorPagamento'] ?? $pag['valor_pagamento'] ?? 0);
 
                 $tpIntegra = $pag['tpIntegra'] ?? $pag['tp_integra'] ?? '2';
-                $tBand     = $pag['tBand']     ?? $pag['t_band']    ?? null;
-                $cAut      = $pag['cAut']      ?? $pag['c_aut']     ?? null;
+                $isPix     = in_array($fPag, ['17']);
+                $tBand     = $isPix ? null : ($pag['tBand'] ?? $pag['t_band'] ?? null);
+                $cAut      = $isPix ? null : ($pag['cAut']  ?? $pag['c_aut']  ?? null);
                 $stmtPag = $pdo->prepare("INSERT INTO vendas_pagamentos (venda_id, forma_pagamento, valor_pagamento, tp_integra, t_band, c_aut) VALUES (?, ?, ?, ?, ?, ?)");
                 $stmtPag->execute([ $vendaId, $fPag, $vPag, $tpIntegra, $tBand, $cAut ]);
             }
