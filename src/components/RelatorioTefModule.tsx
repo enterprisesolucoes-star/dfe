@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Search, RefreshCw } from 'lucide-react';
+import { Search, BarChart2, X } from 'lucide-react';
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const STATUS_MAP: Record<number, { label: string; color: string }> = {
   1: { label: 'Solicitado',     color: 'bg-yellow-100 text-yellow-700' },
@@ -30,6 +31,7 @@ export const RelatorioTefTab = ({ showAlert }: any) => {
   const [selectedPos, setSelectedPos] = useState('');
   const [loading, setLoading] = useState(false);
   const [transacoes, setTransacoes] = useState<any[]>([]);
+  const [showGrafico, setShowGrafico] = useState(false);
 
   useEffect(() => {
     fetch('./api.php?action=listar_smartpos')
@@ -84,6 +86,11 @@ export const RelatorioTefTab = ({ showAlert }: any) => {
         <button onClick={buscar} disabled={loading} className="mt-4 px-4 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all flex items-center gap-1 disabled:opacity-50">
           <Search className="w-3 h-3" /> {loading ? 'Buscando...' : 'Buscar'}
         </button>
+        {transacoes.length > 0 && (
+          <button onClick={() => setShowGrafico(true)} className="mt-4 px-4 py-1.5 bg-purple-600 text-white text-xs font-bold rounded-xl hover:bg-purple-700 transition-all flex items-center gap-1">
+            <BarChart2 className="w-3 h-3" /> Gráfico
+          </button>
+        )}
       </div>
 
       {transacoes.length > 0 && (
@@ -134,6 +141,52 @@ export const RelatorioTefTab = ({ showAlert }: any) => {
           </tbody>
         </table>
       </div>
+    {/* Modal Gráfico */}
+      {showGrafico && (() => {
+        const pagas = transacoes.filter(t => t.payment_status === 4);
+        const debito = pagas.filter(t => t.payment_order?.transaction_type === '1').reduce((s,t) => s + parseFloat(t.payment_order?.amount||0), 0);
+        const credito = pagas.filter(t => t.payment_order?.transaction_type === '2').reduce((s,t) => s + parseFloat(t.payment_order?.amount||0), 0);
+        const pix = pagas.filter(t => t.payment_order?.transaction_type === '3').reduce((s,t) => s + parseFloat(t.payment_order?.amount||0), 0);
+        const total = debito + credito + pix;
+        const data = [
+          { name: 'Débito', value: parseFloat(debito.toFixed(2)), color: '#3b82f6' },
+          { name: 'Crédito', value: parseFloat(credito.toFixed(2)), color: '#8b5cf6' },
+          { name: 'PIX', value: parseFloat(pix.toFixed(2)), color: '#10b981' },
+        ].filter(d => d.value > 0);
+        const RADIAN = Math.PI / 180;
+        const renderLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }: any) => {
+          const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+          const x = cx + radius * Math.cos(-midAngle * RADIAN);
+          const y = cy + radius * Math.sin(-midAngle * RADIAN);
+          return percent > 0.05 ? (
+            <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" fontSize={12} fontWeight="bold">
+              {`${(percent * 100).toFixed(1)}%`}
+            </text>
+          ) : null;
+        };
+        return (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[90] p-4">
+            <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-lg font-bold text-gray-800">Vendas por Forma de Pagamento</h2>
+                  <p className="text-xs text-gray-400 mt-0.5">Total: {fmt(total)} · {pagas.length} transações</p>
+                </div>
+                <button onClick={() => setShowGrafico(false)} className="p-2 hover:bg-gray-100 rounded-xl"><X className="w-5 h-5 text-gray-500" /></button>
+              </div>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie data={data} cx="50%" cy="50%" outerRadius={110} dataKey="value" labelLine={false} label={renderLabel}>
+                    {data.map((entry, index) => <Cell key={index} fill={entry.color} />)}
+                  </Pie>
+                  <Tooltip formatter={(v: any) => fmt(v)} />
+                  <Legend formatter={(v) => <span className="text-xs font-medium">{v}: {fmt(data.find(d => d.name === v)?.value || 0)}</span>} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };
