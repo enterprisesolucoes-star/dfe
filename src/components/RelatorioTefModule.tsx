@@ -104,8 +104,7 @@ export const RelatorioTefTab = ({ showAlert }: any) => {
               <th className="px-6 py-4 font-bold uppercase text-[10px]">Data/Hora</th>
               <th className="px-6 py-4 font-bold uppercase text-[10px]">Tipo</th>
               <th className="px-6 py-4 font-bold uppercase text-[10px]">Bandeira</th>
-              <th className="px-6 py-4 font-bold uppercase text-[10px]">NSU</th>
-              <th className="px-6 py-4 font-bold uppercase text-[10px]">Autorização</th>
+              <th className="px-6 py-4 font-bold uppercase text-[10px]">NSU / Autorização</th>
               <th className="px-6 py-4 font-bold uppercase text-[10px] text-right">Valor</th>
               <th className="px-6 py-4 font-bold uppercase text-[10px]">Status</th>
             </tr>
@@ -123,8 +122,10 @@ export const RelatorioTefTab = ({ showAlert }: any) => {
                   <td className="px-6 py-4 text-xs text-gray-600">{data}</td>
                   <td className="px-6 py-4 text-xs font-medium text-gray-700">{tipo}</td>
                   <td className="px-6 py-4 text-xs text-gray-600">{t.payment_data?.brand || '-'}</td>
-                  <td className="px-6 py-4 text-xs text-gray-500">{t.payment_data?.nsu || '-'}</td>
-                  <td className="px-6 py-4 text-xs text-gray-500">{t.payment_data?.authorization_code || '-'}</td>
+                  <td className="px-6 py-4 text-xs text-gray-500">
+                    <div>{t.payment_data?.nsu || '-'}</div>
+                    <div className="text-[10px] text-gray-400 mt-0.5">{t.payment_data?.authorization_code || '-'}</div>
+                  </td>
                   <td className="px-6 py-4 text-xs font-bold text-gray-700 text-right">{fmt(valor)}</td>
                   <td className="px-6 py-4"><span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${status.color}`}>{status.label}</span></td>
                 </tr>
