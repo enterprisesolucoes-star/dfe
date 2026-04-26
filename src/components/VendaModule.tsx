@@ -476,7 +476,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
       {tefState && <TefModal pagamentoId={tefState.pagamentosIds[tefState.currentIndex]} vendaId={tefState.vendaId} numero={tefState.numero} pagamentoAtual={tefState.currentIndex + 1} totalPagamentos={tefState.pagamentosIds.length} onComplete={handleTefComplete} onCancel={() => setTefState(null)} />}
       {showIdentificar && <IdentificarModal onClose={() => setShowIdentificar(false)} onConfirm={(d) => { setDestinatario(d); setShowIdentificar(false); }} />}
       {modalAutManual && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000]">
           <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">

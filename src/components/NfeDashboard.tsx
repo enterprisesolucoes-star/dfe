@@ -176,6 +176,9 @@ const NfeDashboard: React.FC<Props> = ({
   // TEF (SMARTPOS) — para NF-e: ativa se SMARTPOS estiver configurado, independente do estado
   type NfeTefState = { pagamentosIds: number[]; currentIndex: number; vendaId: number; numero: number };
   const [nfeTefState, setNfeTefState] = useState<NfeTefState | null>(null);
+  const [modalAutManual, setModalAutManual] = useState<{ operadora: string; codigo: string; resolve: ((v: { operadora: string; codigo: string } | null) => void) } | null>(null);
+  const [bandeiras, setBandeiras] = useState<any[]>([]);
+  useEffect(() => { fetch('./api.php?action=bandeiras').then(r => r.json()).then(d => { if (Array.isArray(d)) setBandeiras(d); }).catch(() => {}); }, []);
 
   const handleDownloadXml = (base64: string, filename: string) => {
     const link = document.createElement('a');
@@ -392,11 +395,12 @@ const NfeDashboard: React.FC<Props> = ({
         },
       };
 
-      // ── Fluxo TEF: verifica SMARTPOS antes de emitir ──────────────────
+      // ── Fluxo TEF: verifica tem_tef antes de emitir ──────────────────
       if (hasTefPayment) {
         const spResp = await fetch('api.php?action=tem_smartpos');
         const spData = await spResp.json();
         if (spData.tem) {
+          // TEF ativo: salvar pendente e abrir fluxo SmartPOS
           const resp = await fetch('api.php?action=nfe_salvar_pendente', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -406,9 +410,30 @@ const NfeDashboard: React.FC<Props> = ({
           if (!d.success) { showAlert('Erro', d.message || 'Erro ao salvar NF-e.'); setEmitindo(false); return; }
           setNfeTefState({ pagamentosIds: d.pagamentosIds ?? [d.pagamentoId], currentIndex: 0, vendaId: d.vendaId, numero: d.numero });
           setEmitindo(false);
-          return; // TefModal cuida do restante
+          return;
+        } else {
+          // Sem TEF: cartão exige autorização manual, PIX finaliza direto
+          const temCartao = pagamentos.some(p => ['03', '04'].includes(p.formaPagamento));
+          if (temCartao) {
+            setEmitindo(false);
+            const autManual = await new Promise<{ operadora: string; codigo: string } | null>(resolve => {
+              setModalAutManual({ operadora: '', codigo: '', resolve });
+            });
+            if (!autManual) return;
+            setEmitindo(true);
+            body.pagamentos = body.pagamentos.map((p: any) =>
+              ['03', '04'].includes(p.formaPagamento)
+                ? { ...p, tpIntegra: '2', cAut: autManual.codigo }
+                : p
+            );
+          }
+          // PIX: sem card no XML
+          body.pagamentos = body.pagamentos.map((p: any) =>
+            p.formaPagamento === '17'
+              ? { ...p, tpIntegra: '2', tBand: null, cAut: null }
+              : p
+          );
         }
-        // SMARTPOS não configurado → emissão direta abaixo
       }
 
       // ── Emissão direta (sem TEF ou SMARTPOS não configurado) ───────────
@@ -1286,6 +1311,60 @@ const NfeDashboard: React.FC<Props> = ({
     )}
 
     {/* ── TEF Modal (SMARTPOS) ───────────────────────────────────────────── */}
+    {modalAutManual && (
+      <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000]">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+              <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-gray-800">Pagamento com Cartão</h3>
+              <p className="text-xs text-gray-400">Informe os dados da transação</p>
+            </div>
+          </div>
+          <p className="text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2 mb-5 mt-2">
+            Integração TEF não ativa. Registre os dados manualmente conforme exigido pela legislação fiscal.
+          </p>
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Operadora / Bandeira</label>
+              <select
+                className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"
+                value={modalAutManual.operadora}
+                onChange={e => setModalAutManual(prev => prev ? { ...prev, operadora: e.target.value } : null)}
+              >
+                <option value="">Selecione...</option>
+                {bandeiras.map((b: any) => <option key={b.id} value={b.tpag || b.id}>{b.tband_opc}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Código de Autorização</label>
+              <input
+                type="text"
+                className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500 font-mono tracking-widest"
+                placeholder="Ex: 123456"
+                value={modalAutManual.codigo}
+                onChange={e => setModalAutManual(prev => prev ? { ...prev, codigo: e.target.value } : null)}
+                autoFocus
+              />
+            </div>
+          </div>
+          <div className="flex gap-3 mt-6">
+            <button onClick={() => { modalAutManual.resolve(null); setModalAutManual(null); }} className="flex-1 px-4 py-2 rounded-xl border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50">Cancelar</button>
+            <button
+              onClick={() => {
+                if (!modalAutManual.codigo.trim()) { alert('Informe o código de autorização.'); return; }
+                const val = { operadora: modalAutManual.operadora, codigo: modalAutManual.codigo };
+                modalAutManual.resolve(val);
+                setModalAutManual(null);
+              }}
+              className="flex-1 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 shadow"
+            >Confirmar</button>
+          </div>
+        </div>
+      </div>
+    )}
     {nfeTefState && (
       <NfeTefModal
         pagamentoId={nfeTefState.pagamentosIds[nfeTefState.currentIndex]}
