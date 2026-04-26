@@ -200,15 +200,15 @@ if ($logado && isset($_GET['api'])) {
   <main class="max-w-7xl mx-auto px-6 py-8">
     <!-- Toolbar -->
     <div class="flex items-center justify-between mb-6">
-      <h2 class="text-lg font-bold text-gray-800">Empresas Cadastradas</h2>
-      <div class="flex gap-2 mt-2 mb-2">
+      <div class="flex items-center gap-3">
+        <h2 class="text-lg font-bold text-gray-800">Empresas Cadastradas</h2>
         <button onclick="manutencaoGlobal(true)" class="px-3 py-1.5 bg-orange-500 text-white text-xs font-bold rounded-lg hover:bg-orange-600 flex items-center gap-1">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
-          Ativar Manutenção Global
+          Manutenção ON
         </button>
         <button onclick="manutencaoGlobal(false)" class="px-3 py-1.5 bg-green-600 text-white text-xs font-bold rounded-lg hover:bg-green-700 flex items-center gap-1">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-          Reativar Todos
+          Manutenção OFF
         </button>
       </div>
       <div class="flex items-center gap-3">
