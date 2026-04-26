@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, BarChart, Bar } from 'recharts';
 import { ComprasTab, ImportXmlModal, CompraModal } from './ComprasModule';
 import { OrdemServicoTab } from './OrdemServicoModule';
-import { RelatorioTefTab } from './RelatorioTefModule';
-import { RelatorioTefTab } from './RelatorioTefModule';
+import { RelatoriosHub } from './RelatorioTefModule';
 import { StatCard, Input } from './UIComponents';
 import { FinanceiroView, CaixaView, BaixaModal, ParcelamentoModal } from './FinanceiroModule';
 import { Sidebar } from './SidebarModule';
@@ -359,6 +358,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           certificadoSenha: data.certificado_senha || '',
           certificadoFileName: data.certificado_file_name || '',
           emailContador: data.email_contador || '',
+          temTef: Number(data.tem_tef) === 1,
           smtpHost: data.smtp_host || '',
           smtpPort: data.smtp_port ? Number(data.smtp_port) : 587,
           smtpUser: data.smtp_user || '',
@@ -804,7 +804,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           }}
         />
       );
-      case 'relatorios_tef': return <RelatorioTefTab showAlert={showAlert} />;
+      case 'relatorios_tef': return <RelatoriosHub showAlert={showAlert} emitente={emitente} />;
       case 'ordens_servico': return (
         <OrdemServicoTab
           clientes={clientes}
