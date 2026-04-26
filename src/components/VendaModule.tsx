@@ -379,13 +379,25 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
 
   const removeItem = (idx: number) => setItens(itens.filter((_, i) => i !== idx));
 
-  const addPagamento = () => {
+  const addPagamento = async () => {
     if (valorPagamentoInput <= 0) return;
-    if (!isTefRequired && ['03', '04'].includes(formaPagamentoInput) && !bandeiraSelecionada) {
-      showAlert('Atenção', 'Selecione a bandeira do cartão.'); return;
-    }
     const b = bandeiras.find(x => String(x.id) === bandeiraSelecionada);
-    const novos = [...pagamentos, { formaPagamento: formaPagamentoInput, valorPagamento: valorPagamentoInput, tBand: b?.tpag || '99', cAut: autorizacaoInput, tpIntegra: isTefRequired ? '1' : '2' }];
+    let tBand = b?.tpag || '99';
+    let cAut = autorizacaoInput;
+    let tpIntegra = isTefRequired ? '1' : '2';
+
+    if (!isTefRequired && ['03', '04'].includes(formaPagamentoInput)) {
+      // Sem TEF: abre modal para operadora e código de autorização
+      const autManual = await new Promise<{ operadora: string; codigo: string } | null>(resolve => {
+        setModalAutManual({ operadora: '', codigo: '', resolve });
+      });
+      if (!autManual) return;
+      tBand = autManual.operadora || '99';
+      cAut = autManual.codigo;
+      tpIntegra = '2';
+    }
+
+    const novos = [...pagamentos, { formaPagamento: formaPagamentoInput, valorPagamento: valorPagamentoInput, tBand, cAut, tpIntegra }];
     setPagamentos(novos);
     const novoTotalPago = novos.reduce((acc, p) => acc + p.valorPagamento, 0);
     setValorPagamentoInput(parseFloat(Math.max(0, totalDevido - novoTotalPago).toFixed(2)));
@@ -422,20 +434,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
         setTefState({ pagamentosIds: d.pagamentosIds, currentIndex: 0, vendaId: d.vendaId, numero: d.numero });
         return;
       } else {
-        // Sem SmartPOS disponível — cartão exige autorização manual, PIX finaliza direto
-        const temCartao = pagamentos.some(p => ['03', '04'].includes(p.formaPagamento));
-        if (temCartao) {
-          const autManual = await new Promise<{ operadora: string; codigo: string } | null>(resolve => {
-            setModalAutManual({ operadora: '', codigo: '', resolve });
-          });
-          if (!autManual) return;
-          pagsPayload = pagsPayload.map((p: any) =>
-            ['03', '04'].includes(p.formaPagamento)
-              ? { ...p, tpIntegra: '2', cAut: autManual.codigo }
-              : p
-          );
-        }
-        // PIX: sempre sem card no XML
+        // Sem TEF: cartão já tem cAut do addPagamento; PIX sem card no XML
         pagsPayload = pagsPayload.map((p: any) =>
           p.formaPagamento === '17'
             ? { ...p, tpIntegra: '2', tBand: null, cAut: null }
