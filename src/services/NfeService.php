@@ -349,12 +349,22 @@ class NfeService
                     $tPag = $pag['formaPagamento'] ?? '01';
                     $nfe->tagdetPag((object) ['tPag' => $tPag, 'vPag' => number_format($vPagItem, 2, '.', '')]);
 
-                    if (in_array($tPag, ['03', '04'])) {
-                        $cardInjecoes[] = [
-                            'tpIntegra' => (string) ($pag['tp_integra'] ?? $pag['tpIntegra'] ?? '2'),
-                            'tBand' => (string) ($pag['t_band'] ?? $pag['tBand'] ?? '99'),
-                            'cAut' => (string) ($pag['c_aut'] ?? $pag['cAut'] ?? '')
-                        ];
+                    if (in_array($tPag, ['03', '04', '17'])) {
+                        if ($tPag === '17') {
+                            // PIX: SEFAZ exige card com CNPJ da instituição (Banco Central)
+                            $cardInjecoes[] = [
+                                'tpIntegra' => '2',
+                                'CNPJ' => '00038166000105',
+                                'tBand' => '99',
+                                'cAut' => $pag['c_aut'] ?? $pag['cAut'] ?? '000000'
+                            ];
+                        } else {
+                            $cardInjecoes[] = [
+                                'tpIntegra' => (string) ($pag['tp_integra'] ?? $pag['tpIntegra'] ?? '2'),
+                                'tBand' => (string) ($pag['t_band'] ?? $pag['tBand'] ?? '99'),
+                                'cAut' => (string) ($pag['c_aut'] ?? $pag['cAut'] ?? '')
+                            ];
+                        }
                     } else {
                         $cardInjecoes[] = null;
                     }

@@ -322,8 +322,8 @@ class NfceService
                     'vPag' => number_format($vPagItem, 2, '.', '')
                 ]);
 
-                // Coleta dados de <card> apenas para cartão crédito/débito (PIX=17 nunca usa <card>)
-                if (in_array($tPag, ['03', '04'])) {
+                // Coleta dados de <card> para cartão e PIX (SEFAZ GO/MT exige card para PIX também)
+                if (in_array($tPag, ['03', '04', '17'])) {
                     if (!empty($pag['tef_autorizacao'])) {
                         $cnpjCredenciadora = preg_replace('/\D/', '', $pag['tef_cnpj_credenciadora'] ?? '');
                         if (strlen($cnpjCredenciadora) === 14) {
@@ -348,8 +348,16 @@ class NfceService
                             'tBand' => $pag['tBand'] ?? '99',
                             'cAut' => $pag['cAut']
                         ];
+                    } else if ($tPag === '17') {
+                        // PIX sem TEF: SEFAZ exige card com CNPJ da instituição (Banco Central)
+                        $cardInjecoes[] = [
+                            'tpIntegra' => '2',
+                            'CNPJ' => '00038166000105',
+                            'tBand' => '99',
+                            'cAut' => $pag['c_aut'] ?? $pag['cAut'] ?? '000000'
+                        ];
                     } else {
-                        $cardInjecoes[] = ['tpIntegra' => '2'];
+                        $cardInjecoes[] = ['tpIntegra' => '2', 'tBand' => '99', 'cAut' => '000000'];
                     }
                 } else {
                     $cardInjecoes[] = null;

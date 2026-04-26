@@ -386,8 +386,8 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
     let cAut = autorizacaoInput;
     let tpIntegra = isTefRequired ? '1' : '2';
 
-    if (!isTefRequired && ['03', '04'].includes(formaPagamentoInput)) {
-      // Sem TEF: abre modal para operadora e código de autorização
+    if (['03', '04'].includes(formaPagamentoInput) && !emitente.temTef) {
+      // Cartão sem TEF ativo: abre modal para operadora e código de autorização manual
       const autManual = await new Promise<{ operadora: string; codigo: string } | null>(resolve => {
         setModalAutManual({ operadora: '', codigo: '', resolve });
       });
