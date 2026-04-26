@@ -82,6 +82,17 @@ if ($logado && isset($_GET['api'])) {
     if ($api === 'bloquear_empresa' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $d = json_decode(file_get_contents('php://input'), true);
         $pdo->prepare("UPDATE empresas SET status = ? WHERE id = ?")->execute([$d['status'], (int)$d['id']]);
+    } elseif ($action === 'manutencao_global') {
+        $d = json_decode(file_get_contents('php://input'), true);
+        $ativar = $d['ativar'] ?? true;
+        if ($ativar) {
+            // Salva quais estavam Ativo antes de mudar
+            $pdo->exec("UPDATE empresas SET status = 'Manutenção' WHERE status = 'Ativo'");
+        } else {
+            $pdo->exec("UPDATE empresas SET status = 'Ativo' WHERE status = 'Manutenção'");
+        }
+        echo json_encode(['success' => true]);
+        exit;
         echo json_encode(['success' => true]);
         exit;
     }
@@ -143,6 +154,16 @@ if ($logado && isset($_GET['api'])) {
       </div>
       <h1 class="text-2xl font-bold text-gray-800">DFe IA</h1>
       <p class="text-sm text-gray-500 mt-1">Painel Administrativo</p>
+      <div class="flex gap-2 mt-3">
+        <button onclick="manutencaoGlobal(true)" class="px-4 py-2 bg-orange-500 text-white text-sm font-bold rounded-lg hover:bg-orange-600 flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+          Ativar Manutenção Global
+        </button>
+        <button onclick="manutencaoGlobal(false)" class="px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-lg hover:bg-green-700 flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          Reativar Todos
+        </button>
+      </div>
     </div>
     <?php if (!empty($erro_login)): ?>
     <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm mb-4"><?= htmlspecialchars($erro_login) ?></div>
@@ -502,6 +523,13 @@ async function excluirEmpresa(id) {
   carregarEmpresas();
 }
 
+async function manutencaoGlobal(ativar) {
+  const msg = ativar ? 'Ativar manutenção para TODAS as empresas ativas?' : 'Reativar TODAS as empresas em manutenção?';
+  if (!confirm(msg)) return;
+  await api('manutencao_global', 'POST', { ativar });
+  alert(ativar ? 'Sistema em manutenção ativado!' : 'Empresas reativadas!');
+  listar();
+}
 async function bloquear(id, statusAtual) {
   const novoStatus = statusAtual === 'Bloqueado' ? 'Ativo' : 'Bloqueado';
   const msg = novoStatus === 'Bloqueado' ? 'Bloquear esta empresa por inadimplência?' : 'Desbloquear esta empresa?';

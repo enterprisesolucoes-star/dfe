@@ -48,6 +48,10 @@ switch ($action) {
                         echo json_encode(['success' => false, 'message' => 'Esta conta foi desativada.']);
                         exit;
                     }
+                    if ($empresaData['status'] === 'Manutenção') {
+                        echo json_encode(['success' => false, 'manutencao' => true, 'message' => 'Sistema em manutenção. Por favor, aguarde e tente novamente em alguns minutos.']);
+                        exit;
+                    }
                     if ($empresaData['status'] === 'Bloqueado') {
                         echo json_encode(['success' => false, 'message' => 'BLOQUEADO: Favor entrar em contato com Administrador!']);
                         exit;
