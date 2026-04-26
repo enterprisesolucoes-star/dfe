@@ -423,7 +423,7 @@ switch ($action) {
             $stmtNum->execute([$empresaId]);
             $numPedido = (int)$stmtNum->fetchColumn();
             // Inserir venda com status Pedido
-            $stmtV = $pdo->prepare("INSERT INTO vendas (empresa_id, numero, serie, modelo, status, valor_total, valor_desconto, valor_troco, usuario_id, caixa_id, cliente_id, created_at) VALUES (?, ?, '001', 65, 'Pedido', ?, ?, ?, ?, ?, ?, NOW())");
+            $stmtV = $pdo->prepare("INSERT INTO vendas (empresa_id, numero, serie, modelo, status, valor_total, valor_desconto, valor_troco, usuario_id, caixa_id, cliente_id, data_emissao) VALUES (?, ?, '001', 65, 'Pedido', ?, ?, ?, ?, ?, ?, NOW())");
             $stmtV->execute([
                 $empresaId, $numPedido,
                 (float)($venda['valorTotal'] ?? 0),
