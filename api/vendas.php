@@ -441,12 +441,21 @@ switch ($action) {
                 $pdo->prepare("UPDATE produtos SET estoque = GREATEST(0, estoque - ?) WHERE id = ?")
                     ->execute([$item['quantidade'], $item['produtoId']]);
             }
+            // Buscar conta padrão para caixa
+            $stmtConta = $pdo->prepare("SELECT id FROM contas WHERE empresa_id=? AND tipo='Caixa' ORDER BY id LIMIT 1");
+            $stmtConta->execute([$empresaId]);
+            $contaIdPedido = $stmtConta->fetchColumn() ?: null;
             // Inserir pagamentos e parcelas financeiras
             foreach (($venda['pagamentos'] ?? []) as $pag) {
                 $fPag = $pag['formaPagamento'] ?? '01';
                 $vPag = (float)($pag['valorPagamento'] ?? 0);
                 $pdo->prepare("INSERT INTO vendas_pagamentos (venda_id, forma_pagamento, valor_pagamento, tp_integra, t_band, c_aut) VALUES (?,?,?,'2','99','')")
                     ->execute([$vendaId, $fPag, $vPag]);
+                // Dinheiro: lançar no caixa
+                if ($fPag === '01' && $contaIdPedido) {
+                    $pdo->prepare("INSERT INTO caixa_movimentos (empresa_id, venda_id, conta_id, tipo, valor, forma_pagamento, historico, usuario_id) VALUES (?,?,?,'C',?,?,?,?)")
+                        ->execute([$empresaId, $vendaId, $contaIdPedido, $vPag, $fPag, $numPedido, $venda['usuarioId'] ?? null]);
+                }
                 // Crédito Loja: gerar parcelas financeiras
                 if ($fPag === '05') {
                     $parcelas = $pag['parcelas'] ?? [];

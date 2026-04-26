@@ -458,6 +458,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
       const data = await resp.json();
       if (data.success) {
         setPedidoGerado({ numero: data.numero, itens, total: totalDevido, pagamentos, data: new Date().toLocaleString('pt-BR') });
+        fetchProdutos && fetchProdutos();
         setShowPedidoModal(false);
       } else {
         showAlert("Erro", data.message || "Erro ao salvar pedido.");
@@ -558,7 +559,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
                 <p className="text-xs text-orange-500">PEDIDO #{pedidoGerado.numero}</p>
               </div>
             </div>
-            <div className="p-4 font-mono text-xs space-y-1">
+            <div id="cupom-pedido" className="p-4 font-mono text-xs space-y-1">
               <div className="flex justify-between border-b pb-1 mb-1 text-gray-500">
                 <span>ITEM</span><span>QTD</span><span>TOTAL</span>
               </div>
@@ -586,8 +587,24 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
                 <p>Obrigado pela preferência!</p>
               </div>
             </div>
-            <div className="p-4 flex gap-2">
-              <button onClick={() => window.print()} className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200">Imprimir</button>
+            <div className="p-4 flex gap-2 no-print">
+              <button onClick={() => {
+                const conteudo = document.getElementById('cupom-pedido')?.innerHTML || '';
+                const w = window.open('', '_blank', 'width=302,height=600');
+                if (w) {
+                  w.document.write(`<html><head><title>Pedido</title><style>
+                    body{font-family:monospace;font-size:11px;width:280px;margin:0;padding:4px;}
+                    .linha{display:flex;justify-content:space-between;}
+                    .center{text-align:center;}
+                    .bold{font-weight:bold;}
+                    .divider{border-top:1px dashed #000;margin:4px 0;}
+                  </style></head><body>${conteudo}</body></html>`);
+                  w.document.close();
+                  w.focus();
+                  w.print();
+                  w.close();
+                }
+              }} className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200">Imprimir</button>
               <button onClick={() => { setPedidoGerado(null); onSave({ id: 0, numero: 0, status: 'Pedido' } as any); }} className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-700">Fechar</button>
             </div>
           </div>
