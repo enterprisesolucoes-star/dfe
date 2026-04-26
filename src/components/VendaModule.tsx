@@ -97,6 +97,7 @@ export const IdentificarModal = ({ onClose, onConfirm }: { onClose: () => void; 
   useEffect(() => {
     fetch('./api.php?action=clientes').then(r => r.json()).then(d => setClientes(Array.isArray(d) ? d : []));
   }, []);
+  useEffect(() => { fetchMunicipios(form.uf); }, []);
 
   const fetchMunicipios = async (uf: string) => {
     if (!uf) return;
@@ -325,6 +326,8 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
   const [tefState, setTefState] = useState<{ pagamentosIds: number[]; currentIndex: number; vendaId: number; numero: number } | null>(null);
   const [showIdentificar, setShowIdentificar] = useState(false);
   const [showParcelamento, setShowParcelamento] = useState(false);
+  const [parcelasCredito, setParcelasCredito] = useState<{ numero: number; valor: number; vencimento: string }[]>([]);
+  const [pendingCreditoValor, setPendingCreditoValor] = useState(0);
   const [destinatario, setDestinatario] = useState<any>(null);
   const [searchIndex, setSearchIndex] = useState(-1);
 
@@ -381,6 +384,12 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
 
   const addPagamento = async () => {
     if (valorPagamentoInput <= 0) return;
+    // Crédito Loja: abre modal de parcelamento
+    if (formaPagamentoInput === '05') {
+      setPendingCreditoValor(valorPagamentoInput);
+      setShowParcelamento(true);
+      return;
+    }
     const b = bandeiras.find(x => String(x.id) === bandeiraSelecionada);
     let tBand = b?.tpag || '99';
     let cAut = autorizacaoInput;
@@ -414,7 +423,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
     if (itens.length === 0) { showAlert("Aviso", "Adicione ao menos um item."); return; }
 
     // Montar pagamentos base
-    let pagsPayload = pagamentos.map((p, idx) => ({ id: idx + 1, formaPagamento: p.formaPagamento, valorPagamento: p.valorPagamento, tpIntegra: p.tpIntegra, tBand: p.tBand, cAut: p.cAut }));
+    let pagsPayload = pagamentos.map((p, idx) => ({ id: idx + 1, formaPagamento: p.formaPagamento, valorPagamento: p.valorPagamento, tpIntegra: p.tpIntegra, tBand: p.tBand, cAut: p.cAut, parcelas: p.parcelas || [] }));
 
     // Se tem cartão ou PIX, verificar TEF antes de setIsEmitting
     if (pagamentos.some(p => ['03', '04', '17'].includes(p.formaPagamento))) {
@@ -474,6 +483,71 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
     <>
       {tefState && <TefModal pagamentoId={tefState.pagamentosIds[tefState.currentIndex]} vendaId={tefState.vendaId} numero={tefState.numero} pagamentoAtual={tefState.currentIndex + 1} totalPagamentos={tefState.pagamentosIds.length} onComplete={handleTefComplete} onCancel={() => setTefState(null)} />}
       {showIdentificar && <IdentificarModal onClose={() => setShowIdentificar(false)} onConfirm={(d) => { setDestinatario(d); setShowIdentificar(false); }} />}
+      {showParcelamento && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000]">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                <svg className="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-800">Crédito Loja — Parcelamento</h3>
+                <p className="text-xs text-gray-400">Total: R$ {pendingCreditoValor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+              </div>
+            </div>
+            <div className="mb-4">
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Número de Parcelas</label>
+              <select
+                className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-purple-500"
+                value={parcelasCredito.length || 1}
+                onChange={e => {
+                  const n = parseInt(e.target.value);
+                  const valorParcela = parseFloat((pendingCreditoValor / n).toFixed(2));
+                  const hoje = new Date();
+                  const novas = Array.from({ length: n }, (_, i) => {
+                    const venc = new Date(hoje);
+                    venc.setMonth(venc.getMonth() + i + 1);
+                    return { numero: i + 1, valor: valorParcela, vencimento: venc.toISOString().split('T')[0] };
+                  });
+                  setParcelasCredito(novas);
+                }}
+              >
+                {[1,2,3,4,5,6,7,8,9,10,11,12].map(n => <option key={n} value={n}>{n}x de R$ {(pendingCreditoValor / n).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</option>)}
+              </select>
+            </div>
+            {parcelasCredito.length > 0 && (
+              <div className="space-y-2 max-h-48 overflow-y-auto mb-4">
+                {parcelasCredito.map((p, i) => (
+                  <div key={i} className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
+                    <span className="text-xs font-bold text-purple-600 w-6">{p.numero}x</span>
+                    <span className="text-sm font-bold flex-1">R$ {p.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    <input type="date" value={p.vencimento} onChange={e => {
+                      const novas = [...parcelasCredito];
+                      novas[i] = { ...novas[i], vencimento: e.target.value };
+                      setParcelasCredito(novas);
+                    }} className="border border-gray-200 rounded px-2 py-1 text-xs outline-none focus:border-purple-500" />
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="flex gap-3 mt-2">
+              <button onClick={() => { setShowParcelamento(false); setParcelasCredito([]); }} className="flex-1 px-4 py-2 rounded-xl border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50">Cancelar</button>
+              <button
+                onClick={() => {
+                  const parc = parcelasCredito.length > 0 ? parcelasCredito : [{ numero: 1, valor: pendingCreditoValor, vencimento: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0] }];
+                  const novos = [...pagamentos, { formaPagamento: '05', valorPagamento: pendingCreditoValor, tBand: '99', cAut: '', tpIntegra: '2', parcelas: parc }];
+                  setPagamentos(novos);
+                  const novoTotalPago = novos.reduce((acc, p) => acc + p.valorPagamento, 0);
+                  setValorPagamentoInput(parseFloat(Math.max(0, totalDevido - novoTotalPago).toFixed(2)));
+                  setShowParcelamento(false);
+                  setParcelasCredito([]);
+                }}
+                className="flex-1 px-4 py-2 rounded-xl bg-purple-600 text-white text-sm font-bold hover:bg-purple-700 shadow"
+              >Confirmar</button>
+            </div>
+          </div>
+        </div>
+      )}
       {modalAutManual && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000]">
           <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm">

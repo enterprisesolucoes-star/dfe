@@ -504,7 +504,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
         const data = await resp.json();
         if (data.success) {
           showAlert("Cancelada", `NFC-e #${id} cancelada com sucesso na SEFAZ. Protocolo: ${data.protocolo}`);
-          setVendas(vendas.map((v: Nfce) => v.id === id ? { ...v, status: 'Cancelada' } : v));
+          fetchVendas();
           fetchProdutos();
         } else {
           showAlert("Falha no Cancelamento", data.message || "Erro desconhecido.");
@@ -532,7 +532,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
         const data = await resp.json();
         if (data.success) {
           showAlert('Cancelada', `NF-e #${id} cancelada com sucesso. Protocolo: ${data.protocolo}`);
-          setNfeList(prev => prev.map(v => v.id === id ? { ...v, status: 'Cancelada' } : v));
+          fetchNfeList();
           fetchProdutos();
         } else { showAlert('Falha', data.message || 'Erro desconhecido.'); }
       } catch { showAlert('Erro de Conexão', 'Não foi possível comunicar com o servidor.'); }
@@ -545,7 +545,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
         const resp = await fetch(`./api.php?action=nfe_excluir&id=${id}`);
         const data = await resp.json();
         if (data.success) {
-          setNfeList(prev => prev.filter(v => v.id !== id));
+          fetchNfeList();
           showAlert('Excluída', 'NF-e removida com sucesso.');
         } else {
           showAlert('Erro', data.message || 'Não foi possível excluir a NF-e.');
@@ -615,7 +615,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
         const resp = await fetch(`./api.php?action=excluir_venda&id=${id}`);
         const data = await resp.json();
         if (data.success) {
-          setVendas(vendas.filter(v => v.id !== id));
+          fetchVendas();
           showAlert("Excluída", "Venda removida com sucesso.");
         } else {
           showAlert("Erro", data.message || "Não foi possível excluir a venda.");
