@@ -320,6 +320,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
   const [bandeiras, setBandeiras] = useState<any[]>([]);
   const [bandeiraSelecionada, setBandeiraSelecionada] = useState('');
   const [autorizacaoInput, setAutorizacaoInput] = useState('');
+  const [modalAutManual, setModalAutManual] = useState<{ operadora: string; codigo: string; resolve: ((v: { operadora: string; codigo: string } | null) => void) } | null>(null);
   const [isEmitting, setIsEmitting] = useState(false);
   const [tefState, setTefState] = useState<{ pagamentosIds: number[]; currentIndex: number; vendaId: number; numero: number } | null>(null);
   const [showIdentificar, setShowIdentificar] = useState(false);
@@ -410,10 +411,20 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
         const spResp = await fetch('./api.php?action=tem_smartpos&_=' + Date.now());
         const spData = await spResp.json();
         if (!spData.tem) {
-          showAlert('TEF não disponível', spData.message || 'Integração TEF não configurada. Verifique as configurações da empresa.');
-          return;
-        }
-        if (spData.tem) {
+          const soCartao = pagamentos.filter(p => ['03', '04'].includes(p.formaPagamento));
+          if (soCartao.length > 0) {
+            const autManual = await new Promise<{ operadora: string; codigo: string } | null>(resolve => {
+              setModalAutManual({ operadora: '', codigo: '', resolve });
+            });
+            if (!autManual) { setIsEmitting(false); return; }
+            payload.pagamentos = payload.pagamentos.map((p: any) =>
+              ['03', '04'].includes(p.formaPagamento)
+                ? { ...p, tpIntegra: '2', cAut: autManual.codigo }
+                : p
+            );
+          }
+          // PIX sem TEF: finaliza direto sem modal
+        } else {
           const resp = await fetch('./api.php?action=salvar_pendente', { method: 'POST', body: JSON.stringify({ venda: payload }) });
           const d = await resp.json();
           if (!d.success) { showAlert("Erro", d.message); return; }
@@ -445,6 +456,63 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
     <>
       {tefState && <TefModal pagamentoId={tefState.pagamentosIds[tefState.currentIndex]} vendaId={tefState.vendaId} numero={tefState.numero} pagamentoAtual={tefState.currentIndex + 1} totalPagamentos={tefState.pagamentosIds.length} onComplete={handleTefComplete} onCancel={() => setTefState(null)} />}
       {showIdentificar && <IdentificarModal onClose={() => setShowIdentificar(false)} onConfirm={(d) => { setDestinatario(d); setShowIdentificar(false); }} />}
+      {modalAutManual && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-800">Pagamento com Cartão</h3>
+                <p className="text-xs text-gray-400">Informe os dados da transação</p>
+              </div>
+            </div>
+            <p className="text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2 mb-5 mt-2">
+              Integração TEF não ativa. Registre os dados manualmente conforme exigido pela legislação fiscal.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Operadora / Bandeira</label>
+                <select
+                  className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"
+                  value={modalAutManual.operadora}
+                  onChange={e => setModalAutManual(prev => prev ? { ...prev, operadora: e.target.value } : null)}
+                >
+                  <option value="">Selecione...</option>
+                  {bandeiras.map(b => <option key={b.id} value={b.tpag || b.id}>{b.tband_opc}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Código de Autorização</label>
+                <input
+                  type="text"
+                  className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500 font-mono tracking-widest"
+                  placeholder="Ex: 123456"
+                  value={modalAutManual.codigo}
+                  onChange={e => setModalAutManual(prev => prev ? { ...prev, codigo: e.target.value } : null)}
+                  autoFocus
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => { modalAutManual.resolve(null); setModalAutManual(null); }}
+                className="flex-1 px-4 py-2 rounded-xl border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50"
+              >Cancelar</button>
+              <button
+                onClick={() => {
+                  if (!modalAutManual.codigo.trim()) { alert('Informe o código de autorização.'); return; }
+                  const val = { operadora: modalAutManual.operadora, codigo: modalAutManual.codigo };
+                  modalAutManual.resolve(val);
+                  setModalAutManual(null);
+                }}
+                className="flex-1 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 shadow"
+              >Confirmar</button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[200] p-4">
         <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden flex flex-col">
           <div className="p-4 border-b border-gray-100 flex items-center gap-4">
