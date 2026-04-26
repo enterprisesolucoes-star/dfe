@@ -400,43 +400,58 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
 
   const handleFinalizar = async () => {
     if (itens.length === 0) { showAlert("Aviso", "Adicione ao menos um item."); return; }
+
+    // Montar pagamentos base
+    let pagsPayload = pagamentos.map((p, idx) => ({ id: idx + 1, formaPagamento: p.formaPagamento, valorPagamento: p.valorPagamento, tpIntegra: p.tpIntegra, tBand: p.tBand, cAut: p.cAut }));
+
+    // Se tem cartão ou PIX, verificar TEF antes de setIsEmitting
+    if (pagamentos.some(p => ['03', '04', '17'].includes(p.formaPagamento))) {
+      const spResp = await fetch('./api.php?action=tem_smartpos&_=' + Date.now());
+      const spData = await spResp.json();
+      if (spData.tem) {
+        // TEF ativo: salvar pendente e abrir fluxo SmartPOS
+        setIsEmitting(true);
+        const payload2 = {
+          valorTotal: totalDevido, valorDesconto, valorTroco: troco, usuarioId: session?.usuarioId, caixaId: session?.caixaId, destinatario,
+          itens: itens.map((it, idx) => ({ id: idx + 1, produtoId: it.produtoId, quantidade: it.quantidade, valorUnitario: it.valorUnitario, valorTotal: it.quantidade * it.valorUnitario, percentualTributosNacional: it.percentualTributosNacional, percentualTributosEstadual: it.percentualTributosEstadual })),
+          pagamentos: pagsPayload
+        };
+        const resp = await fetch('./api.php?action=salvar_pendente', { method: 'POST', body: JSON.stringify({ venda: payload2 }) });
+        const d = await resp.json();
+        if (!d.success) { showAlert("Erro", d.message); setIsEmitting(false); return; }
+        setTefState({ pagamentosIds: d.pagamentosIds, currentIndex: 0, vendaId: d.vendaId, numero: d.numero });
+        return;
+      } else {
+        // TEF não ativo
+        const temCartao = pagamentos.some(p => ['03', '04'].includes(p.formaPagamento));
+        if (temCartao) {
+          // Abre modal de autorização manual ANTES de setIsEmitting
+          const autManual = await new Promise<{ operadora: string; codigo: string } | null>(resolve => {
+            setModalAutManual({ operadora: '', codigo: '', resolve });
+          });
+          if (!autManual) return; // cancelou, não emite
+          pagsPayload = pagsPayload.map((p: any) =>
+            ['03', '04'].includes(p.formaPagamento)
+              ? { ...p, tpIntegra: '2', cAut: autManual.codigo }
+              : p
+          );
+        }
+        // PIX sem TEF: sem card no XML
+        pagsPayload = pagsPayload.map((p: any) =>
+          p.formaPagamento === '17'
+            ? { ...p, tpIntegra: '2', tBand: null, cAut: null }
+            : p
+        );
+      }
+    }
+
     setIsEmitting(true);
     const payload = {
       valorTotal: totalDevido, valorDesconto, valorTroco: troco, usuarioId: session?.usuarioId, caixaId: session?.caixaId, destinatario,
       itens: itens.map((it, idx) => ({ id: idx + 1, produtoId: it.produtoId, quantidade: it.quantidade, valorUnitario: it.valorUnitario, valorTotal: it.quantidade * it.valorUnitario, percentualTributosNacional: it.percentualTributosNacional, percentualTributosEstadual: it.percentualTributosEstadual })),
-      pagamentos: pagamentos.map((p, idx) => ({ id: idx + 1, formaPagamento: p.formaPagamento, valorPagamento: p.valorPagamento, tpIntegra: p.tpIntegra, tBand: p.tBand, cAut: p.cAut }))
+      pagamentos: pagsPayload
     };
     try {
-      if (pagamentos.some(p => ['03', '04', '17'].includes(p.formaPagamento))) {
-        const spResp = await fetch('./api.php?action=tem_smartpos&_=' + Date.now());
-        const spData = await spResp.json();
-        if (!spData.tem) {
-          const soCartao = pagamentos.filter(p => ['03', '04'].includes(p.formaPagamento));
-          if (soCartao.length > 0) {
-            const autManual = await new Promise<{ operadora: string; codigo: string } | null>(resolve => {
-              setModalAutManual({ operadora: '', codigo: '', resolve });
-            });
-            if (!autManual) { setIsEmitting(false); return; }
-            payload.pagamentos = payload.pagamentos.map((p: any) =>
-              ['03', '04'].includes(p.formaPagamento)
-                ? { ...p, tpIntegra: '2', cAut: autManual.codigo }
-                : p
-            );
-          }
-          // PIX sem TEF: remove tpIntegra/cAut para não gerar <card> no XML
-          payload.pagamentos = payload.pagamentos.map((p: any) =>
-            p.formaPagamento === '17'
-              ? { ...p, tpIntegra: '2', tBand: null, cAut: null }
-              : p
-          );
-        } else {
-          const resp = await fetch('./api.php?action=salvar_pendente', { method: 'POST', body: JSON.stringify({ venda: payload }) });
-          const d = await resp.json();
-          if (!d.success) { showAlert("Erro", d.message); return; }
-          setTefState({ pagamentosIds: d.pagamentosIds, currentIndex: 0, vendaId: d.vendaId, numero: d.numero });
-          return;
-        }
-      }
       const response = await fetch('./api.php?action=emitir', { method: 'POST', body: JSON.stringify({ venda: payload, emitente }) });
       const result = await response.json();
       if (result.success) {
