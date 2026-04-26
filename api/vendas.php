@@ -1764,9 +1764,20 @@ switch ($action) {
         $df = $_GET['data_fim'] ?? '';
         $clienteChave = $_GET['cliente_chave'] ?? '';
         if (!$clienteChave) { echo json_encode(['success' => false, 'message' => 'cliente_chave obrigatorio']); break; }
+        // Converter datas para UTC (SuperTEF armazena em UTC)
+        $tzSP = new DateTimeZone('America/Sao_Paulo');
+        $tzUTC = new DateTimeZone('UTC');
         $url = 'https://api.supertef.com.br/api/pagamentos?per_page=500';
-        if ($di) $url .= '&data_inicio=' . urlencode($di . ' 00:00:00');
-        if ($df) $url .= '&data_fim=' . urlencode($df . ' 23:59:59');
+        if ($di) {
+            $dtIni = new DateTime($di . ' 00:00:00', $tzSP);
+            $dtIni->setTimezone($tzUTC);
+            $url .= '&data_inicio=' . urlencode($dtIni->format('Y-m-d H:i:s'));
+        }
+        if ($df) {
+            $dtFim = new DateTime($df . ' 23:59:59', $tzSP);
+            $dtFim->setTimezone($tzUTC);
+            $url .= '&data_fim=' . urlencode($dtFim->format('Y-m-d H:i:s'));
+        }
         $ch = curl_init($url);
         curl_setopt_array($ch, [CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . SUPERTEF_TOKEN], CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 15, CURLOPT_SSL_VERIFYPEER => false]);
         $raw = curl_exec($ch);

@@ -14,9 +14,18 @@ const TIPO_MAP: Record<string, string> = {
 };
 
 export const RelatorioTefTab = ({ showAlert }: any) => {
-  const today = new Date().toISOString().split('T')[0];
-  const [di, setDi] = useState(today);
-  const [df, setDf] = useState(today);
+  const getLocalDate = () => {
+    const d = new Date();
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString().split('T')[0];
+  };
+  const getFirstDayOfMonth = () => {
+    const d = new Date();
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString().split('T')[0].substring(0, 8) + '01';
+  };
+  const [di, setDi] = useState(getFirstDayOfMonth);
+  const [df, setDf] = useState(getLocalDate);
   const [smartposList, setSmartposList] = useState<any[]>([]);
   const [selectedPos, setSelectedPos] = useState('');
   const [loading, setLoading] = useState(false);
