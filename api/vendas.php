@@ -804,9 +804,9 @@ switch ($action) {
         $stmtSP->execute([$empId]);
         $temSmartpos = (int)$stmtSP->fetchColumn() > 0;
         if (!$temTef || !$temSmartpos) {
-            echo json_encode(['tem' => false, 'message' => !$temTef ? 'Integração TEF não está ativa para esta empresa.' : 'Nenhuma máquina SmartPOS cadastrada para esta empresa.']);
+            echo json_encode(['tem' => false, 'tem_tef' => $temTef, 'message' => !$temTef ? 'Integração TEF não está ativa para esta empresa.' : 'Nenhuma máquina SmartPOS cadastrada para esta empresa.']);
         } else {
-            echo json_encode(['tem' => true]);
+            echo json_encode(['tem' => true, 'tem_tef' => true]);
         }
         break;
 

@@ -409,7 +409,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
       const spResp = await fetch('./api.php?action=tem_smartpos&_=' + Date.now());
       const spData = await spResp.json();
       if (spData.tem) {
-        // TEF ativo: salvar pendente e abrir fluxo SmartPOS
+        // TEF ativo com SmartPOS: salvar pendente e abrir fluxo SmartPOS
         setIsEmitting(true);
         const payload2 = {
           valorTotal: totalDevido, valorDesconto, valorTroco: troco, usuarioId: session?.usuarioId, caixaId: session?.caixaId, destinatario,
@@ -422,21 +422,20 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
         setTefState({ pagamentosIds: d.pagamentosIds, currentIndex: 0, vendaId: d.vendaId, numero: d.numero });
         return;
       } else {
-        // TEF não ativo
+        // Sem SmartPOS disponível — cartão exige autorização manual, PIX finaliza direto
         const temCartao = pagamentos.some(p => ['03', '04'].includes(p.formaPagamento));
         if (temCartao) {
-          // Abre modal de autorização manual ANTES de setIsEmitting
           const autManual = await new Promise<{ operadora: string; codigo: string } | null>(resolve => {
             setModalAutManual({ operadora: '', codigo: '', resolve });
           });
-          if (!autManual) return; // cancelou, não emite
+          if (!autManual) return;
           pagsPayload = pagsPayload.map((p: any) =>
             ['03', '04'].includes(p.formaPagamento)
               ? { ...p, tpIntegra: '2', cAut: autManual.codigo }
               : p
           );
         }
-        // PIX sem TEF: sem card no XML
+        // PIX: sempre sem card no XML
         pagsPayload = pagsPayload.map((p: any) =>
           p.formaPagamento === '17'
             ? { ...p, tpIntegra: '2', tBand: null, cAut: null }
