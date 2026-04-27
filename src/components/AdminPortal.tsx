@@ -122,7 +122,9 @@ const AdminPortal = () => {
   const [modalManutencao, setModalManutencao] = useState<{ ativar: boolean } | null>(null);
 
   const manutencaoGlobal = async (ativar: boolean) => {
+    console.log('manutencaoGlobal chamado', ativar);
     setModalManutencao({ ativar });
+    console.log('modalManutencao setado');
   };
 
   const confirmarManutencao = async () => {
