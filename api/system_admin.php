@@ -49,7 +49,7 @@ switch ($action) {
             $chk->execute([$tok]);
             if (!$chk->fetch()) { echo json_encode([]); exit; }
         }
-        $empId = (int)($_GET['empresa_id'] ?? 0);
+        $empId = (int)($_GET['emp_id'] ?? $_GET['empresa_id'] ?? 0);
         $stmt = $pdo->prepare("SELECT id, nome, login, perfil, ativo FROM usuarios WHERE empresa_id = ? AND empresa_id IS NOT NULL ORDER BY nome");
         $stmt->execute([$empId]);
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));

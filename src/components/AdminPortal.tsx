@@ -93,7 +93,7 @@ const AdminPortal = () => {
       setEmpresaId(emp.id);
       const sps = await api(`listar_smartpos_admin&empresa_id=${emp.id}`);
       setSmartPosList(Array.isArray(sps) ? sps : []);
-      const usrs = await api(`listar_usuarios_admin&empresa_id=${emp.id}`);
+      const usrs = await api(`listar_usuarios_admin&emp_id=${emp.id}`);
       setUsuarios(Array.isArray(usrs) ? usrs : []);
     } else {
       setForm({ status: 'Ativo', usuario_dfe: 2, ambiente: 2, crt: 1, tem_tef: 0, uf: 'GO' });
@@ -196,7 +196,7 @@ const AdminPortal = () => {
   const set = (f: string, v: any) => setForm((p: any) => ({ ...p, [f]: v }));
   const carregarUsuarios = async (empId: number) => {
     console.log('carregarUsuarios empId:', empId, 'token:', adminToken || localStorage.getItem('dfe_admin_token'));
-    const usrs = await api(`listar_usuarios_admin&empresa_id=${empId}`);
+    const usrs = await api(`listar_usuarios_admin&emp_id=${empId}`);
     console.log('usuarios:', usrs);
     setUsuarios(Array.isArray(usrs) ? usrs : []);
   };
@@ -587,7 +587,7 @@ const AdminPortal = () => {
                           return;
                         }
                         if (r.success) {
-                          const usrs = await api(`listar_usuarios_admin&empresa_id=${empresaId}`);
+                          const usrs = await api(`listar_usuarios_admin&emp_id=${empresaId}`);
                           setUsuarios(Array.isArray(usrs) ? usrs : []);
                           setUserForm({ nome: '', login: '', senha: '', perfil: 'operador' });
                           setUserEdit(null);
