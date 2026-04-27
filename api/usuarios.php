@@ -154,6 +154,18 @@ switch ($action) {
         $perfil = in_array($data['perfil'] ?? 'operador', ['admin','operador']) ? $data['perfil'] : 'operador';
         $ativo = isset($data['ativo']) ? (int)$data['ativo'] : 1;
         if (!$nome || !$login) { echo json_encode(['success' => false, 'message' => 'Nome e login são obrigatórios.']); break; }
+        // Verificar duplicidade login+senha na mesma empresa
+        $senhaDigitada = $data['senha'] ?? '';
+        if ($senhaDigitada) {
+            $chkId = isset($data['id']) && $data['id'] > 0 ? (int)$data['id'] : 0;
+            $chk = $pdo->prepare("SELECT id, senha_hash FROM usuarios WHERE login=? AND empresa_id=? AND id != ?");
+            $chk->execute([$login, $empresaId, $chkId]);
+            $existente = $chk->fetch();
+            if ($existente && password_verify($senhaDigitada, $existente['senha_hash'])) {
+                echo json_encode(['success' => false, 'duplicado' => true, 'message' => 'Já existe um usuário com este login e senha nesta empresa. Altere o usuário ou a senha.']);
+                break;
+            }
+        }
         if (isset($data['id']) && $data['id'] > 0) {
             $sql = "UPDATE usuarios SET nome=?, login=?, perfil=?, ativo=?";
             $params = [$nome, $login, $perfil, $ativo];

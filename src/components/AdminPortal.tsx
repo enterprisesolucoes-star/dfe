@@ -575,11 +575,17 @@ const AdminPortal = () => {
                       <button onClick={async () => {
                         if (!userForm.nome || !userForm.login) return;
                         const r = await api('salvar_usuario_admin', 'POST', { ...userForm, empresa_id: empresaId, id: userEdit });
+                        if (r.duplicado) {
+                          setAlertModal({ open: true, tipo: 'warning', titulo: 'Login e Senha Duplicados', msg: r.message });
+                          return;
+                        }
                         if (r.success) {
                           const usrs = await api(`listar_usuarios_admin&empresa_id=${empresaId}`);
                           setUsuarios(Array.isArray(usrs) ? usrs : []);
                           setUserForm({ nome: '', login: '', senha: '', perfil: 'operador' });
                           setUserEdit(null);
+                        } else {
+                          setAlertModal({ open: true, tipo: 'error', titulo: 'Erro', msg: r.message || 'Erro ao salvar usuário.' });
                         }
                       }} className="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-blue-700 flex items-center gap-1">
                         {userEdit ? 'Salvar Alteração' : 'Adicionar Usuário'}

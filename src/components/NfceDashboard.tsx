@@ -2314,6 +2314,7 @@ const UsuarioModal = ({ usuario, onClose, onSave, showAlert }: { usuario: Usuari
     });
     const data = await res.json();
     if (data.success) onSave();
+    else if (data.duplicado) showAlert('Login e Senha Duplicados', data.message);
     else showAlert('Erro ao salvar', data.message || 'Erro ao salvar usuário.');
     setLoading(false);
   };

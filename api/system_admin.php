@@ -44,7 +44,7 @@ switch ($action) {
 
     case 'listar_usuarios_admin':
         $empId = (int)($_GET['empresa_id'] ?? 0);
-        $stmt = $pdo->prepare("SELECT id, nome, login, perfil, ativo FROM usuarios WHERE empresa_id = ? ORDER BY nome");
+        $stmt = $pdo->prepare("SELECT id, nome, login, perfil, ativo FROM usuarios WHERE empresa_id = ? AND empresa_id IS NOT NULL ORDER BY nome");
         $stmt->execute([$empId]);
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         break;
@@ -57,6 +57,14 @@ switch ($action) {
         $senha = $d['senha'] ?? '';
         $perfil = $d['perfil'] ?? 'operador';
         $empresaId2 = (int)($d['empresa_id'] ?? 0);
+        // Verificar duplicidade login+senha dentro da mesma empresa
+        $chkLogin = $pdo->prepare("SELECT id, senha_hash FROM usuarios WHERE login=? AND empresa_id=? AND id != ?");
+        $chkLogin->execute([$login, $empresaId2, $id ?: 0]);
+        $existente = $chkLogin->fetch();
+        if ($existente && $senha && password_verify($senha, $existente['senha_hash'])) {
+            echo json_encode(['success'=>false,'duplicado'=>true,'message'=>'Já existe um usuário com este login e senha nesta empresa. Altere o usuário ou a senha.']);
+            break;
+        }
         if ($id) {
             if ($senha) {
                 $pdo->prepare("UPDATE usuarios SET nome=?, login=?, senha_hash=?, perfil=? WHERE id=?")
@@ -67,8 +75,8 @@ switch ($action) {
             }
         } else {
             if (!$senha) { echo json_encode(['success'=>false,'message'=>'Senha obrigatória']); break; }
-            $pdo->prepare("INSERT INTO usuarios (empresa_id, nome, login, senha_hash, perfil) VALUES (?,?,?,?,'$perfil')")
-                ->execute([$empresaId2, $nome, $login, password_hash($senha, PASSWORD_DEFAULT)]);
+            $pdo->prepare("INSERT INTO usuarios (empresa_id, nome, login, senha_hash, perfil) VALUES (?,?,?,?,?)")
+                ->execute([$empresaId2, $nome, $login, password_hash($senha, PASSWORD_DEFAULT), $perfil]);
         }
         echo json_encode(['success'=>true]);
         break;
