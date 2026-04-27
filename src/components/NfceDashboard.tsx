@@ -112,7 +112,7 @@ const NfceDashboard: React.FC<{ session: Session; onLogout: () => void; onUpdate
     }
   }, [darkMode]);
 
-  const isFiscal = Number((emitente as any).usuarioDfe ?? session.usuarioDfe ?? 2) !== 0 && Number((emitente as any).usuarioDfe ?? session.usuarioDfe ?? 2) !== 4;
+  const isFiscal = Number(session.usuarioDfe) !== 0 && Number(session.usuarioDfe) !== 4;
 
 // Se empresa não está configurada, força aba de configurações e bloqueia as demais
 const [activeTab, setActiveTab] = useState<'dashboard' | 'vendas' | 'vendas_geral' | 'produtos' | 'clientes' | 'fornecedores' | 'compras' | 'orcamentos' | 'transportadores' | 'config' | 'ncm' | 'usuarios' | 'medidas' | 'bandeiras' | 'dfe_nfe' | 'dfe_nfe_geral' | 'dfe_nfe_parametros' | 'dfe_nfce_parametros' | 'reforma_tributaria' | 'config_empresa' | 'config_email' | 'config_smartpos' | 'config_integracao' | 'dfe_nfe_dados' | 'dfe_nfce_dados' | 'dfe_provedor' | 'empresa' | 'dfe_config' | 'fin_receber' | 'fin_pagar' | 'fin_caixa' | 'relatorios_tef'>(
