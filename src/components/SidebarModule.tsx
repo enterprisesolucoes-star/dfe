@@ -32,7 +32,8 @@ export const Sidebar = ({
   dfeNfceOpen,
   setDfeNfceOpen,
   cadastrosOpen,
-  setCadastrosOpen
+  setCadastrosOpen,
+  usuarioDfe
 }: any) => {
   const isFiscal = Number(usuarioDfe ?? session?.usuarioDfe ?? 0) > 0 && Number(usuarioDfe ?? session?.usuarioDfe ?? 0) !== 4;
 
