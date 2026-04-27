@@ -464,7 +464,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
         showAlert("Erro", data.message || "Erro ao salvar pedido.");
         setShowPedidoModal(false);
       }
-    } catch { showAlert("Erro", "Erro de conexão."); setShowPedidoModal(false); }
+    } catch(e: any) { console.error('F8 erro:', e); showAlert("Erro", "Erro de conexão: " + e.message); setShowPedidoModal(false); }
   };
 
   const handleFinalizar = async () => {
