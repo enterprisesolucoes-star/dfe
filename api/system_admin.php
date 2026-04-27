@@ -57,12 +57,11 @@ switch ($action) {
         $senha = $d['senha'] ?? '';
         $perfil = $d['perfil'] ?? 'operador';
         $empresaId2 = (int)($d['empresa_id'] ?? 0);
-        // Verificar duplicidade login+senha dentro da mesma empresa
-        $chkLogin = $pdo->prepare("SELECT id, senha_hash FROM usuarios WHERE login=? AND empresa_id=? AND id != ?");
-        $chkLogin->execute([$login, $empresaId2, $id ?: 0]);
-        $existente = $chkLogin->fetch();
-        if ($existente && $senha && password_verify($senha, $existente['senha_hash'])) {
-            echo json_encode(['success'=>false,'duplicado'=>true,'message'=>'Já existe um usuário com este login e senha nesta empresa. Altere o usuário ou a senha.']);
+        // Verificar login único globalmente
+        $chkLogin = $pdo->prepare("SELECT id FROM usuarios WHERE login=? AND id != ?");
+        $chkLogin->execute([$login, $id ?: 0]);
+        if ($chkLogin->fetch()) {
+            echo json_encode(['success'=>false,'duplicado'=>true,'message'=>'Este login já está sendo utilizado por outro usuário. Escolha um login diferente.']);
             break;
         }
         if ($id) {
