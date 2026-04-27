@@ -442,7 +442,7 @@ switch ($action) {
                     ->execute([$item['quantidade'], $item['produtoId']]);
             }
             // Buscar conta padrão para caixa
-            $stmtConta = $pdo->prepare("SELECT id FROM contas WHERE empresa_id=? AND tipo='Caixa' ORDER BY id LIMIT 1");
+            $stmtConta = $pdo->prepare("SELECT id FROM contas_financeiras WHERE empresa_id=? AND tipo='Caixa' ORDER BY id LIMIT 1");
             $stmtConta->execute([$empresaId]);
             $contaIdPedido = $stmtConta->fetchColumn() ?: null;
             // Inserir pagamentos e parcelas financeiras

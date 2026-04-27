@@ -589,20 +589,41 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
             </div>
             <div className="p-4 flex gap-2 no-print">
               <button onClick={() => {
-                const conteudo = document.getElementById('cupom-pedido')?.innerHTML || '';
+                const linhas: string[] = [];
+                linhas.push((emitente?.razaoSocial || '').toUpperCase());
+                linhas.push('CNPJ: ' + (emitente?.cnpj || ''));
+                linhas.push(pedidoGerado.data);
+                linhas.push('--------------------------------');
+                linhas.push('*** SEM VALOR FISCAL ***');
+                linhas.push('PEDIDO #' + pedidoGerado.numero);
+                linhas.push('--------------------------------');
+                linhas.push('ITEM             QTD     TOTAL');
+                pedidoGerado.itens.forEach(it => {
+                  const prod = produtos.find(p => p.id === it.produtoId);
+                  const desc = (prod?.descricao || 'Produto').substring(0, 16).padEnd(16, ' ');
+                  const qtd = String(it.quantidade).padStart(4, ' ');
+                  const tot = ('R$' + (it.quantidade * it.valorUnitario).toFixed(2)).padStart(10, ' ');
+                  linhas.push(desc + ' ' + qtd + ' ' + tot);
+                });
+                linhas.push('--------------------------------');
+                linhas.push('TOTAL'.padEnd(20, ' ') + ('R$ ' + pedidoGerado.total.toFixed(2)).padStart(12, ' '));
+                pedidoGerado.pagamentos.forEach(p => {
+                  const forma = p.formaPagamento === '01' ? 'Dinheiro' : 'Crédito Loja';
+                  linhas.push(forma.padEnd(20, ' ') + ('R$ ' + p.valorPagamento.toFixed(2)).padStart(12, ' '));
+                });
+                linhas.push('--------------------------------');
+                linhas.push('*** SEM VALOR FISCAL ***');
+                linhas.push('Obrigado pela preferencia!');
+                const conteudo = linhas.join('\n');
                 const w = window.open('', '_blank', 'width=302,height=600');
                 if (w) {
                   w.document.write(`<html><head><title>Pedido</title><style>
-                    body{font-family:monospace;font-size:11px;width:280px;margin:0;padding:4px;}
-                    .linha{display:flex;justify-content:space-between;}
-                    .center{text-align:center;}
-                    .bold{font-weight:bold;}
-                    .divider{border-top:1px dashed #000;margin:4px 0;}
+                    @page { size: 80mm auto; margin: 0; }
+                    body { font-family: 'Courier New', monospace; font-size: 11px; width: 280px; margin: 0; padding: 4px; white-space: pre; }
                   </style></head><body>${conteudo}</body></html>`);
                   w.document.close();
                   w.focus();
-                  w.print();
-                  w.close();
+                  setTimeout(() => { w.print(); w.close(); }, 250);
                 }
               }} className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200">Imprimir</button>
               <button onClick={() => { setPedidoGerado(null); onSave({ id: 0, numero: 0, status: 'Pedido' } as any); }} className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-700">Fechar</button>

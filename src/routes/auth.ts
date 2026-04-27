@@ -28,6 +28,21 @@ export async function login(req: Request, res: Response) {
     if (!senhaValida) {
       return res.status(401).json({ success: false, error: "Senha inválida" });
     }
+    // Verifica status da empresa
+    if (usuario.empresa_id) {
+      const empresa = await prismaNfce.empresas.findFirst({ where: { id: usuario.empresa_id } });
+      if (empresa) {
+        if (empresa.status === 'Inativo') {
+          return res.json({ success: false, message: 'Esta conta foi desativada.' });
+        }
+        if (empresa.status === 'Manutenção') {
+          return res.json({ success: false, manutencao: true, message: 'Sistema em manutenção. Por favor, aguarde e tente novamente em alguns minutos.' });
+        }
+        if (empresa.status === 'Bloqueado') {
+          return res.json({ success: false, message: 'BLOQUEADO: Favor entrar em contato com Administrador!' });
+        }
+      }
+    }
 
     const token = jwt.sign(
       {
