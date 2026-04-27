@@ -2181,13 +2181,6 @@ const UsuariosTab = ({ session, showAlert, showConfirm }: { session: Session; sh
           className={`py-2.5 px-5 text-sm font-semibold transition-colors ${activeSection === 'usuarios' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>
           Usuários
         </button>
-        <button onClick={() => setActiveSection('pendentes')}
-          className={`py-2.5 px-5 text-sm font-semibold transition-colors flex items-center gap-2 ${activeSection === 'pendentes' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>
-          Solicitações de Acesso
-          {pendentesCount > 0 && (
-            <span className="bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{pendentesCount}</span>
-          )}
-        </button>
       </div>
 
       {activeSection === 'usuarios' && (

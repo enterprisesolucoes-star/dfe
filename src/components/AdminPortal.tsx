@@ -650,6 +650,22 @@ const AdminPortal = () => {
           </div>
         </div>
       )}
+      {alertModal.open && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[80] p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${alertModal.tipo === 'error' ? 'bg-red-100' : alertModal.tipo === 'warning' ? 'bg-amber-100' : alertModal.tipo === 'success' ? 'bg-green-100' : 'bg-blue-100'}`}>
+                {alertModal.tipo === 'error' ? <X className="w-5 h-5 text-red-600" /> : alertModal.tipo === 'warning' ? <Shield className="w-5 h-5 text-amber-600" /> : alertModal.tipo === 'success' ? <CheckCircle className="w-5 h-5 text-green-600" /> : <Shield className="w-5 h-5 text-blue-600" />}
+              </div>
+              <p className="font-bold text-gray-800 text-sm">{alertModal.titulo}</p>
+            </div>
+            <p className="text-sm text-gray-600 mb-6 whitespace-pre-line">{alertModal.msg}</p>
+            <div className="flex justify-end">
+              <button onClick={() => setAlertModal({...alertModal, open: false})} className="px-6 py-2.5 bg-blue-600 text-white font-bold text-xs uppercase rounded-xl hover:bg-blue-700">OK</button>
+            </div>
+          </div>
+        </div>
+      )}
       {modalManutencao && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
           <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6">
