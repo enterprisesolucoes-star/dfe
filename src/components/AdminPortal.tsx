@@ -27,6 +27,7 @@ const AdminPortal = () => {
   const [usuarios, setUsuarios] = useState<any[]>([]);
   const [userForm, setUserForm] = useState({ nome: '', login: '', senha: '', perfil: 'operador' });
   const [userEdit, setUserEdit] = useState<number|null>(null);
+  const [confirmExcluirUser, setConfirmExcluirUser] = useState<{id: number, nome: string} | null>(null);
   const [form, setForm] = useState<any>({});
   const [smartPosList, setSmartPosList] = useState<any[]>([]);
   const [spForm, setSpForm] = useState({ codigo: '', numero_serie: '', integradora: '', apelido: '' });
@@ -193,6 +194,10 @@ const AdminPortal = () => {
   };
 
   const set = (f: string, v: any) => setForm((p: any) => ({ ...p, [f]: v }));
+  const carregarUsuarios = async (empId: number) => {
+    const usrs = await api(`listar_usuarios_admin&empresa_id=${empId}`);
+    setUsuarios(Array.isArray(usrs) ? usrs : []);
+  };
 
   const buscarMunicipios = async (uf: string) => {
     try {
@@ -370,7 +375,7 @@ const AdminPortal = () => {
             {/* Tabs */}
             <div className="grid grid-cols-2 border-b border-gray-100">
               {([['dados','Dados'],['smartpos','SmartPOS / TEF'],['usuarios','Usuários']] as const).map(([t,l]) => (
-                <button key={t} onClick={() => setTab(t as any)}
+                <button key={t} onClick={() => { setTab(t as any); if (t === 'usuarios' && empresaId) carregarUsuarios(empresaId); }}
                   className={`py-3 text-[11px] font-bold uppercase tracking-wider border-b-2 transition-all text-center w-full ${tab === t ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}>
                   {l}
                 </button>
@@ -604,7 +609,7 @@ const AdminPortal = () => {
                             <td className="px-3 py-2 text-center">
                               <div className="flex items-center justify-center gap-2">
                                 <button onClick={() => { setUserForm({ nome: u.nome, login: u.login, senha: '', perfil: u.perfil }); setUserEdit(u.id); }} className="text-gray-400 hover:text-blue-600"><Edit2 className="w-3.5 h-3.5" /></button>
-                                <button onClick={async () => { await api('excluir_usuario_admin', 'POST', { id: u.id }); const usrs = await api(`listar_usuarios_admin&empresa_id=${empresaId}`); setUsuarios(Array.isArray(usrs) ? usrs : []); }} className="text-gray-400 hover:text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
+                                <button onClick={() => setConfirmExcluirUser({ id: u.id, nome: u.nome })} className="text-gray-400 hover:text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
                               </div>
                             </td>
                           </tr>)}
@@ -625,6 +630,30 @@ const AdminPortal = () => {
         </div>
       )}
       {/* Modal Confirmação */}
+      {confirmExcluirUser && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[70] p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
+                <Trash2 className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <p className="font-bold text-gray-800 text-sm">Excluir Usuário</p>
+                <p className="text-xs text-gray-400">Esta ação não pode ser desfeita</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 mb-6">Deseja excluir o usuário <strong>{confirmExcluirUser.nome}</strong>?</p>
+            <div className="flex gap-3">
+              <button onClick={() => setConfirmExcluirUser(null)} className="flex-1 py-2.5 text-gray-500 font-bold text-xs uppercase hover:bg-gray-100 rounded-xl">Cancelar</button>
+              <button onClick={async () => {
+                await api('excluir_usuario_admin', 'POST', { id: confirmExcluirUser.id });
+                setConfirmExcluirUser(null);
+                if (empresaId) carregarUsuarios(empresaId);
+              }} className="flex-1 py-2.5 text-white font-bold text-xs uppercase rounded-xl bg-red-600 hover:bg-red-700">Excluir</button>
+            </div>
+          </div>
+        </div>
+      )}
       {modalManutencao && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
           <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6">
