@@ -329,7 +329,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
   const [parcelasCredito, setParcelasCredito] = useState<{ numero: number; valor: number; vencimento: string }[]>([]);
   const [pendingCreditoValor, setPendingCreditoValor] = useState(0);
   const [showPedidoModal, setShowPedidoModal] = useState(false);
-  const [pedidoGerado, setPedidoGerado] = useState<{ numero: number; itens: any[]; total: number; pagamentos: any[]; data: string } | null>(null);
+  const [pedidoGerado, setPedidoGerado] = useState<{ numero: number; itens: any[]; total: number; pagamentos: any[]; data: string; cliente?: any } | null>(null);
   const [destinatario, setDestinatario] = useState<any>(null);
   const [searchIndex, setSearchIndex] = useState(-1);
 
@@ -457,7 +457,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
       const resp = await fetch('./api.php?action=salvar_pedido', { method: 'POST', body: JSON.stringify({ venda: payload, emitente }) });
       const data = await resp.json();
       if (data.success) {
-        setPedidoGerado({ numero: data.numero, itens, total: totalDevido, pagamentos, data: new Date().toLocaleString('pt-BR') });
+        setPedidoGerado({ numero: data.numero, itens, total: totalDevido, pagamentos, data: new Date().toLocaleString('pt-BR'), cliente: destinatario });
         setShowPedidoModal(false);
       } else {
         showAlert("Erro", data.message || "Erro ao salvar pedido.");
@@ -588,42 +588,47 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
             </div>
             <div className="p-4 flex gap-2 no-print">
               <button onClick={() => {
-                const el = document.getElementById('cupom-pedido');
-                if (!el) return;
+                const itensList = pedidoGerado.itens.map(it => {
+                  const prod = produtos.find((p: any) => p.id === it.produtoId);
+                  return `<tr><td style="padding:1px 2px">${prod?.descricao || 'Produto'}</td><td style="padding:1px 2px;text-align:center">${it.quantidade}</td><td style="padding:1px 2px;text-align:right">R$ ${(it.quantidade * it.valorUnitario).toFixed(2)}</td></tr>`;
+                }).join('');
+                const pagsHtml = pedidoGerado.pagamentos.map((p: any) =>
+                  `<tr><td>${p.formaPagamento === '01' ? 'Dinheiro' : 'Crédito Loja'}</td><td style="text-align:right">R$ ${p.valorPagamento.toFixed(2)}</td></tr>`
+                ).join('');
+                const clienteHtml = pedidoGerado.cliente?.nome
+                  ? `<p style="margin:1px 0">${pedidoGerado.cliente.nome}</p>${pedidoGerado.cliente.documento ? `<p style="margin:1px 0">CPF/CNPJ: ${pedidoGerado.cliente.documento}</p>` : ''}<hr style="border-top:1px dashed #000;margin:4px 0"/>`
+                  : '';
+                const html = `<html><head><title>Pedido</title><style>
+                  @page{size:80mm auto;margin:2mm}
+                  body{font-family:'Courier New',monospace;font-size:11px;width:76mm;margin:0;padding:2mm}
+                  table{width:100%;border-collapse:collapse}
+                  td{font-size:11px;padding:1px 2px;vertical-align:top}
+                  hr{border:none;border-top:1px dashed #000;margin:4px 0}
+                  .c{text-align:center} .b{font-weight:bold} .r{text-align:right} .s{color:#666;font-size:10px}
+                </style></head><body>
+                  <div class="c b">${emitente?.razaoSocial || ''}</div>
+                  <div class="c s">CNPJ: ${emitente?.cnpj || ''}</div>
+                  <div class="c s">${pedidoGerado.data}</div>
+                  <hr/>
+                  <div class="c b">*** SEM VALOR FISCAL ***</div>
+                  <div class="c b">PEDIDO #${String(pedidoGerado.numero).padStart(4,'0')}</div>
+                  <hr/>
+                  ${clienteHtml}
+                  <table>
+                    <thead><tr><td class="b">PRODUTO</td><td class="b c">QTD</td><td class="b r">TOTAL</td></tr></thead>
+                    <tbody>${itensList}</tbody>
+                  </table>
+                  <hr/>
+                  <table>
+                    <tr><td class="b">TOTAL</td><td class="b r">R$ ${pedidoGerado.total.toFixed(2)}</td></tr>
+                    ${pagsHtml}
+                  </table>
+                  <hr/>
+                  <div class="c">*** SEM VALOR FISCAL ***</div>
+                  <div class="c">Obrigado pela preferência!</div>
+                </body></html>`;
                 const w = window.open('', '_blank', 'width=320,height=700');
-                if (w) {
-                  w.document.write(`<html><head><title>Pedido</title><style>
-                    @page { size: 80mm auto; margin: 2mm; }
-                    * { box-sizing: border-box; }
-                    body { font-family: 'Courier New', monospace; font-size: 11px; width: 76mm; margin: 0; padding: 2mm; }
-                    .flex { display: flex; }
-                    .justify-between { justify-content: space-between; }
-                    .text-center { text-align: center; }
-                    .font-bold { font-weight: bold; }
-                    .text-gray-400 { color: #999; }
-                    .text-gray-500 { color: #666; }
-                    .border-t { border-top: 1px dashed #000; }
-                    .pt-2 { padding-top: 4px; }
-                    .mt-2 { margin-top: 4px; }
-                    .mt-3 { margin-top: 6px; }
-                    .mb-2 { margin-bottom: 4px; }
-                    .space-y-1 > * { margin-bottom: 2px; }
-                    .w-8 { width: 20px; }
-                    .w-16 { width: 55px; text-align: right; }
-                    .flex-1 { flex: 1; overflow: hidden; white-space: nowrap; }
-                    .truncate { overflow: hidden; text-overflow: ellipsis; }
-                    p { margin: 1px 0; }
-                    .bg-orange-50, .rounded, .px-2, .py-1 { padding: 2px; }
-                    .text-orange-600 { color: #c05000; }
-                    .text-orange-500 { color: #e06000; }
-                    .text-xs { font-size: 10px; }
-                    .text-sm { font-size: 11px; }
-                    .text-lg { font-size: 13px; }
-                  </style></head><body>${el.innerHTML}</body></html>`);
-                  w.document.close();
-                  w.focus();
-                  setTimeout(() => { w.print(); w.close(); }, 300);
-                }
+                if (w) { w.document.write(html); w.document.close(); w.focus(); setTimeout(() => { w.print(); w.close(); }, 300); }
               }} className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200">Imprimir</button>
               <button onClick={() => { setPedidoGerado(null); onSave({ id: 0, numero: 0, status: 'Pedido' } as any); }} className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-700">Fechar</button>
             </div>
