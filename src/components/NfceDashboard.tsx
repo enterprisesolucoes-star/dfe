@@ -376,7 +376,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           ultimoNsu: data.ultimo_nsu || '0',
           dataUltimaConsultaDfe: data.data_ultima_consulta_dfe || ''
         }));
-        if (data.usuario_dfe !== undefined) setUsuarioDfeAtual(Number(data.usuario_dfe));
+        console.log('usuario_dfe da API:', data.usuario_dfe); if (data.usuario_dfe !== undefined) setUsuarioDfeAtual(Number(data.usuario_dfe));
         if (data.logo_url) {
           fetch('./api.php?action=logo_base64')
             .then(r => r.json())
