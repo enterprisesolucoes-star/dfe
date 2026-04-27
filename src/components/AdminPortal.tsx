@@ -39,7 +39,7 @@ const AdminPortal = () => {
 
   const api = async (action: string, method = 'GET', body?: any) => {
     const token = adminToken || localStorage.getItem('dfe_admin_token') || '';
-    const url = `./api.php?action=${action}&adm_token=${token}`;
+    const url = `/api.php?action=${action}&adm_token=${token}`;
     const opts: any = { method, headers: { 'Content-Type': 'application/json' } };
     if (body) opts.body = JSON.stringify(body);
     const res = await fetch(url, opts);
@@ -47,7 +47,7 @@ const AdminPortal = () => {
   };
 
   const apiWithToken = async (action: string, token: string, method = 'GET', body?: any) => {
-    const url = `./api.php?action=${action}&adm_token=${token}`;
+    const url = `/api.php?action=${action}&adm_token=${token}`;
     const opts: any = { method, headers: { 'Content-Type': 'application/json' } };
     if (body) opts.body = JSON.stringify(body);
     const res = await fetch(url, opts);
