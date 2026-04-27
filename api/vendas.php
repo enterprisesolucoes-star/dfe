@@ -1233,6 +1233,17 @@ switch ($action) {
         }
         // Excluir nunca estorna estoque — baixa só ocorre na autorização
 
+        // Se for Pedido: estornar estoque, excluir financeiro e caixa
+        if ($vRow['status'] === 'Pedido') {
+            $itens = $pdo->prepare("SELECT produto_id, quantidade FROM vendas_itens WHERE venda_id = ?");
+            $itens->execute([$id]);
+            foreach ($itens->fetchAll() as $item) {
+                $pdo->prepare("UPDATE produtos SET estoque = estoque + ? WHERE id = ?")
+                    ->execute([$item['quantidade'], $item['produto_id']]);
+            }
+            $pdo->prepare("DELETE FROM financeiro WHERE venda_id = ?")->execute([$id]);
+            $pdo->prepare("DELETE FROM caixa_movimentos WHERE venda_id = ?")->execute([$id]);
+        }
         $pdo->prepare("DELETE FROM vendas_pagamentos WHERE venda_id = ?")->execute([$id]);
         $pdo->prepare("DELETE FROM vendas_itens WHERE venda_id = ?")->execute([$id]);
         $pdo->prepare("DELETE FROM vendas WHERE id = ?")->execute([$id]);
