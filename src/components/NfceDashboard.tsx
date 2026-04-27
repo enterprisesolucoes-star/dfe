@@ -804,7 +804,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           }}
         />
       );
-      case 'relatorios_tef': return <RelatoriosHub showAlert={showAlert} emitente={emitente} />;
+      case 'relatorios_tef': return <RelatoriosHub showAlert={showAlert} emitente={emitente} isFiscal={isFiscal} />;
       case 'ordens_servico': return (
         <OrdemServicoTab
           clientes={clientes}

@@ -3,9 +3,9 @@ import { Search, BarChart2, X, Monitor, Package, ChevronRight } from 'lucide-rea
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 // ─── Hub de Relatórios ───────────────────────────────────────────────────────
-export const RelatoriosHub = ({ showAlert, emitente }: any) => {
+export const RelatoriosHub = ({ showAlert, emitente, isFiscal }: any) => {
   const [ativo, setAtivo] = useState<string | null>(null);
-  const temTef = emitente?.temTef || false;
+  const temTef = (emitente?.temTef || false) && isFiscal !== false;
 
   const relatorios = [
     ...(temTef ? [{

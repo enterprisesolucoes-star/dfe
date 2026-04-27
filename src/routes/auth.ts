@@ -62,7 +62,7 @@ export async function login(req: Request, res: Response) {
       perfil: usuario.perfil,
       empresaId: usuario.empresa_id ?? 1,
       empresaConfigurada: true,
-      usuarioDfe: 2,
+      usuarioDfe: usuario.empresa_id ? (await (async () => { try { const emp = await prismaNfce.empresas.findFirst({ where: { id: usuario.empresa_id! } }); return emp?.usuario_dfe ?? 2; } catch { return 2; } })()) : 2,
       user: {
         id: usuario.id,
         login: usuario.login,
