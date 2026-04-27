@@ -119,7 +119,7 @@ const AdminPortal = () => {
     setConfirmModal({ open: true, id, nome, tipo: 'inativar' });
   };
 
-  const [modalManutencao, setModalManutencao] = React.useState<{ ativar: boolean } | null>(null);
+  const [modalManutencao, setModalManutencao] = useState<{ ativar: boolean } | null>(null);
 
   const manutencaoGlobal = async (ativar: boolean) => {
     setModalManutencao({ ativar });
