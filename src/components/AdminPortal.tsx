@@ -265,7 +265,7 @@ const AdminPortal = () => {
 
       <main className="max-w-7xl mx-auto px-6 py-8">
         {/* Toolbar */}
-        <div class="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-bold text-gray-800">Empresas Cadastradas</h2>
           <div className="flex gap-2">
             <button onClick={() => manutencaoGlobal(true)} className="px-3 py-1.5 bg-orange-500 text-white text-xs font-bold rounded-lg hover:bg-orange-600 flex items-center gap-1">
