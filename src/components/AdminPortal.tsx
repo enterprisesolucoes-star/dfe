@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 
 const ESTADOS = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
-const RECURSOS: Record<number, string> = { 0: 'S/ Recurso', 1: 'NFe', 2: 'NFe + NFCe', 3: 'PDV Offline', 4: 'BLOQUEADO' };
+const RECURSOS: Record<number, string> = { 0: 'S/ Recurso', 1: 'NFe', 2: 'NFe + NFCe', 3: 'Contingência Automática', 4: 'BLOQUEADO' };
 
 const AdminPortal = () => {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -451,7 +451,7 @@ const AdminPortal = () => {
                         <option value={0}>S/ Recurso Fiscal</option>
                         <option value={1}>NFe</option>
                         <option value={2}>NFe + NFCe</option>
-                        <option value={3}>PDV Offline</option>
+                        <option value={3}>Contingência Automática</option>
                         <option value={4}>DFe BLOQUEADO</option>
                       </select>
                     </div>
