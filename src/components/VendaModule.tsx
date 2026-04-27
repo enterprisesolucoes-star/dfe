@@ -458,13 +458,12 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
       const data = await resp.json();
       if (data.success) {
         setPedidoGerado({ numero: data.numero, itens, total: totalDevido, pagamentos, data: new Date().toLocaleString('pt-BR') });
-        fetchProdutos && fetchProdutos();
         setShowPedidoModal(false);
       } else {
         showAlert("Erro", data.message || "Erro ao salvar pedido.");
         setShowPedidoModal(false);
       }
-    } catch(e: any) { console.error('F8 erro:', e); showAlert("Erro", "Erro de conexão: " + e.message); setShowPedidoModal(false); }
+    } catch { showAlert("Erro", "Erro de conexão."); setShowPedidoModal(false); }
   };
 
   const handleFinalizar = async () => {
@@ -589,41 +588,41 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
             </div>
             <div className="p-4 flex gap-2 no-print">
               <button onClick={() => {
-                const linhas: string[] = [];
-                linhas.push((emitente?.razaoSocial || '').toUpperCase());
-                linhas.push('CNPJ: ' + (emitente?.cnpj || ''));
-                linhas.push(pedidoGerado.data);
-                linhas.push('--------------------------------');
-                linhas.push('*** SEM VALOR FISCAL ***');
-                linhas.push('PEDIDO #' + pedidoGerado.numero);
-                linhas.push('--------------------------------');
-                linhas.push('ITEM             QTD     TOTAL');
-                pedidoGerado.itens.forEach(it => {
-                  const prod = produtos.find(p => p.id === it.produtoId);
-                  const desc = (prod?.descricao || 'Produto').substring(0, 16).padEnd(16, ' ');
-                  const qtd = String(it.quantidade).padStart(4, ' ');
-                  const tot = ('R$' + (it.quantidade * it.valorUnitario).toFixed(2)).padStart(10, ' ');
-                  linhas.push(desc + ' ' + qtd + ' ' + tot);
-                });
-                linhas.push('--------------------------------');
-                linhas.push('TOTAL'.padEnd(20, ' ') + ('R$ ' + pedidoGerado.total.toFixed(2)).padStart(12, ' '));
-                pedidoGerado.pagamentos.forEach(p => {
-                  const forma = p.formaPagamento === '01' ? 'Dinheiro' : 'Crédito Loja';
-                  linhas.push(forma.padEnd(20, ' ') + ('R$ ' + p.valorPagamento.toFixed(2)).padStart(12, ' '));
-                });
-                linhas.push('--------------------------------');
-                linhas.push('*** SEM VALOR FISCAL ***');
-                linhas.push('Obrigado pela preferencia!');
-                const conteudo = linhas.join('\n');
-                const w = window.open('', '_blank', 'width=302,height=600');
+                const el = document.getElementById('cupom-pedido');
+                if (!el) return;
+                const w = window.open('', '_blank', 'width=320,height=700');
                 if (w) {
                   w.document.write(`<html><head><title>Pedido</title><style>
-                    @page { size: 80mm auto; margin: 0; }
-                    body { font-family: 'Courier New', monospace; font-size: 11px; width: 280px; margin: 0; padding: 4px; white-space: pre; }
-                  </style></head><body>${conteudo}</body></html>`);
+                    @page { size: 80mm auto; margin: 2mm; }
+                    * { box-sizing: border-box; }
+                    body { font-family: 'Courier New', monospace; font-size: 11px; width: 76mm; margin: 0; padding: 2mm; }
+                    .flex { display: flex; }
+                    .justify-between { justify-content: space-between; }
+                    .text-center { text-align: center; }
+                    .font-bold { font-weight: bold; }
+                    .text-gray-400 { color: #999; }
+                    .text-gray-500 { color: #666; }
+                    .border-t { border-top: 1px dashed #000; }
+                    .pt-2 { padding-top: 4px; }
+                    .mt-2 { margin-top: 4px; }
+                    .mt-3 { margin-top: 6px; }
+                    .mb-2 { margin-bottom: 4px; }
+                    .space-y-1 > * { margin-bottom: 2px; }
+                    .w-8 { width: 20px; }
+                    .w-16 { width: 55px; text-align: right; }
+                    .flex-1 { flex: 1; overflow: hidden; white-space: nowrap; }
+                    .truncate { overflow: hidden; text-overflow: ellipsis; }
+                    p { margin: 1px 0; }
+                    .bg-orange-50, .rounded, .px-2, .py-1 { padding: 2px; }
+                    .text-orange-600 { color: #c05000; }
+                    .text-orange-500 { color: #e06000; }
+                    .text-xs { font-size: 10px; }
+                    .text-sm { font-size: 11px; }
+                    .text-lg { font-size: 13px; }
+                  </style></head><body>${el.innerHTML}</body></html>`);
                   w.document.close();
                   w.focus();
-                  setTimeout(() => { w.print(); w.close(); }, 250);
+                  setTimeout(() => { w.print(); w.close(); }, 300);
                 }
               }} className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200">Imprimir</button>
               <button onClick={() => { setPedidoGerado(null); onSave({ id: 0, numero: 0, status: 'Pedido' } as any); }} className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-700">Fechar</button>

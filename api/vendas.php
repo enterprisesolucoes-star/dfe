@@ -454,7 +454,7 @@ switch ($action) {
                 // Dinheiro: lançar no caixa
                 if ($fPag === '01' && $contaIdPedido) {
                     $pdo->prepare("INSERT INTO caixa_movimentos (empresa_id, venda_id, conta_id, tipo, valor, forma_pagamento, historico, usuario_id) VALUES (?,?,?,'C',?,?,?,?)")
-                        ->execute([$empresaId, $vendaId, $contaIdPedido, $vPag, $fPag, $numPedido, $venda['usuarioId'] ?? null]);
+                        ->execute([$empresaId, $vendaId, $contaIdPedido, $vPag, $fPag, 'Pedido #' . str_pad($numPedido, 4, '0', STR_PAD_LEFT), $venda['usuarioId'] ?? null]);
                 }
                 // Crédito Loja: gerar parcelas financeiras
                 if ($fPag === '05') {
