@@ -119,11 +119,17 @@ const AdminPortal = () => {
     setConfirmModal({ open: true, id, nome, tipo: 'inativar' });
   };
 
+  const [modalManutencao, setModalManutencao] = React.useState<{ ativar: boolean } | null>(null);
+
   const manutencaoGlobal = async (ativar: boolean) => {
-    const msg = ativar ? 'Ativar manutenção para TODAS as empresas ativas?' : 'Reativar TODAS as empresas em manutenção?';
-    if (!confirm(msg)) return;
-    await oe('manutencao_global', 'POST', { ativar });
-    alert(ativar ? 'Sistema em manutenção ativado!' : 'Empresas reativadas!');
+    setModalManutencao({ ativar });
+  };
+
+  const confirmarManutencao = async () => {
+    if (!modalManutencao) return;
+    await oe('manutencao_global', 'POST', { ativar: modalManutencao.ativar });
+    setModalManutencao(null);
+    setAlertModal({ open: true, tipo: 'success', titulo: modalManutencao.ativar ? 'Manutenção Ativada' : 'Sistema Reativado', msg: modalManutencao.ativar ? 'Todas as empresas ativas foram colocadas em manutenção.' : 'Todas as empresas em manutenção foram reativadas.' });
     listar();
   };
 
@@ -554,6 +560,26 @@ const AdminPortal = () => {
         </div>
       )}
       {/* Modal Confirmação */}
+      {modalManutencao && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${modalManutencao.ativar ? 'bg-orange-100' : 'bg-green-100'}`}>
+                <svg className={`w-5 h-5 ${modalManutencao.ativar ? 'text-orange-500' : 'text-green-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+              </div>
+              <div>
+                <p className="font-bold text-gray-800 text-sm">{modalManutencao.ativar ? 'Ativar Manutenção Global' : 'Desativar Manutenção'}</p>
+                <p className="text-xs text-gray-400">{modalManutencao.ativar ? 'Todas as empresas ativas serão afetadas' : 'Todas as empresas em manutenção serão reativadas'}</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 mb-6">{modalManutencao.ativar ? 'Deseja colocar TODAS as empresas ativas em modo manutenção? Os usuários não conseguirão fazer login.' : 'Deseja reativar TODAS as empresas que estão em manutenção?'}</p>
+            <div className="flex gap-3">
+              <button onClick={() => setModalManutencao(null)} className="flex-1 py-2.5 text-gray-500 font-bold text-xs uppercase hover:bg-gray-100 rounded-xl transition-colors">Cancelar</button>
+              <button onClick={confirmarManutencao} className={`flex-1 py-2.5 text-white font-bold text-xs uppercase rounded-xl transition-colors ${modalManutencao.ativar ? 'bg-orange-500 hover:bg-orange-600' : 'bg-green-600 hover:bg-green-700'}`}>{modalManutencao.ativar ? 'Ativar' : 'Reativar'}</button>
+            </div>
+          </div>
+        </div>
+      )}
       {confirmModal.open && (() => {
         const cfg = {
           inativar:   { titulo: 'Inativar Empresa',     subtitulo: 'A empresa não aparecerá mais na lista', acao: 'Inativar',     cor: 'red',    icon: Trash2 },

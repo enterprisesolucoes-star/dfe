@@ -42,6 +42,17 @@ switch ($action) {
         }
         break;
 
+    case 'manutencao_global':
+        $d = json_decode(file_get_contents('php://input'), true);
+        $ativar = $d['ativar'] ?? true;
+        if ($ativar) {
+            $pdo->exec("UPDATE empresas SET status = 'Manutenção' WHERE status = 'Ativo'");
+        } else {
+            $pdo->exec("UPDATE empresas SET status = 'Ativo' WHERE status = 'Manutenção'");
+        }
+        echo json_encode(['success' => true]);
+        break;
+
     case 'listar_empresas_admin':
         $tok = $_GET['adm_token'] ?? $_SERVER['HTTP_X_ADM_TOKEN'] ?? '';
         if (!isset($_SESSION['system_admin_id'])) {

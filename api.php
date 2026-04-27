@@ -280,7 +280,7 @@ $modules = [
     'rtc_atualizar_online' => 'rtc', 'rtc_aliquotas_listar' => 'rtc', 'rtc_aliquota_salvar' => 'rtc', 'rtc_aliquota_excluir' => 'rtc',
     'check_vendor' => 'check_vendor',
     'dashboard_vendas' => 'dashboard', 'dashboard_financeiro' => 'dashboard',
-    'system_admin' => 'system_admin', 'login_admin' => 'system_admin', 'alterar_status_empresa' => 'system_admin', 'listar_smartpos_admin' => 'system_admin', 'salvar_smartpos_admin' => 'system_admin', 'excluir_smartpos_admin' => 'system_admin', 'listar_empresas_admin' => 'system_admin', 'salvar_empresa_admin' => 'system_admin', 'excluir_empresa_admin' => 'system_admin', 'salvar_usuario_admin' => 'system_admin',
+    'system_admin' => 'system_admin', 'login_admin' => 'system_admin', 'manutencao_global' => 'system_admin', 'alterar_status_empresa' => 'system_admin', 'listar_smartpos_admin' => 'system_admin', 'salvar_smartpos_admin' => 'system_admin', 'excluir_smartpos_admin' => 'system_admin', 'listar_empresas_admin' => 'system_admin', 'salvar_empresa_admin' => 'system_admin', 'excluir_empresa_admin' => 'system_admin', 'salvar_usuario_admin' => 'system_admin',
     'fin_listar_contas' => 'financeiro',
     'fin_listar_titulos' => 'financeiro',
     'fin_baixar_titulo' => 'financeiro',
