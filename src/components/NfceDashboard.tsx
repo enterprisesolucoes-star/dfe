@@ -2759,7 +2759,7 @@ const ConfigTab = ({ emitente, onUpdate, onSave, showAlert, usuarioDfe }: { emit
               </select>
             </div>
 
-            {emitente.crt === '1' && (
+            {emitente.crt === '1' && (Number(usuarioDfe) === 1 || Number(usuarioDfe) === 2) && (
               <div className="col-span-2 bg-blue-50/50 p-4 rounded-xl border border-blue-100/50 space-y-4 animate-fadeIn">
                 <div className="flex items-center gap-3">
                   <input 

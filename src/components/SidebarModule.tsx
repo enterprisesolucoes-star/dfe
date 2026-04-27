@@ -34,6 +34,8 @@ export const Sidebar = ({
   cadastrosOpen,
   setCadastrosOpen
 }: any) => {
+  const isFiscal = (session?.usuarioDfe ?? 0) > 0;
+
   return (
     <aside className="w-64 bg-white flex flex-col shadow-sm border-r border-gray-100 h-screen sticky top-0 z-50">
       <div className="p-6 border-b border-gray-50 flex items-center justify-between">
@@ -85,7 +87,7 @@ export const Sidebar = ({
         </div>
 
         {/* DFe - NFe */}
-        <div>
+        {isFiscal && <div>
           <button
             onClick={() => setDfeNfeOpen(!dfeNfeOpen)}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
@@ -106,10 +108,9 @@ export const Sidebar = ({
               </button>
             </div>
           )}
-        </div>
-
+        </div>}
         {/* DFe - NFCe */}
-        <div>
+        {isFiscal && <div>
           <button
             onClick={() => setDfeNfceOpen(!dfeNfceOpen)}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
@@ -130,8 +131,7 @@ export const Sidebar = ({
               </button>
             </div>
           )}
-        </div>
-
+        </div>}
         <SidebarItem icon={Package} label="Produtos" active={activeTab === 'produtos'} onClick={() => handleSetActiveTab('produtos')} />
         <SidebarItem icon={Users} label="Clientes" active={activeTab === 'clientes'} onClick={() => handleSetActiveTab('clientes')} />
         <SidebarItem icon={Store} label="Fornecedores" active={activeTab === 'fornecedores'} onClick={() => handleSetActiveTab('fornecedores')} />
@@ -157,10 +157,10 @@ export const Sidebar = ({
               {[
                 { id: 'ncm', label: 'NCM/IBPT', icon: Hash },
                 { id: 'medidas', label: 'Medidas', icon: Ruler },
-                { id: 'bandeiras', label: 'Bandeiras', icon: CreditCard },
+                ...(isFiscal ? [{ id: 'bandeiras', label: 'Bandeiras', icon: CreditCard }] : []),
                 { id: 'transportadores', label: 'Transportadores', icon: Truck },
-                { id: 'config_integracao', label: 'Integração', icon: Zap },
-                { id: 'dfe_config', label: 'DFe', icon: Settings },
+                ...(isFiscal ? [{ id: 'config_integracao', label: 'Integração', icon: Zap }] : []),
+                ...(isFiscal ? [{ id: 'dfe_config', label: 'DFe', icon: Settings }] : []),
                 { id: 'usuarios', label: 'Usuários', icon: ShieldCheck },
               ].map(sub => (
                 <button
