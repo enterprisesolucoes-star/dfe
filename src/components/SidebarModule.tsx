@@ -34,7 +34,7 @@ export const Sidebar = ({
   cadastrosOpen,
   setCadastrosOpen
 }: any) => {
-  const isFiscal = (session?.usuarioDfe ?? 0) > 0;
+  const isFiscal = Number(usuarioDfe ?? session?.usuarioDfe ?? 0) > 0 && Number(usuarioDfe ?? session?.usuarioDfe ?? 0) !== 4;
 
   return (
     <aside className="w-64 bg-white flex flex-col shadow-sm border-r border-gray-100 h-screen sticky top-0 z-50">

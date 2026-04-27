@@ -997,7 +997,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           setDfeNfceOpen={setDfeNfceOpen}
           cadastrosOpen={cadastrosOpen}
           setCadastrosOpen={setCadastrosOpen}
-          usuarioDfe={(emitente as any).usuarioDfe ?? session.usuarioDfe}
+          usuarioDfe={usuarioDfeAtual}
         />
 
       {/* Main Content */}
