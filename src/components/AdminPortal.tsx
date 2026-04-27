@@ -90,7 +90,8 @@ const AdminPortal = () => {
       const sps = await api(`listar_smartpos_admin&empresa_id=${emp.id}`);
       setSmartPosList(Array.isArray(sps) ? sps : []);
     } else {
-      setForm({ status: 'Ativo', usuario_dfe: 2, ambiente: 2, crt: 1, tem_tef: 0 });
+      setForm({ status: 'Ativo', usuario_dfe: 2, ambiente: 2, crt: 1, tem_tef: 0, uf: 'GO' });
+      buscarMunicipios('GO');
       setEmpresaId(null);
       setSmartPosList([]);
     }
