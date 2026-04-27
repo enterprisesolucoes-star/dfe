@@ -112,7 +112,8 @@ const NfceDashboard: React.FC<{ session: Session; onLogout: () => void; onUpdate
     }
   }, [darkMode]);
 
-  const isFiscal = Number(session.usuarioDfe) !== 0 && Number(session.usuarioDfe) !== 4;
+  const [usuarioDfeAtual, setUsuarioDfeAtual] = useState<number>(Number(session.usuarioDfe) ?? 2);
+  const isFiscal = usuarioDfeAtual !== 0 && usuarioDfeAtual !== 4;
 
 // Se empresa não está configurada, força aba de configurações e bloqueia as demais
 const [activeTab, setActiveTab] = useState<'dashboard' | 'vendas' | 'vendas_geral' | 'produtos' | 'clientes' | 'fornecedores' | 'compras' | 'orcamentos' | 'transportadores' | 'config' | 'ncm' | 'usuarios' | 'medidas' | 'bandeiras' | 'dfe_nfe' | 'dfe_nfe_geral' | 'dfe_nfe_parametros' | 'dfe_nfce_parametros' | 'reforma_tributaria' | 'config_empresa' | 'config_email' | 'config_smartpos' | 'config_integracao' | 'dfe_nfe_dados' | 'dfe_nfce_dados' | 'dfe_provedor' | 'empresa' | 'dfe_config' | 'fin_receber' | 'fin_pagar' | 'fin_caixa' | 'relatorios_tef'>(
@@ -373,9 +374,9 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           contingenciaAutomatica: Number(data.contingencia_automatica) !== 0,
           tef_required_states: data.tef_required_states || '',
           ultimoNsu: data.ultimo_nsu || '0',
-          dataUltimaConsultaDfe: data.data_ultima_consulta_dfe || '',
-          usuarioDfe: Number(data.usuario_dfe ?? session.usuarioDfe ?? 2)
+          dataUltimaConsultaDfe: data.data_ultima_consulta_dfe || ''
         }));
+        if (data.usuario_dfe !== undefined) setUsuarioDfeAtual(Number(data.usuario_dfe));
         if (data.logo_url) {
           fetch('./api.php?action=logo_base64')
             .then(r => r.json())
