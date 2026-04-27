@@ -195,7 +195,9 @@ const AdminPortal = () => {
 
   const set = (f: string, v: any) => setForm((p: any) => ({ ...p, [f]: v }));
   const carregarUsuarios = async (empId: number) => {
+    console.log('carregarUsuarios empId:', empId, 'token:', adminToken || localStorage.getItem('dfe_admin_token'));
     const usrs = await api(`listar_usuarios_admin&empresa_id=${empId}`);
+    console.log('usuarios:', usrs);
     setUsuarios(Array.isArray(usrs) ? usrs : []);
   };
 
