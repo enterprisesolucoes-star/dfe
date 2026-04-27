@@ -130,7 +130,7 @@ const AdminPortal = () => {
     await api('manutencao_global', 'POST', { ativar: modalManutencao.ativar });
     setModalManutencao(null);
     setAlertModal({ open: true, tipo: 'success', titulo: modalManutencao.ativar ? 'Manutenção Ativada' : 'Sistema Reativado', msg: modalManutencao.ativar ? 'Todas as empresas ativas foram colocadas em manutenção.' : 'Todas as empresas em manutenção foram reativadas.' });
-    listar();
+    fetchEmpresas();
   };
 
   const bloquear = (id: number, nome: string, status: string) => {
