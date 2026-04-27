@@ -374,21 +374,13 @@ const AdminPortal = () => {
               </button>
             </div>
 
-            {/* Tabs */}
-            <div className="grid grid-cols-2 border-b border-gray-100">
-              {([['dados','Dados'],['smartpos','SmartPOS / TEF'],['usuarios','Usuários']] as const).map(([t,l]) => (
-                <button key={t} onClick={() => { setTab(t as any); if (t === 'usuarios' && empresaId) carregarUsuarios(empresaId); }}
-                  className={`py-3 text-[11px] font-bold uppercase tracking-wider border-b-2 transition-all text-center w-full ${tab === t ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}>
-                  {l}
-                </button>
-              ))}
-            </div>
+
 
             {/* Modal Body */}
             <div className="flex-1 overflow-y-auto p-6 min-h-[400px]">
 
               {/* Tab Dados */}
-              {tab === 'dados' && (
+              {true && (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="col-span-2">
@@ -484,7 +476,8 @@ const AdminPortal = () => {
 
 
               {/* Tab SmartPOS */}
-              {tab === 'smartpos' && (
+              {empresaId && (<div className="mt-8 pt-6 border-t border-gray-100 mb-4"><h3 className="text-sm font-bold text-gray-700 uppercase tracking-wide">SmartPOS / TEF</h3></div>)}
+              {empresaId && Number(form.tem_tef) === 1 && (
                 <div className="space-y-6">
                   <div className="border border-gray-100 rounded-2xl p-4 bg-gray-50/50">
                     <label className="flex items-center gap-3 cursor-pointer">
@@ -564,7 +557,8 @@ const AdminPortal = () => {
                   {empresaId && Number(form.tem_tef) !== 1 && <p className="text-xs text-gray-400 text-center py-4">Ative a Integração TEF acima para cadastrar máquinas SmartPOS.</p>}
                 </div>
               )}
-              {tab === 'usuarios' && (
+              {empresaId && (<div className="mt-8 pt-6 border-t border-gray-100 mb-4"><h3 className="text-sm font-bold text-gray-700 uppercase tracking-wide">Usuários</h3></div>)}
+              {empresaId && (
                 <div className="space-y-4">
                   {!empresaId && <p className="text-xs text-gray-400 text-center py-4">Salve a empresa primeiro para gerenciar usuários.</p>}
                   {empresaId && (<>
