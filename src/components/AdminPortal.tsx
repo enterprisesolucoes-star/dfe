@@ -618,9 +618,9 @@ const AdminPortal = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-6 bg-gray-50/50 border-t border-gray-100 flex justify-end gap-3 rounded-b-2xl">
+            <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-3">
               <button onClick={() => setModal(false)} className="px-6 py-2.5 text-gray-500 font-bold text-xs uppercase hover:bg-gray-100 rounded-xl transition-colors">Cancelar</button>
-              <button onClick={salvar} className="px-8 py-2.5 bg-blue-600 text-white font-bold text-xs uppercase rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-100">Salvar</button>
+              <button onClick={salvar} className="px-8 py-2.5 bg-blue-600 text-white font-bold text-xs uppercase rounded-xl hover:bg-blue-700 transition-colors">Salvar</button>
             </div>
           </motion.div>
         </div>
