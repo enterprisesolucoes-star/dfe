@@ -119,6 +119,14 @@ const AdminPortal = () => {
     setConfirmModal({ open: true, id, nome, tipo: 'inativar' });
   };
 
+  const manutencaoGlobal = async (ativar: boolean) => {
+    const msg = ativar ? 'Ativar manutenção para TODAS as empresas ativas?' : 'Reativar TODAS as empresas em manutenção?';
+    if (!confirm(msg)) return;
+    await oe('manutencao_global', 'POST', { ativar });
+    alert(ativar ? 'Sistema em manutenção ativado!' : 'Empresas reativadas!');
+    listar();
+  };
+
   const bloquear = (id: number, nome: string, status: string) => {
     const tipo = status === 'Bloqueado' ? 'desbloquear' : 'bloquear';
     setConfirmModal({ open: true, id, nome, tipo });
@@ -251,6 +259,14 @@ const AdminPortal = () => {
         {/* Toolbar */}
         <div class="flex items-center justify-between mb-6">
           <h2 className="text-lg font-bold text-gray-800">Empresas Cadastradas</h2>
+          <div className="flex gap-2">
+            <button onClick={() => manutencaoGlobal(true)} className="px-3 py-1.5 bg-orange-500 text-white text-xs font-bold rounded-lg hover:bg-orange-600 flex items-center gap-1">
+              Manutenção ON
+            </button>
+            <button onClick={() => manutencaoGlobal(false)} className="px-3 py-1.5 bg-green-600 text-white text-xs font-bold rounded-lg hover:bg-green-700 flex items-center gap-1">
+              Manutenção OFF
+            </button>
+          </div>
           <div className="flex items-center gap-3">
             <div className="relative">
               <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
