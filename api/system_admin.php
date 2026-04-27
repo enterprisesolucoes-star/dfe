@@ -42,6 +42,43 @@ switch ($action) {
         }
         break;
 
+    case 'listar_usuarios_admin':
+        $empId = (int)($_GET['empresa_id'] ?? 0);
+        $stmt = $pdo->prepare("SELECT id, nome, login, perfil, ativo FROM usuarios WHERE empresa_id = ? ORDER BY nome");
+        $stmt->execute([$empId]);
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        break;
+
+    case 'salvar_usuario_admin':
+        $d = json_decode(file_get_contents('php://input'), true);
+        $id = (int)($d['id'] ?? 0);
+        $nome = $d['nome'] ?? '';
+        $login = $d['login'] ?? '';
+        $senha = $d['senha'] ?? '';
+        $perfil = $d['perfil'] ?? 'operador';
+        $empresaId2 = (int)($d['empresa_id'] ?? 0);
+        if ($id) {
+            if ($senha) {
+                $pdo->prepare("UPDATE usuarios SET nome=?, login=?, senha_hash=?, perfil=? WHERE id=?")
+                    ->execute([$nome, $login, password_hash($senha, PASSWORD_DEFAULT), $perfil, $id]);
+            } else {
+                $pdo->prepare("UPDATE usuarios SET nome=?, login=?, perfil=? WHERE id=?")
+                    ->execute([$nome, $login, $perfil, $id]);
+            }
+        } else {
+            if (!$senha) { echo json_encode(['success'=>false,'message'=>'Senha obrigatória']); break; }
+            $pdo->prepare("INSERT INTO usuarios (empresa_id, nome, login, senha_hash, perfil) VALUES (?,?,?,?,'$perfil')")
+                ->execute([$empresaId2, $nome, $login, password_hash($senha, PASSWORD_DEFAULT)]);
+        }
+        echo json_encode(['success'=>true]);
+        break;
+
+    case 'excluir_usuario_admin':
+        $d = json_decode(file_get_contents('php://input'), true);
+        $pdo->prepare("DELETE FROM usuarios WHERE id=?")->execute([(int)($d['id']??0)]);
+        echo json_encode(['success'=>true]);
+        break;
+
     case 'manutencao_global':
         $d = json_decode(file_get_contents('php://input'), true);
         $ativar = $d['ativar'] ?? true;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import {
-  FileText, Lock, User, LogOut, Plus, Edit, Trash2,
+  FileText, Lock, User, LogOut, Plus, Edit, Edit2, Trash2,
   Search, CheckCircle, X, Smartphone, Shield, RefreshCw
 } from 'lucide-react';
 
@@ -23,7 +23,10 @@ const AdminPortal = () => {
   const [empresas, setEmpresas] = useState<any[]>([]);
   const [busca, setBusca] = useState('');
   const [modal, setModal] = useState(false);
-  const [tab, setTab] = useState<'dados'|'smartpos'>('dados');
+  const [tab, setTab] = useState<'dados'|'smartpos'|'usuarios'>('dados');
+  const [usuarios, setUsuarios] = useState<any[]>([]);
+  const [userForm, setUserForm] = useState({ nome: '', login: '', senha: '', perfil: 'operador' });
+  const [userEdit, setUserEdit] = useState<number|null>(null);
   const [form, setForm] = useState<any>({});
   const [smartPosList, setSmartPosList] = useState<any[]>([]);
   const [spForm, setSpForm] = useState({ codigo: '', numero_serie: '', integradora: '', apelido: '' });
@@ -89,6 +92,8 @@ const AdminPortal = () => {
       setEmpresaId(emp.id);
       const sps = await api(`listar_smartpos_admin&empresa_id=${emp.id}`);
       setSmartPosList(Array.isArray(sps) ? sps : []);
+      const usrs = await api(`listar_usuarios_admin&empresa_id=${emp.id}`);
+      setUsuarios(Array.isArray(usrs) ? usrs : []);
     } else {
       setForm({ status: 'Ativo', usuario_dfe: 2, ambiente: 2, crt: 1, tem_tef: 0, uf: 'GO' });
       buscarMunicipios('GO');
@@ -364,7 +369,7 @@ const AdminPortal = () => {
 
             {/* Tabs */}
             <div className="grid grid-cols-2 border-b border-gray-100">
-              {([['dados','Dados'],['smartpos','SmartPOS / TEF']] as const).map(([t,l]) => (
+              {([['dados','Dados'],['smartpos','SmartPOS / TEF'],['usuarios','Usuários']] as const).map(([t,l]) => (
                 <button key={t} onClick={() => setTab(t as any)}
                   className={`py-3 text-[11px] font-bold uppercase tracking-wider border-b-2 transition-all text-center w-full ${tab === t ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}>
                   {l}
@@ -550,6 +555,57 @@ const AdminPortal = () => {
                   )}
                   {!empresaId && <p className="text-xs text-gray-400 text-center py-4">Salve a empresa primeiro para cadastrar máquinas SmartPOS.</p>}
                   {empresaId && Number(form.tem_tef) !== 1 && <p className="text-xs text-gray-400 text-center py-4">Ative a Integração TEF acima para cadastrar máquinas SmartPOS.</p>}
+                </div>
+              )}
+              {tab === 'usuarios' && (
+                <div className="space-y-4">
+                  {!empresaId && <p className="text-xs text-gray-400 text-center py-4">Salve a empresa primeiro para gerenciar usuários.</p>}
+                  {empresaId && (<>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Nome</label><input value={userForm.nome} onChange={e => setUserForm(p => ({...p, nome: e.target.value}))} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-400" /></div>
+                      <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Login</label><input value={userForm.login} onChange={e => setUserForm(p => ({...p, login: e.target.value}))} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-400" /></div>
+                      <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Senha</label><input type="password" value={userForm.senha} onChange={e => setUserForm(p => ({...p, senha: e.target.value}))} placeholder={userEdit ? "Deixe vazio para manter" : "Senha"} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-400" /></div>
+                      <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Perfil</label>
+                        <select value={userForm.perfil} onChange={e => setUserForm(p => ({...p, perfil: e.target.value}))} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-400">
+                          <option value="admin">Admin</option><option value="operador">Operador</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={async () => {
+                        if (!userForm.nome || !userForm.login) return;
+                        const r = await api('salvar_usuario_admin', 'POST', { ...userForm, empresa_id: empresaId, id: userEdit });
+                        if (r.success) {
+                          const usrs = await api(`listar_usuarios_admin&empresa_id=${empresaId}`);
+                          setUsuarios(Array.isArray(usrs) ? usrs : []);
+                          setUserForm({ nome: '', login: '', senha: '', perfil: 'operador' });
+                          setUserEdit(null);
+                        }
+                      }} className="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-blue-700 flex items-center gap-1">
+                        {userEdit ? 'Salvar Alteração' : 'Adicionar Usuário'}
+                      </button>
+                      {userEdit && <button onClick={() => { setUserForm({ nome: '', login: '', senha: '', perfil: 'operador' }); setUserEdit(null); }} className="bg-gray-100 text-gray-600 px-4 py-2 rounded-xl text-xs font-bold">Cancelar</button>}
+                    </div>
+                    <div className="border border-gray-100 rounded-xl overflow-hidden">
+                      <table className="w-full text-xs text-left">
+                        <thead className="bg-gray-50 text-gray-400"><tr><th className="px-3 py-2">Nome</th><th className="px-3 py-2">Login</th><th className="px-3 py-2">Perfil</th><th className="px-3 py-2 text-center">Ações</th></tr></thead>
+                        <tbody className="divide-y divide-gray-50">
+                          {usuarios.length === 0 && <tr><td colSpan={4} className="px-3 py-4 text-center text-gray-400">Nenhum usuário cadastrado.</td></tr>}
+                          {usuarios.map((u: any) => <tr key={u.id} className="hover:bg-gray-50">
+                            <td className="px-3 py-2">{u.nome}</td>
+                            <td className="px-3 py-2">{u.login}</td>
+                            <td className="px-3 py-2">{u.perfil}</td>
+                            <td className="px-3 py-2 text-center">
+                              <div className="flex items-center justify-center gap-2">
+                                <button onClick={() => { setUserForm({ nome: u.nome, login: u.login, senha: '', perfil: u.perfil }); setUserEdit(u.id); }} className="text-gray-400 hover:text-blue-600"><Edit2 className="w-3.5 h-3.5" /></button>
+                                <button onClick={async () => { await api('excluir_usuario_admin', 'POST', { id: u.id }); const usrs = await api(`listar_usuarios_admin&empresa_id=${empresaId}`); setUsuarios(Array.isArray(usrs) ? usrs : []); }} className="text-gray-400 hover:text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
+                              </div>
+                            </td>
+                          </tr>)}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>)}
                 </div>
               )}
             </div>
