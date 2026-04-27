@@ -43,6 +43,12 @@ switch ($action) {
         break;
 
     case 'listar_usuarios_admin':
+        $tok = $_GET['adm_token'] ?? '';
+        if ($tok) {
+            $chk = $pdo->prepare("SELECT id FROM dfe_admins WHERE token=? AND token_exp > NOW() AND ativo=1");
+            $chk->execute([$tok]);
+            if (!$chk->fetch()) { echo json_encode([]); exit; }
+        }
         $empId = (int)($_GET['empresa_id'] ?? 0);
         $stmt = $pdo->prepare("SELECT id, nome, login, perfil, ativo FROM usuarios WHERE empresa_id = ? AND empresa_id IS NOT NULL ORDER BY nome");
         $stmt->execute([$empId]);
@@ -50,6 +56,8 @@ switch ($action) {
         break;
 
     case 'salvar_usuario_admin':
+        $tok = $_GET['adm_token'] ?? '';
+        if ($tok) { $chk = $pdo->prepare("SELECT id FROM dfe_admins WHERE token=? AND token_exp > NOW() AND ativo=1"); $chk->execute([$tok]); if (!$chk->fetch()) { echo json_encode(['success'=>false]); exit; } }
         $d = json_decode(file_get_contents('php://input'), true);
         $id = (int)($d['id'] ?? 0);
         $nome = $d['nome'] ?? '';
@@ -81,6 +89,8 @@ switch ($action) {
         break;
 
     case 'excluir_usuario_admin':
+        $tok = $_GET['adm_token'] ?? '';
+        if ($tok) { $chk = $pdo->prepare("SELECT id FROM dfe_admins WHERE token=? AND token_exp > NOW() AND ativo=1"); $chk->execute([$tok]); if (!$chk->fetch()) { echo json_encode(['success'=>false]); exit; } }
         $d = json_decode(file_get_contents('php://input'), true);
         $pdo->prepare("DELETE FROM usuarios WHERE id=?")->execute([(int)($d['id']??0)]);
         echo json_encode(['success'=>true]);
