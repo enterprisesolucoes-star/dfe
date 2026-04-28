@@ -232,6 +232,7 @@ switch ($action) {
             }
 
             $ultimoNsu = (string)$xmlResp->ultNSU;
+            $maxNsu = (string)($xmlResp->maxNSU ?? '0');
             $xmlResp->registerXPathNamespace('n', 'http://www.portalfiscal.inf.br/nfe');
             $docsZip = $xmlResp->xpath('//docZip');
 
@@ -264,6 +265,8 @@ switch ($action) {
                 'cStat'      => $cStat,
                 'xMotivo'    => (string)$xmlResp->xMotivo,
                 'ultimo_nsu' => $ultimoNsu,
+                'max_nsu'    => $maxNsu,
+                'tem_mais'   => ((int)$ultimoNsu < (int)$maxNsu),
                 'data_consulta' => $dataConsulta,
             ]);
         } catch (Exception $e) { echo json_encode(['success' => false, 'message' => $e->getMessage()]); }

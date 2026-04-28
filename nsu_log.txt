@@ -17,3 +17,11 @@
 [2026-04-15 17:11:51] SEFAZ respondeu cStat: 656 | Motivo: Rejeicao: Consumo Indevido (Deve ser utilizado o ultNSU nas solicitacoes subsequentes. Tente apos 1 hora) | Proximo NSU: 000000000011557
 [2026-04-16 10:55:13] Enviando consulta para NSU: 0
 [2026-04-16 10:55:13] SEFAZ respondeu cStat: 656 | Motivo: Rejeicao: Consumo Indevido (Deve ser utilizado o ultNSU nas solicitacoes subsequentes. Tente apos 1 hora) | Proximo NSU: 000000000011558
+[2026-04-28 11:30:24] Enviando consulta para NSU: 0
+[2026-04-28 11:30:24] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000050
+[2026-04-28 11:30:34] Enviando consulta para NSU: 50
+[2026-04-28 11:30:34] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000100
+[2026-04-28 11:30:37] Enviando consulta para NSU: 100
+[2026-04-28 11:30:37] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000150
+[2026-04-28 11:30:40] Enviando consulta para NSU: 150
+[2026-04-28 11:30:40] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000200

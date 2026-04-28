@@ -3792,6 +3792,10 @@ const SefazConsultModal = ({ onClose, onImportXml, showAlert, emitente, onUpdate
   const [docs, setDocs] = useState<any[]>([]);
   const [lastQuery, setLastQuery] = useState(emitente.dataUltimaConsultaDfe || '');
   const [nsu, setNsu] = useState(emitente.ultimoNsu || '0');
+  const [progresso, setProgresso] = useState<{aberto: boolean; lote: number; baixados: number; nsuAtual: string; cancelar: boolean}>({
+    aberto: false, lote: 0, baixados: 0, nsuAtual: '0', cancelar: false
+  });
+  const cancelarRef = useRef(false);
 
   const fetchLocalDocs = async () => {
     try {
@@ -3807,35 +3811,54 @@ const SefazConsultModal = ({ onClose, onImportXml, showAlert, emitente, onUpdate
   useEffect(() => { fetchLocalDocs(); }, []);
 
   const handleConsultar = async () => {
-    setLoading(true);
+    cancelarRef.current = false;
+    setProgresso({ aberto: true, lote: 0, baixados: 0, nsuAtual: nsu, cancelar: false });
+    let nsuAtual = nsu;
+    let totalBaixados = 0;
+    let lote = 0;
+    let ultimaResposta: any = null;
     try {
-      const res = await fetch(`./api.php?action=dist_dfe&nsu=${nsu}`);
-      const data = await res.json();
-      setLoading(false);
-      // Atualiza data e NSU no estado tanto no sucesso quanto no consumo indevido (656)
-      if (data.data_consulta) setLastQuery(data.data_consulta);
-      if (data.ultimo_nsu) setNsu(data.ultimo_nsu);
-      if (data.data_consulta || data.ultimo_nsu) {
-        onUpdateEmitente((prev: any) => ({
-          ...prev,
-          ultimoNsu: data.ultimo_nsu || prev.ultimoNsu,
-          dataUltimaConsultaDfe: data.data_consulta || prev.dataUltimaConsultaDfe
-        }));
+      while (true) {
+        if (cancelarRef.current) break;
+        lote++;
+        setProgresso(p => ({ ...p, lote, nsuAtual: nsuAtual }));
+        const res = await fetch(`./api.php?action=dist_dfe&nsu=${nsuAtual}`);
+        const data = await res.json();
+        ultimaResposta = data;
+        if (data.data_consulta) setLastQuery(data.data_consulta);
+        if (data.ultimo_nsu) {
+          setNsu(data.ultimo_nsu);
+          nsuAtual = data.ultimo_nsu;
+        }
+        if (data.data_consulta || data.ultimo_nsu) {
+          onUpdateEmitente((prev: any) => ({
+            ...prev,
+            ultimoNsu: data.ultimo_nsu || prev.ultimoNsu,
+            dataUltimaConsultaDfe: data.data_consulta || prev.dataUltimaConsultaDfe
+          }));
+        }
+        if (!data.success) {
+          setProgresso(p => ({ ...p, aberto: false }));
+          showAlert('Erro SEFAZ', data.message || 'Falha na consulta.');
+          return;
+        }
+        totalBaixados += (data.docs_count || 0);
+        setProgresso(p => ({ ...p, baixados: totalBaixados }));
+        if (!data.tem_mais) break;
+        await new Promise(r => setTimeout(r, 2000));
       }
-
-      if (data.success) {
-         fetchLocalDocs();
-         if (data.docs_count > 0) {
-           showAlert('Consulta Finalizada', `${data.docs_count} novos documentos foram localizados e salvos.`);
-         } else {
-           showAlert('Consulta Concluída', data.xMotivo || 'Nenhum documento novo foi localizado para o NSU informado.');
-         }
+      setProgresso(p => ({ ...p, aberto: false }));
+      fetchLocalDocs();
+      if (cancelarRef.current) {
+        showAlert('Consulta Cancelada', `Operação interrompida. ${totalBaixados} documentos baixados em ${lote} lote(s).`);
+      } else if (totalBaixados > 0) {
+        showAlert('Consulta Finalizada', `${totalBaixados} documento(s) baixado(s) em ${lote} lote(s).`);
       } else {
-        showAlert('Erro SEFAZ', data.message || 'Falha na consulta.');
+        showAlert('Consulta Concluída', ultimaResposta?.xMotivo || 'Nenhum documento novo foi localizado.');
       }
-    } catch (err: any) { 
-      setLoading(false);
-      showAlert('Erro', 'Falha ao conectar com o servidor.'); 
+    } catch (err: any) {
+      setProgresso(p => ({ ...p, aberto: false }));
+      showAlert('Erro', 'Falha ao conectar com o servidor.');
     }
   };
 
@@ -3896,9 +3919,9 @@ const SefazConsultModal = ({ onClose, onImportXml, showAlert, emitente, onUpdate
                <p className="text-[9px] text-blue-400 mt-1 font-medium">Última consulta: {new Date(lastQuery).toLocaleString('pt-BR')}</p>
              )}
            </div>
-           <button onClick={handleConsultar} disabled={loading} className={`px-8 py-2.5 ${loading ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-xl text-xs font-bold uppercase transition-all flex items-center gap-2 shadow-lg`}>
-             {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-             {loading ? 'Consultando SEFAZ...' : 'Consultar Documentos'}
+           <button onClick={handleConsultar} disabled={progresso.aberto} className={`px-8 py-2.5 ${progresso.aberto ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-xl text-xs font-bold uppercase transition-all flex items-center gap-2 shadow-lg`}>
+             {progresso.aberto ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+             {progresso.aberto ? 'Consultando SEFAZ...' : 'Consultar Documentos'}
            </button>
            <div className="flex-1 flex flex-col justify-center">
              {loading ? (
@@ -3993,6 +4016,49 @@ const SefazConsultModal = ({ onClose, onImportXml, showAlert, emitente, onUpdate
            </button>
         </div>
       </motion.div>
+      {progresso.aberto && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[90] p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+                <RefreshCw className="w-6 h-6 text-blue-600 animate-spin" />
+              </div>
+              <div>
+                <p className="font-bold text-gray-800">Consultando SEFAZ</p>
+                <p className="text-xs text-gray-500">Buscando documentos em lotes</p>
+              </div>
+            </div>
+            <div className="space-y-3 mb-6">
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-gray-600">Lote atual:</span>
+                <span className="font-bold text-gray-800">{progresso.lote}</span>
+              </div>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-gray-600">Documentos baixados:</span>
+                <span className="font-bold text-green-600">{progresso.baixados}</span>
+              </div>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-gray-600">NSU atual:</span>
+                <span className="font-mono text-xs font-bold text-gray-700">{progresso.nsuAtual}</span>
+              </div>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2 mb-6 overflow-hidden">
+              <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '100%' }}></div>
+            </div>
+            <p className="text-xs text-gray-500 text-center mb-4">
+              Aguardando 2s entre lotes (rate limit SEFAZ). Não feche esta janela.
+            </p>
+            <div className="flex justify-center">
+              <button
+                onClick={() => { cancelarRef.current = true; }}
+                className="px-6 py-2 text-sm font-semibold text-red-600 border border-red-200 rounded-xl hover:bg-red-50 transition-all"
+              >
+                Cancelar Consulta
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
