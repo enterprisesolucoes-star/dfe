@@ -4493,6 +4493,17 @@ const DfeConfigPage = ({
               value={emitente.numeroNfe ?? ''}
               onChange={(e: any) => handleChange('numeroNfe', parseInt(e.target.value) || 1)}
             />
+            <div className="md:col-span-2">
+              <Input
+                label="Último NSU (DF-e / Distribuição)"
+                type="number"
+                value={emitente.ultimoNsu ?? '0'}
+                onChange={(e: any) => handleChange('ultimoNsu', e.target.value || '0')}
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Número do último NSU consultado na SEFAZ. Ajuste apenas se necessário (ex: ressincronizar consulta de NF-es recebidas).
+              </p>
+            </div>
           </div>
         </div>
 
