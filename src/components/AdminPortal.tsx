@@ -868,17 +868,16 @@ const AuditoriaModal = ({ empresa, onClose }: { empresa: {id: number; nome: stri
           <table className="w-full text-sm">
             <thead className="bg-gray-50 sticky top-0">
               <tr className="text-left">
-                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase">Data/Hora</th>
-                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase">Usuário</th>
-                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase">Ação</th>
-                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase">Descrição</th>
-                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase">IP</th>
-                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase text-center">Detalhes</th>
+                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase whitespace-nowrap">Data/Hora</th>
+                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase whitespace-nowrap">Usuário</th>
+                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase whitespace-nowrap">Ação</th>
+                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase w-full">Descrição</th>
+                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase text-center whitespace-nowrap">Detalhes</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {logs.length === 0 && !loading && (
-                <tr><td colSpan={6} className="px-6 py-12 text-center text-xs text-gray-400 italic">Nenhum registro encontrado para o filtro selecionado.</td></tr>
+                <tr><td colSpan={5} className="px-6 py-12 text-center text-xs text-gray-400 italic">Nenhum registro encontrado para o filtro selecionado.</td></tr>
               )}
               {logs.map((l: any) => (
                 <tr key={l.id} className="hover:bg-gray-50/50">
@@ -889,10 +888,9 @@ const AuditoriaModal = ({ empresa, onClose }: { empresa: {id: number; nome: stri
                       {formatarAcao(l.acao)}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-xs text-gray-700 max-w-md truncate" title={l.descricao || ''}>
+                  <td className="px-4 py-3 text-xs text-gray-700" title={l.descricao || ''}>
                     {l.descricao || '—'}
                   </td>
-                  <td className="px-4 py-3 text-xs text-gray-500 font-mono">{l.ip || '—'}</td>
                   <td className="px-4 py-3 text-center">
                     <button onClick={() => setDetalhe(l)} className="p-1.5 text-gray-400 hover:text-purple-600" title="Ver detalhes">
                       <Eye className="w-3.5 h-3.5" />

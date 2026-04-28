@@ -335,9 +335,9 @@ switch ($action) {
                     registrarAuditoria(
                         $pdo, $empresaId, $usuarioId ?? null, $usuarioNome ?? null,
                         'emitir_nfce', 'venda', $vendaId,
-                        "NFC-e emitida — Nº {$venda['numero']} | Valor R$ " . number_format($venda['total'] ?? 0, 2, ',', '.'),
+                        "NFC-e emitida — Nº {$venda['numero']} | Valor R$ " . number_format($venda['valorTotal'] ?? 0, 2, ',', '.'),
                         null,
-                        ['status' => $statusSalvar, 'numero' => $venda['numero'], 'chave' => $chaveAcesso, 'protocolo' => $resultado->protocolo, 'valor_total' => $venda['total'] ?? 0]
+                        ['status' => $statusSalvar, 'numero' => $venda['numero'], 'chave' => $chaveAcesso, 'protocolo' => $resultado->protocolo, 'valor_total' => $venda['valorTotal'] ?? 0]
                     );
                 }
 
