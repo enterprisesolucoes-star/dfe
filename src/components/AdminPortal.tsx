@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import {
   FileText, Lock, User, LogOut, Plus, Edit, Edit2, Trash2,
-  Search, CheckCircle, X, Smartphone, Shield, RefreshCw
+  Search, CheckCircle, X, Smartphone, Shield, RefreshCw,
+  FileSearch, Eye, Filter, Calendar
 } from 'lucide-react';
 
 const ESTADOS = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
@@ -24,6 +25,7 @@ const AdminPortal = () => {
   const [busca, setBusca] = useState('');
   const [modal, setModal] = useState(false);
   const [tab, setTab] = useState<'dados'|'smartpos'|'usuarios'>('dados');
+  const [auditoriaEmpresa, setAuditoriaEmpresa] = useState<{id: number; nome: string} | null>(null);
   const [usuarios, setUsuarios] = useState<any[]>([]);
   const [userForm, setUserForm] = useState({ nome: '', login: '', senha: '', perfil: 'operador' });
   const [userEdit, setUserEdit] = useState<number|null>(null);
@@ -348,6 +350,10 @@ const AdminPortal = () => {
                         className={`p-1.5 transition-colors ${e.status === 'Bloqueado' ? 'text-green-500 hover:text-green-700' : 'text-orange-400 hover:text-orange-600'}`}
                         title={e.status === 'Bloqueado' ? 'Desbloquear' : 'Bloquear'}>
                         <Shield className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => setAuditoriaEmpresa({ id: e.id, nome: e.razao_social || e.cnpj || '—' })}
+                        className="p-1.5 text-gray-400 hover:text-purple-600 transition-colors" title="Auditoria de Ações">
+                        <FileSearch className="w-3.5 h-3.5" />
                       </button>
                       <button onClick={() => excluir(e.id, e.razao_social || e.cnpj)} className="p-1.5 text-gray-400 hover:text-red-600 transition-colors" title="Inativar">
                         <Trash2 className="w-3.5 h-3.5" />
@@ -733,6 +739,199 @@ const AdminPortal = () => {
           </div>
         );
       })()}
+      {auditoriaEmpresa && (
+        <AuditoriaModal empresa={auditoriaEmpresa} onClose={() => setAuditoriaEmpresa(null)} />
+      )}
+    </div>
+  );
+};
+
+// ──────────────────────────────────────────────────────────────────
+// Modal de Auditoria de Ações
+// ──────────────────────────────────────────────────────────────────
+const AuditoriaModal = ({ empresa, onClose }: { empresa: {id: number; nome: string}; onClose: () => void }) => {
+  const hoje = new Date().toISOString().slice(0, 10);
+  const inicioMes = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0, 10);
+  const [dataInicio, setDataInicio] = useState(inicioMes);
+  const [dataFim, setDataFim] = useState(hoje);
+  const [acoes, setAcoes] = useState<string[]>([]);
+  const [filtroAcao, setFiltroAcao] = useState('');
+  const [logs, setLogs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [detalhe, setDetalhe] = useState<any | null>(null);
+
+  const carregarAcoes = async () => {
+    try {
+      const r = await fetch('./api.php?action=auditoria_acoes');
+      const d = await r.json();
+      if (Array.isArray(d)) setAcoes(d);
+    } catch {}
+  };
+
+  const carregar = async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({
+        emitente_id: String(empresa.id),
+        data_inicio: dataInicio,
+        data_fim: dataFim,
+      });
+      if (filtroAcao) params.set('acao', filtroAcao);
+      const r = await fetch(`./api.php?action=auditoria_listar&${params.toString()}`);
+      const d = await r.json();
+      if (Array.isArray(d)) setLogs(d);
+      else setLogs([]);
+    } catch { setLogs([]); }
+    setLoading(false);
+  };
+
+  useEffect(() => { carregarAcoes(); carregar(); /* eslint-disable-next-line */ }, []);
+
+  const formatarAcao = (a: string) => {
+    const map: Record<string, string> = {
+      'login_sucesso': '🔓 Login',
+      'login_falha': '⚠️ Login Falho',
+      'emitir_nfce': '📄 Emitir NFC-e',
+      'cancelar_nfce': '❌ Cancelar NFC-e',
+      'alterar_produto': '✏️ Alterar Produto',
+    };
+    return map[a] || a;
+  };
+
+  const corDaAcao = (a: string) => {
+    if (a.includes('falha') || a.includes('cancelar') || a.includes('excluir')) return 'bg-red-50 text-red-700';
+    if (a.includes('emitir') || a.includes('login_sucesso')) return 'bg-green-50 text-green-700';
+    if (a.includes('alterar') || a.includes('editar')) return 'bg-amber-50 text-amber-700';
+    return 'bg-gray-100 text-gray-700';
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[80] p-4">
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+        className="bg-white rounded-2xl w-full max-w-6xl shadow-2xl max-h-[90vh] flex flex-col">
+        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
+              <FileSearch className="w-5 h-5 text-purple-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-gray-800">Auditoria de Ações</h3>
+              <p className="text-xs text-gray-500">{empresa.nome}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+            <X className="w-5 h-5 text-gray-500" />
+          </button>
+        </div>
+        <div className="p-4 bg-gray-50 border-b border-gray-100 flex flex-wrap items-end gap-3">
+          <div>
+            <label className="block text-[10px] font-bold text-gray-600 uppercase mb-1">De</label>
+            <input type="date" value={dataInicio} onChange={e => setDataInicio(e.target.value)}
+              className="px-3 py-2 border border-gray-200 rounded-lg text-xs" />
+          </div>
+          <div>
+            <label className="block text-[10px] font-bold text-gray-600 uppercase mb-1">Até</label>
+            <input type="date" value={dataFim} onChange={e => setDataFim(e.target.value)}
+              className="px-3 py-2 border border-gray-200 rounded-lg text-xs" />
+          </div>
+          <div>
+            <label className="block text-[10px] font-bold text-gray-600 uppercase mb-1">Ação</label>
+            <select value={filtroAcao} onChange={e => setFiltroAcao(e.target.value)}
+              className="px-3 py-2 border border-gray-200 rounded-lg text-xs min-w-[180px]">
+              <option value="">Todas</option>
+              {acoes.map(a => <option key={a} value={a}>{formatarAcao(a)}</option>)}
+            </select>
+          </div>
+          <button onClick={carregar} disabled={loading}
+            className={`px-5 py-2 ${loading ? 'bg-gray-400' : 'bg-purple-600 hover:bg-purple-700'} text-white text-xs font-bold uppercase rounded-lg flex items-center gap-2`}>
+            {loading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Filter className="w-3.5 h-3.5" />}
+            Filtrar
+          </button>
+          <div className="ml-auto text-xs text-gray-500">
+            {logs.length} registro(s)
+          </div>
+        </div>
+        <div className="overflow-auto flex-1">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 sticky top-0">
+              <tr className="text-left">
+                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase">Data/Hora</th>
+                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase">Usuário</th>
+                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase">Ação</th>
+                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase">Descrição</th>
+                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase">IP</th>
+                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase text-center">Detalhes</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {logs.length === 0 && !loading && (
+                <tr><td colSpan={6} className="px-6 py-12 text-center text-xs text-gray-400 italic">Nenhum registro encontrado para o filtro selecionado.</td></tr>
+              )}
+              {logs.map((l: any) => (
+                <tr key={l.id} className="hover:bg-gray-50/50">
+                  <td className="px-4 py-3 text-xs text-gray-600 whitespace-nowrap">{new Date(l.criado_em).toLocaleString('pt-BR')}</td>
+                  <td className="px-4 py-3 text-xs font-medium text-gray-800">{l.usuario_nome || '—'}</td>
+                  <td className="px-4 py-3">
+                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${corDaAcao(l.acao)}`}>
+                      {formatarAcao(l.acao)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-xs text-gray-700 max-w-md truncate" title={l.descricao || ''}>
+                    {l.descricao || '—'}
+                  </td>
+                  <td className="px-4 py-3 text-xs text-gray-500 font-mono">{l.ip || '—'}</td>
+                  <td className="px-4 py-3 text-center">
+                    <button onClick={() => setDetalhe(l)} className="p-1.5 text-gray-400 hover:text-purple-600" title="Ver detalhes">
+                      <Eye className="w-3.5 h-3.5" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end">
+          <button onClick={onClose} className="px-5 py-2 text-xs font-semibold text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100">Fechar</button>
+        </div>
+      </motion.div>
+      {detalhe && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[90] p-4">
+          <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl max-h-[85vh] flex flex-col">
+            <div className="p-5 border-b flex items-center justify-between">
+              <p className="font-bold text-gray-800 text-sm">Detalhes da Ação</p>
+              <button onClick={() => setDetalhe(null)} className="p-1 hover:bg-gray-100 rounded">
+                <X className="w-4 h-4 text-gray-500" />
+              </button>
+            </div>
+            <div className="p-5 overflow-auto space-y-3 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div><span className="text-gray-500 font-bold">Quando:</span><br />{new Date(detalhe.criado_em).toLocaleString('pt-BR')}</div>
+                <div><span className="text-gray-500 font-bold">Quem:</span><br />{detalhe.usuario_nome || '—'} (ID {detalhe.usuario_id || '—'})</div>
+                <div><span className="text-gray-500 font-bold">Ação:</span><br />{formatarAcao(detalhe.acao)}</div>
+                <div><span className="text-gray-500 font-bold">Entidade:</span><br />{detalhe.entidade || '—'} #{detalhe.entidade_id || '—'}</div>
+                <div className="col-span-2"><span className="text-gray-500 font-bold">Descrição:</span><br />{detalhe.descricao || '—'}</div>
+                <div><span className="text-gray-500 font-bold">IP:</span><br />{detalhe.ip || '—'}</div>
+                <div className="col-span-2"><span className="text-gray-500 font-bold">User Agent:</span><br /><span className="text-[10px] text-gray-500">{detalhe.user_agent || '—'}</span></div>
+              </div>
+              {detalhe.dados_antes && (
+                <div>
+                  <p className="text-gray-500 font-bold mb-1">Antes:</p>
+                  <pre className="bg-red-50 text-red-800 p-3 rounded-lg overflow-auto text-[10px]">{JSON.stringify(JSON.parse(detalhe.dados_antes), null, 2)}</pre>
+                </div>
+              )}
+              {detalhe.dados_depois && (
+                <div>
+                  <p className="text-gray-500 font-bold mb-1">Depois:</p>
+                  <pre className="bg-green-50 text-green-800 p-3 rounded-lg overflow-auto text-[10px]">{JSON.stringify(JSON.parse(detalhe.dados_depois), null, 2)}</pre>
+                </div>
+              )}
+            </div>
+            <div className="p-4 border-t flex justify-end">
+              <button onClick={() => setDetalhe(null)} className="px-4 py-2 text-xs font-semibold text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100">Fechar</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

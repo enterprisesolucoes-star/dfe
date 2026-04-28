@@ -111,6 +111,15 @@ if (!defined('SUPERTEF_TOKEN')) {
 require_once __DIR__ . '/src/services/NfceService.php';
 require_once __DIR__ . '/src/services/NfeService.php';
 require_once __DIR__ . '/src/services/PrinterService.php';
+// Carrega função registrarAuditoria() globalmente (sem executar o switch)
+$_audit_skip_switch = true;
+if (file_exists(__DIR__ . '/api/auditoria.php')) {
+    // Roda só a parte de criar tabela e definir função (sem entrar no switch)
+    $_acao_original = $action ?? null;
+    $action = '__noop__';
+    require_once __DIR__ . '/api/auditoria.php';
+    if ($_acao_original !== null) $action = $_acao_original;
+}
 
 use App\Services\NfceService;
 use App\Services\NfeService;
@@ -118,7 +127,9 @@ use App\Services\PrinterService;
 
 // empresa_id e perfil da sessão PHP — disponíveis em todos os módulos incluídos
 $empresaId = (int)($_SESSION['empresa_id'] ?? $_GET['empresa_id'] ?? $_POST['empresa_id'] ?? 0);
-$usuarioPerfil  = $_SESSION['usuario_perfil'] ?? 'operador';
+$usuarioPerfil = $_SESSION['usuario_perfil'] ?? 'operador';
+$usuarioId    = (int)($_SESSION['usuario_id'] ?? 0);
+$usuarioNome  = $_SESSION['usuario_nome'] ?? null;
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -290,7 +301,10 @@ $modules = [
     'fin_listar_movimentos' => 'financeiro',
     'fin_salvar_movimento'  => 'financeiro',
     'fin_excluir_movimento' => 'financeiro',
-    'relatorio_tef' => 'vendas', 'status_sefaz' => 'vendas'
+    'relatorio_tef' => 'vendas', 'status_sefaz' => 'vendas',
+    'auditoria_listar'   => 'auditoria',
+    'auditoria_acoes'    => 'auditoria',
+    'auditoria_detalhe'  => 'auditoria'
 ];
 
 if (isset($modules[$action])) {

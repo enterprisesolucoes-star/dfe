@@ -36,6 +36,7 @@ switch ($action) {
             $_SESSION['usuario_id'] = (int)$usr['id'];
             $_SESSION['empresa_id'] = (int)($usr['empresa_id'] ?? 0);
             $_SESSION['usuario_perfil'] = $usr['perfil'] ?? 'operador';
+            $_SESSION['usuario_nome'] = $usr['nome'] ?? null;
 
             $empresaData = null;
             if ($_SESSION['empresa_id']) {
@@ -68,6 +69,10 @@ switch ($action) {
                 $empresaConfigurada = true;
             }
 
+            // Auditoria — login bem-sucedido
+            if (function_exists('registrarAuditoria')) {
+                registrarAuditoria($pdo, (int)($usr['empresa_id'] ?? 0), (int)$usr['id'], $usr['nome'], 'login_sucesso', 'usuario', $usr['id'], 'Login realizado com sucesso');
+            }
             echo json_encode([
                 'success'             => true,
                 'usuarioId'           => $usr['id'],
@@ -78,6 +83,12 @@ switch ($action) {
                 'usuarioDfe'          => (int)($empresaData['usuario_dfe'] ?? 2)
             ]);
         } else {
+            // Auditoria — tentativa de login falha
+            if (function_exists('registrarAuditoria')) {
+                $emitenteFalha = $usr ? (int)($usr['empresa_id'] ?? 0) : null;
+                $usuarioIdFalha = $usr ? (int)$usr['id'] : null;
+                registrarAuditoria($pdo, $emitenteFalha, $usuarioIdFalha, $loginInput, 'login_falha', 'usuario', $usuarioIdFalha, 'Tentativa de login com credenciais inválidas');
+            }
             echo json_encode(['success' => false, 'message' => 'Login ou senha incorretos.']);
         }
         break;

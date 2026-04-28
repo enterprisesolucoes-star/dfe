@@ -25,3 +25,267 @@
 [2026-04-28 11:30:37] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000150
 [2026-04-28 11:30:40] Enviando consulta para NSU: 150
 [2026-04-28 11:30:40] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000200
+[2026-04-28 11:55:34] Enviando consulta para NSU: 200
+[2026-04-28 11:55:34] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000250
+[2026-04-28 11:55:36] Enviando consulta para NSU: 250
+[2026-04-28 11:55:36] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000300
+[2026-04-28 11:55:38] Enviando consulta para NSU: 300
+[2026-04-28 11:55:38] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000350
+[2026-04-28 11:55:40] Enviando consulta para NSU: 350
+[2026-04-28 11:55:41] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000400
+[2026-04-28 11:55:43] Enviando consulta para NSU: 400
+[2026-04-28 11:55:43] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000450
+[2026-04-28 11:55:45] Enviando consulta para NSU: 450
+[2026-04-28 11:55:45] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000500
+[2026-04-28 11:55:47] Enviando consulta para NSU: 500
+[2026-04-28 11:55:47] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000550
+[2026-04-28 11:55:49] Enviando consulta para NSU: 550
+[2026-04-28 11:55:49] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000600
+[2026-04-28 11:55:51] Enviando consulta para NSU: 600
+[2026-04-28 11:55:52] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000650
+[2026-04-28 11:55:54] Enviando consulta para NSU: 650
+[2026-04-28 11:55:54] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000700
+[2026-04-28 11:55:56] Enviando consulta para NSU: 700
+[2026-04-28 11:55:56] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000750
+[2026-04-28 11:55:58] Enviando consulta para NSU: 750
+[2026-04-28 11:55:58] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000800
+[2026-04-28 11:56:00] Enviando consulta para NSU: 800
+[2026-04-28 11:56:00] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000850
+[2026-04-28 11:56:03] Enviando consulta para NSU: 850
+[2026-04-28 11:56:03] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000900
+[2026-04-28 11:56:05] Enviando consulta para NSU: 900
+[2026-04-28 11:56:05] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000930
+[2026-04-28 13:46:35] Enviando consulta para NSU: 0
+[2026-04-28 13:46:35] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000050
+[2026-04-28 13:46:37] Enviando consulta para NSU: 50
+[2026-04-28 13:46:37] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000100
+[2026-04-28 13:46:40] Enviando consulta para NSU: 100
+[2026-04-28 13:46:40] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000150
+[2026-04-28 13:46:42] Enviando consulta para NSU: 150
+[2026-04-28 13:46:42] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000200
+[2026-04-28 13:46:44] Enviando consulta para NSU: 200
+[2026-04-28 13:46:44] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000250
+[2026-04-28 13:46:46] Enviando consulta para NSU: 250
+[2026-04-28 13:46:46] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000300
+[2026-04-28 13:46:48] Enviando consulta para NSU: 300
+[2026-04-28 13:46:48] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000350
+[2026-04-28 13:46:50] Enviando consulta para NSU: 350
+[2026-04-28 13:46:51] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000400
+[2026-04-28 13:46:53] Enviando consulta para NSU: 400
+[2026-04-28 13:46:53] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000450
+[2026-04-28 13:46:55] Enviando consulta para NSU: 450
+[2026-04-28 13:46:55] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000500
+[2026-04-28 13:46:57] Enviando consulta para NSU: 500
+[2026-04-28 13:46:57] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000550
+[2026-04-28 13:46:59] Enviando consulta para NSU: 550
+[2026-04-28 13:46:59] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000600
+[2026-04-28 13:47:01] Enviando consulta para NSU: 600
+[2026-04-28 13:47:01] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000650
+[2026-04-28 13:47:04] Enviando consulta para NSU: 650
+[2026-04-28 13:47:04] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000700
+[2026-04-28 13:47:06] Enviando consulta para NSU: 700
+[2026-04-28 13:47:06] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000750
+[2026-04-28 13:47:08] Enviando consulta para NSU: 750
+[2026-04-28 13:47:08] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000800
+[2026-04-28 13:47:10] Enviando consulta para NSU: 800
+[2026-04-28 13:47:10] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000850
+[2026-04-28 13:47:12] Enviando consulta para NSU: 850
+[2026-04-28 13:47:12] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000900
+[2026-04-28 13:47:14] Enviando consulta para NSU: 900
+[2026-04-28 13:47:15] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000000950
+[2026-04-28 13:47:17] Enviando consulta para NSU: 950
+[2026-04-28 13:47:17] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000001000
+[2026-04-28 13:47:19] Enviando consulta para NSU: 1000
+[2026-04-28 13:47:19] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000001050
+[2026-04-28 13:47:21] Enviando consulta para NSU: 1050
+[2026-04-28 13:47:21] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000001100
+[2026-04-28 13:47:23] Enviando consulta para NSU: 1100
+[2026-04-28 13:47:23] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000001150
+[2026-04-28 13:47:25] Enviando consulta para NSU: 1150
+[2026-04-28 13:47:25] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000001200
+[2026-04-28 13:47:27] Enviando consulta para NSU: 1200
+[2026-04-28 13:47:28] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000001250
+[2026-04-28 13:47:30] Enviando consulta para NSU: 1250
+[2026-04-28 13:47:30] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000001300
+[2026-04-28 13:47:32] Enviando consulta para NSU: 1300
+[2026-04-28 13:47:32] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000001350
+[2026-04-28 13:47:34] Enviando consulta para NSU: 1350
+[2026-04-28 13:47:34] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000001400
+[2026-04-28 13:47:36] Enviando consulta para NSU: 1400
+[2026-04-28 13:47:36] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000001450
+[2026-04-28 13:47:38] Enviando consulta para NSU: 1450
+[2026-04-28 13:47:38] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000001500
+[2026-04-28 13:47:40] Enviando consulta para NSU: 1500
+[2026-04-28 13:47:41] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000001550
+[2026-04-28 13:47:43] Enviando consulta para NSU: 1550
+[2026-04-28 13:47:43] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000001600
+[2026-04-28 13:47:45] Enviando consulta para NSU: 1600
+[2026-04-28 13:47:45] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000001650
+[2026-04-28 13:47:47] Enviando consulta para NSU: 1650
+[2026-04-28 13:47:47] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000001700
+[2026-04-28 13:47:49] Enviando consulta para NSU: 1700
+[2026-04-28 13:47:49] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000001750
+[2026-04-28 13:47:51] Enviando consulta para NSU: 1750
+[2026-04-28 13:47:51] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000001800
+[2026-04-28 13:47:53] Enviando consulta para NSU: 1800
+[2026-04-28 13:47:54] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000001850
+[2026-04-28 13:47:56] Enviando consulta para NSU: 1850
+[2026-04-28 13:47:56] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000001900
+[2026-04-28 13:47:58] Enviando consulta para NSU: 1900
+[2026-04-28 13:47:58] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000001950
+[2026-04-28 13:48:00] Enviando consulta para NSU: 1950
+[2026-04-28 13:48:00] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000002000
+[2026-04-28 13:48:02] Enviando consulta para NSU: 2000
+[2026-04-28 13:48:02] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000002050
+[2026-04-28 13:48:04] Enviando consulta para NSU: 2050
+[2026-04-28 13:48:04] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000002100
+[2026-04-28 13:48:07] Enviando consulta para NSU: 2100
+[2026-04-28 13:48:07] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000002150
+[2026-04-28 13:48:09] Enviando consulta para NSU: 2150
+[2026-04-28 13:48:09] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000002200
+[2026-04-28 13:48:11] Enviando consulta para NSU: 2200
+[2026-04-28 13:48:11] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000002250
+[2026-04-28 13:48:13] Enviando consulta para NSU: 2250
+[2026-04-28 13:48:13] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000002300
+[2026-04-28 13:48:15] Enviando consulta para NSU: 2300
+[2026-04-28 13:48:15] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000002350
+[2026-04-28 13:48:17] Enviando consulta para NSU: 2350
+[2026-04-28 13:48:18] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000002400
+[2026-04-28 13:48:20] Enviando consulta para NSU: 2400
+[2026-04-28 13:48:20] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000002450
+[2026-04-28 13:48:22] Enviando consulta para NSU: 2450
+[2026-04-28 13:48:22] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000002500
+[2026-04-28 13:48:24] Enviando consulta para NSU: 2500
+[2026-04-28 13:48:24] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000002550
+[2026-04-28 13:48:26] Enviando consulta para NSU: 2550
+[2026-04-28 13:48:26] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000002600
+[2026-04-28 13:48:28] Enviando consulta para NSU: 2600
+[2026-04-28 13:48:29] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000002650
+[2026-04-28 13:48:31] Enviando consulta para NSU: 2650
+[2026-04-28 13:48:31] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000002700
+[2026-04-28 13:48:33] Enviando consulta para NSU: 2700
+[2026-04-28 13:48:33] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000002750
+[2026-04-28 13:48:35] Enviando consulta para NSU: 2750
+[2026-04-28 13:48:35] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000002800
+[2026-04-28 13:48:37] Enviando consulta para NSU: 2800
+[2026-04-28 13:48:37] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000002850
+[2026-04-28 13:48:39] Enviando consulta para NSU: 2850
+[2026-04-28 13:48:39] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000002900
+[2026-04-28 13:48:41] Enviando consulta para NSU: 2900
+[2026-04-28 13:48:42] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000002950
+[2026-04-28 13:48:44] Enviando consulta para NSU: 2950
+[2026-04-28 13:48:44] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000003000
+[2026-04-28 13:48:46] Enviando consulta para NSU: 3000
+[2026-04-28 13:48:46] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000003050
+[2026-04-28 13:48:48] Enviando consulta para NSU: 3050
+[2026-04-28 13:48:48] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000003100
+[2026-04-28 13:48:50] Enviando consulta para NSU: 3100
+[2026-04-28 13:48:50] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000003150
+[2026-04-28 13:48:52] Enviando consulta para NSU: 3150
+[2026-04-28 13:48:52] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000003200
+[2026-04-28 13:48:54] Enviando consulta para NSU: 3200
+[2026-04-28 13:48:55] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000003250
+[2026-04-28 13:48:57] Enviando consulta para NSU: 3250
+[2026-04-28 13:48:57] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000003300
+[2026-04-28 13:48:59] Enviando consulta para NSU: 3300
+[2026-04-28 13:48:59] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000003350
+[2026-04-28 13:49:01] Enviando consulta para NSU: 3350
+[2026-04-28 13:49:01] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000003400
+[2026-04-28 13:49:03] Enviando consulta para NSU: 3400
+[2026-04-28 13:49:03] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000003450
+[2026-04-28 13:49:05] Enviando consulta para NSU: 3450
+[2026-04-28 13:49:05] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000003500
+[2026-04-28 13:49:07] Enviando consulta para NSU: 3500
+[2026-04-28 13:49:08] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000003550
+[2026-04-28 13:49:10] Enviando consulta para NSU: 3550
+[2026-04-28 13:49:10] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000003600
+[2026-04-28 13:49:12] Enviando consulta para NSU: 3600
+[2026-04-28 13:49:12] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000003650
+[2026-04-28 13:49:14] Enviando consulta para NSU: 3650
+[2026-04-28 13:49:14] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000003700
+[2026-04-28 13:49:16] Enviando consulta para NSU: 3700
+[2026-04-28 13:49:16] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000003750
+[2026-04-28 13:49:18] Enviando consulta para NSU: 3750
+[2026-04-28 13:49:18] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000003800
+[2026-04-28 13:49:20] Enviando consulta para NSU: 3800
+[2026-04-28 13:49:20] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000003850
+[2026-04-28 13:49:22] Enviando consulta para NSU: 3850
+[2026-04-28 13:49:23] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000003900
+[2026-04-28 13:49:25] Enviando consulta para NSU: 3900
+[2026-04-28 13:49:25] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000003950
+[2026-04-28 13:49:27] Enviando consulta para NSU: 3950
+[2026-04-28 13:49:27] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000004000
+[2026-04-28 13:49:29] Enviando consulta para NSU: 4000
+[2026-04-28 13:49:29] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000004050
+[2026-04-28 13:49:31] Enviando consulta para NSU: 4050
+[2026-04-28 13:49:31] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000004100
+[2026-04-28 13:49:33] Enviando consulta para NSU: 4100
+[2026-04-28 13:49:33] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000004150
+[2026-04-28 13:49:35] Enviando consulta para NSU: 4150
+[2026-04-28 13:49:36] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000004200
+[2026-04-28 13:49:38] Enviando consulta para NSU: 4200
+[2026-04-28 13:49:38] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000004250
+[2026-04-28 13:49:40] Enviando consulta para NSU: 4250
+[2026-04-28 13:49:40] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000004300
+[2026-04-28 13:49:42] Enviando consulta para NSU: 4300
+[2026-04-28 13:49:42] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000004350
+[2026-04-28 13:49:44] Enviando consulta para NSU: 4350
+[2026-04-28 13:49:44] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000004400
+[2026-04-28 13:49:46] Enviando consulta para NSU: 4400
+[2026-04-28 13:49:46] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000004450
+[2026-04-28 13:49:48] Enviando consulta para NSU: 4450
+[2026-04-28 13:49:49] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000004500
+[2026-04-28 13:49:51] Enviando consulta para NSU: 4500
+[2026-04-28 13:49:51] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000004550
+[2026-04-28 13:49:53] Enviando consulta para NSU: 4550
+[2026-04-28 13:49:53] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000004600
+[2026-04-28 13:49:55] Enviando consulta para NSU: 4600
+[2026-04-28 13:49:55] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000004650
+[2026-04-28 13:49:57] Enviando consulta para NSU: 4650
+[2026-04-28 13:49:57] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000004700
+[2026-04-28 13:49:59] Enviando consulta para NSU: 4700
+[2026-04-28 13:49:59] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000004750
+[2026-04-28 13:50:01] Enviando consulta para NSU: 4750
+[2026-04-28 13:50:02] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000004800
+[2026-04-28 13:50:04] Enviando consulta para NSU: 4800
+[2026-04-28 13:50:04] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000004850
+[2026-04-28 13:50:06] Enviando consulta para NSU: 4850
+[2026-04-28 13:50:06] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000004900
+[2026-04-28 13:50:08] Enviando consulta para NSU: 4900
+[2026-04-28 13:50:08] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000004950
+[2026-04-28 13:50:10] Enviando consulta para NSU: 4950
+[2026-04-28 13:50:10] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000005000
+[2026-04-28 13:50:12] Enviando consulta para NSU: 5000
+[2026-04-28 13:50:12] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000005050
+[2026-04-28 13:50:15] Enviando consulta para NSU: 5050
+[2026-04-28 13:50:15] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000005100
+[2026-04-28 13:50:17] Enviando consulta para NSU: 5100
+[2026-04-28 13:50:17] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000005150
+[2026-04-28 13:50:19] Enviando consulta para NSU: 5150
+[2026-04-28 13:50:19] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000005200
+[2026-04-28 13:50:21] Enviando consulta para NSU: 5200
+[2026-04-28 13:50:21] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000005250
+[2026-04-28 13:50:23] Enviando consulta para NSU: 5250
+[2026-04-28 13:50:23] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000005300
+[2026-04-28 13:50:25] Enviando consulta para NSU: 5300
+[2026-04-28 13:50:25] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000005350
+[2026-04-28 13:50:28] Enviando consulta para NSU: 5350
+[2026-04-28 13:50:28] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000005400
+[2026-04-28 13:50:30] Enviando consulta para NSU: 5400
+[2026-04-28 13:50:30] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000005450
+[2026-04-28 13:50:32] Enviando consulta para NSU: 5450
+[2026-04-28 13:50:32] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000005500
+[2026-04-28 13:50:34] Enviando consulta para NSU: 5500
+[2026-04-28 13:50:34] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000005550
+[2026-04-28 13:50:36] Enviando consulta para NSU: 5550
+[2026-04-28 13:50:36] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000005600
+[2026-04-28 13:50:38] Enviando consulta para NSU: 5600
+[2026-04-28 13:50:39] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000005650
+[2026-04-28 13:50:41] Enviando consulta para NSU: 5650
+[2026-04-28 13:50:41] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000005700
+[2026-04-28 13:50:43] Enviando consulta para NSU: 5700
+[2026-04-28 13:50:43] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000005750
+[2026-04-28 13:50:45] Enviando consulta para NSU: 5750
+[2026-04-28 13:50:45] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000005800
+[2026-04-28 13:50:47] Enviando consulta para NSU: 5800
+[2026-04-28 13:50:47] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000005823

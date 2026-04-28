@@ -330,6 +330,16 @@ switch ($action) {
                 $chaveAcesso = (string)($resultado->chave_acesso ?? '');
                 $stmt = $pdo->prepare("UPDATE vendas SET status = ?, protocolo = ?, chave_acesso = ?, xml_autorizado = ? WHERE id = ?");
                 $stmt->execute([$statusSalvar, $resultado->protocolo, $chaveAcesso, $resultado->xml_assinado, $vendaId]);
+                // Auditoria — emissão de NFC-e
+                if (function_exists('registrarAuditoria')) {
+                    registrarAuditoria(
+                        $pdo, $empresaId, $usuarioId ?? null, $usuarioNome ?? null,
+                        'emitir_nfce', 'venda', $vendaId,
+                        "NFC-e emitida — Nº {$venda['numero']} | Valor R$ " . number_format($venda['total'] ?? 0, 2, ',', '.'),
+                        null,
+                        ['status' => $statusSalvar, 'numero' => $venda['numero'], 'chave' => $chaveAcesso, 'protocolo' => $resultado->protocolo, 'valor_total' => $venda['total'] ?? 0]
+                    );
+                }
 
                 $stmt = $pdo->prepare("UPDATE empresas SET numero_nfce = ? WHERE id = ?");
                 $stmt->execute([$venda['numero'], $empresaDb['id']]);
@@ -1173,6 +1183,16 @@ switch ($action) {
             if ($resultado->sucesso) {
                 $stmt = $pdo->prepare("UPDATE vendas SET status = 'Cancelada', xml_cancelamento = ?, protocolo_cancelamento = ?, justificativa_cancelamento = ?, data_cancelamento = NOW() WHERE id = ?");
                 $stmt->execute([$resultado->xmlCancelamento ?? '', $resultado->protocolo ?? '', $justificativa, $vendaId]);
+                // Auditoria — cancelamento de NFC-e
+                if (function_exists('registrarAuditoria')) {
+                    registrarAuditoria(
+                        $pdo, $empresaId, $usuarioId ?? null, $usuarioNome ?? null,
+                        'cancelar_nfce', 'venda', $vendaId,
+                        "NFC-e cancelada — Nº " . ($venda['numero'] ?? '?') . " | Justificativa: " . substr($justificativa, 0, 150),
+                        ['status' => 'Autorizada'],
+                        ['status' => 'Cancelada', 'protocolo_cancelamento' => $resultado->protocolo ?? '', 'justificativa' => $justificativa]
+                    );
+                }
 
                 // Estorno de estoque ao cancelar nota Autorizada
                 $itensCanc = $pdo->prepare("SELECT produto_id, quantidade FROM vendas_itens WHERE venda_id = ?");

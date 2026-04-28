@@ -58,10 +58,44 @@ switch ($action) {
         $codForn     = $data['codigoFornecedor'] ?? null;
 
         if (isset($data['id']) && $data['id'] > 0) {
+            // Captura estado antes para auditoria
+            $auditAntes = null;
+            try {
+                $stmtAnt = $pdo->prepare("SELECT descricao, valor_unitario, custo_compra, estoque FROM produtos WHERE id = ?");
+                $stmtAnt->execute([$data['id']]);
+                $auditAntes = $stmtAnt->fetch();
+            } catch (Throwable $e) {}
+
             $stmt = $pdo->prepare("UPDATE produtos SET codigo_interno=?, codigo_barras=?, descricao=?, ncm=?, unidade_comercial=?, valor_unitario=?, cfop=?, icms_cst_csosn=?, custo_compra=?, simples_nacional=?, despesas_operacionais=?, frete_seguro=?, margem_lucro=?, estoque=?, cbs_cst=?, cbs_classtrib=?, ibs_cst=?, ibs_classtrib=?, ccredpres=?, codigo_fornecedor=? WHERE id=?" . ($empresaId ? " AND empresa_id=?" : ""));
             $params = [$data['codigoInterno'], $data['codigoBarras'] ?? null, $data['descricao'], $data['ncm'], $data['unidadeComercial'], $data['valorUnitario'], $data['cfop'], $data['icmsCstCsosn'], $custoCopra, $simplesNac, $despesasOp, $freteSeguro, $margemLucro, $estoque, $cbsCst, $cbsClasstrib, $ibsCst, $ibsClasstrib, $ccredpres, $codForn, $data['id']];
             if ($empresaId) $params[] = $empresaId;
             $stmt->execute($params);
+
+            // Auditoria — só registra se houve mudança em preço, custo ou estoque
+            if (function_exists('registrarAuditoria') && $auditAntes) {
+                $precoAntes  = (float)$auditAntes['valor_unitario'];
+                $precoDepois = (float)$data['valorUnitario'];
+                $custoAntes  = (float)$auditAntes['custo_compra'];
+                $custoDepois = $custoCopra;
+                $estoqueAntes  = (float)$auditAntes['estoque'];
+                $estoqueDepois = $estoque;
+                $mudouPreco   = abs($precoAntes - $precoDepois) > 0.001;
+                $mudouCusto   = abs($custoAntes - $custoDepois) > 0.001;
+                $mudouEstoque = abs($estoqueAntes - $estoqueDepois) > 0.001;
+                if ($mudouPreco || $mudouCusto || $mudouEstoque) {
+                    $partes = [];
+                    if ($mudouPreco)   $partes[] = "Preço: R$ " . number_format($precoAntes, 2, ',', '.') . " → R$ " . number_format($precoDepois, 2, ',', '.');
+                    if ($mudouCusto)   $partes[] = "Custo: R$ " . number_format($custoAntes, 2, ',', '.') . " → R$ " . number_format($custoDepois, 2, ',', '.');
+                    if ($mudouEstoque) $partes[] = "Estoque: " . number_format($estoqueAntes, 3, ',', '.') . " → " . number_format($estoqueDepois, 3, ',', '.');
+                    registrarAuditoria(
+                        $pdo, $empresaId, $usuarioId ?? null, $usuarioNome ?? null,
+                        'alterar_produto', 'produto', (int)$data['id'],
+                        ($auditAntes['descricao'] ?? '') . " — " . implode(' | ', $partes),
+                        ['valor_unitario' => $precoAntes, 'custo_compra' => $custoAntes, 'estoque' => $estoqueAntes],
+                        ['valor_unitario' => $precoDepois, 'custo_compra' => $custoDepois, 'estoque' => $estoqueDepois]
+                    );
+                }
+            }
         } else {
             // Auto-gera código interno sequencial por empresa se não informado
             $codigoInterno = trim($data['codigoInterno'] ?? '');
