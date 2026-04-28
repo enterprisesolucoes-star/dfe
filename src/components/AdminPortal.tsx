@@ -793,6 +793,14 @@ const AuditoriaModal = ({ empresa, onClose }: { empresa: {id: number; nome: stri
       'login_falha': '⚠️ Login Falho',
       'emitir_nfce': '📄 Emitir NFC-e',
       'cancelar_nfce': '❌ Cancelar NFC-e',
+      'emitir_nfe': '📄 Emitir NF-e',
+      'cancelar_nfe': '❌ Cancelar NF-e',
+      'cce_nfe': '✉️ CC-e NF-e',
+      'devolucao_nfe': '↩️ Devolução NF-e',
+      'excluir_nfe': '🗑️ Excluir NF-e',
+      'criar_os': '🆕 Criar OS',
+      'editar_os': '✏️ Editar OS',
+      'excluir_os': '🗑️ Excluir OS',
       'alterar_produto': '✏️ Alterar Produto',
     };
     return map[a] || a;

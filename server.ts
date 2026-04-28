@@ -127,7 +127,12 @@ app.all("/api.php", async (req, res) => {
     if (data && data.success) {
       registerSuccess(loginName);
       if (data.empresaId) {
-        res.setHeader("Set-Cookie", `empresa_id=${data.empresaId}; Path=/; HttpOnly`);
+        const cookies = [
+          `empresa_id=${data.empresaId}; Path=/; HttpOnly`,
+          `usuario_id=${data.usuarioId || ''}; Path=/; HttpOnly`,
+          `usuario_nome=${encodeURIComponent(data.nome || '')}; Path=/; HttpOnly`
+        ];
+        res.setHeader("Set-Cookie", cookies);
       }
     } else if (loginName) {
       registerFailure(loginName);
@@ -136,11 +141,18 @@ app.all("/api.php", async (req, res) => {
   }
 
   try {
-    // Extrai empresa_id do cookie
+    // Extrai empresa_id, usuario_id, usuario_nome do cookie
     let empresaId = 1;
+    let usuarioId = 0;
+    let usuarioNome = '';
     const cookieStr = req.headers.cookie || "";
-    const match = cookieStr.match(/empresa_id=(\d+)/);
-    if (match) empresaId = parseInt(match[1]);
+    const matchEmp = cookieStr.match(/empresa_id=(\d+)/);
+    if (matchEmp) empresaId = parseInt(matchEmp[1]);
+    const matchUsr = cookieStr.match(/usuario_id=(\d+)/);
+    if (matchUsr) usuarioId = parseInt(matchUsr[1]);
+    const matchNome = cookieStr.match(/usuario_nome=([^;]+)/);
+    if (matchNome) { try { usuarioNome = decodeURIComponent(matchNome[1]); } catch {} }
+    const realIp = (req.headers['x-forwarded-for'] as string || req.socket.remoteAddress || '').split(',')[0].trim();
 
     const fetch = (await import("node-fetch")).default;
     const allQuery = new URLSearchParams({ ...req.query as any, action, empresa_id: String(empresaId) });
@@ -148,9 +160,18 @@ app.all("/api.php", async (req, res) => {
     let parsedBody = req.body;
     if (typeof parsedBody === 'string') { try { parsedBody = JSON.parse(parsedBody); } catch {} }
     const hasBody = parsedBody && typeof parsedBody === 'object' && Object.keys(parsedBody).length > 0;
+    const proxyHeaders: any = {
+      'X-Real-IP': realIp,
+      'X-Forwarded-For': realIp,
+      'X-Usuario-Id': String(usuarioId),
+      'X-Usuario-Nome': encodeURIComponent(usuarioNome),
+      'X-Empresa-Id': String(empresaId),
+      'User-Agent': req.headers['user-agent'] || 'unknown'
+    };
+    if (hasBody) proxyHeaders['Content-Type'] = 'application/json';
     const response = await fetch(url, {
       method: hasBody ? "POST" : "GET",
-      headers: hasBody ? { "Content-Type": "application/json" } : {},
+      headers: proxyHeaders,
       body: hasBody ? JSON.stringify(parsedBody) : undefined
     });
     const contentType = response.headers.get('content-type') || '';

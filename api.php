@@ -126,10 +126,13 @@ use App\Services\NfeService;
 use App\Services\PrinterService;
 
 // empresa_id e perfil da sessão PHP — disponíveis em todos os módulos incluídos
-$empresaId = (int)($_SESSION['empresa_id'] ?? $_GET['empresa_id'] ?? $_POST['empresa_id'] ?? 0);
+$empresaId = (int)($_SESSION['empresa_id'] ?? $_GET['empresa_id'] ?? $_POST['empresa_id'] ?? $_SERVER['HTTP_X_EMPRESA_ID'] ?? 0);
 $usuarioPerfil = $_SESSION['usuario_perfil'] ?? 'operador';
-$usuarioId    = (int)($_SESSION['usuario_id'] ?? 0);
-$usuarioNome  = $_SESSION['usuario_nome'] ?? null;
+// Headers vindos do proxy Node têm prioridade (sessão PHP não persiste por causa do proxy)
+$usuarioId    = (int)($_SERVER['HTTP_X_USUARIO_ID'] ?? $_SESSION['usuario_id'] ?? 0);
+$usuarioNome  = !empty($_SERVER['HTTP_X_USUARIO_NOME']) ? urldecode($_SERVER['HTTP_X_USUARIO_NOME']) : ($_SESSION['usuario_nome'] ?? null);
+// Sobrescreve REMOTE_ADDR com o IP real vindo do proxy
+if (!empty($_SERVER['HTTP_X_REAL_IP'])) { $_SERVER['REMOTE_ADDR'] = $_SERVER['HTTP_X_REAL_IP']; }
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');

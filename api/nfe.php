@@ -204,6 +204,16 @@ switch ($action) {
 
                 $pdo->prepare("UPDATE empresas SET numero_nfe = ? WHERE id = ?")
                     ->execute([$venda['numero'], $empresaDb['id']]);
+                // Auditoria — emissão de NF-e
+                if (function_exists('registrarAuditoria')) {
+                    registrarAuditoria(
+                        $pdo, $empresaId, $usuarioId ?? null, $usuarioNome ?? null,
+                        'emitir_nfe', 'venda', $vendaId,
+                        "NF-e emitida — Nº " . ($venda['numero'] ?? '?') . " | Valor R$ " . number_format($venda['total'] ?? 0, 2, ',', '.'),
+                        null,
+                        ['status' => $statusSalvar, 'numero' => $venda['numero'] ?? null, 'chave' => $chaveAcesso, 'protocolo' => $resultado->protocolo ?? '', 'valor_total' => $venda['total'] ?? 0]
+                    );
+                }
 
                 // Baixa de estoque
                 foreach ($venda['itens'] as $item) {
@@ -378,6 +388,16 @@ switch ($action) {
                     ->execute([$statusSalvar, $resultado->protocolo ?? '', $chaveAcesso, $resultado->xml_assinado ?? '', $id]);
                 $pdo->prepare("UPDATE empresas SET numero_nfe = ? WHERE id = ?")
                     ->execute([$vendaDb['numero'], $empresaDb['id']]);
+                // Auditoria — emissão NF-e pendente
+                if (function_exists('registrarAuditoria')) {
+                    registrarAuditoria(
+                        $pdo, $empresaId, $usuarioId ?? null, $usuarioNome ?? null,
+                        'emitir_nfe', 'venda', $id,
+                        "NF-e pendente emitida — Nº " . ($vendaDb['numero'] ?? '?'),
+                        null,
+                        ['status' => $statusSalvar, 'numero' => $vendaDb['numero'] ?? null, 'chave' => $chaveAcesso, 'protocolo' => $resultado->protocolo ?? '']
+                    );
+                }
 
                 echo json_encode([
                     'success' => true, 'id' => $id, 'numero' => $vendaDb['numero'],
@@ -804,6 +824,16 @@ switch ($action) {
 
                 $pdo->prepare("UPDATE vendas SET status = 'Cancelada', xml_cancelamento = ?, protocolo_cancelamento = ?, justificativa_cancelamento = ?, data_cancelamento = NOW() WHERE id = ?")
                     ->execute([$resultado->xml_cancelamento ?? '', $resultado->protocolo ?? '', $justificativa, $vendaId]);
+                // Auditoria — cancelamento de NF-e
+                if (function_exists('registrarAuditoria')) {
+                    registrarAuditoria(
+                        $pdo, $empresaId, $usuarioId ?? null, $usuarioNome ?? null,
+                        'cancelar_nfe', 'venda', $vendaId,
+                        "NF-e cancelada — Nº " . ($venda['numero'] ?? '?') . " | Justificativa: " . substr($justificativa, 0, 150),
+                        ['status' => 'Autorizada'],
+                        ['status' => 'Cancelada', 'protocolo_cancelamento' => $resultado->protocolo ?? '', 'justificativa' => $justificativa]
+                    );
+                }
 
                 // Estorno de estoque
                 $itens = $pdo->prepare("SELECT produto_id, quantidade FROM vendas_itens WHERE venda_id = ?");
@@ -875,6 +905,16 @@ switch ($action) {
             $resultado = $servico->cartaCorrecaoNfe($venda['chave_acesso'], $texto, $seq);
 
             if ($resultado->sucesso) {
+                // Auditoria — CC-e (Carta de Correção)
+                if (function_exists('registrarAuditoria')) {
+                    registrarAuditoria(
+                        $pdo, $empresaId, $usuarioId ?? null, $usuarioNome ?? null,
+                        'cce_nfe', 'venda', $vendaId,
+                        "CC-e emitida — NF-e Nº " . ($venda['numero'] ?? '?') . " | Seq: $seq | Texto: " . substr($texto, 0, 120),
+                        null,
+                        ['sequencia' => $seq, 'texto' => $texto, 'protocolo' => $resultado->protocolo ?? '']
+                    );
+                }
                 echo json_encode(['success' => true, 'protocolo' => $resultado->protocolo ?? '', 'mensagem' => $resultado->mensagem ?? '']);
             } else {
                 echo json_encode(['success' => false, 'message' => $resultado->mensagem]);
@@ -901,6 +941,15 @@ switch ($action) {
         $pdo->prepare("DELETE FROM vendas_pagamentos WHERE venda_id = ?")->execute([$id]);
         $pdo->prepare("DELETE FROM vendas_itens WHERE venda_id = ?")->execute([$id]);
         $pdo->prepare("DELETE FROM vendas WHERE id = ?")->execute([$id]);
+            // Auditoria — exclusão de NF-e
+            if (function_exists('registrarAuditoria')) {
+                registrarAuditoria(
+                    $pdo, $empresaId, $usuarioId ?? null, $usuarioNome ?? null,
+                    'excluir_nfe', 'venda', $id,
+                    "NF-e excluída — ID $id",
+                    null, null
+                );
+            }
         echo json_encode(['success' => true]);
         break;
 
@@ -1059,6 +1108,16 @@ switch ($action) {
                     ->execute([$statusSalvar, $resultado->protocolo ?? '', $chaveAcesso, $resultado->xml_assinado ?? '', $vendaId]);
                 $pdo->prepare("UPDATE empresas SET numero_nfe = ? WHERE id = ?")
                     ->execute([$venda['numero'], $empresaDb['id']]);
+                // Auditoria — devolução NF-e
+                if (function_exists('registrarAuditoria')) {
+                    registrarAuditoria(
+                        $pdo, $empresaId, $usuarioId ?? null, $usuarioNome ?? null,
+                        'devolucao_nfe', 'venda', $vendaId,
+                        "NF-e de devolução emitida — Nº " . ($venda['numero'] ?? '?'),
+                        null,
+                        ['status' => $statusSalvar, 'numero' => $venda['numero'] ?? null, 'chave' => $chaveAcesso, 'protocolo' => $resultado->protocolo ?? '']
+                    );
+                }
 
                 // Estorno de estoque na devolução de VENDA
                 foreach ($venda['itens'] as $item) {

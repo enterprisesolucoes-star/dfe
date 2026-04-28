@@ -319,6 +319,20 @@ switch ($action) {
                 }
             }
 
+            // Auditoria — salvar OS
+            if (function_exists('registrarAuditoria')) {
+                $acaoOs = !empty($data['id']) ? 'editar_os' : 'criar_os';
+                $descOs = !empty($data['id'])
+                    ? "OS #$id editada — Cliente: " . ($clienteNome ?? '?') . " | Status: $status | Total: R$ " . number_format($valorTotal, 2, ',', '.')
+                    : "OS #$num criada — Cliente: " . ($clienteNome ?? '?') . " | Status: $status | Total: R$ " . number_format($valorTotal, 2, ',', '.');
+                registrarAuditoria(
+                    $pdo, $empresaId, $usuarioId ?? null, $usuarioNome ?? null,
+                    $acaoOs, 'ordem_servico', $id,
+                    $descOs,
+                    !empty($data['id']) ? ['status_anterior' => $statusAnterior ?? null] : null,
+                    ['status' => $status, 'cliente_nome' => $clienteNome, 'valor_total' => $valorTotal, 'qtd_itens' => count($itens)]
+                );
+            }
             $pdo->commit();
             echo json_encode(['success' => true, 'id' => $id]);
         } catch (Exception $e) {
@@ -338,6 +352,15 @@ switch ($action) {
         }
         $pdo->prepare("DELETE FROM ordens_servico_itens WHERE ordem_id=?")->execute([$id]);
         $pdo->prepare("DELETE FROM ordens_servico WHERE id=?")->execute([$id]);
+        // Auditoria — exclusão de OS
+        if (function_exists('registrarAuditoria')) {
+            registrarAuditoria(
+                $pdo, $empresaId, $usuarioId ?? null, $usuarioNome ?? null,
+                'excluir_os', 'ordem_servico', $id,
+                "OS #$id excluída",
+                null, null
+            );
+        }
         echo json_encode(['success' => true]);
         break;
 
