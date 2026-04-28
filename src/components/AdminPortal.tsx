@@ -93,10 +93,19 @@ const AdminPortal = () => {
       setForm({ ...emp });
       if (emp.uf) buscarMunicipios(emp.uf);
       setEmpresaId(emp.id);
-      const sps = await api(`listar_smartpos_admin&empresa_id=${emp.id}`);
-      setSmartPosList(Array.isArray(sps) ? sps : []);
-      const usrs = await api(`listar_usuarios_admin&emp_id=${emp.id}`);
-      setUsuarios(Array.isArray(usrs) ? usrs : []);
+      setSmartPosList([]);
+      setUsuarios([]);
+      // Abre o modal imediatamente — carrega dados em background
+      setModal(true);
+      try {
+        const sps = await api(`listar_smartpos_admin&empresa_id=${emp.id}`);
+        setSmartPosList(Array.isArray(sps) ? sps : []);
+      } catch (e) { console.error('smartpos:', e); }
+      try {
+        const usrs = await api(`listar_usuarios_admin&emp_id=${emp.id}`);
+        setUsuarios(Array.isArray(usrs) ? usrs : []);
+      } catch (e) { console.error('usuarios:', e); }
+      return;
     } else {
       setForm({ status: 'Ativo', usuario_dfe: 2, ambiente: 2, crt: 1, tem_tef: 0, uf: 'GO' });
       buscarMunicipios('GO');
@@ -374,7 +383,7 @@ const AdminPortal = () => {
             className="bg-white rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col" style={{height: 'calc(100vh - 4rem)', maxHeight: '750px'}}>
             {/* Modal Header */}
             <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50 rounded-t-2xl">
-              <h3 className="font-bold text-gray-800">{empresaId ? 'Editar Empresa' : 'Nova Empresa'}</h3>
+              <h3 className="font-bold text-gray-800">{empresaId ? `Editar Empresa — ${form.razao_social || form.nome_fantasia || ''}` : 'Nova Empresa'}</h3>
               <button onClick={() => setModal(false)} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
                 <X className="w-5 h-5 text-gray-400" />
               </button>
