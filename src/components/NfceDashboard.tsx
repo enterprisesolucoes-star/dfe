@@ -4344,13 +4344,26 @@ const DfeConfigPage = ({
       showAlert('Formato inválido', 'Selecione um arquivo .pfx ou .p12.'); return;
     }
     setUploadingCert(true);
-    const fd = new FormData();
-    fd.append('certificado', file);
-    fd.append('senha', emitente.certificadoSenha || '');
     try {
-      const res = await fetch('./api.php?action=upload_certificado', { method: 'POST', body: fd });
+      // Converte arquivo para base64
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      // Envia junto com os dados da empresa via salvar_empresa
+      const payload = {
+        ...emitente,
+        certificadoPfx: base64,
+        certificadoFileName: file.name,
+      };
+      const res = await fetch('./api.php?action=salvar_empresa', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
       const data = await res.json();
-      if (data.success) {
+      if (data.success !== false) {
         onUpdate({ ...emitente, certificadoFileName: file.name });
         showAlert('Certificado', 'Certificado digital enviado com sucesso!');
       } else {
