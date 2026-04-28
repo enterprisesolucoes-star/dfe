@@ -138,11 +138,148 @@ switch ($action) {
         }
         break;
 
+    case 'fin_lancar_parcelado':
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!$data) { echo json_encode(['success' => false, 'message' => 'Dados inválidos']); break; }
+
+        $tipo            = ($data['tipo'] ?? 'R') === 'P' ? 'P' : 'R';
+        $descricao       = trim($data['descricao'] ?? $data['categoria'] ?? '');
+        $categoria       = trim($data['categoria'] ?? 'Geral');
+        $valorTotal      = (float)($data['valor_total'] ?? 0);
+        $numParcelas     = max(1, (int)($data['num_parcelas'] ?? 1));
+        $primeiroVenc    = $data['primeiro_vencimento'] ?? date('Y-m-d');
+        $intervaloDias   = max(1, (int)($data['intervalo_dias'] ?? 30));
+        $entidadeId      = !empty($data['entidade_id']) ? (int)$data['entidade_id'] : null;
+        $observacoes     = $data['observacoes'] ?? null;
+        $formaPgto       = $data['forma_pagamento_prevista'] ?? '01';
+        // Aceita parcelas customizadas (array de {valor, vencimento})
+        $parcelasCustom  = $data['parcelas'] ?? null;
+
+        if ($valorTotal <= 0 || empty($descricao)) {
+            echo json_encode(['success' => false, 'message' => 'Valor e descrição são obrigatórios']);
+            break;
+        }
+
+        try {
+            $pdo->beginTransaction();
+            $idsCriados = [];
+
+            if (is_array($parcelasCustom) && count($parcelasCustom) > 0) {
+                $totalParcelas = count($parcelasCustom);
+                foreach ($parcelasCustom as $idx => $p) {
+                    $valorP = (float)($p['valor'] ?? 0);
+                    $vencP  = $p['vencimento'] ?? $primeiroVenc;
+                    $stmt = $pdo->prepare("INSERT INTO financeiro
+                        (empresa_id, tipo, status, entidade_id, valor_total, vencimento, parcela_numero, parcela_total, forma_pagamento_prevista, categoria, observacoes)
+                        VALUES (?, ?, 'Pendente', ?, ?, ?, ?, ?, ?, ?, ?)");
+                    $stmt->execute([$empresaId, $tipo, $entidadeId, $valorP, $vencP, $idx+1, $totalParcelas, $formaPgto, $categoria, $observacoes]);
+                    $idsCriados[] = (int)$pdo->lastInsertId();
+                }
+            } else {
+                // Gera parcelas iguais
+                $valorParcela = round($valorTotal / $numParcelas, 2);
+                $somaParciais = $valorParcela * ($numParcelas - 1);
+                $ultimaParcela = round($valorTotal - $somaParciais, 2);
+
+                for ($i = 1; $i <= $numParcelas; $i++) {
+                    $valorP = ($i === $numParcelas) ? $ultimaParcela : $valorParcela;
+                    $vencP = date('Y-m-d', strtotime($primeiroVenc . " +" . (($i-1) * $intervaloDias) . " days"));
+                    $stmt = $pdo->prepare("INSERT INTO financeiro
+                        (empresa_id, tipo, status, entidade_id, valor_total, vencimento, parcela_numero, parcela_total, forma_pagamento_prevista, categoria, observacoes)
+                        VALUES (?, ?, 'Pendente', ?, ?, ?, ?, ?, ?, ?, ?)");
+                    $stmt->execute([$empresaId, $tipo, $entidadeId, $valorP, $vencP, $i, $numParcelas, $formaPgto, $categoria, $observacoes]);
+                    $idsCriados[] = (int)$pdo->lastInsertId();
+                }
+            }
+
+            $pdo->commit();
+
+            // Auditoria
+            if (function_exists('registrarAuditoria')) {
+                $tipoTexto = $tipo === 'R' ? 'Receber' : 'Pagar';
+                registrarAuditoria(
+                    $pdo, $empresaId, $usuarioId ?? null, $usuarioNome ?? null,
+                    'fin_lancamento_manual', 'financeiro', implode(',', $idsCriados),
+                    "Lançamento manual ($tipoTexto): $descricao — Total R$ " . number_format($valorTotal, 2, ',', '.') . " em " . count($idsCriados) . "x",
+                    null,
+                    ['tipo' => $tipo, 'valor_total' => $valorTotal, 'parcelas' => count($idsCriados), 'descricao' => $descricao, 'ids' => $idsCriados]
+                );
+            }
+
+            echo json_encode(['success' => true, 'ids' => $idsCriados]);
+        } catch (Exception $e) {
+            if ($pdo->inTransaction()) $pdo->rollBack();
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
+    case 'fin_estornar_titulo':
+        $data = json_decode(file_get_contents('php://input'), true);
+        $id = (int)($data['id'] ?? $_GET['id'] ?? 0);
+        if (!$id) { echo json_encode(['success' => false, 'message' => 'ID inválido']); break; }
+        try {
+            $pdo->beginTransaction();
+            $stmt = $pdo->prepare("SELECT * FROM financeiro WHERE id = ? AND empresa_id = ?");
+            $stmt->execute([$id, $empresaId]);
+            $titulo = $stmt->fetch();
+            if (!$titulo) throw new Exception("Título não encontrado.");
+            if ($titulo['status'] !== 'Pago') throw new Exception("Apenas títulos pagos podem ser estornados.");
+
+            // 1. Reverter status do título
+            $pdo->prepare("UPDATE financeiro SET status = 'Pendente', valor_pago = 0, data_baixa = NULL WHERE id = ?")->execute([$id]);
+            // 2. Remover lançamentos no caixa
+            $pdo->prepare("DELETE FROM caixa_movimentos WHERE financeiro_id = ? AND empresa_id = ?")->execute([$id, $empresaId]);
+
+            $pdo->commit();
+
+            // Auditoria
+            if (function_exists('registrarAuditoria')) {
+                $tipoTexto = $titulo['tipo'] === 'R' ? 'Receber' : 'Pagar';
+                registrarAuditoria(
+                    $pdo, $empresaId, $usuarioId ?? null, $usuarioNome ?? null,
+                    'fin_estornar', 'financeiro', $id,
+                    "Título $tipoTexto #$id estornado — R$ " . number_format($titulo['valor_pago'], 2, ',', '.'),
+                    ['status' => 'Pago', 'valor_pago' => $titulo['valor_pago'], 'data_baixa' => $titulo['data_baixa']],
+                    ['status' => 'Pendente', 'valor_pago' => 0, 'data_baixa' => null]
+                );
+            }
+
+            echo json_encode(['success' => true]);
+        } catch (Exception $e) {
+            if ($pdo->inTransaction()) $pdo->rollBack();
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
     case 'fin_excluir_titulo':
         $id = (int)($_GET['id'] ?? 0);
         if (!$id) { echo json_encode(['success' => false, 'message' => 'ID inválido']); break; }
-        $pdo->prepare("DELETE FROM financeiro WHERE id = ? AND empresa_id = ?")->execute([$id, $empresaId]);
-        echo json_encode(['success' => true]);
+        try {
+            $pdo->beginTransaction();
+            $stmt = $pdo->prepare("SELECT * FROM financeiro WHERE id = ? AND empresa_id = ?");
+            $stmt->execute([$id, $empresaId]);
+            $titulo = $stmt->fetch();
+            if (!$titulo) throw new Exception("Título não encontrado.");
+            // Remove movimentos de caixa associados (se já foi pago)
+            $pdo->prepare("DELETE FROM caixa_movimentos WHERE financeiro_id = ? AND empresa_id = ?")->execute([$id, $empresaId]);
+            $pdo->prepare("DELETE FROM financeiro WHERE id = ? AND empresa_id = ?")->execute([$id, $empresaId]);
+            $pdo->commit();
+            // Auditoria
+            if (function_exists('registrarAuditoria')) {
+                $tipoTexto = $titulo['tipo'] === 'R' ? 'Receber' : 'Pagar';
+                registrarAuditoria(
+                    $pdo, $empresaId, $usuarioId ?? null, $usuarioNome ?? null,
+                    'fin_excluir', 'financeiro', $id,
+                    "Título $tipoTexto #$id excluído — R$ " . number_format($titulo['valor_total'], 2, ',', '.') . " (status: {$titulo['status']})",
+                    ['status' => $titulo['status'], 'valor_total' => $titulo['valor_total'], 'vencimento' => $titulo['vencimento']],
+                    null
+                );
+            }
+            echo json_encode(['success' => true]);
+        } catch (Exception $e) {
+            if ($pdo->inTransaction()) $pdo->rollBack();
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
         break;
 
     case 'fin_baixar_titulo':
@@ -182,6 +319,17 @@ switch ($action) {
             ]);
 
             $pdo->commit();
+            // Auditoria
+            if (function_exists('registrarAuditoria')) {
+                $tipoTexto = $titulo['tipo'] === 'R' ? 'Receber' : 'Pagar';
+                registrarAuditoria(
+                    $pdo, $empresaId, $usuarioId ?? null, $usuarioNome ?? null,
+                    'fin_baixar', 'financeiro', $titulo['id'],
+                    "Título $tipoTexto #" . $titulo['id'] . " baixado — R$ " . number_format($data['valor_pago'], 2, ',', '.') . " em " . $data['data_pagamento'],
+                    ['status' => $titulo['status'], 'valor_pago' => $titulo['valor_pago']],
+                    ['status' => 'Pago', 'valor_pago' => $data['valor_pago'], 'data_baixa' => $data['data_pagamento']]
+                );
+            }
             echo json_encode(['success' => true]);
         } catch (Exception $e) {
             if ($pdo->inTransaction()) $pdo->rollBack();

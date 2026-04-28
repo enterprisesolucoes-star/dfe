@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { DollarSign, CheckCircle, Trash2, Search, TrendingUp, TrendingDown } from 'lucide-react';
+import { DollarSign, CheckCircle, Trash2, Search, TrendingUp, TrendingDown, Plus, RotateCcw } from 'lucide-react';
 import { StatCard, Input } from './UIComponents';
 
 // ─── Componente Baixa de Título ──────────────────────────────────────────────
@@ -121,6 +121,7 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm }: { tip
   const [df, setDf] = useState(() => new Date().toISOString().split('T')[0]);
   const [busca, setBusca] = useState('');
   const [baixaTitulo, setBaixaTitulo] = useState<any | null>(null);
+  const [showLancamento, setShowLancamento] = useState(false);
 
   const fetchTitulos = async () => {
     setLoading(true);
@@ -145,10 +146,18 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm }: { tip
       if ((await res.json()).success) { fetchTitulos(); }
     });
   };
+  const handleEstornar = (id: number) => {
+    showConfirm('Estornar Recebimento', 'Esta ação irá reverter o pagamento e remover o lançamento do caixa. Deseja continuar?', async () => {
+      const res = await fetch('./api.php?action=fin_estornar_titulo', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ id }) });
+      const data = await res.json();
+      if (data.success) { fetchTitulos(); showAlert('Sucesso', 'Estorno realizado.'); } else showAlert('Erro', data.message || 'Falha ao estornar.');
+    });
+  };
 
   return (
     <div className="space-y-4">
       {baixaTitulo && <BaixaModal titulo={baixaTitulo} emitente={emitente} onClose={() => setBaixaTitulo(null)} onSuccess={() => { setBaixaTitulo(null); fetchTitulos(); }} showAlert={showAlert} />}
+      {showLancamento && <LancamentoManualModal tipo={tipo} onClose={() => setShowLancamento(false)} onSuccess={() => { setShowLancamento(false); fetchTitulos(); }} showAlert={showAlert} />}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <StatCard label={tipo === 'R' ? "Contas a Receber" : "Contas a Pagar"} value={Number(totPendente).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} icon={DollarSign} color={tipo === 'R' ? 'blue' : 'red'} />
         <StatCard label={tipo === 'R' ? "Recebido no Período" : "Pago no Período"} value={Number(totPago).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} icon={CheckCircle} color="green" />
@@ -167,6 +176,7 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm }: { tip
           <span className="text-[10px] text-gray-400 font-bold uppercase">Até:</span>
           <input type="date" value={df} onChange={e => setDf(e.target.value)} className="border border-gray-200 rounded-xl px-2 py-1.5 text-xs outline-none" />
           <button onClick={fetchTitulos} className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all">Atualizar</button>
+          <button onClick={() => setShowLancamento(true)} className="flex items-center gap-1 px-3 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition-all"><Plus className="w-3 h-3" /> Novo Lançamento</button>
         </div>
         <div className="flex items-center gap-2">
           <div className="relative">
@@ -216,6 +226,7 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm }: { tip
                 <td className="px-6 py-4 text-center">
                   <div className="flex items-center justify-center gap-2">
                     {t.status !== 'Pago' && <button onClick={() => setBaixaTitulo(t)} className="p-1.5 text-gray-400 hover:text-emerald-600" title="Baixar"><CheckCircle className="w-3.5 h-3.5" /></button>}
+                    {t.status === 'Pago' && <button onClick={() => handleEstornar(t.id)} className="p-1.5 text-gray-400 hover:text-amber-600" title="Estornar"><RotateCcw className="w-3.5 h-3.5" /></button>}
                     <button onClick={() => handleExcluir(t.id)} className="p-1.5 text-gray-400 hover:text-red-600" title="Excluir"><Trash2 className="w-3.5 h-3.5" /></button>
                   </div>
                 </td>
@@ -229,6 +240,147 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm }: { tip
 };
 
 // ─── Componente Parcelamento ────────────────────────────────────────────────
+export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: any) => {
+  const tipoTexto = tipo === 'R' ? 'Receber' : 'Pagar';
+  const corBtn = tipo === 'R' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-red-600 hover:bg-red-700';
+  const [descricao, setDescricao] = useState('');
+  const [valorTotal, setValorTotal] = useState('');
+  const [numParcelas, setNumParcelas] = useState(1);
+  const [primeiroVenc, setPrimeiroVenc] = useState(new Date().toISOString().split('T')[0]);
+  const [intervaloDias, setIntervaloDias] = useState(30);
+  const [observacoes, setObservacoes] = useState('');
+  const [parcelas, setParcelas] = useState<any[]>([]);
+  const [showAjusteParcelas, setShowAjusteParcelas] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const valorNum = Number(String(valorTotal).replace(',','.')) || 0;
+  // Recalcula parcelas quando muda valor, num parcelas, primeira data ou intervalo
+  useEffect(() => {
+    if (valorNum <= 0 || numParcelas < 1) { setParcelas([]); return; }
+    const valorBase = Math.floor((valorNum / numParcelas) * 100) / 100;
+    const arr = [];
+    let soma = 0;
+    for (let i = 1; i <= numParcelas; i++) {
+      const data = new Date(primeiroVenc + 'T12:00:00');
+      data.setDate(data.getDate() + ((i-1) * intervaloDias));
+      let v = valorBase;
+      if (i === numParcelas) v = Number((valorNum - soma).toFixed(2));
+      else soma += valorBase;
+      arr.push({ numero: i, vencimento: data.toISOString().split('T')[0], valor: v });
+    }
+    setParcelas(arr);
+  }, [valorNum, numParcelas, primeiroVenc, intervaloDias]);
+
+  const totalParcelas = parcelas.reduce((acc, p) => acc + Number(p.valor), 0);
+  const diferenca = Math.abs(totalParcelas - valorNum);
+
+  const handleSalvar = async () => {
+    if (!descricao.trim()) { showAlert('Atenção', 'Descrição é obrigatória.'); return; }
+    if (valorNum <= 0) { showAlert('Atenção', 'Valor total deve ser maior que zero.'); return; }
+    if (diferenca > 0.01) { showAlert('Atenção', 'Soma das parcelas não confere com o valor total.'); return; }
+    setSaving(true);
+    try {
+      const res = await fetch('./api.php?action=fin_lancar_parcelado', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          tipo, descricao, categoria: descricao,
+          valor_total: valorNum,
+          parcelas: parcelas.map(p => ({ valor: Number(p.valor), vencimento: p.vencimento })),
+          observacoes
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showAlert('Sucesso', `${parcelas.length} parcela(s) lançada(s) com sucesso.`);
+        onSuccess();
+      } else {
+        showAlert('Erro', data.message || 'Falha ao salvar.');
+      }
+    } catch { showAlert('Erro', 'Falha ao conectar.'); }
+    setSaving(false);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[200] p-4 backdrop-blur-sm">
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+        <div className="p-6 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+          <div>
+            <h3 className="font-bold text-gray-800 text-sm">Novo Lançamento — Contas a {tipoTexto}</h3>
+            <p className="text-xs text-gray-500">Lançamento manual com parcelamento opcional</p>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+        </div>
+        <div className="p-6 space-y-4 overflow-y-auto">
+          <div>
+            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Descrição / Categoria</label>
+            <input type="text" value={descricao} onChange={e => setDescricao(e.target.value)} placeholder="Ex: Aluguel, Cliente João, Energia..." className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm" />
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Valor Total (R$)</label>
+              <input type="number" step="0.01" value={valorTotal} onChange={e => setValorTotal(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm font-bold" />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Nº Parcelas</label>
+              <input type="number" min="1" max="120" value={numParcelas} onChange={e => setNumParcelas(Math.max(1, Number(e.target.value)))} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm font-bold" />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Intervalo (dias)</label>
+              <input type="number" min="1" value={intervaloDias} onChange={e => setIntervaloDias(Math.max(1, Number(e.target.value)))} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Primeiro Vencimento</label>
+            <input type="date" value={primeiroVenc} onChange={e => setPrimeiroVenc(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm" />
+          </div>
+          <div>
+            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Observações</label>
+            <textarea value={observacoes} onChange={e => setObservacoes(e.target.value)} rows={2} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm resize-none" />
+          </div>
+          {parcelas.length > 0 && (
+            <div className="border border-gray-200 rounded-xl overflow-hidden">
+              <div className="bg-gray-50 px-4 py-2 flex justify-between items-center">
+                <span className="text-[10px] font-bold text-gray-500 uppercase">Parcelas Geradas ({parcelas.length})</span>
+                <span className={`text-xs font-bold ${diferenca > 0.01 ? 'text-red-600' : 'text-emerald-600'}`}>
+                  Total: R$ {totalParcelas.toFixed(2)}
+                </span>
+              </div>
+              <table className="w-full text-xs">
+                <thead className="bg-gray-50 border-t border-gray-100">
+                  <tr className="text-left">
+                    <th className="px-4 py-2 font-bold text-[10px] text-gray-500 uppercase">#</th>
+                    <th className="px-4 py-2 font-bold text-[10px] text-gray-500 uppercase">Vencimento</th>
+                    <th className="px-4 py-2 font-bold text-[10px] text-gray-500 uppercase text-right">Valor</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {parcelas.map((p, idx) => (
+                    <tr key={idx}>
+                      <td className="px-4 py-2 font-bold">{p.numero}/{parcelas.length}</td>
+                      <td className="px-4 py-2">
+                        <input type="date" value={p.vencimento} onChange={e => { const n = [...parcelas]; n[idx].vencimento = e.target.value; setParcelas(n); }} className="border-0 bg-transparent text-xs" />
+                      </td>
+                      <td className="px-4 py-2 text-right">
+                        <input type="number" step="0.01" value={p.valor} onChange={e => { const n = [...parcelas]; n[idx].valor = Number(e.target.value); setParcelas(n); }} className="border-0 bg-transparent text-right w-24 text-xs font-bold" />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+        <div className="p-4 bg-gray-50 border-t border-gray-100 flex gap-3">
+          <button onClick={onClose} className="flex-1 py-2.5 text-gray-500 font-bold uppercase text-xs border border-gray-200 rounded-xl hover:bg-gray-100">Cancelar</button>
+          <button onClick={handleSalvar} disabled={saving || diferenca > 0.01 || !descricao.trim() || valorNum <= 0} className={`flex-1 py-2.5 ${corBtn} disabled:bg-gray-300 text-white font-bold uppercase text-xs rounded-xl`}>
+            {saving ? 'Salvando...' : `Lançar ${parcelas.length} Parcela(s)`}
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
 export const ParcelamentoModal = ({ total, initialParcelas, onConfirm, onCancel }: any) => {
   const [numParcelas, setNumParcelas] = useState(initialParcelas?.length || 1);
   const [parcelas, setParcelas] = useState<any[]>(initialParcelas || []);
