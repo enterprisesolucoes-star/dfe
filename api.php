@@ -306,6 +306,7 @@ $modules = [
     'fin_excluir_movimento' => 'financeiro',
     'fin_lancar_parcelado'  => 'financeiro',
     'fin_estornar_titulo'   => 'financeiro',
+    'fin_editar_titulo'     => 'financeiro',
     'relatorio_tef' => 'vendas', 'status_sefaz' => 'vendas',
     'auditoria_listar'   => 'auditoria',
     'auditoria_acoes'    => 'auditoria',

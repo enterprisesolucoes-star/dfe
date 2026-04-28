@@ -805,6 +805,7 @@ const AuditoriaModal = ({ empresa, onClose }: { empresa: {id: number; nome: stri
       'fin_lancamento_manual': '💰 Lançamento Financeiro',
       'fin_baixar': '✅ Baixar Título',
       'fin_estornar': '↩️ Estornar Título',
+      'fin_editar': '✏️ Editar Título',
       'fin_excluir': '🗑️ Excluir Título',
     };
     return map[a] || a;

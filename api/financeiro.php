@@ -251,6 +251,64 @@ switch ($action) {
         }
         break;
 
+    case 'fin_editar_titulo':
+        $data = json_decode(file_get_contents('php://input'), true);
+        $id = (int)($data['id'] ?? 0);
+        if (!$id) { echo json_encode(['success' => false, 'message' => 'ID inválido']); break; }
+        try {
+            $pdo->beginTransaction();
+            $stmt = $pdo->prepare("SELECT * FROM financeiro WHERE id = ? AND empresa_id = ?");
+            $stmt->execute([$id, $empresaId]);
+            $titulo = $stmt->fetch();
+            if (!$titulo) throw new Exception("Título não encontrado.");
+            if ($titulo['status'] === 'Pago') throw new Exception("Títulos pagos não podem ser editados. Estorne primeiro.");
+
+            $novaCategoria   = trim($data['categoria'] ?? $titulo['categoria']);
+            $novoValor       = (float)($data['valor_total'] ?? $titulo['valor_total']);
+            $novoVencimento  = $data['vencimento'] ?? $titulo['vencimento'];
+            $novaObservacao  = $data['observacoes'] ?? $titulo['observacoes'];
+            $novaForma       = $data['forma_pagamento_prevista'] ?? $titulo['forma_pagamento_prevista'];
+
+            if ($novoValor <= 0) throw new Exception("Valor inválido.");
+            if (empty($novaCategoria)) throw new Exception("Descrição é obrigatória.");
+
+            $pdo->prepare("UPDATE financeiro SET categoria = ?, valor_total = ?, vencimento = ?, observacoes = ?, forma_pagamento_prevista = ? WHERE id = ? AND empresa_id = ?")
+                ->execute([$novaCategoria, $novoValor, $novoVencimento, $novaObservacao, $novaForma, $id, $empresaId]);
+
+            $pdo->commit();
+
+            // Auditoria — só registra se algo mudou
+            if (function_exists('registrarAuditoria')) {
+                $mudou = (
+                    $titulo['categoria'] !== $novaCategoria ||
+                    abs((float)$titulo['valor_total'] - $novoValor) > 0.001 ||
+                    $titulo['vencimento'] !== $novoVencimento ||
+                    ($titulo['observacoes'] ?? '') !== ($novaObservacao ?? '') ||
+                    ($titulo['forma_pagamento_prevista'] ?? '') !== ($novaForma ?? '')
+                );
+                if ($mudou) {
+                    $tipoTexto = $titulo['tipo'] === 'R' ? 'Receber' : 'Pagar';
+                    $partes = [];
+                    if ($titulo['categoria'] !== $novaCategoria) $partes[] = "Descrição";
+                    if (abs((float)$titulo['valor_total'] - $novoValor) > 0.001) $partes[] = "Valor: R$ " . number_format($titulo['valor_total'], 2, ',', '.') . " → R$ " . number_format($novoValor, 2, ',', '.');
+                    if ($titulo['vencimento'] !== $novoVencimento) $partes[] = "Vencimento: {$titulo['vencimento']} → $novoVencimento";
+                    registrarAuditoria(
+                        $pdo, $empresaId, $usuarioId ?? null, $usuarioNome ?? null,
+                        'fin_editar', 'financeiro', $id,
+                        "Título $tipoTexto #$id editado — " . implode(' | ', $partes),
+                        ['categoria' => $titulo['categoria'], 'valor_total' => $titulo['valor_total'], 'vencimento' => $titulo['vencimento'], 'observacoes' => $titulo['observacoes'], 'forma_pagamento_prevista' => $titulo['forma_pagamento_prevista']],
+                        ['categoria' => $novaCategoria, 'valor_total' => $novoValor, 'vencimento' => $novoVencimento, 'observacoes' => $novaObservacao, 'forma_pagamento_prevista' => $novaForma]
+                    );
+                }
+            }
+
+            echo json_encode(['success' => true]);
+        } catch (Exception $e) {
+            if ($pdo->inTransaction()) $pdo->rollBack();
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
     case 'fin_excluir_titulo':
         $id = (int)($_GET['id'] ?? 0);
         if (!$id) { echo json_encode(['success' => false, 'message' => 'ID inválido']); break; }

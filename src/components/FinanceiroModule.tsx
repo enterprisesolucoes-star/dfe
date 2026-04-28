@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { DollarSign, CheckCircle, Trash2, Search, TrendingUp, TrendingDown, Plus, RotateCcw } from 'lucide-react';
+import { DollarSign, CheckCircle, Trash2, Search, TrendingUp, TrendingDown, Plus, RotateCcw, Edit2 } from 'lucide-react';
 import { StatCard, Input } from './UIComponents';
 
 // ─── Componente Baixa de Título ──────────────────────────────────────────────
@@ -122,6 +122,7 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm }: { tip
   const [busca, setBusca] = useState('');
   const [baixaTitulo, setBaixaTitulo] = useState<any | null>(null);
   const [showLancamento, setShowLancamento] = useState(false);
+  const [editTitulo, setEditTitulo] = useState<any | null>(null);
 
   const fetchTitulos = async () => {
     setLoading(true);
@@ -158,6 +159,7 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm }: { tip
     <div className="space-y-4">
       {baixaTitulo && <BaixaModal titulo={baixaTitulo} emitente={emitente} onClose={() => setBaixaTitulo(null)} onSuccess={() => { setBaixaTitulo(null); fetchTitulos(); }} showAlert={showAlert} />}
       {showLancamento && <LancamentoManualModal tipo={tipo} onClose={() => setShowLancamento(false)} onSuccess={() => { setShowLancamento(false); fetchTitulos(); }} showAlert={showAlert} />}
+      {editTitulo && <EditarTituloModal titulo={editTitulo} onClose={() => setEditTitulo(null)} onSuccess={() => { setEditTitulo(null); fetchTitulos(); }} showAlert={showAlert} />}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <StatCard label={tipo === 'R' ? "Contas a Receber" : "Contas a Pagar"} value={Number(totPendente).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} icon={DollarSign} color={tipo === 'R' ? 'blue' : 'red'} />
         <StatCard label={tipo === 'R' ? "Recebido no Período" : "Pago no Período"} value={Number(totPago).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} icon={CheckCircle} color="green" />
@@ -226,6 +228,7 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm }: { tip
                 <td className="px-6 py-4 text-center">
                   <div className="flex items-center justify-center gap-2">
                     {t.status !== 'Pago' && <button onClick={() => setBaixaTitulo(t)} className="p-1.5 text-gray-400 hover:text-emerald-600" title="Baixar"><CheckCircle className="w-3.5 h-3.5" /></button>}
+                    {t.status !== 'Pago' && <button onClick={() => setEditTitulo(t)} className="p-1.5 text-gray-400 hover:text-blue-600" title="Editar"><Edit2 className="w-3.5 h-3.5" /></button>}
                     {t.status === 'Pago' && <button onClick={() => handleEstornar(t.id)} className="p-1.5 text-gray-400 hover:text-amber-600" title="Estornar"><RotateCcw className="w-3.5 h-3.5" /></button>}
                     <button onClick={() => handleExcluir(t.id)} className="p-1.5 text-gray-400 hover:text-red-600" title="Excluir"><Trash2 className="w-3.5 h-3.5" /></button>
                   </div>
@@ -240,6 +243,88 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm }: { tip
 };
 
 // ─── Componente Parcelamento ────────────────────────────────────────────────
+export const EditarTituloModal = ({ titulo, onClose, onSuccess, showAlert }: any) => {
+  const tipoTexto = titulo.tipo === 'R' ? 'Receber' : 'Pagar';
+  const corBtn = titulo.tipo === 'R' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-red-600 hover:bg-red-700';
+  const [categoria, setCategoria] = useState(titulo.categoria || '');
+  const [valorTotal, setValorTotal] = useState(String(titulo.valor_total || ''));
+  const [vencimento, setVencimento] = useState(titulo.vencimento || '');
+  const [observacoes, setObservacoes] = useState(titulo.observacoes || '');
+  const [formaPgto, setFormaPgto] = useState(titulo.forma_pagamento_prevista || '01');
+  const [saving, setSaving] = useState(false);
+
+  const handleSalvar = async () => {
+    const valorNum = Number(String(valorTotal).replace(',','.')) || 0;
+    if (!categoria.trim()) { showAlert('Atenção', 'Descrição é obrigatória.'); return; }
+    if (valorNum <= 0) { showAlert('Atenção', 'Valor deve ser maior que zero.'); return; }
+    setSaving(true);
+    try {
+      const res = await fetch('./api.php?action=fin_editar_titulo', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          id: titulo.id, categoria, valor_total: valorNum, vencimento,
+          observacoes, forma_pagamento_prevista: formaPgto
+        })
+      });
+      const data = await res.json();
+      if (data.success) { showAlert('Sucesso', 'Título atualizado.'); onSuccess(); }
+      else showAlert('Erro', data.message || 'Falha ao salvar.');
+    } catch { showAlert('Erro', 'Falha ao conectar.'); }
+    setSaving(false);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[200] p-4 backdrop-blur-sm">
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden">
+        <div className="p-6 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+          <div>
+            <h3 className="font-bold text-gray-800 text-sm">Editar Título — {tipoTexto}</h3>
+            <p className="text-xs text-gray-500">Parcela {titulo.parcela_numero}/{titulo.parcela_total}</p>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+        </div>
+        <div className="p-6 space-y-3">
+          <div>
+            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Descrição</label>
+            <input type="text" value={categoria} onChange={e => setCategoria(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Valor (R$)</label>
+              <input type="number" step="0.01" value={valorTotal} onChange={e => setValorTotal(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm font-bold" />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Vencimento</label>
+              <input type="date" value={vencimento} onChange={e => setVencimento(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Forma de Pagamento Prevista</label>
+            <select value={formaPgto} onChange={e => setFormaPgto(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm">
+              <option value="01">01 - Dinheiro</option>
+              <option value="03">03 - Crédito</option>
+              <option value="04">04 - Débito</option>
+              <option value="15">15 - Boleto</option>
+              <option value="17">17 - PIX</option>
+              <option value="99">99 - Outros</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Observações</label>
+            <textarea value={observacoes} onChange={e => setObservacoes(e.target.value)} rows={2} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm resize-none" />
+          </div>
+        </div>
+        <div className="p-4 bg-gray-50 border-t border-gray-100 flex gap-3">
+          <button onClick={onClose} className="flex-1 py-2.5 text-gray-500 font-bold uppercase text-xs border border-gray-200 rounded-xl hover:bg-gray-100">Cancelar</button>
+          <button onClick={handleSalvar} disabled={saving} className={`flex-1 py-2.5 ${corBtn} disabled:bg-gray-300 text-white font-bold uppercase text-xs rounded-xl`}>
+            {saving ? 'Salvando...' : 'Salvar'}
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
 export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: any) => {
   const tipoTexto = tipo === 'R' ? 'Receber' : 'Pagar';
   const corBtn = tipo === 'R' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-red-600 hover:bg-red-700';
