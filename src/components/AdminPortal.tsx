@@ -883,8 +883,8 @@ const AuditoriaModal = ({ empresa, onClose }: { empresa: {id: number; nome: stri
                 <tr key={l.id} className="hover:bg-gray-50/50">
                   <td className="px-4 py-3 text-xs text-gray-600 whitespace-nowrap">{new Date(l.criado_em).toLocaleString('pt-BR')}</td>
                   <td className="px-4 py-3 text-xs font-medium text-gray-800">{l.usuario_nome || '—'}</td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${corDaAcao(l.acao)}`}>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${corDaAcao(l.acao)} whitespace-nowrap`}>
                       {formatarAcao(l.acao)}
                     </span>
                   </td>
