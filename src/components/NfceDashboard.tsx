@@ -2883,7 +2883,7 @@ const LogoUploadSection = ({ emitente, onUpdate, showAlert }: { emitente: Emiten
       } else {
         showAlert('Erro', data.message || 'Falha ao enviar logo.');
       }
-    } catch { showAlert('Erro', 'Falha na requisição.'); }
+    } catch (err: any) { console.error('Falha na requisição:', err); showAlert('Erro', 'Falha na requisição: ' + (err?.message || 'desconhecido')); }
     finally { setUploading(false); }
   };
 
@@ -3084,7 +3084,7 @@ const OrcamentosTab = ({
       const data = await res.json();
       if (data.success) { setViewMode('list'); fetchOrcamentos(); }
       else showAlert('Erro', data.message || 'Falha ao salvar.');
-    } catch { showAlert('Erro', 'Falha na requisição.'); }
+    } catch (err: any) { console.error('Falha na requisição:', err); showAlert('Erro', 'Falha na requisição: ' + (err?.message || 'desconhecido')); }
     setSaving(false);
   };
 
@@ -3608,7 +3608,7 @@ const OrcamentoModal = ({
       const data = await res.json();
       if (data.success) onSaved();
       else showAlert('Erro', data.message || 'Falha ao salvar.');
-    } catch { showAlert('Erro', 'Falha na requisição.'); }
+    } catch (err: any) { console.error('Falha na requisição:', err); showAlert('Erro', 'Falha na requisição: ' + (err?.message || 'desconhecido')); }
     setSaving(false);
   };
 
