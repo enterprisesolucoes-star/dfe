@@ -3344,18 +3344,34 @@ const OrcamentosTab = ({
                   </div>
                 </div>
               ) : (
-                <p className="text-center text-sm text-red-500 py-4">Nenhum item adicionado. Volte para a etapa anterior.</p>
+                <p className="text-center text-sm text-red-500 py-4">Nenhum item adicionado. Volte para a aba anterior.</p>
               )}
-              <div className="flex justify-center pt-2">
-                <button onClick={handleSalvar} disabled={saving || form.itens.length === 0} className="flex items-center gap-2 px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm font-medium">
-                  {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                  {saving ? 'Salvando...' : 'Salvar Orçamento'}
-                </button>
-              </div>
             </div>
           )}
         </div>
 
+        <div className="bg-white rounded-xl border border-gray-200 px-6 py-4 flex items-center justify-between">
+          <div>
+            {formStep > 1 && (
+              <button onClick={() => setFormStep(s => (s - 1) as 1 | 2 | 3)} className="flex items-center gap-2 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 text-sm">
+                ← Anterior
+              </button>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            {formStep < 3 && (
+              <button onClick={() => setFormStep(s => (s + 1) as 1 | 2 | 3)} className="flex items-center gap-2 px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+                Próximo →
+              </button>
+            )}
+            {formStep === 3 && (
+              <button onClick={handleSalvar} disabled={saving || form.itens.length === 0} className="flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm">
+                {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                {saving ? 'Salvando...' : 'Salvar Orçamento'}
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     );
   }
@@ -3413,7 +3429,7 @@ const OrcamentosTab = ({
                       <button title="Imprimir PDF" onClick={() => handlePrint(orc.id!)} className="p-1.5 hover:bg-gray-50 rounded-lg text-gray-600 transition-colors"><Printer className="w-4 h-4" /></button>
                       <button title="Enviar por e-mail" onClick={() => { setEmailOrc(orc); setEmailDest(orc.cliente_email || ''); setShowEmail(true); }} className="p-1.5 hover:bg-purple-50 rounded-lg text-purple-600 transition-colors"><Mail className="w-4 h-4" /></button>
                       <button title="Enviar WhatsApp" onClick={() => handleWhatsApp(orc)} className="p-1.5 hover:bg-green-50 rounded-lg text-green-600 transition-colors"><MessageCircle className="w-4 h-4" /></button>
-                      {isFiscal && <button title="Exportar para NFC-e" onClick={() => handleExportarNFCe(orc)} className="p-1.5 hover:bg-orange-50 rounded-lg text-orange-600 transition-colors"><ArrowRight className="w-4 h-4" /></button>}
+                      <button title="Exportar para NFC-e" onClick={() => handleExportarNFCe(orc)} className="p-1.5 hover:bg-orange-50 rounded-lg text-orange-600 transition-colors"><ArrowRight className="w-4 h-4" /></button>
                       <button title="Excluir" onClick={() => handleExcluir(orc.id!)} className="p-1.5 hover:bg-red-50 rounded-lg text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
                     </div>
                   </td>
