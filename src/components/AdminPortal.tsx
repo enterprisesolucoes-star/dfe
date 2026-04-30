@@ -983,19 +983,24 @@ const BackupPanel = ({ onClose, adminToken }: { onClose: () => void; adminToken:
 
   useEffect(() => { carregar(); }, []);
 
+  const [confirmGerar, setConfirmGerar] = useState(false);
+  const [resultado, setResultado] = useState<{tipo: 'success' | 'error', msg: string} | null>(null);
+
   const gerarBackup = async () => {
-    if (!confirm('Gerar backup agora? Pode levar alguns segundos.')) return;
+    setConfirmGerar(false);
     setGerando(true);
     try {
       const r = await fetch(`${window.location.origin}/api.php?action=backup_admin_gerar&adm_token=${adminToken}`);
       const data = await r.json();
       if (data.success) {
-        alert('✅ Backup gerado com sucesso!');
+        setResultado({ tipo: 'success', msg: 'Backup gerado com sucesso!' });
         await carregar();
       } else {
-        alert('❌ Falha:\n\n' + (data.output || 'Erro desconhecido'));
+        setResultado({ tipo: 'error', msg: data.output || 'Erro desconhecido' });
       }
-    } catch (e: any) { alert('Erro: ' + e.message); }
+    } catch (e: any) {
+      setResultado({ tipo: 'error', msg: e.message });
+    }
     setGerando(false);
   };
 
@@ -1052,7 +1057,7 @@ const BackupPanel = ({ onClose, adminToken }: { onClose: () => void; adminToken:
                 </div>
                 <div className="flex gap-2">
                   <button onClick={carregar} className="flex items-center gap-1 px-3 py-2 text-xs border border-gray-200 rounded-lg hover:bg-gray-50"><RefreshCw className="w-3.5 h-3.5" /> Atualizar</button>
-                  <button onClick={gerarBackup} disabled={gerando} className="flex items-center gap-1 px-4 py-2 text-xs bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50">
+                  <button onClick={() => setConfirmGerar(true)} disabled={gerando} className="flex items-center gap-1 px-4 py-2 text-xs bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50">
                     {gerando ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
                     {gerando ? 'Gerando...' : 'Gerar Backup Agora'}
                   </button>
@@ -1101,6 +1106,38 @@ const BackupPanel = ({ onClose, adminToken }: { onClose: () => void; adminToken:
           )}
         </div>
       </div>
+
+      {/* Modal de confirmação de gerar backup */}
+      {confirmGerar && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <h3 className="text-base font-semibold text-gray-800 mb-2 flex items-center gap-2">
+              <Database className="w-5 h-5 text-blue-600" /> Gerar Backup
+            </h3>
+            <p className="text-sm text-gray-600 mb-5">Deseja gerar um backup agora? Pode levar alguns segundos.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setConfirmGerar(false)} className="flex-1 border border-gray-200 rounded-lg py-2 text-sm hover:bg-gray-50">Cancelar</button>
+              <button onClick={gerarBackup} className="flex-1 bg-blue-600 text-white rounded-lg py-2 text-sm hover:bg-blue-700">Confirmar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de resultado */}
+      {resultado && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <h3 className={`text-base font-semibold mb-2 flex items-center gap-2 ${resultado.tipo === 'success' ? 'text-green-700' : 'text-red-700'}`}>
+              {resultado.tipo === 'success' ? <CheckCircle className="w-5 h-5" /> : <X className="w-5 h-5" />}
+              {resultado.tipo === 'success' ? 'Sucesso' : 'Erro'}
+            </h3>
+            <pre className="text-sm text-gray-700 mb-5 whitespace-pre-wrap font-sans max-h-64 overflow-y-auto">{resultado.msg}</pre>
+            <div className="flex justify-end">
+              <button onClick={() => setResultado(null)} className="px-5 bg-blue-600 text-white rounded-lg py-2 text-sm hover:bg-blue-700">OK</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
