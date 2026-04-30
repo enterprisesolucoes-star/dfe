@@ -138,6 +138,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
   const [showFecharCaixaModal, setShowFecharCaixaModal] = useState(false);
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [vendedores, setVendedores] = useState<Vendedor[]>([]);
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
   const [transportadores, setTransportadores] = useState<Transportador[]>([]);
   const [isProdutoModalOpen, setIsProdutoModalOpen] = useState(false);
