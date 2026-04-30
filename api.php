@@ -314,7 +314,10 @@ $modules = [
     'backup_admin_status'    => 'backup_admin',
     'backup_admin_listar'    => 'backup_admin',
     'backup_admin_gerar'     => 'backup_admin',
-    'backup_admin_download'  => 'backup_admin'
+    'backup_admin_download'  => 'backup_admin',
+    'listar_vendedores'   => 'vendedores',
+    'salvar_vendedor'     => 'vendedores',
+    'excluir_vendedor'    => 'vendedores'
 ];
 
 if (isset($modules[$action])) {
