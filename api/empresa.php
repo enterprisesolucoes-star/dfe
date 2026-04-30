@@ -385,6 +385,7 @@ switch ($action) {
         $gerarCreditoSimples = (int) ($data['gerarCreditoSimples'] ?? 0);
         $aliquotaCreditoSimples = (float) ($data['aliquotaCreditoSimples'] ?? 0);
         $recolheIbsCbsFora = (int) ($data['recolhe_ibscbs_fora'] ?? 0);
+        $momentoComissao = $data['momento_comissao'] ?? 'emissao';
 
         $paramsUpdate = [
             $data['razaoSocial'] ?? '',
@@ -421,7 +422,8 @@ switch ($action) {
             (float)($data['multa_receber'] ?? 0),
             (float)($data['juros_dia_receber'] ?? 0),
             (int)($data['carencia_dias_receber'] ?? 0),
-            $recolheIbsCbsFora
+            $recolheIbsCbsFora,
+            $momentoComissao
         ];
         $paramsInsert = $paramsUpdate;
 
@@ -455,7 +457,7 @@ switch ($action) {
 
         if (isset($data['id']) && $data['id'] > 0) {
             $paramsUpdate[] = $data['id'];
-            $stmt = $pdo->prepare("UPDATE empresas SET razao_social=?, cnpj=?, inscricao_estadual=?, csc_token=?, csc_id=?, ambiente=?, uf=?, codigo_municipio=?, numero_nfce=?, serie_nfce=?, numero_nfe=?, serie_nfe=?, ambiente_nfe=?, emissao_contingencia=?, contingencia_automatica=?, logradouro=?, numero=?, bairro=?, municipio=?, cep=?, telefone=?, crt=?, email_contador=?, smtp_host=?, smtp_port=?, smtp_user=?, smtp_pass=?, smtp_secure=?, gerar_credito_simples=?, aliquota_credito_simples=?, ultimo_nsu=?, multa_receber=?, juros_dia_receber=?, carencia_dias_receber=?, recolhe_ibscbs_fora=? {$certPfxSql} {$certFileNameSql} {$certSenhaSql} WHERE id=?");
+            $stmt = $pdo->prepare("UPDATE empresas SET razao_social=?, cnpj=?, inscricao_estadual=?, csc_token=?, csc_id=?, ambiente=?, uf=?, codigo_municipio=?, numero_nfce=?, serie_nfce=?, numero_nfe=?, serie_nfe=?, ambiente_nfe=?, emissao_contingencia=?, contingencia_automatica=?, logradouro=?, numero=?, bairro=?, municipio=?, cep=?, telefone=?, crt=?, email_contador=?, smtp_host=?, smtp_port=?, smtp_user=?, smtp_pass=?, smtp_secure=?, gerar_credito_simples=?, aliquota_credito_simples=?, ultimo_nsu=?, multa_receber=?, juros_dia_receber=?, carencia_dias_receber=?, recolhe_ibscbs_fora=?, momento_comissao=? {$certPfxSql} {$certFileNameSql} {$certSenhaSql} WHERE id=?");
             try {
                 $stmt->execute($paramsUpdate);
                 echo json_encode(['success' => true]);

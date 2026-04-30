@@ -378,6 +378,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           gerarCreditoSimples: Number(data.gerar_credito_simples) === 1,
           aliquotaCreditoSimples: Number(data.aliquota_credito_simples || 0),
           recolhe_ibscbs_fora: Number(data.recolhe_ibscbs_fora) === 1,
+          momento_comissao: data.momento_comissao || 'emissao',
           emissaoContingencia: Number(data.emissao_contingencia) === 1,
           contingenciaAutomatica: Number(data.contingencia_automatica) !== 0,
           tef_required_states: data.tef_required_states || '',
@@ -2960,6 +2961,18 @@ const ConfigTab = ({ emitente, onUpdate, onSave, showAlert, usuarioDfe }: { emit
               </div>
             )}
 
+            <div className="col-span-2 pt-2">
+              <label className="block text-xs font-semibold text-gray-600 mb-1">Gerar comissão de vendedor</label>
+              <select
+                value={emitente.momento_comissao || 'emissao'}
+                onChange={(e) => handleChange('momento_comissao', e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="emissao">Na emissão do documento (Orçamento Aprovado / OS Concluída / Venda)</option>
+                <option value="pagamento">No pagamento do cliente (baixa em Contas a Receber)</option>
+              </select>
+              <p className="text-xs text-gray-400 mt-1">Define quando a comissão do vendedor é contabilizada.</p>
+            </div>
             <div className="col-span-2 pt-4 border-t border-gray-100 mt-4">
               <h4 className="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
                 <Send className="w-4 h-4 text-blue-600" /> Envio de Arquivos (Contador / SMTP)

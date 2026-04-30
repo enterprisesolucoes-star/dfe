@@ -16,6 +16,7 @@ export interface Emitente {
   codigoMunicipio: string;
   uf: string;
   ambiente: '1' | '2';
+  momento_comissao?: 'emissao' | 'pagamento';
 }
 
 export interface Produto {
