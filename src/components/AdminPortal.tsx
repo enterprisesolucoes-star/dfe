@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import {
   FileText, Lock, User, LogOut, Plus, Edit, Edit2, Trash2,
   Search, CheckCircle, X, Smartphone, Shield, RefreshCw,
-  FileSearch, Eye, Filter, Calendar
+  FileSearch, Eye, Filter, Calendar, HardDrive, Cloud, Download, Database
 } from 'lucide-react';
 
 const ESTADOS = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
@@ -25,6 +25,7 @@ const AdminPortal = () => {
   const [busca, setBusca] = useState('');
   const [modal, setModal] = useState(false);
   const [tab, setTab] = useState<'dados'|'smartpos'|'usuarios'>('dados');
+  const [showBackup, setShowBackup] = useState(false);
   const [auditoriaEmpresa, setAuditoriaEmpresa] = useState<{id: number; nome: string} | null>(null);
   const [usuarios, setUsuarios] = useState<any[]>([]);
   const [userForm, setUserForm] = useState({ nome: '', login: '', senha: '', perfil: 'operador' });
@@ -282,9 +283,14 @@ const AdminPortal = () => {
             <p className="text-xs text-gray-400">Gerenciamento de Empresas</p>
           </div>
         </div>
-        <button onClick={handleLogout} className="flex items-center gap-2 text-xs text-gray-500 hover:text-red-600 font-bold transition-colors">
-          <LogOut className="w-4 h-4" /> Sair
-        </button>
+        <div className="flex items-center gap-4">
+          <button onClick={() => setShowBackup(true)} className="flex items-center gap-2 text-xs text-gray-500 hover:text-blue-600 font-bold transition-colors">
+            <HardDrive className="w-4 h-4" /> Backup
+          </button>
+          <button onClick={handleLogout} className="flex items-center gap-2 text-xs text-gray-500 hover:text-red-600 font-bold transition-colors">
+            <LogOut className="w-4 h-4" /> Sair
+          </button>
+        </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-8">
@@ -952,6 +958,149 @@ const AuditoriaModal = ({ empresa, onClose }: { empresa: {id: number; nome: stri
           </div>
         </div>
       )}
+      {showBackup && <BackupPanel onClose={() => setShowBackup(false)} adminToken={adminToken} />}
+    </div>
+  );
+};
+
+const BackupPanel = ({ onClose, adminToken }: { onClose: () => void; adminToken: string }) => {
+  const [status, setStatus] = useState<any>(null);
+  const [backups, setBackups] = useState<{ local: any[]; nuvem: any[] }>({ local: [], nuvem: [] });
+  const [loading, setLoading] = useState(true);
+  const [gerando, setGerando] = useState(false);
+  const [tab, setTab] = useState<'local' | 'nuvem'>('local');
+
+  const carregar = async () => {
+    setLoading(true);
+    try {
+      const r1 = await fetch(`/api.php?action=backup_admin_status&adm_token=${adminToken}`);
+      setStatus(await r1.json());
+      const r2 = await fetch(`/api.php?action=backup_admin_listar&adm_token=${adminToken}`);
+      setBackups(await r2.json());
+    } catch (e) { console.error(e); }
+    setLoading(false);
+  };
+
+  useEffect(() => { carregar(); }, []);
+
+  const gerarBackup = async () => {
+    if (!confirm('Gerar backup agora? Pode levar alguns segundos.')) return;
+    setGerando(true);
+    try {
+      const r = await fetch(`/api.php?action=backup_admin_gerar&adm_token=${adminToken}`);
+      const data = await r.json();
+      if (data.success) {
+        alert('✅ Backup gerado com sucesso!');
+        await carregar();
+      } else {
+        alert('❌ Falha:\n\n' + (data.output || 'Erro desconhecido'));
+      }
+    } catch (e: any) { alert('Erro: ' + e.message); }
+    setGerando(false);
+  };
+
+  const baixar = (nome: string) => {
+    window.open(`/api.php?action=backup_admin_download&adm_token=${adminToken}&arquivo=${encodeURIComponent(nome)}`, '_blank');
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+            <HardDrive className="w-5 h-5 text-blue-600" /> Gerenciamento de Backups
+          </h3>
+          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-400" /></button>
+        </div>
+
+        <div className="overflow-y-auto flex-1 px-6 py-5">
+          {loading ? (
+            <div className="text-center py-12 text-gray-400 text-sm">Carregando...</div>
+          ) : (
+            <>
+              {/* Cards de Status */}
+              {status?.success && (
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-5">
+                  <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
+                    <div className="flex items-center gap-2 text-xs text-blue-600 font-semibold mb-1"><Database className="w-4 h-4" /> Último Backup</div>
+                    <div className="text-base font-bold text-gray-800">{status.ultimo_backup?.data || '—'}</div>
+                    <div className="text-xs text-gray-500 mt-1">{status.ultimo_backup ? `${status.ultimo_backup.tamanho} • ${status.ultimo_backup.idade_horas}h atrás` : 'Nenhum'}</div>
+                  </div>
+                  <div className="bg-purple-50 border border-purple-100 rounded-xl p-4">
+                    <div className="flex items-center gap-2 text-xs text-purple-600 font-semibold mb-1"><HardDrive className="w-4 h-4" /> Local (VPS)</div>
+                    <div className="text-base font-bold text-gray-800">{status.backups_local.qtd} arquivos</div>
+                    <div className="text-xs text-gray-500 mt-1">{status.backups_local.tamanho} ocupados</div>
+                  </div>
+                  <div className={`${status.nuvem.conectado ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100'} border rounded-xl p-4`}>
+                    <div className={`flex items-center gap-2 text-xs ${status.nuvem.conectado ? 'text-green-600' : 'text-red-600'} font-semibold mb-1`}><Cloud className="w-4 h-4" /> Google Drive</div>
+                    <div className="text-base font-bold text-gray-800">{status.nuvem.conectado ? `${status.nuvem.qtd} arquivos` : 'Desconectado'}</div>
+                    <div className="text-xs text-gray-500 mt-1">{status.nuvem.tamanho}</div>
+                  </div>
+                  <div className="bg-gray-50 border border-gray-100 rounded-xl p-4">
+                    <div className="flex items-center gap-2 text-xs text-gray-600 font-semibold mb-1"><FileText className="w-4 h-4" /> Disco</div>
+                    <div className="text-base font-bold text-gray-800">{status.disco.uso_pct}% usado</div>
+                    <div className="text-xs text-gray-500 mt-1">{status.disco.livre} livres</div>
+                  </div>
+                </div>
+              )}
+
+              {/* Botões de ação */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex rounded-lg overflow-hidden border border-gray-200">
+                  <button onClick={() => setTab('local')} className={`px-4 py-2 text-xs font-medium transition-colors ${tab === 'local' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>Local ({backups.local?.length || 0})</button>
+                  <button onClick={() => setTab('nuvem')} className={`px-4 py-2 text-xs font-medium transition-colors ${tab === 'nuvem' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>Nuvem ({backups.nuvem?.length || 0})</button>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={carregar} className="flex items-center gap-1 px-3 py-2 text-xs border border-gray-200 rounded-lg hover:bg-gray-50"><RefreshCw className="w-3.5 h-3.5" /> Atualizar</button>
+                  <button onClick={gerarBackup} disabled={gerando} className="flex items-center gap-1 px-4 py-2 text-xs bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50">
+                    {gerando ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+                    {gerando ? 'Gerando...' : 'Gerar Backup Agora'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Tabela */}
+              <div className="border border-gray-100 rounded-xl overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 text-xs text-gray-500 uppercase border-b border-gray-100">
+                    <tr>
+                      <th className="px-3 py-2 text-left">Arquivo</th>
+                      <th className="px-3 py-2 text-left">Tipo</th>
+                      <th className="px-3 py-2 text-left">Data</th>
+                      <th className="px-3 py-2 text-right">Tamanho</th>
+                      <th className="px-3 py-2 text-center">Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {(tab === 'local' ? backups.local : backups.nuvem)?.map((b: any) => (
+                      <tr key={b.nome} className="hover:bg-gray-50">
+                        <td className="px-3 py-2 text-gray-800 font-mono text-xs">{b.nome}</td>
+                        <td className="px-3 py-2"><span className={`text-xs px-2 py-0.5 rounded-full font-medium ${b.tipo === 'Banco de Dados' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>{b.tipo}</span></td>
+                        <td className="px-3 py-2 text-gray-600">{b.data}</td>
+                        <td className="px-3 py-2 text-right font-medium text-gray-700">{b.tamanho}</td>
+                        <td className="px-3 py-2 text-center">
+                          {tab === 'local' ? (
+                            <button onClick={() => baixar(b.nome)} className="p-1.5 hover:bg-blue-50 rounded text-blue-600" title="Baixar"><Download className="w-4 h-4 inline" /></button>
+                          ) : (
+                            <span className="text-xs text-gray-400">Apenas local</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                    {(tab === 'local' ? backups.local : backups.nuvem)?.length === 0 && (
+                      <tr><td colSpan={5} className="text-center py-8 text-gray-400 text-sm">Nenhum backup encontrado.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              <p className="text-xs text-gray-400 mt-4 text-center">
+                Backup automático diário às 03:00 • Retenção: 7 dias local / 30 dias nuvem
+              </p>
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

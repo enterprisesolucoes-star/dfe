@@ -310,7 +310,11 @@ $modules = [
     'relatorio_tef' => 'vendas', 'status_sefaz' => 'vendas',
     'auditoria_listar'   => 'auditoria',
     'auditoria_acoes'    => 'auditoria',
-    'auditoria_detalhe'  => 'auditoria'
+    'auditoria_detalhe'  => 'auditoria',
+    'backup_admin_status'    => 'backup_admin',
+    'backup_admin_listar'    => 'backup_admin',
+    'backup_admin_gerar'     => 'backup_admin',
+    'backup_admin_download'  => 'backup_admin'
 ];
 
 if (isset($modules[$action])) {
