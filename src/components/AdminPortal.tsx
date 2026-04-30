@@ -973,9 +973,9 @@ const BackupPanel = ({ onClose, adminToken }: { onClose: () => void; adminToken:
   const carregar = async () => {
     setLoading(true);
     try {
-      const r1 = await fetch(`/api.php?action=backup_admin_status&adm_token=${adminToken}`);
+      const r1 = await fetch(`${window.location.origin}/api.php?action=backup_admin_status&adm_token=${adminToken}`);
       setStatus(await r1.json());
-      const r2 = await fetch(`/api.php?action=backup_admin_listar&adm_token=${adminToken}`);
+      const r2 = await fetch(`${window.location.origin}/api.php?action=backup_admin_listar&adm_token=${adminToken}`);
       setBackups(await r2.json());
     } catch (e) { console.error(e); }
     setLoading(false);
@@ -987,7 +987,7 @@ const BackupPanel = ({ onClose, adminToken }: { onClose: () => void; adminToken:
     if (!confirm('Gerar backup agora? Pode levar alguns segundos.')) return;
     setGerando(true);
     try {
-      const r = await fetch(`/api.php?action=backup_admin_gerar&adm_token=${adminToken}`);
+      const r = await fetch(`${window.location.origin}/api.php?action=backup_admin_gerar&adm_token=${adminToken}`);
       const data = await r.json();
       if (data.success) {
         alert('✅ Backup gerado com sucesso!');
@@ -1000,7 +1000,7 @@ const BackupPanel = ({ onClose, adminToken }: { onClose: () => void; adminToken:
   };
 
   const baixar = (nome: string) => {
-    window.open(`/api.php?action=backup_admin_download&adm_token=${adminToken}&arquivo=${encodeURIComponent(nome)}`, '_blank');
+    window.open(`${window.location.origin}/api.php?action=backup_admin_download&adm_token=${adminToken}&arquivo=${encodeURIComponent(nome)}`, '_blank');
   };
 
   return (
