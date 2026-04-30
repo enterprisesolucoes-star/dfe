@@ -14,7 +14,7 @@ type OsItem = { id?: number; tipo: 'produto' | 'servico'; produto_id?: number | 
 type OrdemServico = {
   id?: number; numero?: number; status: string; cliente_id?: number | null;
   cliente_nome?: string; cliente_documento?: string; cliente_telefone?: string; cliente_email?: string;
-  valor_total: number; observacao?: string; previsao?: string; data_criacao?: string; itens: OsItem[];
+  valor_total: number; observacao?: string; previsao?: string; data_criacao?: string; vendedor_id?: number | null; itens: OsItem[];
 };
 
 const STATUS_OS_COLORS: Record<string, string> = {
@@ -26,10 +26,11 @@ const STATUS_OS_COLORS: Record<string, string> = {
 };
 
 export const OrdemServicoTab = ({
-  clientes, produtos, emitente, showAlert, showConfirm
+  clientes, produtos, vendedores, emitente, showAlert, showConfirm
 }: {
   clientes: Cliente[];
   produtos: Produto[];
+  vendedores: Vendedor[];
   emitente: Emitente;
   showAlert: (t: string, m: string) => void;
   showConfirm: (t: string, m: string, fn: () => void) => void;
@@ -261,6 +262,17 @@ export const OrdemServicoTab = ({
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Observações</label>
                   <textarea value={form.observacao || ''} onChange={e => setField('observacao', e.target.value)} rows={3} className={ic + ' resize-none'} placeholder="Defeito relatado, peças necessárias, etc." />
                 </div>
+                {vendedores.length > 0 && (
+                  <div className="col-span-2">
+                    <label className="block text-xs font-semibold text-gray-600 mb-1">Vendedor</label>
+                    <select value={form.vendedor_id ? String(form.vendedor_id) : ''} onChange={e => setField('vendedor_id', e.target.value ? Number(e.target.value) : null)} className={ic}>
+                      <option value="">Sem vendedor</option>
+                      {vendedores.filter(v => v.ativo).map(v => (
+                        <option key={v.id} value={String(v.id)}>{v.nome} ({Number(v.percentual_comissao).toFixed(2)}%)</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
               <div className="border border-gray-100 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-3">

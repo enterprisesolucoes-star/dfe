@@ -220,6 +220,13 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
     }
   };
 
+  const fetchVendedores = async () => {
+    try {
+      const res = await fetch('./api.php?action=listar_vendedores');
+      const data = await res.json();
+      if (Array.isArray(data)) setVendedores(data);
+    } catch { /* silent */ }
+  };
   const fetchClientes = async () => {
     try {
       const response = await fetch('./api.php?action=clientes');
@@ -435,6 +442,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
     fetchNfeList();
     fetchProdutos();
     fetchClientes();
+    fetchVendedores();
     fetchFornecedores();
     fetchTransportadores();
     fetchMedidas();
@@ -796,6 +804,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
         <OrcamentosTab
           clientes={clientes}
           produtos={produtos}
+          vendedores={vendedores}
           emitente={emitente}
           showAlert={showAlert}
           showConfirm={showConfirm}
@@ -812,6 +821,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
         <OrdemServicoTab
           clientes={clientes}
           produtos={produtos}
+          vendedores={vendedores}
           emitente={emitente}
           showAlert={showAlert}
           showConfirm={showConfirm}
@@ -3068,7 +3078,7 @@ type OrcItem = { id?: number; tipo: 'produto' | 'servico'; produto_id?: number |
 type Orcamento = {
   id?: number; numero?: number; status: string; cliente_id?: number | null;
   cliente_nome?: string; cliente_documento?: string; cliente_telefone?: string; cliente_email?: string;
-  valor_total: number; observacao?: string; validade?: string; data_criacao?: string; itens: OrcItem[];
+  valor_total: number; observacao?: string; validade?: string; data_criacao?: string; vendedor_id?: number | null; itens: OrcItem[];
 };
 
 const STATUS_ORC_COLORS: Record<string, string> = {
@@ -3080,10 +3090,11 @@ const STATUS_ORC_COLORS: Record<string, string> = {
 };
 
 const OrcamentosTab = ({
-  clientes, produtos, emitente, showAlert, showConfirm, isFiscal, onExportarNFCe
+  clientes, produtos, vendedores, emitente, showAlert, showConfirm, isFiscal, onExportarNFCe
 }: {
   clientes: Cliente[];
   produtos: Produto[];
+  vendedores: Vendedor[];
   emitente: Emitente;
   showAlert: (t: string, m: string) => void;
   showConfirm: (t: string, m: string, fn: () => void) => void;
@@ -3329,6 +3340,17 @@ const OrcamentosTab = ({
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Observações</label>
                   <textarea value={form.observacao || ''} onChange={e => setField('observacao', e.target.value)} rows={3} className={ic + ' resize-none'} placeholder="Condições de pagamento, prazo de entrega, etc." />
                 </div>
+                {vendedores.length > 0 && (
+                  <div className="col-span-2">
+                    <label className="block text-xs font-semibold text-gray-600 mb-1">Vendedor</label>
+                    <select value={form.vendedor_id ? String(form.vendedor_id) : ''} onChange={e => setField('vendedor_id', e.target.value ? Number(e.target.value) : null)} className={ic}>
+                      <option value="">Sem vendedor</option>
+                      {vendedores.filter(v => v.ativo).map(v => (
+                        <option key={v.id} value={String(v.id)}>{v.nome} ({Number(v.percentual_comissao).toFixed(2)}%)</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
               <div className="border border-gray-100 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-3">
