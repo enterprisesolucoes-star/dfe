@@ -757,6 +757,7 @@ const AdminPortal = () => {
       {auditoriaEmpresa && (
         <AuditoriaModal empresa={auditoriaEmpresa} onClose={() => setAuditoriaEmpresa(null)} />
       )}
+      {showBackup && <BackupPanel onClose={() => setShowBackup(false)} adminToken={adminToken} />}
     </div>
   );
 };
@@ -958,7 +959,6 @@ const AuditoriaModal = ({ empresa, onClose }: { empresa: {id: number; nome: stri
           </div>
         </div>
       )}
-      {showBackup && <BackupPanel onClose={() => setShowBackup(false)} adminToken={adminToken} />}
     </div>
   );
 };
