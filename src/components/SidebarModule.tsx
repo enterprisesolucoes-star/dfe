@@ -3,7 +3,7 @@ import {
   Monitor, DollarSign, ChevronDown, ChevronRight, ArrowUpCircle, 
   ArrowDownCircle, History, FileText, Send, QrCode, Package, 
   Users, Store, ShoppingCart, ClipboardList, Wrench, FolderOpen, BarChart2, 
-  Hash, Ruler, CreditCard, Truck, ShieldCheck, Building, Settings, LogOut, Zap
+  Hash, Ruler, CreditCard, Truck, ShieldCheck, Building, Settings, LogOut, Zap, UserCircle
 } from 'lucide-react';
 
 export const SidebarItem = ({ icon: Icon, label, active, onClick }: any) => (
