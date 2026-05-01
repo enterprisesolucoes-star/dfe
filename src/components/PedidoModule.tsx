@@ -151,13 +151,15 @@ export const PedidoTab = ({ produtos, clientes, vendedores, emitente, showAlert,
         pagamentos: pagamentos.map(p => ({ forma_pagamento: p.formaPagamento, valor: p.valorPagamento, vencimentos: p.vencimentos||[], bandeira: p.bandeira||'', autorizacao: p.autorizacao||'' })),
       };
       const res  = await fetch('./api.php?action=salvar_pedido_completo', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-      const data = await res.json();
+      const text = await res.text();
+      let data: any = {};
+      try { data = JSON.parse(text); } catch { showAlert('Erro', 'Resposta inválida: ' + text.substring(0, 200)); setSalvando(false); return; }
       if (data.success) {
         setPedidoSalvo({ ...payload, numero: data.numero, id: data.id, data: new Date().toLocaleString('pt-BR') });
         setModo('sucesso');
         carregarPedidos();
       } else showAlert('Erro', data.message || 'Erro ao salvar pedido.');
-    } catch { showAlert('Erro', 'Erro de conexão.'); }
+    } catch (e: any) { showAlert('Erro', 'Erro de conexão: ' + (e?.message || String(e))); }
     finally { setSalvando(false); }
   };
 
