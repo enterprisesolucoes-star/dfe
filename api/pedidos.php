@@ -14,10 +14,13 @@ if ($action === 'listar_pedidos') {
         FROM vendas v
         LEFT JOIN vendedores vd ON vd.id = v.vendedor_id AND vd.empresa_id = v.empresa_id
         WHERE v.empresa_id = ? AND v.status = 'Pedido'
+        AND DATE(v.data_emissao) BETWEEN ? AND ?
         ORDER BY v.data_emissao DESC
-        LIMIT 200
+        LIMIT 500
     ");
-    $stmt->execute([$empresaId]);
+    $dtInicio = $_GET['dt_inicio'] ?? date('Y-01-01');
+    $dtFim = $_GET['dt_fim'] ?? date('Y-m-d');
+    $stmt->execute([$empresaId, $dtInicio, $dtFim]);
     echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
     exit;
 }
@@ -51,7 +54,9 @@ if ($action === 'salvar_pedido_completo') {
     try {
         // Próximo número
         $stmt = $pdo->prepare("SELECT COALESCE(MAX(numero),0)+1 FROM vendas WHERE empresa_id = ? AND status = 'Pedido'");
-        $stmt->execute([$empresaId]);
+        $dtInicio = $_GET['dt_inicio'] ?? date('Y-01-01');
+    $dtFim = $_GET['dt_fim'] ?? date('Y-m-d');
+    $stmt->execute([$empresaId, $dtInicio, $dtFim]);
         $numero = (int)$stmt->fetchColumn();
 
         // Cliente
