@@ -204,7 +204,6 @@ if ($action === 'salvar_pedido_completo') {
     exit;
 }
 
-echo json_encode(['success' => false, 'message' => 'Ação inválida']);
 
 // ── Buscar pedido completo para edição ────────────────────────────────────────
 if ($action === 'buscar_pedido') {

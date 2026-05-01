@@ -184,7 +184,7 @@ ${v.observacao?`<div style="border:1px solid #ddd;border-radius:4px;padding:10px
       async () => {
         const res  = await fetch(`./api.php?action=excluir_pedido&id=${p.id}`);
         const data = await res.json();
-        if (data.success) { showAlert('Sucesso', 'Pedido excluído com sucesso!'); carregarPedidos(); }
+        if (data.success) { await carregarPedidos(); showAlert('Sucesso', 'Pedido excluído com sucesso!'); }
         else showAlert('Erro', data.message || 'Falha ao excluir.');
       }
     );
