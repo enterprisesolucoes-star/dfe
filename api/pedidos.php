@@ -54,9 +54,7 @@ if ($action === 'salvar_pedido_completo') {
     try {
         // Próximo número
         $stmt = $pdo->prepare("SELECT COALESCE(MAX(numero),0)+1 FROM vendas WHERE empresa_id = ? AND status = 'Pedido'");
-        $dtInicio = $_GET['dt_inicio'] ?? date('Y-01-01');
-    $dtFim = $_GET['dt_fim'] ?? date('Y-m-d');
-    $stmt->execute([$empresaId, $dtInicio, $dtFim]);
+        $stmt->execute([$empresaId]);
         $numero = (int)$stmt->fetchColumn();
 
         // Cliente
