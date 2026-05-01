@@ -360,11 +360,11 @@ ${observacao ? `<div style="border:1px solid #ddd;border-radius:4px;padding:10px
   const ic = 'w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none shadow-sm';
 
   const TABS = [
-    { id: 'identificacao', label: 'Identificação' },
-    { id: 'produtos',      label: 'Produtos' },
-    { id: 'transporte',    label: 'Transporte' },
-    { id: 'pagamento',     label: 'Pagamento' },
-    { id: 'finalizar',     label: 'Finalizar' },
+    { id: 'identificacao', label: 'Identificação', icon: User },
+    { id: 'produtos',      label: 'Produtos',      icon: Package },
+    { id: 'transporte',    label: 'Transporte',    icon: Truck },
+    { id: 'pagamento',     label: 'Pagamento',     icon: CreditCard },
+    { id: 'finalizar',     label: 'Finalizar',     icon: CheckCircle },
   ] as const;
 
   return (
@@ -384,16 +384,22 @@ ${observacao ? `<div style="border:1px solid #ddd;border-radius:4px;padding:10px
         </button>
       </div>
 
-      {/* Abas */}
-      <div className="flex gap-1 p-1 bg-gray-100 rounded-xl">
-        {TABS.map(tab => (
+      {/* Abas — padrão NFe */}
+      <div className="flex gap-2">
+        {TABS.map((tab, idx) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 py-2.5 text-xs font-semibold rounded-lg transition-all ${
-              activeTab === tab.id ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all ${
+              activeTab === tab.id
+                ? 'bg-white text-blue-600 border-blue-200 shadow-sm'
+                : 'bg-gray-50 text-gray-400 border-gray-100 hover:text-gray-600 hover:bg-white'
             }`}
           >
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+              activeTab === tab.id ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'
+            }`}>{idx + 1}</span>
+            <tab.icon className="w-4 h-4" />
             {tab.label}
           </button>
         ))}
