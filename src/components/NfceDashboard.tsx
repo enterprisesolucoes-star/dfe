@@ -764,7 +764,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       case 'ncm':       return <NcmTab ufEmpresa={emitente.uf} />;
       case 'usuarios':  return <UsuariosTab session={session} showAlert={showAlert} showConfirm={showConfirm} />;
       case 'vendedores': return <VendedoresTab showAlert={showAlert} showConfirm={showConfirm} />;
-      case 'pedidos': return <PedidoTab produtos={produtos} clientes={clientes} vendedores={vendedores} emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} session={session} />;
+      case 'pedidos': return <PedidoTab produtos={produtos} clientes={clientes} vendedores={vendedores} emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} showPrompt={showPrompt} session={session} />;
       case 'comissoes': return <ComissoesTab showAlert={showAlert} showConfirm={showConfirm} />;
       case 'medidas': return (
         <MedidasTab

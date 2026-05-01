@@ -98,6 +98,166 @@ export const PedidoTab = ({ produtos, clientes, vendedores, emitente, showAlert,
     !busca || String(p.numero).includes(busca) || (p.cliente_nome||'').toLowerCase().includes(busca.toLowerCase())
   );
 
+  const handleImprimir2 = async (id: number) => {
+    const res  = await fetch('./api.php?action=buscar_pedido&id=' + id);
+    const data = await res.json();
+    if (!data.success) { showAlert('Erro', data.message); return; }
+    const v = data.venda;
+    const itensHtml = data.itens.map((it: any, i: number) => `
+      <tr><td>${i+1}</td><td>${it.descricao||'Produto'}</td><td>${it.unidade||'UN'}</td>
+      <td style="text-align:right">${Number(it.quantidade).toLocaleString('pt-BR',{minimumFractionDigits:3})}</td>
+      <td style="text-align:right">R$ ${brl(it.valor_unitario)}</td>
+      <td style="text-align:right"><strong>R$ ${brl(it.valor_total)}</strong></td></tr>`).join('');
+    const pagsHtml = data.pagamentos.map((p: any) => {
+      const label = FORMAS_PAGAMENTO.find(f => f.codigo === p.forma_pagamento)?.descricao || p.forma_pagamento;
+      return `<tr><td>${label}</td><td style="text-align:right">R$ ${brl(p.valor_pagamento)}</td></tr>`;
+    }).join('');
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Pedido #${String(v.numero).padStart(6,'0')}</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;font-size:11pt;color:#222;padding:20mm 15mm}
+.header{text-align:center;border-bottom:2px solid #333;padding-bottom:12px;margin-bottom:16px}
+.header h1{font-size:18pt;font-weight:bold}.header p{font-size:10pt;color:#555;margin-top:2px}
+.sem-fiscal{background:#fff3cd;border:1px solid #ffc107;padding:6px 12px;border-radius:4px;text-align:center;font-size:10pt;font-weight:bold;color:#856404;margin-bottom:16px}
+table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:10pt}
+th{background:#f1f5f9;font-weight:bold;padding:7px 6px;border:1px solid #ddd;text-align:left;font-size:9pt}
+td{padding:6px;border:1px solid #eee}tr:nth-child(even) td{background:#f9fafb}
+.total-final td{background:#1a56db;color:white;font-weight:bold;font-size:12pt}
+.footer{text-align:center;font-size:9pt;color:#888;border-top:1px solid #ddd;padding-top:10px;margin-top:10px}
+@media print{body{padding:10mm}}</style></head><body>
+<div class="header"><h1>${emitente?.razaoSocial||''}</h1>
+${emitente?.cnpj?`<p>CNPJ: ${emitente.cnpj}</p>`:''}
+${emitente?.telefone?`<p>Tel: ${emitente.telefone}</p>`:''}</div>
+<div class="sem-fiscal">⚠ DOCUMENTO SEM VALOR FISCAL — NÃO É NOTA FISCAL</div>
+<div style="margin-bottom:16px">
+<div style="font-size:14pt;font-weight:bold;color:#1a56db">PEDIDO Nº ${String(v.numero).padStart(6,'0')}</div>
+<p style="font-size:10pt;color:#555">Emitido em: ${new Date(v.data_emissao).toLocaleString('pt-BR')}</p>
+${v.natureza_operacao?`<p style="font-size:10pt;color:#555">Natureza: ${v.natureza_operacao}</p>`:''}
+${v.vendedor_nome?`<p style="font-size:10pt;color:#555">Vendedor: ${v.vendedor_nome}</p>`:''}</div>
+${v.cliente_nome?`<div style="border:1px solid #ddd;border-radius:4px;padding:10px;margin-bottom:16px"><strong>Cliente:</strong> ${v.cliente_nome}${v.cliente_documento?' — '+v.cliente_documento:''}</div>`:''}
+<table><thead><tr><th>#</th><th>Produto</th><th>Un</th><th style="text-align:right">Qtd</th><th style="text-align:right">Vl.Unit</th><th style="text-align:right">Total</th></tr></thead>
+<tbody>${itensHtml}</tbody></table>
+<table style="width:320px;margin-left:auto"><tbody>
+${v.valor_frete>0?`<tr><td>Frete</td><td style="text-align:right">R$ ${brl(v.valor_frete)}</td></tr>`:''}
+<tr class="total-final"><td>TOTAL DO PEDIDO</td><td style="text-align:right">R$ ${brl(v.valor_total)}</td></tr>
+</tbody></table>
+<h4 style="font-size:10pt;font-weight:bold;margin:16px 0 8px;text-transform:uppercase">Formas de Pagamento</h4>
+<table><thead><tr><th>Forma</th><th style="text-align:right">Valor</th></tr></thead><tbody>${pagsHtml}</tbody></table>
+${v.observacao?`<div style="border:1px solid #ddd;border-radius:4px;padding:10px;margin-top:16px"><strong>Obs:</strong> ${v.observacao}</div>`:''}
+<div class="footer"><p>⚠ ESTE DOCUMENTO NÃO TEM VALOR FISCAL ⚠</p><p>Obrigado pela preferência!</p></div>
+<script>window.onload=()=>{window.print()}</script></body></html>`;
+    const w = window.open('','_blank','width=900,height=700');
+    if (w) { w.document.write(html); w.document.close(); }
+  };
+
+  const handleEmail = (p: PedidoLista) => {
+    const emailInicial = '';
+    showPrompt('Enviar E-mail', 'Digite o e-mail do destinatário:', async (email) => {
+      if (!email?.trim()) return;
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { showAlert('Atenção', 'E-mail inválido.'); return; }
+      const res  = await fetch(`./api.php?action=pedido_email&id=${p.id}&email=${encodeURIComponent(email.trim())}`, { method: 'POST' });
+      const data = await res.json();
+      if (data.success) showAlert('Sucesso', 'E-mail enviado com sucesso!');
+      else showAlert('Erro', data.message || 'Falha ao enviar e-mail.');
+    }, emailInicial);
+  };
+
+  const handleWhatsApp = (p: PedidoLista) => {
+    const texto = encodeURIComponent(
+      `*${emitente?.razaoSocial || ''}*\n` +
+      `⚠ DOCUMENTO SEM VALOR FISCAL\n\n` +
+      `*PEDIDO Nº ${String(p.numero).padStart(6,'0')}*\n` +
+      `Data: ${new Date(p.data_emissao).toLocaleDateString('pt-BR')}\n` +
+      (p.cliente_nome ? `Cliente: ${p.cliente_nome}\n` : '') +
+      `\n*Total: R$ ${brl(Number(p.valor_total))}*\n\n` +
+      `Obrigado pela preferência!`
+    );
+    window.open(`https://wa.me/?text=${texto}`, '_blank');
+  };
+
+  const handleExcluir = (p: PedidoLista) => {
+    showConfirm('Excluir Pedido',
+      `Confirma a exclusão do Pedido #${String(p.numero).padStart(6,'0')}?\n\nEsta ação irá:\n• Devolver o estoque dos produtos\n• Remover lançamentos financeiros pendentes\n• Cancelar a comissão gerada`,
+      async () => {
+        const res  = await fetch(`./api.php?action=excluir_pedido&id=${p.id}`);
+        const data = await res.json();
+        if (data.success) { showAlert('Sucesso', 'Pedido excluído com sucesso!'); carregarPedidos(); }
+        else showAlert('Erro', data.message || 'Falha ao excluir.');
+      }
+    );
+  };
+
+  const handleEditar = async (p: PedidoLista) => {
+    const res  = await fetch('./api.php?action=buscar_pedido&id=' + p.id);
+    const data = await res.json();
+    if (!data.success) { showAlert('Erro', data.message); return; }
+    const v = data.venda;
+    // Recarregar formulário com dados do pedido
+    setEditandoId(p.id);
+    setClienteSel(v.cliente_id ? { id: v.cliente_id, nome: v.cliente_nome || '', documento: v.cliente_documento || '' } : null);
+    setBuscaCliente(v.cliente_nome || '');
+    setVendedorId(v.vendedor_id || 0);
+    setNatureza(v.natureza_operacao || 'VENDA');
+    setObservacao(v.observacao || '');
+    setValorFrete(Number(v.valor_frete) || 0);
+    setValorSeguro(Number(v.valor_seguro) || 0);
+    setValorOutras(Number(v.valor_outras) || 0);
+    setItens(data.itens.map((it: any) => ({
+      produtoId: it.produto_id, descricao: it.descricao || 'Produto',
+      unidade: it.unidade || 'UN', quantidade: Number(it.quantidade),
+      valorUnitario: Number(it.valor_unitario), desconto: 0,
+      valorTotal: Number(it.valor_total),
+    })));
+    setPagamentos(data.pagamentos.map((p: any) => ({
+      formaPagamento: p.forma_pagamento, valorPagamento: Number(p.valor_pagamento),
+      vencimentos: [],
+    })));
+    setActiveTab('identificacao');
+    setModo('novo');
+  };
+
+  const handleFinalizarEdicao = async () => {
+    const erro = validar();
+    if (erro) { showAlert('Atenção', erro); return; }
+    // Verificar se houve mudança financeira
+    const res = await fetch('./api.php?action=buscar_pedido&id=' + editandoId);
+    const data = await res.json();
+    const finAtual = data.financeiro || [];
+    const temFinanceiroPendente = finAtual.some((f: any) => f.status === 'Pendente');
+    const valorMudou = Math.abs(Number(data.venda.valor_total) - totalPedido) > 0.01;
+    if (temFinanceiroPendente && valorMudou) {
+      setModalFinanceiro({ show: true, payload: buildPayload() });
+    } else {
+      await salvarEdicao(buildPayload(), 'manter');
+    }
+  };
+
+  const buildPayload = () => ({
+    id: editandoId,
+    vendedor_id: vendedorId || null, natureza_operacao: natureza, observacao,
+    valor_frete: valorFrete, valor_seguro: valorSeguro, valor_outras: valorOutras,
+    valor_total: totalPedido, usuario_id: session?.usuarioId, caixa_id: session?.caixaId,
+    cliente: clienteSel ? { id: clienteSel.id, nome: clienteSel.nome, documento: clienteSel.documento } : null,
+    itens: itens.map(it => ({ produto_id: it.produtoId, descricao: it.descricao, unidade: it.unidade, quantidade: it.quantidade, valor_unitario: it.valorUnitario, desconto: it.desconto, valor_total: it.valorTotal })),
+    pagamentos: pagamentos.map(p => ({ forma_pagamento: p.formaPagamento, valor: p.valorPagamento, vencimentos: p.vencimentos||[], bandeira: p.bandeira||'', autorizacao: p.autorizacao||'' })),
+  });
+
+  const salvarEdicao = async (payload: any, acaoFinanceiro: string) => {
+    setSalvando(true);
+    try {
+      const res  = await fetch('./api.php?action=atualizar_pedido', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...payload, acao_financeiro: acaoFinanceiro }) });
+      const text = await res.text();
+      let data: any = {};
+      try { data = JSON.parse(text); } catch { showAlert('Erro', text.substring(0,200)); return; }
+      if (data.success) {
+        setEditandoId(null);
+        setModalFinanceiro(null);
+        showAlert('Sucesso', 'Pedido atualizado com sucesso!');
+        setModo('lista');
+        carregarPedidos();
+      } else showAlert('Erro', data.message || 'Erro ao atualizar.');
+    } catch (e: any) { showAlert('Erro', e?.message || 'Erro de conexão.'); }
+    finally { setSalvando(false); }
+  };
+
   const iniciarNovo = () => {
     setClienteSel(null); setBuscaCliente(''); setVendedorId(0);
     setNatureza('VENDA'); setObservacao('');
@@ -299,6 +459,7 @@ ${observacao?`<div style="border:1px solid #ddd;border-radius:4px;padding:10px;m
               <th className="px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Vendedor</th>
               <th className="px-5 py-3 text-xs font-semibold text-gray-500 uppercase text-right">Valor</th>
               <th className="px-5 py-3 text-xs font-semibold text-gray-500 uppercase text-center">Status</th>
+              <th className="px-5 py-3 text-xs font-semibold text-gray-500 uppercase text-center">Ações</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -317,6 +478,15 @@ ${observacao?`<div style="border:1px solid #ddd;border-radius:4px;padding:10px;m
                 <td className="px-5 py-3 text-right font-semibold text-gray-800">R$ {brl(Number(p.valor_total))}</td>
                 <td className="px-5 py-3 text-center">
                   <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700">{p.status}</span>
+                </td>
+                <td className="px-5 py-3">
+                  <div className="flex gap-1 justify-center">
+                    <button onClick={() => handleImprimir2(p.id)} title="Imprimir" className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"><Printer className="w-4 h-4" /></button>
+                    <button onClick={() => handleEmail(p)} title="Enviar E-mail" className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg"><Mail className="w-4 h-4" /></button>
+                    <button onClick={() => handleWhatsApp(p)} title="WhatsApp" className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg"><MessageCircle className="w-4 h-4" /></button>
+                    <button onClick={() => handleEditar(p)} title="Editar" className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg"><Edit className="w-4 h-4" /></button>
+                    <button onClick={() => handleExcluir(p)} title="Excluir" className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -366,7 +536,7 @@ ${observacao?`<div style="border:1px solid #ddd;border-radius:4px;padding:10px;m
           <div className="flex items-center gap-2 text-sm">
             <button onClick={() => setModo('lista')} className="text-blue-600 hover:underline">← Pedidos</button>
             <span className="text-gray-300">/</span>
-            <span className="font-semibold text-gray-800">Novo Pedido</span>
+            <span className="font-semibold text-gray-800">{editandoId ? `Editando Pedido` : 'Novo Pedido'}</span>
           </div>
           <p className="text-xs text-amber-600 font-medium mt-0.5">⚠ Documento sem valor fiscal</p>
         </div>
@@ -637,10 +807,44 @@ ${observacao?`<div style="border:1px solid #ddd;border-radius:4px;padding:10px;m
           </section>
           <div className="flex justify-between">
             <button onClick={() => setActiveTab('transporte')} className="px-6 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-200">Voltar</button>
-            <button onClick={handleFinalizar} disabled={salvando || !!validar()}
-              className={`px-8 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 ${salvando || validar() ? 'bg-gray-200 text-gray-400' : 'bg-green-600 text-white hover:bg-green-700 shadow-md'}`}>
-              {salvando ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Salvando...</> : <><Save className="w-4 h-4" /> Finalizar Pedido</>}
+            <button onClick={editandoId ? handleFinalizarEdicao : handleFinalizar} disabled={salvando || !!validar()}
+              className={`px-8 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 ${salvando || validar() ? 'bg-gray-200 text-gray-400' : editandoId ? 'bg-orange-500 text-white hover:bg-orange-600 shadow-md' : 'bg-green-600 text-white hover:bg-green-700 shadow-md'}`}>
+              {salvando ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Salvando...</> : editandoId ? <><Save className="w-4 h-4" /> Salvar Alterações</> : <><Save className="w-4 h-4" /> Finalizar Pedido</>}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal decisão financeira */}
+      {modalFinanceiro?.show && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[400] p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-orange-500" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-800">Alteração Financeira Detectada</h3>
+                <p className="text-xs text-gray-500">O valor do pedido foi alterado</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 mb-6">Existem lançamentos financeiros pendentes vinculados a este pedido. O que deseja fazer?</p>
+            <div className="space-y-3">
+              <button onClick={() => salvarEdicao(modalFinanceiro.payload, 'recriar')}
+                className="w-full px-4 py-3 bg-orange-500 text-white rounded-xl text-sm font-bold hover:bg-orange-600 text-left">
+                🔄 Recriar lançamentos financeiros
+                <p className="text-xs font-normal opacity-80 mt-0.5">Remove pendentes e gera novos com os valores atualizados</p>
+              </button>
+              <button onClick={() => salvarEdicao(modalFinanceiro.payload, 'manter')}
+                className="w-full px-4 py-3 bg-blue-50 text-blue-700 border border-blue-200 rounded-xl text-sm font-bold hover:bg-blue-100 text-left">
+                ✅ Manter lançamentos existentes
+                <p className="text-xs font-normal opacity-80 mt-0.5">Atualiza apenas os dados do pedido sem mexer no financeiro</p>
+              </button>
+              <button onClick={() => setModalFinanceiro(null)}
+                className="w-full px-4 py-3 bg-gray-100 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-200">
+                Cancelar
+              </button>
+            </div>
           </div>
         </div>
       )}
