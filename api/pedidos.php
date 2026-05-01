@@ -457,3 +457,5 @@ if ($action === 'pedido_email') {
     }
     exit;
 }
+
+echo json_encode(['success' => false, 'message' => 'Ação inválida']);
