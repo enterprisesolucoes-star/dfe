@@ -278,4 +278,3 @@ if ($action === 'resumo_vendedores') {
     exit;
 }
 
-echo json_encode(['success' => false, 'message' => 'Ação inválida']);
