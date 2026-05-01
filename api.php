@@ -317,7 +317,13 @@ $modules = [
     'backup_admin_download'  => 'backup_admin',
     'listar_vendedores'   => 'vendedores',
     'salvar_vendedor'     => 'vendedores',
-    'excluir_vendedor'    => 'vendedores'
+    'excluir_vendedor'    => 'vendedores',
+    'gerar_comissao'      => 'comissoes',
+    'cancelar_comissao'   => 'comissoes',
+    'aprovar_comissao'    => 'comissoes',
+    'pagar_comissao'      => 'comissoes',
+    'listar_comissoes'    => 'comissoes',
+    'resumo_vendedores'   => 'comissoes'
 ];
 
 if (isset($modules[$action])) {

@@ -275,6 +275,18 @@ switch ($action) {
                 $id = (int)$pdo->lastInsertId();
             }
 
+            // Geração automática de comissão
+            if ($status === 'Aprovado') {
+                require_once __DIR__ . '/comissoes.php';
+                $docId = $id > 0 ? $id : (int)$pdo->lastInsertId();
+                gerarComissao($pdo, 'orcamento', $docId, $empresaId ?: 0, 0);
+            }
+            if ($status === 'Recusado' || $status === 'Cancelado') {
+                require_once __DIR__ . '/comissoes.php';
+                $docId = $id > 0 ? $id : (int)$pdo->lastInsertId();
+                cancelarComissao($pdo, 'orcamento', $docId, $empresaId ?: 0, 'Orçamento ' . $status);
+            }
+
             $stmtItem = $pdo->prepare("INSERT INTO orcamentos_itens
                 (orcamento_id, tipo, produto_id, descricao, unidade, quantidade, valor_unitario, valor_total)
                 VALUES (?,?,?,?,?,?,?,?)");

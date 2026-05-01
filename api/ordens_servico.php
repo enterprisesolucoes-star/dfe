@@ -282,6 +282,18 @@ switch ($action) {
                 $id = (int)$pdo->lastInsertId();
             }
 
+            // Geração automática de comissão
+            if ($status === 'Concluída' && (!isset($statusAnterior) || $statusAnterior !== 'Concluída')) {
+                require_once __DIR__ . '/comissoes.php';
+                $docId = $id > 0 ? $id : (int)$pdo->lastInsertId();
+                gerarComissao($pdo, 'os', $docId, $empresaId ?: 0, 0);
+            }
+            if ($status === 'Cancelada' && isset($statusAnterior) && $statusAnterior !== 'Cancelada') {
+                require_once __DIR__ . '/comissoes.php';
+                $docId = $id > 0 ? $id : (int)$pdo->lastInsertId();
+                cancelarComissao($pdo, 'os', $docId, $empresaId ?: 0, 'OS Cancelada');
+            }
+
             $stmtItem = $pdo->prepare("INSERT INTO ordens_servico_itens
                 (ordem_id, tipo, produto_id, descricao, unidade, quantidade, valor_unitario, valor_total)
                 VALUES (?,?,?,?,?,?,?,?)");
