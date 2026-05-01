@@ -72,8 +72,8 @@ switch ($action) {
 
     case 'detalhar_compra':
         $id = (int)($_GET['id'] ?? 0);
-        $stmt = $pdo->prepare("SELECT ci.*, p.descricao AS produto_descricao, p.codigo_interno, p.unidade_comercial FROM compras_itens ci JOIN produtos p ON p.id = ci.produto_id WHERE ci.compra_id = ?");
-        $stmt->execute([$id]);
+        $stmt = $pdo->prepare("SELECT ci.*, p.descricao AS produto_descricao, p.codigo_interno, p.unidade_comercial FROM compras_itens ci JOIN produtos p ON p.id = ci.produto_id JOIN compras c ON c.id = ci.compra_id WHERE ci.compra_id = ? AND c.empresa_id = ?");
+        $stmt->execute([$id, $empresaId]);
         echo json_encode($stmt->fetchAll());
         break;
 

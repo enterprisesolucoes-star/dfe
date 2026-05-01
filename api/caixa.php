@@ -70,7 +70,9 @@ switch ($action) {
 
         $cxS = $pdo->prepare("SELECT * FROM caixas WHERE id = ?"); $cxS->execute([$caixaId]); $caixa = $cxS->fetch();
         if (!$caixa) { http_response_code(404); echo 'Caixa nao encontrado'; exit; }
-        $emp = $pdo->query("SELECT * FROM empresas LIMIT 1")->fetch();
+        $stmtEmp = $empresaId ? $pdo->prepare("SELECT * FROM empresas WHERE id = ?") : $pdo->query("SELECT * FROM empresas LIMIT 1");
+        if ($empresaId) $stmtEmp->execute([$empresaId]);
+        $emp = $empresaId ? $stmtEmp->fetch() : $stmtEmp->fetch();
         $vendasS = $pdo->prepare("SELECT numero, valor_total, status, data_emissao FROM vendas WHERE caixa_id = ? ORDER BY data_emissao"); $vendasS->execute([$caixaId]); $vendas = $vendasS->fetchAll();
         $pagsS = $pdo->prepare("SELECT vp.forma_pagamento, SUM(vp.valor_pagamento) as total FROM vendas_pagamentos vp JOIN vendas v ON v.id = vp.venda_id WHERE v.caixa_id = ? AND v.status IN ('Autorizada','Contingencia') GROUP BY vp.forma_pagamento ORDER BY total DESC"); $pagsS->execute([$caixaId]); $pagamentos = $pagsS->fetchAll();
 

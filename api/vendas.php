@@ -21,7 +21,7 @@ $empresaDb = fetchEmpresaDb($pdo, $empresaId);
 switch ($action) {
 
     case 'vendas':
-        $where = ["v.modelo = 65"];
+        $where = ["v.modelo = 65", "v.status != 'Pedido'"];
         $params = [];
 
         if ($empresaId) {
