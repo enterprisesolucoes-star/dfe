@@ -27,10 +27,12 @@ const FORMAS_RECEBER = ['02','05','15','99'];
 const brl    = (v: number) => Number(v)?.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0,00';
 const round2 = (v: number) => Math.round(v * 100) / 100;
 
-export const PedidoTab = ({ produtos, clientes, vendedores, emitente, showAlert, showConfirm, session }: {
+export const PedidoTab = ({ produtos, clientes, vendedores, emitente, showAlert, showConfirm, showPrompt, session }: {
   produtos: Produto[]; clientes: Cliente[]; vendedores: Vendedor[];
   emitente: any; showAlert: (t: string, m: string) => void;
-  showConfirm: (t: string, m: string, cb: () => void) => void; session: any;
+  showConfirm: (t: string, m: string, cb: () => void) => void;
+  showPrompt: (t: string, m: string, cb: (v: string) => void, init?: string) => void;
+  session: any;
 }) => {
   // MODO CONTROLA QUAL TELA MOSTRAR
   const [modo, setModo] = useState<'lista' | 'novo' | 'sucesso'>('lista');
@@ -39,6 +41,8 @@ export const PedidoTab = ({ produtos, clientes, vendedores, emitente, showAlert,
   const [pedidos, setPedidos]   = useState<PedidoLista[]>([]);
   const [loading, setLoading]   = useState(false);
   const [busca, setBusca]       = useState('');
+  const [editandoId, setEditandoId] = useState<number | null>(null);
+  const [modalFinanceiro, setModalFinanceiro] = useState<{ show: boolean; payload: any } | null>(null);
   const [dtInicio, setDtInicio] = useState(() => new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0]);
   const [dtFim, setDtFim]       = useState(() => new Date().toISOString().split('T')[0]);
 
