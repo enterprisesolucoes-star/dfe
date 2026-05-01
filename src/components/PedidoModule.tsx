@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   Search, Plus, Trash2, User, Package, Truck, CreditCard,
   CheckCircle, AlertCircle, ChevronRight, Save, X, CalendarDays,
-  UserCheck, RefreshCw, Eye, Printer
+  UserCheck, RefreshCw, Eye, Printer, Mail, Edit, MessageCircle,
+  AlertTriangle
 } from 'lucide-react';
 import { motion } from 'motion/react';
 
