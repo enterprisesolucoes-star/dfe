@@ -133,6 +133,7 @@ export const Sidebar = ({
             </div>
           )}
         </div>}
+        {!isFiscal && <SidebarItem icon={ShoppingCart} label="Pedidos" active={activeTab === 'pedidos'} onClick={() => handleSetActiveTab('pedidos')} />}
         <SidebarItem icon={Package} label="Produtos" active={activeTab === 'produtos'} onClick={() => handleSetActiveTab('produtos')} />
         <SidebarItem icon={Users} label="Clientes" active={activeTab === 'clientes'} onClick={() => handleSetActiveTab('clientes')} />
         <SidebarItem icon={Store} label="Fornecedores" active={activeTab === 'fornecedores'} onClick={() => handleSetActiveTab('fornecedores')} />
