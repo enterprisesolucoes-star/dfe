@@ -7,6 +7,21 @@ if ($empresaId <= 0) {
     exit;
 }
 
+if ($action === 'listar_pedidos') {
+    $stmt = $pdo->prepare("
+        SELECT v.id, v.numero, v.data_emissao, v.status, v.valor_total,
+               v.cliente_nome, vd.nome AS vendedor_nome
+        FROM vendas v
+        LEFT JOIN vendedores vd ON vd.id = v.vendedor_id AND vd.empresa_id = v.empresa_id
+        WHERE v.empresa_id = ? AND v.status = 'Pedido'
+        ORDER BY v.data_emissao DESC
+        LIMIT 200
+    ");
+    $stmt->execute([$empresaId]);
+    echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+    exit;
+}
+
 if ($action === 'salvar_pedido_completo') {
     $data = json_decode(file_get_contents('php://input'), true) ?? [];
 

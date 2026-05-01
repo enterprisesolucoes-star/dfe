@@ -318,6 +318,7 @@ $modules = [
     'listar_vendedores'   => 'vendedores',
     'salvar_vendedor'     => 'vendedores',
     'excluir_vendedor'    => 'vendedores',
+    'listar_pedidos'         => 'pedidos',
     'salvar_pedido_completo' => 'pedidos',
     'gerar_comissao'      => 'comissoes',
     'cancelar_comissao'   => 'comissoes',
