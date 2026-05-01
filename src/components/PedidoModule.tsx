@@ -541,10 +541,13 @@ ${observacao?`<div style="border:1px solid #ddd;border-radius:4px;padding:10px;m
           <div className="flex items-center gap-2 text-sm">
             <button onClick={() => setModo('lista')} className="text-blue-600 hover:underline">← Pedidos</button>
             <span className="text-gray-300">/</span>
-            <span className="font-semibold text-gray-800">{editandoId ? `Editando Pedido` : 'Novo Pedido'}</span>
+            <span className="font-semibold text-gray-800">{editandoId ? 'Editando Pedido' : 'Novo Pedido'}</span>
           </div>
           <p className="text-xs text-amber-600 font-medium mt-0.5">⚠ Documento sem valor fiscal</p>
         </div>
+        <button onClick={() => setModo('lista')} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl" title="Fechar">
+          <X className="w-5 h-5" />
+        </button>
       </div>
 
       {/* Abas padrão NFe */}
@@ -702,10 +705,7 @@ ${observacao?`<div style="border:1px solid #ddd;border-radius:4px;padding:10px;m
               <div className="text-right"><p className="text-blue-600 text-xs">Total</p><p className="font-bold text-blue-600 text-lg">R$ {brl(totalProdutos - totalDescontos)}</p></div>
             </div>
           )}
-          <div className="flex justify-between">
-            <button onClick={() => setActiveTab('identificacao')} className="px-6 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-200">Voltar</button>
-            <button onClick={() => setActiveTab('transporte')} className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 flex items-center gap-2">Próximo: Transporte <ChevronRight className="w-4 h-4" /></button>
-          </div>
+
         </div>
       )}
 
@@ -726,10 +726,7 @@ ${observacao?`<div style="border:1px solid #ddd;border-radius:4px;padding:10px;m
               </div>
             )}
           </section>
-          <div className="flex justify-between">
-            <button onClick={() => setActiveTab('produtos')} className="px-6 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-200">Voltar</button>
-            <button onClick={() => setActiveTab('pagamento')} className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 flex items-center gap-2">Próximo: Pagamento <ChevronRight className="w-4 h-4" /></button>
-          </div>
+
         </div>
       )}
 
