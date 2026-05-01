@@ -283,7 +283,7 @@ switch ($action) {
 
     case 'nfe_danfe':
         $id = (int)$_GET['id'];
-        $v = $pdo->query("SELECT xml_autorizado, status FROM vendas WHERE id = $id")->fetch();
+        $v = $pdo->query("SELECT xml_autorizado, status FROM vendas WHERE id = $id AND empresa_id = $empresaId")->fetch();
         if ($v && $v['xml_autorizado']) {
             $empresaDb = fetchEmpresaNfe($pdo, $empresaId);
             try {
@@ -304,7 +304,7 @@ switch ($action) {
 
     case 'nfe_download_xml':
         $id = (int)$_GET['id'];
-        $v = $pdo->query("SELECT xml_autorizado, chave_acesso FROM vendas WHERE id = $id")->fetch();
+        $v = $pdo->query("SELECT xml_autorizado, chave_acesso FROM vendas WHERE id = $id AND empresa_id = $empresaId")->fetch();
         if ($v && $v['xml_autorizado']) {
             header('Content-Type: application/xml');
             header('Content-Disposition: attachment; filename="'.$v['chave_acesso'].'.xml"');
@@ -321,7 +321,7 @@ switch ($action) {
             break;
         }
         try {
-            $vendaDb = $pdo->query("SELECT * FROM vendas WHERE id = $id")->fetch();
+            $vendaDb = $pdo->query("SELECT * FROM vendas WHERE id = $id AND empresa_id = $empresaId")->fetch();
             if (!$vendaDb) { echo json_encode(['success' => false, 'message' => 'Venda não encontrada']); break; }
 
             $clienteDb = null;
@@ -940,7 +940,7 @@ switch ($action) {
         
         $pdo->prepare("DELETE FROM vendas_pagamentos WHERE venda_id = ?")->execute([$id]);
         $pdo->prepare("DELETE FROM vendas_itens WHERE venda_id = ?")->execute([$id]);
-        $pdo->prepare("DELETE FROM vendas WHERE id = ?")->execute([$id]);
+        $pdo->prepare("DELETE FROM vendas WHERE id = ? AND empresa_id = ?")->execute([$id, $empresaId]);
             // Auditoria — exclusão de NF-e
             if (function_exists('registrarAuditoria')) {
                 registrarAuditoria(
@@ -1027,7 +1027,7 @@ switch ($action) {
         $devolucaoDeId = (int)($data['devolucaoDeId'] ?? 0);
         
         // Buscar chave da nota original para referenciar
-        $vendaOriginal = $pdo->query("SELECT chave_acesso, numero, serie FROM vendas WHERE id = $devolucaoDeId")->fetch();
+        $vendaOriginal = $pdo->query("SELECT chave_acesso, numero, serie FROM vendas WHERE id = $devolucaoDeId AND empresa_id = $empresaId")->fetch();
         if (!$vendaOriginal || empty($vendaOriginal['chave_acesso'])) {
             echo json_encode(['success' => false, 'message' => 'Nota original não encontrada ou sem chave de acesso para referenciar.']);
             break;

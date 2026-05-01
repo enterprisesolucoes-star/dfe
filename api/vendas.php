@@ -1256,8 +1256,8 @@ switch ($action) {
     case 'excluir_venda':
         $id = (int)($_GET['id'] ?? 0);
         // Bloqueia exclusão de NFC-e Autorizada (deve ser cancelada na SEFAZ antes)
-        $stmtChk = $pdo->prepare("SELECT status FROM vendas WHERE id = ?");
-        $stmtChk->execute([$id]);
+        $stmtChk = $pdo->prepare("SELECT status FROM vendas WHERE id = ? AND empresa_id = ?");
+        $stmtChk->execute([$id, $empresaId]);
         $vRow = $stmtChk->fetch();
         if (!$vRow) {
             echo json_encode(['success' => false, 'message' => 'Venda não encontrada']);
@@ -1282,7 +1282,7 @@ switch ($action) {
         }
         $pdo->prepare("DELETE FROM vendas_pagamentos WHERE venda_id = ?")->execute([$id]);
         $pdo->prepare("DELETE FROM vendas_itens WHERE venda_id = ?")->execute([$id]);
-        $pdo->prepare("DELETE FROM vendas WHERE id = ?")->execute([$id]);
+        $pdo->prepare("DELETE FROM vendas WHERE id = ? AND empresa_id = ?")->execute([$id, $empresaId]);
         echo json_encode(['success' => true]);
         break;
 
@@ -1631,7 +1631,7 @@ switch ($action) {
 
     case 'nfce_download_xml':
         $id = (int)$_GET['id'];
-        $v = $pdo->query("SELECT xml_autorizado, chave_acesso FROM vendas WHERE id = $id")->fetch();
+        $v = $pdo->query("SELECT xml_autorizado, chave_acesso FROM vendas WHERE id = $id AND empresa_id = $empresaId")->fetch();
         if ($v && $v['xml_autorizado']) {
             header('Content-Type: application/xml');
             header('Content-Disposition: attachment; filename="'.$v['chave_acesso'].'.xml"');

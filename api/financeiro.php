@@ -226,7 +226,7 @@ switch ($action) {
             if ($titulo['status'] !== 'Pago') throw new Exception("Apenas títulos pagos podem ser estornados.");
 
             // 1. Reverter status do título
-            $pdo->prepare("UPDATE financeiro SET status = 'Pendente', valor_pago = 0, data_baixa = NULL WHERE id = ?")->execute([$id]);
+            $pdo->prepare("UPDATE financeiro SET status = 'Pendente', valor_pago = 0, data_baixa = NULL WHERE id = ? AND empresa_id = ?")->execute([$id, $empresaId]);
             // 2. Remover lançamentos no caixa
             $pdo->prepare("DELETE FROM caixa_movimentos WHERE financeiro_id = ? AND empresa_id = ?")->execute([$id, $empresaId]);
 
@@ -358,7 +358,7 @@ switch ($action) {
             if (!$titulo) throw new Exception("Título não encontrado.");
 
             // 2. Atualizar título para Pago
-            $stmtUp = $pdo->prepare("UPDATE financeiro SET status = 'Pago', valor_pago = ?, data_baixa = ? WHERE id = ?");
+            $stmtUp = $pdo->prepare("UPDATE financeiro SET status = 'Pago', valor_pago = ?, data_baixa = ? WHERE id = ? AND empresa_id = ?");
             $stmtUp->execute([$data['valor_pago'], $data['data_pagamento'], $data['id']]);
 
             // 3. Gerar movimento no Caixa
