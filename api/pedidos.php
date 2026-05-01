@@ -97,11 +97,11 @@ if ($action === 'salvar_pedido_completo') {
 
             $stmt = $pdo->prepare("
                 INSERT INTO vendas_itens
-                    (venda_id, produto_id, descricao, unidade, quantidade,
-                     valor_unitario, valor_desconto, valor_total)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    (venda_id, produto_id, unidade, quantidade,
+                     valor_unitario, valor_total)
+                VALUES (?, ?, ?, ?, ?, ?)
             ");
-            $stmt->execute([$vendaId, $produtoId, $descricao, $unidade, $quantidade, $valorUnit, $desconto * $quantidade, $valorItemTotal]);
+            $stmt->execute([$vendaId, $produtoId, $unidade, $quantidade, $valorUnit, $valorItemTotal]);
 
             // Baixa de estoque
             if ($produtoId > 0 && $quantidade > 0) {
