@@ -319,6 +319,7 @@ $modules = [
     'salvar_vendedor'     => 'vendedores',
     'excluir_vendedor'    => 'vendedores',
     'listar_pedidos'         => 'pedidos',
+    'pedido_pdf'             => 'pedidos',
     'buscar_pedido'          => 'pedidos',
     'excluir_pedido'         => 'pedidos',
     'atualizar_pedido'       => 'pedidos',

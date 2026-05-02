@@ -161,18 +161,33 @@ ${v.observacao?`<div style="border:1px solid #ddd;border-radius:4px;padding:10px
       const res  = await fetch(`./api.php?action=pedido_email&id=${p.id}&email=${encodeURIComponent(email.trim())}`, { method: 'POST' });
       const data = await res.json();
       if (data.success) showAlert('Sucesso', 'E-mail enviado com sucesso!');
-      else showAlert('Erro', data.message || 'Falha ao enviar e-mail.');
+      else if (data.message?.includes('SMTP') || data.message?.includes('smtp') || data.message?.includes('connect')) {
+        showAlert('E-mail não configurado', 'As configurações de e-mail (SMTP) não estão configuradas para esta empresa.\n\nAcesse: Empresa → Configurações → E-mail para configurar.');
+      } else showAlert('Erro', data.message || 'Falha ao enviar e-mail.');
     }, emailInicial);
   };
 
   const handleWhatsApp = (p: PedidoLista) => {
+    const pdfUrl = `${window.location.origin}/api.php?action=pedido_pdf&id=${p.id}`;
     const texto = encodeURIComponent(
-      `*${emitente?.razaoSocial || ''}*\n` +
-      `⚠ DOCUMENTO SEM VALOR FISCAL\n\n` +
-      `*PEDIDO Nº ${String(p.numero).padStart(6,'0')}*\n` +
-      `Data: ${new Date(p.data_emissao).toLocaleDateString('pt-BR')}\n` +
-      (p.cliente_nome ? `Cliente: ${p.cliente_nome}\n` : '') +
-      `\n*Total: R$ ${brl(Number(p.valor_total))}*\n\n` +
+      `*${emitente?.razaoSocial || ''}*
+` +
+      `⚠ DOCUMENTO SEM VALOR FISCAL
+
+` +
+      `*PEDIDO Nº ${String(p.numero).padStart(6,'0')}*
+` +
+      `Data: ${new Date(p.data_emissao).toLocaleDateString('pt-BR')}
+` +
+      (p.cliente_nome ? `Cliente: ${p.cliente_nome}
+` : '') +
+      `
+*Total: R$ ${brl(Number(p.valor_total))}*
+
+` +
+      `📄 Visualizar pedido: ${pdfUrl}
+
+` +
       `Obrigado pela preferência!`
     );
     window.open(`https://wa.me/?text=${texto}`, '_blank');
