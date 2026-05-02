@@ -531,3 +531,5 @@ td{padding:6px;border:1px solid #eee}tr:nth-child(even) td{background:#f9fafb}
     echo $html;
     exit;
 }
+
+echo json_encode(['success' => false, 'message' => 'Ação inválida']);
