@@ -627,11 +627,7 @@ ${observacao?`<div style="border:1px solid #ddd;border-radius:4px;padding:10px;m
               </div>
             </div>
           </section>
-          <div className="flex justify-end">
-            <button onClick={() => setActiveTab('produtos')} className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 flex items-center gap-2">
-              Próximo: Produtos <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
+
         </div>
       )}
 
@@ -807,8 +803,7 @@ ${observacao?`<div style="border:1px solid #ddd;border-radius:4px;padding:10px;m
               </div>
             </div>
           </section>
-          <div className="flex justify-between">
-            <button onClick={() => setActiveTab('transporte')} className="px-6 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-200">Voltar</button>
+          <div className="flex justify-end">
             <button onClick={editandoId ? handleFinalizarEdicao : handleFinalizar} disabled={salvando || !!validar()}
               className={`px-8 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 ${salvando || validar() ? 'bg-gray-200 text-gray-400' : editandoId ? 'bg-orange-500 text-white hover:bg-orange-600 shadow-md' : 'bg-green-600 text-white hover:bg-green-700 shadow-md'}`}>
               {salvando ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Salvando...</> : editandoId ? <><Save className="w-4 h-4" /> Salvar Alterações</> : <><Save className="w-4 h-4" /> Finalizar Pedido</>}
