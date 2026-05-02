@@ -50,6 +50,9 @@ if ($action === 'salvar_pedido_completo') {
         exit;
     }
 
+    // Buscar conta padrão fora da transação para evitar conflito
+    $contaIdPadrao = $caixaId ?: garantirContaFinanceira($pdo, $empresaId);
+
     $pdo->beginTransaction();
     try {
         // Próximo número
@@ -130,7 +133,7 @@ if ($action === 'salvar_pedido_completo') {
             $stmt->execute([$vendaId, $forma, $valor, $band ?: '99', $aut]);
 
             // Caixa (formas à vista) — usa caixaId da sessão ou conta padrão da empresa
-            $contaIdEfetivo = $caixaId ?: garantirContaFinanceira($pdo, $empresaId);
+            $contaIdEfetivo = $caixaId ?: $contaIdPadrao;
             if (in_array($forma, $formasCaixa) && $contaIdEfetivo) {
                 $formaLabel = [
                     '01' => 'Dinheiro', '03' => 'Cartão Crédito', '04' => 'Cartão Débito',
