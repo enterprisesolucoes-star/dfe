@@ -54,3 +54,78 @@ if ($action === 'cobranca_config_salvar') {
 }
 
 echo json_encode(['success' => false, 'message' => 'Ação inválida']);
+
+// ── Gerar Boleto ──────────────────────────────────────────────────────────────
+if ($action === 'boleto_gerar') {
+    $data         = json_decode(file_get_contents('php://input'), true) ?? [];
+    $financeiroId = (int)($data['financeiro_id'] ?? 0);
+
+    if (!$financeiroId) {
+        echo json_encode(['success' => false, 'message' => 'financeiro_id inválido']);
+        exit;
+    }
+
+    // Buscar título
+    $stmt = $pdo->prepare("SELECT * FROM financeiro WHERE id = ? AND empresa_id = ? AND tipo = 'R'");
+    $stmt->execute([$financeiroId, $empresaId]);
+    $titulo = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$titulo) { echo json_encode(['success' => false, 'message' => 'Título não encontrado']); exit; }
+    if ($titulo['boleto_status'] === 'registrado') { echo json_encode(['success' => false, 'message' => 'Boleto já gerado para este título']); exit; }
+
+    // Buscar configuração da cobrança
+    $cfg = $pdo->prepare("SELECT * FROM empresas_cobranca WHERE empresa_id = ? AND ativo = 1 LIMIT 1");
+    $cfg->execute([$empresaId]);
+    $config = $cfg->fetch(PDO::FETCH_ASSOC);
+    if (!$config) { echo json_encode(['success' => false, 'message' => 'Configuração de cobrança não encontrada. Configure em Configurações → Cobrança.']); exit; }
+
+    // Buscar empresa
+    $emp = $pdo->prepare("SELECT * FROM empresas WHERE id = ?");
+    $emp->execute([$empresaId]);
+    $empresa = $emp->fetch(PDO::FETCH_ASSOC);
+
+    // Buscar cliente
+    $clienteNome = $titulo['entidade_id']
+        ? ($pdo->prepare("SELECT nome, documento FROM clientes WHERE id = ?") && false ?: (function() use ($pdo, $titulo) {
+            $s = $pdo->prepare("SELECT nome, documento FROM clientes WHERE id = ?");
+            $s->execute([$titulo['entidade_id']]);
+            return $s->fetch(PDO::FETCH_ASSOC);
+          })())
+        : null;
+
+    // Nosso número sequencial
+    $nossoNumero = (int)$config['nosso_numero'];
+    $pdo->prepare("UPDATE empresas_cobranca SET nosso_numero = nosso_numero + 1 WHERE empresa_id = ?")
+        ->execute([$empresaId]);
+
+    // Por enquanto gera boleto simulado (será substituído pela API Sicoob quando tiver credenciais)
+    // Formato do nosso número Sicoob: convenio + nosso_numero
+    $nossoNumeroFmt = $config['convenio'] . str_pad($nossoNumero, 7, '0', STR_PAD_LEFT);
+
+    // Linha digitável simulada (será gerada pela API Sicoob)
+    $linhaDigitavel = '75691.' . substr($nossoNumeroFmt, 0, 5) . ' ' .
+                      substr($nossoNumeroFmt, 5, 5) . '.' . substr($nossoNumeroFmt, 5, 6) . ' ' .
+                      '1.' . date('Ymd', strtotime($titulo['vencimento'])) . ' ' .
+                      number_format($titulo['valor_total'], 2, '', '');
+
+    $codigoBarras = '75691' . date('Ymd', strtotime($titulo['vencimento'])) .
+                    number_format($titulo['valor_total'], 2, '', '') . $nossoNumeroFmt;
+
+    // Salvar no financeiro
+    $pdo->prepare("
+        UPDATE financeiro SET
+            boleto_nosso_numero    = ?,
+            boleto_codigo_barras   = ?,
+            boleto_linha_digitavel = ?,
+            boleto_status          = 'registrado',
+            boleto_registrado_em   = NOW()
+        WHERE id = ? AND empresa_id = ?
+    ")->execute([$nossoNumeroFmt, $codigoBarras, $linhaDigitavel, $financeiroId, $empresaId]);
+
+    // Retornar dados atualizados
+    $stmt = $pdo->prepare("SELECT * FROM financeiro WHERE id = ?");
+    $stmt->execute([$financeiroId]);
+    $tituloAtualizado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    echo json_encode(['success' => true, 'boleto' => $tituloAtualizado]);
+    exit;
+}

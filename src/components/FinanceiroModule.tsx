@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { DollarSign, CheckCircle, Trash2, Search, TrendingUp, TrendingDown, Plus, RotateCcw, Edit2 } from 'lucide-react';
+import { DollarSign, CheckCircle, Trash2, Search, TrendingUp, TrendingDown, Plus, RotateCcw, Edit2, FileText, Loader2, Copy, ExternalLink } from 'lucide-react';
 import { StatCard, Input } from './UIComponents';
 
 // ─── Componente Baixa de Título ──────────────────────────────────────────────
@@ -229,6 +229,11 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm }: { tip
                   <div className="flex items-center justify-center gap-2">
                     {t.status !== 'Pago' && <button onClick={() => setBaixaTitulo(t)} className="p-1.5 text-gray-400 hover:text-emerald-600" title="Baixar"><CheckCircle className="w-3.5 h-3.5" /></button>}
                     {t.status !== 'Pago' && <button onClick={() => setEditTitulo(t)} className="p-1.5 text-gray-400 hover:text-blue-600" title="Editar"><Edit2 className="w-3.5 h-3.5" /></button>}
+                    {tipo === 'R' && t.status !== 'Pago' && (
+                      t.boleto_status === 'registrado'
+                        ? <button onClick={() => setBoletoTitulo({ ...t, _modo: 'visualizar' })} className="p-1.5 text-gray-400 hover:text-indigo-600" title="Ver Boleto"><FileText className="w-3.5 h-3.5" /></button>
+                        : <button onClick={() => setBoletoTitulo({ ...t, _modo: 'gerar' })} className="p-1.5 text-gray-400 hover:text-indigo-600" title="Gerar Boleto"><FileText className="w-3.5 h-3.5" /></button>
+                    )}
                     {t.status === 'Pago' && <button onClick={() => handleEstornar(t.id)} className="p-1.5 text-gray-400 hover:text-amber-600" title="Estornar"><RotateCcw className="w-3.5 h-3.5" /></button>}
                     <button onClick={() => handleExcluir(t.id)} className="p-1.5 text-gray-400 hover:text-red-600" title="Excluir"><Trash2 className="w-3.5 h-3.5" /></button>
                   </div>
@@ -667,6 +672,131 @@ export const CaixaView = ({ emitente, showAlert, showConfirm }: { emitente: any,
             ))}
           </tbody>
         </table>
+      </div>
+    </div>
+  );
+};
+
+// ─── Modal Gerar / Visualizar Boleto ─────────────────────────────────────────
+const BoletoModal = ({ titulo, onClose, showAlert }: { titulo: any; onClose: () => void; showAlert: (t: string, m: string) => void }) => {
+  const [loading, setLoading]   = useState(titulo._modo === 'gerar');
+  const [boleto, setBoleto]     = useState<any>(titulo.boleto_status === 'registrado' ? titulo : null);
+  const [copiado, setCopiado]   = useState(false);
+
+  useEffect(() => {
+    if (titulo._modo === 'gerar') gerarBoleto();
+    else setBoleto(titulo);
+  }, []);
+
+  const gerarBoleto = async () => {
+    setLoading(true);
+    try {
+      const res  = await fetch('./api.php?action=boleto_gerar', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ financeiro_id: titulo.id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setBoleto(data.boleto);
+      } else {
+        showAlert('Erro', data.message || 'Falha ao gerar boleto.');
+        onClose();
+      }
+    } catch { showAlert('Erro', 'Erro de conexão.'); onClose(); }
+    finally { setLoading(false); }
+  };
+
+  const copiarLinha = () => {
+    if (!boleto?.boleto_linha_digitavel) return;
+    navigator.clipboard.writeText(boleto.boleto_linha_digitavel);
+    setCopiado(true);
+    setTimeout(() => setCopiado(false), 2000);
+  };
+
+  const brl = (v: number) => Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[200] p-4 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+        {/* Header */}
+        <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+          <h3 className="text-base font-bold text-gray-800 flex items-center gap-2">
+            <FileText className="w-5 h-5 text-indigo-600" />
+            {loading ? 'Gerando Boleto...' : 'Boleto Gerado'}
+          </h3>
+          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600">✕</button>
+        </div>
+
+        {/* Conteúdo */}
+        <div className="p-6">
+          {loading ? (
+            <div className="flex flex-col items-center py-10 gap-4">
+              <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
+              <p className="text-gray-500 text-sm">Registrando boleto no banco...</p>
+            </div>
+          ) : boleto ? (
+            <div className="space-y-4">
+              {/* Info do título */}
+              <div className="bg-indigo-50 rounded-xl p-4 border border-indigo-100">
+                <div className="flex justify-between items-center mb-2">
+                  <p className="text-xs text-indigo-600 font-semibold uppercase">Valor do Boleto</p>
+                  <p className="text-2xl font-bold text-indigo-700">{brl(boleto.valor_total)}</p>
+                </div>
+                <div className="flex justify-between text-xs text-indigo-500">
+                  <span>Vencimento: {new Date(boleto.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</span>
+                  <span>Nosso Nº: {boleto.boleto_nosso_numero || '—'}</span>
+                </div>
+              </div>
+
+              {/* Linha digitável */}
+              {boleto.boleto_linha_digitavel && (
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 uppercase mb-1.5">Linha Digitável</p>
+                  <div className="flex gap-2 items-center bg-gray-50 rounded-xl p-3 border border-gray-200">
+                    <p className="flex-1 text-xs font-mono text-gray-700 break-all">{boleto.boleto_linha_digitavel}</p>
+                    <button onClick={copiarLinha} className={`shrink-0 p-2 rounded-lg transition-all ${copiado ? 'bg-green-100 text-green-600' : 'bg-white text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 border border-gray-200'}`}>
+                      {copiado ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  {copiado && <p className="text-xs text-green-600 mt-1">✓ Copiado!</p>}
+                </div>
+              )}
+
+              {/* Código de barras */}
+              {boleto.boleto_codigo_barras && (
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 uppercase mb-1.5">Código de Barras</p>
+                  <p className="text-xs font-mono text-gray-500 bg-gray-50 rounded-xl p-3 border border-gray-100 break-all">{boleto.boleto_codigo_barras}</p>
+                </div>
+              )}
+
+              {/* Status */}
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-500">Status:</span>
+                <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                  boleto.boleto_status === 'registrado' ? 'bg-green-100 text-green-700' :
+                  boleto.boleto_status === 'pago'       ? 'bg-blue-100 text-blue-700' :
+                  'bg-yellow-100 text-yellow-700'
+                }`}>{boleto.boleto_status || 'pendente'}</span>
+              </div>
+            </div>
+          ) : null}
+        </div>
+
+        {/* Rodapé */}
+        {!loading && boleto && (
+          <div className="p-5 border-t border-gray-100 flex gap-3">
+            {boleto.boleto_url_pdf && (
+              <a href={boleto.boleto_url_pdf} target="_blank" rel="noreferrer"
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700">
+                <ExternalLink className="w-4 h-4" /> Imprimir / PDF
+              </a>
+            )}
+            <button onClick={onClose} className="flex-1 py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-50">
+              Fechar
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
