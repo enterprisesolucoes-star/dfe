@@ -163,7 +163,7 @@ export const Sidebar = ({
                 { id: 'transportadores', label: 'Transportadores', icon: Truck },
                 { id: 'vendedores', label: 'Vendedores', icon: UserCircle },
                 { id: 'comissoes', label: 'Comissões', icon: TrendingUp },
-                { id: 'cobranca_config', label: 'Cobrança - Config', icon: Landmark },
+                { id: 'cobranca_config', label: 'Cobrança', icon: Landmark },
                 { id: 'cobranca_boletos', label: 'Boletos', icon: FileText },
                 ...(isFiscal ? [{ id: 'config_integracao', label: 'Integração', icon: Zap }] : []),
                 ...(isFiscal ? [{ id: 'dfe_config', label: 'DFe', icon: Settings }] : []),

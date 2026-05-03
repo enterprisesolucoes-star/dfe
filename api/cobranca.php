@@ -134,7 +134,16 @@ echo json_encode(['success' => false, 'message' => 'Ação inválida']);
 // ── Imprimir Boleto HTML ──────────────────────────────────────────────────────
 if ($action === 'boleto_imprimir') {
     $id = (int)($_GET['id'] ?? 0);
-    $stmt = $pdo->prepare("SELECT f.*, c.nome as cliente_nome, c.documento as cliente_documento, c.logradouro as cli_logradouro, c.municipio as cli_municipio, c.uf as cli_uf, c.cep as cli_cep FROM financeiro f LEFT JOIN clientes c ON c.id = f.entidade_id WHERE f.id = ? AND f.empresa_id = ?");
+    $stmt = $pdo->prepare("
+        SELECT f.*,
+               c.nome as cliente_nome, c.documento as cliente_documento,
+               c.logradouro as cli_logradouro, c.numero as cli_numero,
+               c.bairro as cli_bairro, c.municipio as cli_municipio,
+               c.uf as cli_uf, c.cep as cli_cep
+        FROM financeiro f
+        LEFT JOIN clientes c ON c.id = f.entidade_id
+        WHERE f.id = ? AND f.empresa_id = ?
+    ");
     $stmt->execute([$id, $empresaId]);
     $titulo = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$titulo) { http_response_code(404); echo 'Título não encontrado'; exit; }
@@ -147,113 +156,239 @@ if ($action === 'boleto_imprimir') {
     $cfg->execute([$empresaId]);
     $config = $cfg->fetch(PDO::FETCH_ASSOC);
 
-    $venc    = date('d/m/Y', strtotime($titulo['vencimento']));
-    $valor   = number_format($titulo['valor_total'], 2, ',', '.');
-    $nossoN  = $titulo['boleto_nosso_numero'] ?? '';
-    $linha   = $titulo['boleto_linha_digitavel'] ?? '';
-    $barras  = $titulo['boleto_codigo_barras'] ?? '';
-    $banco   = $config['banco_codigo'] ?? '756';
-    $conv    = $config['convenio'] ?? '';
-    $agencia = $config['agencia'] ?? '';
-    $conta   = $config['conta'] ?? '';
+    // Formatar dados
+    $venc        = date('d/m/Y', strtotime($titulo['vencimento']));
+    $emissao     = date('d/m/Y', strtotime($titulo['boleto_registrado_em'] ?? 'now'));
+    $hoje        = date('d/m/Y');
+    $valor       = number_format($titulo['valor_total'], 2, ',', '.');
+    $nossoN      = $titulo['boleto_nosso_numero'] ?? '';
+    $linha       = $titulo['boleto_linha_digitavel'] ?? '';
+    $barras      = $titulo['boleto_codigo_barras'] ?? '';
+    $agencia     = $config['agencia'] ?? '';
+    $conta       = $config['conta'] ?? '';
+    $convenio    = $config['convenio'] ?? '';
+    $carteira    = $config['carteira_codigo'] ?? '1';
+    $banco       = $config['banco_codigo'] ?? '756';
 
-    // Gerar código de barras visual (barras simples via CSS)
-    $barrasVisual = '';
-    for ($i = 0; $i < strlen($barras); $i++) {
-        $d = $barras[$i];
-        $w = in_array($d, ['1','3','5','7','9']) ? 3 : 1;
-        $barrasVisual .= "<div style='display:inline-block;width:{$w}px;height:50px;background:#000;margin:0'></div>";
-        if ($i % 2 === 1) $barrasVisual .= "<div style='display:inline-block;width:1px;height:50px;background:#fff;margin:0'></div>";
+    // Nosso número formatado: 01/0000001-D
+    $nossoFmt = substr($carteira, 0, 2) . '/' . str_pad(substr($nossoN, strlen($convenio)), 7, '0', STR_PAD_LEFT) . '-0';
+
+    // Coop/Beneficiário: agencia/conta-digito
+    $coopBenef = $agencia . '/' . $conta . '-0';
+
+    // Instruções
+    $instrucoes = $config['instrucoes'] ?? '';
+    if ($config['multa_valor'] > 0)  $instrucoes .= "\nMulta: {$config['multa_valor']}{$config['multa_tipo']} após o vencimento";
+    if ($config['juros_valor'] > 0)  $instrucoes .= "\nJuros: {$config['juros_valor']}{$config['juros_tipo']} ao dia";
+    if ($config['prazo_devolucao'] > 0) $instrucoes .= "\nNão receber após {$config['prazo_devolucao']} dias do vencimento";
+    if ($config['prazo_protesto'] > 0)  $instrucoes .= "\nProtestar após {$config['prazo_protesto']} dias do vencimento";
+    $instrHtml = nl2br(htmlspecialchars($instrucoes));
+
+    // Dados empresa
+    $empNome    = htmlspecialchars($empresa['razao_social'] ?? '');
+    $empCnpj    = htmlspecialchars($empresa['cnpj'] ?? '');
+    $empEnd     = htmlspecialchars(trim(($empresa['logradouro'] ?? '') . ', ' . ($empresa['numero'] ?? '')));
+    $empCidade  = htmlspecialchars(($empresa['municipio'] ?? '') . '/' . ($empresa['uf'] ?? '') . ' — ' . ($empresa['cep'] ?? ''));
+
+    // Dados cliente
+    $cliNome   = htmlspecialchars($titulo['cliente_nome'] ?? 'NÃO IDENTIFICADO');
+    $cliEnd    = htmlspecialchars(trim(($titulo['cli_logradouro'] ?? '') . ', ' . ($titulo['cli_numero'] ?? '')));
+    $cliBairro = htmlspecialchars($titulo['cli_bairro'] ?? '');
+    $cliCidade = htmlspecialchars(($titulo['cli_municipio'] ?? '') . '/' . ($titulo['cli_uf'] ?? '') . ($titulo['cli_cep'] ? ' — ' . $titulo['cli_cep'] : ''));
+
+    // Gerar barras visuais simples
+    $barrasHtml = '';
+    $chars = str_split($barras);
+    foreach ($chars as $i => $c) {
+        $w = in_array($c, ['1','3','5','7','9']) ? 3 : 1;
+        $color = ($i % 2 === 0) ? '#000' : '#fff';
+        $barrasHtml .= "<span style='display:inline-block;width:{$w}px;height:60px;background:{$color};vertical-align:middle'></span>";
     }
 
-    $instrucoes = nl2br(htmlspecialchars($config['instrucoes'] ?? ''));
-    $multaTxt   = $config['multa_valor'] > 0 ? "Multa após vencimento: {$config['multa_valor']}{$config['multa_tipo']}" : '';
-    $jurosTxt   = $config['juros_valor'] > 0 ? "Juros ao dia: {$config['juros_valor']}{$config['juros_tipo']}" : '';
-
     header('Content-Type: text/html; charset=utf-8');
-    echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Boleto</title>
+    echo '<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<title>Boleto ' . $nossoFmt . '</title>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{font-family:Arial,sans-serif;font-size:9pt;color:#000;padding:10mm}
-  .boleto{width:190mm;margin:0 auto}
-  .linha{display:flex;border-bottom:1px solid #000;padding:2px 0}
-  .campo{flex:1;padding:2px 4px}
-  .campo-label{font-size:7pt;color:#666;display:block}
-  .campo-valor{font-size:9pt;font-weight:bold;display:block}
-  .banco-header{display:flex;align-items:center;border-bottom:2px solid #000;padding-bottom:4px;margin-bottom:4px}
-  .banco-logo{font-size:16pt;font-weight:bold;border-right:2px solid #000;padding-right:10px;margin-right:10px}
-  .banco-cod{font-size:14pt;font-weight:bold;border-right:2px solid #000;padding-right:10px;margin-right:10px}
-  .linha-digitavel{font-size:11pt;font-weight:bold;text-align:right;flex:1}
-  .recibo{border:1px solid #000;padding:4px;margin-bottom:8px}
-  .boleto-body{border:1px solid #000;padding:4px}
-  .separator{border-top:1px dashed #999;margin:8px 0;padding-top:8px;font-size:7pt;color:#999;text-align:center}
-  .barcode{text-align:center;padding:8px 0}
-  @media print{body{padding:5mm}}
-</style></head><body>
-<div class="boleto">
-  <!-- RECIBO DO SACADO -->
-  <div class="recibo">
-    <div class="banco-header">
-      <div class="banco-logo">'.$banco.'</div>
-      <div class="banco-cod">'.$banco.'-'.(strlen($banco)>3?substr($banco,-1):'X').'</div>
-      <div class="linha-digitavel">'.$linha.'</div>
-    </div>
-    <div class="linha">
-      <div class="campo" style="flex:3"><span class="campo-label">Beneficiário</span><span class="campo-valor">'.htmlspecialchars($empresa['razao_social']).' - CNPJ: '.htmlspecialchars($empresa['cnpj']).'</span></div>
-      <div class="campo"><span class="campo-label">Agência/Código Beneficiário</span><span class="campo-valor">'.$agencia.'/'.$conta.'</span></div>
-    </div>
-    <div class="linha">
-      <div class="campo" style="flex:2"><span class="campo-label">Sacado</span><span class="campo-valor">'.htmlspecialchars($titulo['cliente_nome'] ?? 'NÃO IDENTIFICADO').'</span></div>
-      <div class="campo"><span class="campo-label">CPF/CNPJ</span><span class="campo-valor">'.htmlspecialchars($titulo['cliente_documento'] ?? '').'</span></div>
-      <div class="campo"><span class="campo-label">Vencimento</span><span class="campo-valor">'.$venc.'</span></div>
-      <div class="campo"><span class="campo-label">Valor</span><span class="campo-valor">R$ '.$valor.'</span></div>
-    </div>
-    <div class="linha">
-      <div class="campo"><span class="campo-label">Nosso Número</span><span class="campo-valor">'.$nossoN.'</span></div>
-      <div class="campo"><span class="campo-label">Convênio</span><span class="campo-valor">'.$conv.'</span></div>
-      <div class="campo"><span class="campo-label">Data Emissão</span><span class="campo-valor">'.date('d/m/Y', strtotime($titulo['boleto_registrado_em'])).'</span></div>
-    </div>
-  </div>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; font-size: 9pt; color: #000; background: #fff; }
+  .page { width: 210mm; margin: 0 auto; padding: 8mm; }
+  table { width: 100%; border-collapse: collapse; }
+  td, th { border: 1px solid #000; padding: 3px 5px; vertical-align: top; }
+  .no-border td { border: none; }
+  .label { font-size: 7pt; color: #333; display: block; }
+  .value { font-size: 9pt; font-weight: bold; display: block; }
+  .value-lg { font-size: 11pt; font-weight: bold; display: block; }
+  .header-banco { display: flex; align-items: center; border-bottom: 2px solid #000; margin-bottom: 0; }
+  .banco-logo { font-size: 22pt; font-weight: 900; color: #008000; padding-right: 8px; border-right: 3px solid #000; margin-right: 8px; }
+  .banco-cod { font-size: 16pt; font-weight: bold; padding-right: 8px; border-right: 3px solid #000; margin-right: 8px; }
+  .linha-dig { font-size: 12pt; font-weight: bold; text-align: right; flex: 1; }
+  .recibo { border: 1px solid #000; margin-bottom: 8mm; padding: 4px; }
+  .ficha { border: 1px solid #000; }
+  .separator { text-align: center; font-size: 8pt; color: #555; padding: 4mm 0; border-top: 1px dashed #999; margin-top: 4mm; }
+  .barcode { text-align: left; padding: 6px 0 2px 0; }
+  .instru { font-size: 8pt; white-space: pre-line; }
+  .right { text-align: right; }
+  .bold { font-weight: bold; }
+  @media print { body { padding: 0; } .page { padding: 5mm; } }
+</style>
+</head><body>
+<div class="page">
 
-  <div class="separator">✂ Corte aqui</div>
+<!-- ═══ RECIBO DO PAGADOR ═══════════════════════════════════════════════ -->
+<table style="margin-bottom:2mm">
+  <tr>
+    <td style="border:none;width:70%">
+      <span class="label">BENEFICIÁRIO:</span>
+      <span class="value">' . $empNome . ' (CNPJ: ' . $empCnpj . ')</span>
+      <span style="font-size:8pt">' . $empEnd . '<br>' . $empCidade . '</span>
+    </td>
+    <td style="border:none;text-align:right;font-size:10pt;font-weight:bold">RECIBO DO PAGADOR</td>
+  </tr>
+</table>
+<table class="recibo" style="margin-bottom:0">
+  <tr>
+    <td style="width:60%">
+      <span class="label">Nome do Pagador</span>
+      <span class="value">' . $cliNome . '</span>
+    </td>
+    <td style="width:20%">
+      <span class="label">Data de Vencimento</span>
+      <span class="value">' . $venc . '</span>
+    </td>
+    <td style="width:20%">
+      <span class="label">Valor Cobrado</span>
+      <span class="value">&nbsp;</span>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <span class="label">Coop. contratante/Cód. Beneficiário</span>
+      <span class="value">' . $coopBenef . '</span>
+    </td>
+    <td colspan="2">
+      <span class="label">Nosso Número</span>
+      <span class="value">' . $nossoFmt . '</span>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><span class="label">Autenticação Mecânica</span>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+</table>
 
-  <!-- FICHA DE COMPENSAÇÃO -->
-  <div class="boleto-body">
-    <div class="banco-header">
-      <div class="banco-logo">'.$banco.'</div>
-      <div class="banco-cod">'.$banco.'-'.(strlen($banco)>3?substr($banco,-1):'X').'</div>
-      <div class="linha-digitavel">'.$linha.'</div>
-    </div>
-    <div class="linha">
-      <div class="campo" style="flex:3"><span class="campo-label">Beneficiário</span><span class="campo-valor">'.htmlspecialchars($empresa['razao_social']).' - CNPJ: '.htmlspecialchars($empresa['cnpj']).'</span></div>
-      <div class="campo"><span class="campo-label">Agência/Código Beneficiário</span><span class="campo-valor">'.$agencia.'/'.$conta.'</span></div>
-    </div>
-    <div class="linha">
-      <div class="campo"><span class="campo-label">Data do Documento</span><span class="campo-valor">'.date('d/m/Y', strtotime($titulo['boleto_registrado_em'])).'</span></div>
-      <div class="campo"><span class="campo-label">Nosso Número</span><span class="campo-valor">'.$nossoN.'</span></div>
-      <div class="campo"><span class="campo-label">Convênio</span><span class="campo-valor">'.$conv.'</span></div>
-      <div class="campo"><span class="campo-label">Vencimento</span><span class="campo-valor">'.$venc.'</span></div>
-    </div>
-    <div class="linha">
-      <div class="campo" style="flex:2"><span class="campo-label">Sacado</span><span class="campo-valor">'.htmlspecialchars($titulo['cliente_nome'] ?? 'NÃO IDENTIFICADO').'</span></div>
-      <div class="campo"><span class="campo-label">CPF/CNPJ</span><span class="campo-valor">'.htmlspecialchars($titulo['cliente_documento'] ?? '').'</span></div>
-    </div>
-    <div class="linha">
-      <div class="campo" style="flex:2"><span class="campo-label">Instrução / Informações</span>
-        <span class="campo-valor" style="font-weight:normal">'.$instrucoes.'<br>'.$multaTxt.' '.$jurosTxt.'</span>
+<!-- ═══ SEPARADOR ════════════════════════════════════════════════════════ -->
+<div class="separator">✂&nbsp;&nbsp;&nbsp;Corte aqui&nbsp;&nbsp;&nbsp;✂</div>
+
+<!-- ═══ FICHA DE COMPENSAÇÃO ════════════════════════════════════════════ -->
+<table class="ficha" style="margin-bottom:0">
+  <!-- Linha banco + linha digitável -->
+  <tr style="border-bottom:2px solid #000">
+    <td style="width:15%;border:none;padding:4px 6px">
+      <div class="header-banco" style="border-bottom:none">
+        <span class="banco-logo" style="font-size:14pt;color:#008000">&#9658;SICOOB</span>
       </div>
-      <div class="campo" style="text-align:right">
-        <span class="campo-label">Valor do Documento</span>
-        <span class="campo-valor" style="font-size:12pt">R$ '.$valor.'</span>
-      </div>
-    </div>
-    <div class="barcode">
-      '.$barrasVisual.'
-      <div style="font-size:7pt;margin-top:4px">'.$barras.'</div>
-    </div>
-  </div>
+    </td>
+    <td style="width:10%;border:none;border-left:3px solid #000;border-right:3px solid #000;padding:4px 8px;font-size:14pt;font-weight:bold;text-align:center">' . $banco . '-0</td>
+    <td style="border:none;padding:4px 6px;text-align:right;font-size:12pt;font-weight:bold">' . $linha . '</td>
+  </tr>
+  <!-- Local de pagamento + vencimento -->
+  <tr>
+    <td colspan="2">
+      <span class="label">Local de Pagamento</span>
+      <span style="font-size:8pt">Pagável preferencialmente nas cooperativas do Sicoob</span>
+    </td>
+    <td class="right">
+      <span class="label">Vencimento</span>
+      <span class="value-lg">' . $venc . '</span>
+    </td>
+  </tr>
+  <!-- Beneficiário -->
+  <tr>
+    <td colspan="2">
+      <span class="label">Beneficiário</span>
+      <span class="value">' . $empNome . ' (CNPJ: ' . $empCnpj . ')</span>
+    </td>
+    <td class="right">
+      <span class="label">Coop. contratante/Cód. Beneficiário</span>
+      <span class="value">' . $coopBenef . '</span>
+    </td>
+  </tr>
+  <!-- Data doc, Nº doc, Espécie, Aceite, Data processamento, Nosso número -->
+  <tr>
+    <td>
+      <span class="label">Data do Documento</span>
+      <span class="value">' . $emissao . '</span>
+    </td>
+    <td>
+      <span class="label">Nº do Documento</span>
+      <span class="value">' . str_pad($id, 4, '0', STR_PAD_LEFT) . '</span>
+    </td>
+    <td class="right">
+      <span class="label">Nosso Número</span>
+      <span class="value">' . $nossoFmt . '</span>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <span class="label">Uso do Banco</span>
+      <span class="value">&nbsp;</span>
+    </td>
+    <td>
+      <span class="label">Carteira</span>
+      <span class="value">' . $carteira . '</span>
+    </td>
+    <td class="right">
+      <span class="label">Valor do Documento</span>
+      <span class="value-lg">R$ ' . $valor . '</span>
+    </td>
+  </tr>
+  <!-- Instruções + descontos -->
+  <tr>
+    <td colspan="2" style="height:80px;vertical-align:top">
+      <span class="label">Instruções (texto de responsabilidade do beneficiário)</span>
+      <span class="instru">' . $instrHtml . '</span>
+    </td>
+    <td style="vertical-align:top">
+      <table style="width:100%;border:none">
+        <tr><td style="border:none;border-bottom:1px solid #000"><span class="label">(-) Desconto / Abatimento</span><span class="value">&nbsp;</span></td></tr>
+        <tr><td style="border:none;border-bottom:1px solid #000"><span class="label">(-) Outras Deduções</span><span class="value">&nbsp;</span></td></tr>
+        <tr><td style="border:none;border-bottom:1px solid #000"><span class="label">(+) Mora / Multa</span><span class="value">&nbsp;</span></td></tr>
+        <tr><td style="border:none;border-bottom:1px solid #000"><span class="label">(+) Outros Acréscimos</span><span class="value">&nbsp;</span></td></tr>
+        <tr><td style="border:none"><span class="label">(=) Valor Cobrado</span><span class="value">&nbsp;</span></td></tr>
+      </table>
+    </td>
+  </tr>
+  <!-- Pagador -->
+  <tr>
+    <td colspan="3">
+      <span class="label">Pagador</span>
+      <span class="value">' . $cliNome . '</span>
+      <span style="font-size:8pt">' . $cliEnd . ($cliBairro ? ', ' . $cliBairro : '') . '<br>' . $cliCidade . '</span>
+    </td>
+  </tr>
+  <!-- Código de baixa -->
+  <tr>
+    <td colspan="2">
+      <span class="label">Código de Baixa</span>
+      <span class="value">&nbsp;</span>
+    </td>
+    <td class="right">
+      <span class="label">Autenticação Mecânica</span>
+      <span style="font-size:8pt;font-weight:bold">FICHA DE COMPENSAÇÃO</span>
+    </td>
+  </tr>
+  <!-- Código de barras -->
+  <tr>
+    <td colspan="3" style="text-align:left;padding:6px 8px;border-top:2px solid #000">
+      <div class="barcode">' . $barrasHtml . '</div>
+      <div style="font-size:7pt;margin-top:2px;letter-spacing:2px">' . $barras . '</div>
+    </td>
+  </tr>
+</table>
+
 </div>
-<script>window.onload=()=>{window.print()}</script>
+<script>window.onload=()=>{ window.print(); }</script>
 </body></html>';
     exit;
 }
