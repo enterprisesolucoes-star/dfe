@@ -161,6 +161,7 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm }: { tip
       {baixaTitulo && <BaixaModal titulo={baixaTitulo} emitente={emitente} onClose={() => setBaixaTitulo(null)} onSuccess={() => { setBaixaTitulo(null); fetchTitulos(); }} showAlert={showAlert} />}
       {showLancamento && <LancamentoManualModal tipo={tipo} onClose={() => setShowLancamento(false)} onSuccess={() => { setShowLancamento(false); fetchTitulos(); }} showAlert={showAlert} />}
       {editTitulo && <EditarTituloModal titulo={editTitulo} onClose={() => setEditTitulo(null)} onSuccess={() => { setEditTitulo(null); fetchTitulos(); }} showAlert={showAlert} />}
+      {boletoTitulo && <BoletoModal titulo={boletoTitulo} onClose={() => { setBoletoTitulo(null); fetchTitulos(); }} showAlert={showAlert} />}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <StatCard label={tipo === 'R' ? "Contas a Receber" : "Contas a Pagar"} value={Number(totPendente).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} icon={DollarSign} color={tipo === 'R' ? 'blue' : 'red'} />
         <StatCard label={tipo === 'R' ? "Recebido no Período" : "Pago no Período"} value={Number(totPago).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} icon={CheckCircle} color="green" />
