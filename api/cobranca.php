@@ -7,6 +7,18 @@ if ($empresaId <= 0) {
     exit;
 }
 
+// ── Função Módulo 10 para linha digitável ────────────────────────────────────
+function sicoobMod10(string $num): int {
+    $soma = 0; $mult = 2;
+    for ($i = strlen($num) - 1; $i >= 0; $i--) {
+        $r = (int)$num[$i] * $mult;
+        $soma += ($r > 9) ? ($r - 9) : $r;
+        $mult = ($mult == 2) ? 1 : 2;
+    }
+    $resto = $soma % 10;
+    return ($resto == 0) ? 0 : 10 - $resto;
+}
+
 // ── Buscar configuração ───────────────────────────────────────────────────────
 if ($action === 'cobranca_config_buscar') {
     $stmt = $pdo->prepare("SELECT * FROM empresas_cobranca WHERE empresa_id = ? AND ativo = 1 LIMIT 1");
@@ -96,18 +108,66 @@ if ($action === 'boleto_gerar') {
     $pdo->prepare("UPDATE empresas_cobranca SET nosso_numero = nosso_numero + 1 WHERE empresa_id = ?")
         ->execute([$empresaId]);
 
-    // Por enquanto gera boleto simulado (será substituído pela API Sicoob quando tiver credenciais)
-    // Formato do nosso número Sicoob: convenio + nosso_numero
-    $nossoNumeroFmt = $config['convenio'] . str_pad($nossoNumero, 7, '0', STR_PAD_LEFT);
+    // Formato Sicoob: convenio(7) + sequencial(7) = 14 dígitos
+    $convenio    = str_pad($config['convenio'], 7, '0', STR_PAD_LEFT);
+    $seqFmt      = str_pad($nossoNumero, 7, '0', STR_PAD_LEFT);
+    $nossoNumeroFmt = $convenio . $seqFmt; // ex: 1766050000461
 
-    // Linha digitável simulada (será gerada pela API Sicoob)
-    $linhaDigitavel = '75691.' . substr($nossoNumeroFmt, 0, 5) . ' ' .
-                      substr($nossoNumeroFmt, 5, 5) . '.' . substr($nossoNumeroFmt, 5, 6) . ' ' .
-                      '1.' . date('Ymd', strtotime($titulo['vencimento'])) . ' ' .
-                      number_format($titulo['valor_total'], 2, '', '');
+    $carteira    = str_pad($config['carteira_codigo'] ?? '1', 2, '0', STR_PAD_LEFT);
+    $agencia     = str_pad(preg_replace('/\D/', '', $config['agencia']), 4, '0', STR_PAD_LEFT);
+    $agDig       = '0'; // dígito agência
+    $conta       = str_pad(preg_replace('/\D/', '', $config['conta']), 5, '0', STR_PAD_LEFT);
+    $ctDig       = '0'; // dígito conta
+    $banco       = '756';
 
-    $codigoBarras = '75691' . date('Ymd', strtotime($titulo['vencimento'])) .
-                    number_format($titulo['valor_total'], 2, '', '') . $nossoNumeroFmt;
+    // Fator de vencimento (dias desde 07/10/1997)
+    $base        = mktime(0,0,0,10,7,1997);
+    $vencTs      = strtotime($titulo['vencimento']);
+    $fatorVenc   = str_pad((int)(($vencTs - $base) / 86400), 4, '0', STR_PAD_LEFT);
+
+    // Valor em centavos (10 dígitos)
+    $valorCent   = str_pad(number_format($titulo['valor_total'], 2, '', ''), 10, '0', STR_PAD_LEFT);
+
+    // ── Código de barras (44 dígitos) ──
+    // Banco(3) + Moeda(1) + FatorVenc(4) + Valor(10) + Convenio(7) + NossoNum(7) + Agencia(4) + DigAg(1) + Conta(5) + DigCt(1) + Carteira(2)
+    $campoLivre  = $convenio . $seqFmt . $agencia . $agDig . $conta . $ctDig . $carteira;
+    $campoLivre  = str_pad($campoLivre, 25, '0');
+    $semDv       = $banco . '9' . $fatorVenc . $valorCent . $campoLivre;
+
+    // Calcular dígito verificador do código de barras (módulo 11)
+    $mult = 2; $soma = 0;
+    for ($i = strlen($semDv) - 1; $i >= 0; $i--) {
+        $soma += (int)$semDv[$i] * $mult;
+        $mult = ($mult == 9) ? 2 : $mult + 1;
+    }
+    $resto = $soma % 11;
+    $dv    = ($resto == 0 || $resto == 1) ? 1 : 11 - $resto;
+
+    $codigoBarras = substr($semDv, 0, 4) . $dv . substr($semDv, 4);
+
+    // ── Linha digitável (47 dígitos com pontos e espaços) ──
+    // Campo1: banco(3) + moeda(1) + campoLivre[0..4](5) + dv1
+    $c1     = $banco . '9' . substr($campoLivre, 0, 5);
+    $dv1    = sicoobMod10($c1);
+    $campo1 = substr($c1, 0, 5) . '.' . substr($c1, 5) . $dv1;
+
+    // Campo2: campoLivre[5..14](10) + dv2
+    $c2     = substr($campoLivre, 5, 10);
+    $dv2    = sicoobMod10($c2);
+    $campo2 = substr($c2, 0, 5) . '.' . substr($c2, 5) . $dv2;
+
+    // Campo3: campoLivre[15..24](10) + dv3
+    $c3     = substr($campoLivre, 15, 10);
+    $dv3    = sicoobMod10($c3);
+    $campo3 = substr($c3, 0, 5) . '.' . substr($c3, 5) . $dv3;
+
+    // Campo4: dígito verificador do código de barras
+    $campo4 = $dv;
+
+    // Campo5: fatorVenc + valor
+    $campo5 = $fatorVenc . $valorCent;
+
+    $linhaDigitavel = "$campo1 $campo2 $campo3 $campo4 $campo5";
 
     // Salvar no financeiro
     $pdo->prepare("
@@ -129,7 +189,6 @@ if ($action === 'boleto_gerar') {
     exit;
 }
 
-echo json_encode(['success' => false, 'message' => 'Ação inválida']);
 
 // ── Imprimir Boleto HTML ──────────────────────────────────────────────────────
 if ($action === 'boleto_imprimir') {
@@ -710,3 +769,5 @@ if ($action === 'boleto_retorno') {
     echo json_encode(['success' => true, 'pagos' => $pagos, 'valor_total' => $valorTotal]);
     exit;
 }
+
+echo json_encode(['success' => false, 'message' => 'Ação inválida']);

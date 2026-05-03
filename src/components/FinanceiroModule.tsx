@@ -231,7 +231,7 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm }: { tip
                   <div className="flex items-center justify-center gap-2">
                     {t.status !== 'Pago' && <button onClick={() => setBaixaTitulo(t)} className="p-1.5 text-gray-400 hover:text-emerald-600" title="Baixar"><CheckCircle className="w-3.5 h-3.5" /></button>}
                     {t.status !== 'Pago' && <button onClick={() => setEditTitulo(t)} className="p-1.5 text-gray-400 hover:text-blue-600" title="Editar"><Edit2 className="w-3.5 h-3.5" /></button>}
-                    {tipo === 'R' && t.status !== 'Pago' && (
+                    {tipo === 'R' && t.status !== 'Pago' && t.entidade_id && (
                       t.boleto_status === 'registrado'
                         ? <button onClick={() => setBoletoTitulo({ ...t, _modo: 'visualizar' })} className="p-1.5 text-gray-400 hover:text-indigo-600" title="Ver Boleto"><FileText className="w-3.5 h-3.5" /></button>
                         : <button onClick={() => setBoletoTitulo({ ...t, _modo: 'gerar' })} className="p-1.5 text-gray-400 hover:text-indigo-600" title="Gerar Boleto"><FileText className="w-3.5 h-3.5" /></button>
