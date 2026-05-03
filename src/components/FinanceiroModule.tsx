@@ -788,12 +788,10 @@ const BoletoModal = ({ titulo, onClose, showAlert }: { titulo: any; onClose: () 
         {/* Rodapé */}
         {!loading && boleto && (
           <div className="p-5 border-t border-gray-100 flex gap-3">
-            {boleto.boleto_url_pdf && (
-              <a href={boleto.boleto_url_pdf} target="_blank" rel="noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700">
-                <ExternalLink className="w-4 h-4" /> Imprimir / PDF
-              </a>
-            )}
+            <button onClick={() => window.open(`./api.php?action=boleto_imprimir&id=${boleto.id}`, '_blank')}
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700">
+              <ExternalLink className="w-4 h-4" /> Imprimir Boleto
+            </button>
             <button onClick={onClose} className="flex-1 py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-50">
               Fechar
             </button>
