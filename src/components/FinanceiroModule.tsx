@@ -123,6 +123,7 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm }: { tip
   const [baixaTitulo, setBaixaTitulo] = useState<any | null>(null);
   const [showLancamento, setShowLancamento] = useState(false);
   const [editTitulo, setEditTitulo] = useState<any | null>(null);
+  const [boletoTitulo, setBoletoTitulo] = useState<any | null>(null);
 
   const fetchTitulos = async () => {
     setLoading(true);
