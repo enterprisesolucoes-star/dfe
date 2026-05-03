@@ -53,7 +53,6 @@ if ($action === 'cobranca_config_salvar') {
     exit;
 }
 
-echo json_encode(['success' => false, 'message' => 'Ação inválida']);
 
 // ── Gerar Boleto ──────────────────────────────────────────────────────────────
 if ($action === 'boleto_gerar') {
@@ -129,3 +128,5 @@ if ($action === 'boleto_gerar') {
     echo json_encode(['success' => true, 'boleto' => $tituloAtualizado]);
     exit;
 }
+
+echo json_encode(['success' => false, 'message' => 'Ação inválida']);

@@ -321,7 +321,6 @@ $modules = [
     'cobranca_config_buscar' => 'cobranca',
     'cobranca_config_salvar' => 'cobranca',
     'boleto_gerar'           => 'cobranca',
-    'cobranca_config_salvar' => 'cobranca',
     'listar_pedidos'         => 'pedidos',
     'pedido_pdf'             => 'pedidos',
     'buscar_pedido'          => 'pedidos',
