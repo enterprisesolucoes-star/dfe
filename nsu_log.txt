@@ -289,3 +289,7 @@
 [2026-04-28 13:50:45] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000005800
 [2026-04-28 13:50:47] Enviando consulta para NSU: 5800
 [2026-04-28 13:50:47] SEFAZ respondeu cStat: 137 | Motivo: Nenhum documento localizado | Proximo NSU: 000000000005823
+[2026-05-02 09:31:24] Enviando consulta para NSU: 930
+[2026-05-02 09:31:24] SEFAZ respondeu cStat: 138 | Motivo: Documento(s) localizado(s) | Proximo NSU: 000000000000933
+[2026-05-02 09:33:37] Enviando consulta para NSU: 5823
+[2026-05-02 09:33:38] SEFAZ respondeu cStat: 138 | Motivo: Documento(s) localizado(s) | Proximo NSU: 000000000005840

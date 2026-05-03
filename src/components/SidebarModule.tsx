@@ -3,7 +3,7 @@ import {
   Monitor, DollarSign, ChevronDown, ChevronRight, ArrowUpCircle, 
   ArrowDownCircle, History, FileText, Send, QrCode, Package, 
   Users, Store, ShoppingCart, ClipboardList, Wrench, FolderOpen, BarChart2, 
-  Hash, Ruler, CreditCard, Truck, ShieldCheck, Building, Settings, LogOut, Zap, UserCircle, TrendingUp
+  Hash, Ruler, CreditCard, Truck, ShieldCheck, Building, Settings, LogOut, Zap, UserCircle, TrendingUp, Landmark
 } from 'lucide-react';
 
 export const SidebarItem = ({ icon: Icon, label, active, onClick }: any) => (
@@ -147,7 +147,7 @@ export const Sidebar = ({
           <button
             onClick={() => setCadastrosOpen(!cadastrosOpen)}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-              cadastrosOpen || ['ncm', 'usuarios', 'medidas', 'bandeiras', 'transportadores', 'vendedores', 'comissoes', 'config_integracao', 'dfe_config', 'dfe_nfe_dados', 'dfe_nfce_dados', 'dfe_provedor'].includes(activeTab) ? 'text-blue-600 font-bold bg-blue-50/50' : 'text-gray-500 hover:bg-gray-50'
+              cadastrosOpen || ['ncm', 'usuarios', 'medidas', 'bandeiras', 'transportadores', 'vendedores', 'comissoes', 'cobranca_config', 'config_integracao', 'dfe_config', 'dfe_nfe_dados', 'dfe_nfce_dados', 'dfe_provedor'].includes(activeTab) ? 'text-blue-600 font-bold bg-blue-50/50' : 'text-gray-500 hover:bg-gray-50'
             }`}
           >
             <FolderOpen className="w-5 h-5" />
@@ -163,6 +163,7 @@ export const Sidebar = ({
                 { id: 'transportadores', label: 'Transportadores', icon: Truck },
                 { id: 'vendedores', label: 'Vendedores', icon: UserCircle },
                 { id: 'comissoes', label: 'Comissões', icon: TrendingUp },
+                { id: 'cobranca_config', label: 'Cobrança', icon: Landmark },
                 ...(isFiscal ? [{ id: 'config_integracao', label: 'Integração', icon: Zap }] : []),
                 ...(isFiscal ? [{ id: 'dfe_config', label: 'DFe', icon: Settings }] : []),
                 { id: 'usuarios', label: 'Usuários', icon: ShieldCheck },
