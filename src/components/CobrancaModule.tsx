@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Building2, CreditCard, FileText, AlertCircle, RefreshCw, Eye, EyeOff } from 'lucide-react';
+import { Save, Building2, CreditCard, FileText, AlertCircle, RefreshCw, Eye, EyeOff, Download, Upload, Printer, X } from 'lucide-react';
 
 interface ConfigCobranca {
   id?: number;
@@ -349,3 +349,241 @@ export const CobrancaConfigTab = ({ showAlert }: { showAlert: (t: string, m: str
 };
 
 export default CobrancaConfigTab;
+
+// ─── Aba de Administração de Boletos ─────────────────────────────────────────
+export const CobrancaBoletosTab = ({ showAlert, showConfirm }: {
+  showAlert: (t: string, m: string) => void;
+  showConfirm: (t: string, m: string, cb: () => void) => void;
+}) => {
+  const [boletos, setBoletos]       = useState<any[]>([]);
+  const [totais, setTotais]         = useState<any>({});
+  const [loading, setLoading]       = useState(false);
+  const [filtroStatus, setFiltroStatus] = useState('');
+  const [selecionados, setSelecionados] = useState<number[]>([]);
+  const [dtInicio, setDtInicio]     = useState(() => new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0]);
+  const [dtFim, setDtFim]           = useState(() => new Date().toISOString().split('T')[0]);
+  const [importando, setImportando] = useState(false);
+
+  const brl = (v: number) => Number(v)?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || 'R$ 0,00';
+
+  const carregar = async () => {
+    setLoading(true);
+    try {
+      const res  = await fetch(`./api.php?action=boleto_listar&status=${filtroStatus}&dt_inicio=${dtInicio}&dt_fim=${dtFim}`);
+      const data = await res.json();
+      if (data.success) { setBoletos(data.data); setTotais(data.totais); setSelecionados([]); }
+    } catch { } finally { setLoading(false); }
+  };
+
+  useEffect(() => { carregar(); }, [filtroStatus, dtInicio, dtFim]);
+
+  const handleImprimir = (id: number) => window.open(`./api.php?action=boleto_imprimir&id=${id}`, '_blank');
+
+  const handleCancelar = (id: number) => {
+    showConfirm('Cancelar Boleto', 'Confirma o cancelamento deste boleto?', async () => {
+      const res  = await fetch(`./api.php?action=boleto_cancelar&id=${id}`);
+      const data = await res.json();
+      if (data.success) { showAlert('Sucesso', 'Boleto cancelado.'); carregar(); }
+      else showAlert('Erro', data.message || 'Falha ao cancelar.');
+    });
+  };
+
+  const handleGerarRemessa = async () => {
+    if (selecionados.length === 0) { showAlert('Atenção', 'Selecione ao menos um boleto.'); return; }
+    const res  = await fetch('./api.php?action=boleto_remessa', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids: selecionados }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      // Download automático
+      const blob = new Blob([atob(data.conteudo)], { type: 'text/plain' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href = url; a.download = data.arquivo; a.click();
+      URL.revokeObjectURL(url);
+      showAlert('Sucesso', `Remessa ${data.arquivo} gerada com ${data.total} título(s).`);
+      carregar();
+    } else showAlert('Erro', data.message || 'Falha ao gerar remessa.');
+  };
+
+  const handleImportarRetorno = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImportando(true);
+    try {
+      const reader = new FileReader();
+      reader.onload = async (ev) => {
+        const conteudo = btoa(ev.target?.result as string);
+        const res  = await fetch('./api.php?action=boleto_retorno', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ conteudo, nome: file.name }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          showAlert('Retorno Processado', `${data.pagos} título(s) baixado(s) — Total: ${brl(data.valor_total)}`);
+          carregar();
+        } else showAlert('Erro', data.message || 'Falha ao processar retorno.');
+        setImportando(false);
+      };
+      reader.readAsBinaryString(file);
+    } catch { setImportando(false); }
+    e.target.value = '';
+  };
+
+  const toggleSel = (id: number) =>
+    setSelecionados(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+
+  const toggleTodos = () =>
+    setSelecionados(selecionados.length === boletos.filter(b => b.boleto_status === 'registrado').length
+      ? [] : boletos.filter(b => b.boleto_status === 'registrado').map(b => b.id));
+
+  const statusStyle: Record<string, string> = {
+    registrado: 'bg-blue-100 text-blue-700',
+    pago:       'bg-green-100 text-green-700',
+    cancelado:  'bg-red-100 text-red-600',
+    devolvido:  'bg-gray-100 text-gray-600',
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-bold text-gray-800">Administração de Boletos</h2>
+          <p className="text-xs text-gray-500 mt-0.5">Gerencie boletos, remessas e retornos</p>
+        </div>
+        <div className="flex gap-2">
+          <label className={`px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 cursor-pointer ${importando ? 'bg-gray-200 text-gray-400' : 'bg-purple-600 text-white hover:bg-purple-700'}`}>
+            <Upload className="w-4 h-4" />
+            {importando ? 'Processando...' : 'Importar Retorno'}
+            <input type="file" accept=".ret,.RET,.txt" onChange={handleImportarRetorno} className="hidden" disabled={importando} />
+          </label>
+          {selecionados.length > 0 && (
+            <button onClick={handleGerarRemessa}
+              className="px-4 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 flex items-center gap-2">
+              <Download className="w-4 h-4" /> Gerar Remessa ({selecionados.length})
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[
+          { label: 'Total', valor: totais.total || 0, cor: 'gray', tipo: 'num' },
+          { label: 'Registrados', valor: totais.registrado || 0, cor: 'blue', tipo: 'num' },
+          { label: 'Pagos', valor: totais.pago || 0, cor: 'green', tipo: 'num' },
+          { label: 'Valor Total', valor: totais.valor_total || 0, cor: 'indigo', tipo: 'brl' },
+        ].map(c => (
+          <div key={c.label} className="bg-white rounded-xl border border-gray-200 p-4">
+            <p className="text-xs text-gray-500 mb-1">{c.label}</p>
+            <p className={`text-lg font-bold text-${c.cor}-600`}>
+              {c.tipo === 'brl' ? brl(c.valor as number) : c.valor}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* Filtros */}
+      <div className="bg-white rounded-xl border border-gray-200 p-4 flex flex-wrap gap-3 items-end">
+        <div className="flex gap-2 flex-wrap">
+          {['', 'registrado', 'pago', 'cancelado'].map(s => (
+            <button key={s} onClick={() => setFiltroStatus(s)}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${filtroStatus === s ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
+              {s === '' ? 'Todos' : s.charAt(0).toUpperCase() + s.slice(1)}
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-2 items-center ml-auto">
+          <label className="text-xs text-gray-500">De</label>
+          <input type="date" value={dtInicio} onChange={e => setDtInicio(e.target.value)}
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+          <label className="text-xs text-gray-500">Até</label>
+          <input type="date" value={dtFim} onChange={e => setDtFim(e.target.value)}
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+          <button onClick={carregar} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
+            <RefreshCw className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Seleção em massa */}
+      {selecionados.length > 0 && (
+        <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-3 flex items-center gap-3">
+          <span className="text-sm text-indigo-700 font-medium">{selecionados.length} selecionado(s)</span>
+          <button onClick={handleGerarRemessa}
+            className="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700 flex items-center gap-1">
+            <Download className="w-3 h-3" /> Gerar Remessa CNAB 240
+          </button>
+        </div>
+      )}
+
+      {/* Tabela */}
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <table className="w-full text-left text-sm">
+          <thead className="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th className="px-4 py-3">
+                <input type="checkbox"
+                  checked={selecionados.length > 0 && selecionados.length === boletos.filter(b => b.boleto_status === 'registrado').length}
+                  onChange={toggleTodos} className="rounded" />
+              </th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Nosso Nº</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Cliente</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Vencimento</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-right">Valor</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-center">Status</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Remessa</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-center">Ações</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {loading ? (
+              <tr><td colSpan={8} className="px-4 py-10 text-center"><RefreshCw className="w-5 h-5 animate-spin mx-auto text-gray-300" /></td></tr>
+            ) : boletos.length === 0 ? (
+              <tr><td colSpan={8} className="px-4 py-10 text-center text-gray-400">Nenhum boleto encontrado.</td></tr>
+            ) : boletos.map(b => (
+              <tr key={b.id} className="hover:bg-gray-50">
+                <td className="px-4 py-3">
+                  {b.boleto_status === 'registrado' && (
+                    <input type="checkbox" checked={selecionados.includes(b.id)}
+                      onChange={() => toggleSel(b.id)} className="rounded" />
+                  )}
+                </td>
+                <td className="px-4 py-3 font-mono text-xs text-gray-600">{b.boleto_nosso_numero}</td>
+                <td className="px-4 py-3">
+                  <p className="font-medium text-gray-800 text-xs">{b.cliente_nome || '—'}</p>
+                  <p className="text-gray-400 text-[10px]">{b.cliente_documento}</p>
+                </td>
+                <td className="px-4 py-3 text-xs text-gray-500">{new Date(b.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</td>
+                <td className="px-4 py-3 text-right font-semibold text-gray-800 text-sm">{brl(Number(b.valor_total))}</td>
+                <td className="px-4 py-3 text-center">
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusStyle[b.boleto_status] || 'bg-gray-100 text-gray-600'}`}>
+                    {b.boleto_status}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-xs text-gray-400">
+                  {b.boleto_remessa_numero ? `#${b.boleto_remessa_numero}` : '—'}
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex gap-1 justify-center">
+                    <button onClick={() => handleImprimir(b.id)} title="Imprimir"
+                      className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    {b.boleto_status === 'registrado' && (
+                      <button onClick={() => handleCancelar(b.id)} title="Cancelar"
+                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
