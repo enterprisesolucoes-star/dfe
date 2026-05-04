@@ -356,7 +356,7 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
   const clientesFiltrados = clientes.filter(c =>
     clienteBusca.length < 2 ? false :
     (c.nome || c.razao_social || '').toLowerCase().includes(clienteBusca.toLowerCase()) ||
-    (c.cpf_cnpj || '').includes(clienteBusca)
+    (c.documento || '').includes(clienteBusca)
   );
 
   const isBoleto = formaPgto === '15';
@@ -427,7 +427,7 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
       try {
         const res  = await fetch('./api.php?action=boleto_gerar', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id }),
+          body: JSON.stringify({ financeiro_id: id }),
         });
         const data = await res.json();
         if (data.success) ok++; else erro++;
