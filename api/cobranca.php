@@ -166,15 +166,16 @@ if ($action === 'boleto_gerar') {
 
     // Codigo de barras base: sequencia(39) + dvnn + parcela(3) = 43 digitos
     $seq4  = substr($sequencia, 0, 39) . $dvnn . substr($sequencia, 39, 3);
-    $dvcb  = 0;
-    $mult  = 2; $soma = 0;
-    for ($i = 42; $i >= 0; $i--) {
+    // DV codigo de barras - algoritmo VBA exato (mult 2-9, reset quando >9 ANTES de multiplicar)
+    $mult = 2; $soma = 0;
+    for ($i = strlen($seq4) - 1; $i >= 0; $i--) {
         if ($mult > 9) $mult = 2;
         $soma += (int)$seq4[$i] * $mult;
         $mult++;
     }
     $resto = $soma % 11;
-    $dvcb  = (11 - $resto === 11 || 11 - $resto === 10) ? 1 : 11 - $resto;
+    $result = 11 - $resto;
+    $dvcb = ($result == 11 || $result == 10) ? 1 : $result;
 
     // Codigo de barras final: pos1-4 + dvcb + pos5-43
     $codigoBarras   = substr($seq4, 0, 4) . $dvcb . substr($seq4, 4);
