@@ -380,7 +380,7 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
     const restoCentavos = totalCentavos - baseCentavos * numParcelas;
     const arr = [];
     for (let i = 1; i <= numParcelas; i++) {
-      const data = new Date(primeiroVenc + 'T12:00:00');
+      const data = new Date((primeiroVenc || new Date().toISOString().split('T')[0]) + 'T12:00:00'); if (isNaN(data.getTime())) return;
       data.setDate(data.getDate() + ((i - 1) * intervaloDias));
       const centavos = baseCentavos + (i <= restoCentavos ? 1 : 0);
       arr.push({ numero: i, vencimento: data.toISOString().split('T')[0], valor: centavos / 100 });
