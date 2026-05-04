@@ -111,11 +111,12 @@ if ($action === 'boleto_gerar') {
     // ── Montagem Sicoob conforme algoritmo oficial ──────────────────────────
     $banco       = '756';
     $moeda       = '9';
-    $carteira    = str_pad(preg_replace('/\D/', '', $config['carteira_codigo'] ?? '1'), 2, '0', STR_PAD_LEFT);
+    $carteira    = preg_replace('/\D/', '', $config['carteira_codigo'] ?? '1'); // 1 digito
     $agencia     = str_pad(preg_replace('/\D/', '', $config['agencia']), 4, '0', STR_PAD_LEFT);
     $modalidade  = str_pad(preg_replace('/\D/', '', $config['carteira_codigo'] ?? '1'), 2, '0', STR_PAD_LEFT);
     $convenio    = str_pad(preg_replace('/\D/', '', $config['convenio']), 7, '0', STR_PAD_LEFT);
-    $seq         = str_pad($nossoNumero, 7, '0', STR_PAD_LEFT);
+    $seq6        = str_pad($nossoNumero, 6, '0', STR_PAD_LEFT); // seq sem dvnn
+    $seq         = $seq6; // dvnn sera calculado e embutido depois
     $parcela     = '001';
     $conta       = str_pad(preg_replace('/\D/', '', $config['conta']), 5, '0', STR_PAD_LEFT);
 
@@ -131,8 +132,9 @@ if ($action === 'boleto_gerar') {
     $valorCent = str_pad(number_format($titulo['valor_total'], 2, '', ''), 10, '0', STR_PAD_LEFT);
 
     // Sequencia base (43 digitos):
-    // BANCO(3)+MOEDA(1)+FATOR(4)+VALOR(10)+CARTEIRA(2)+AGENCIA(4)+MODALIDADE(2)+CONVENIO(7)+SEQ(7)+PARCELA(3)
-    $sequencia = $banco . $moeda . $fatorVenc . $valorCent . $carteira . $agencia . $modalidade . $convenio . $seq . $parcela;
+    // BANCO(3)+MOEDA(1)+FATOR(4)+VALOR(10)+CARTEIRA(1)+AGENCIA(4)+MODALIDADE(2)+CONVENIO(7)+SEQ6(6)+DVNN(1)+PARCELA(3)
+    // dvnn ainda nao calculado - usar placeholder 0
+    $sequencia = $banco . $moeda . $fatorVenc . $valorCent . $carteira . $agencia . $modalidade . $convenio . $seq6 . '0' . $parcela;
 
     // DV Nosso Numero (fator 3-7-9-1, Sicoob)
     // Seq0 = agencia(4) + conta_cliente(10) + nosso_numero(7)
