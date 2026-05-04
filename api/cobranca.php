@@ -165,7 +165,7 @@ if ($action === 'boleto_gerar') {
     $campo3 = substr($s3, 0, 5) . '.' . substr($s3, 5) . $dv3;
 
     // Codigo de barras base: sequencia(39) + dvnn + parcela(3) = 43 digitos
-    $seq4  = substr($sequencia, 0, 39) . $dvnn . substr($sequencia, 39, 3);
+    $seq4  = substr($sequencia, 0, 39) . $dvnn . substr($sequencia, 40, 3);
     // DV codigo de barras - algoritmo VBA exato (mult 2-9, reset quando >9 ANTES de multiplicar)
     $mult = 2; $soma = 0;
     for ($i = strlen($seq4) - 1; $i >= 0; $i--) {
