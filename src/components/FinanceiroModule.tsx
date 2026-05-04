@@ -363,7 +363,7 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
 
   useEffect(() => {
     if (isBoleto && tipo === 'R') {
-      fetch('./api.php?action=listar_clientes&limit=500')
+      fetch('./api.php?action=clientes')
         .then(r => r.json())
         .then(d => setClientes(Array.isArray(d.clientes) ? d.clientes : Array.isArray(d) ? d : []))
         .catch(() => {});
