@@ -108,30 +108,78 @@ if ($action === 'boleto_gerar') {
     $pdo->prepare("UPDATE empresas_cobranca SET nosso_numero = nosso_numero + 1 WHERE empresa_id = ?")
         ->execute([$empresaId]);
 
-    // Formato Sicoob correto: convenio padded RIGHT para 7 digits + sequencial(7)
-    $convenioRaw = preg_replace('/\D/', '', $config['convenio']); // ex: "176605"
-    $convenio7   = str_pad($convenioRaw, 7, '0', STR_PAD_RIGHT);  // ex: "1766050"
-    $seqFmt      = str_pad($nossoNumero, 7, '0', STR_PAD_LEFT);   // ex: "0000464"
-    $nossoNumeroFmt = $convenio7 . $seqFmt;                        // ex: "17660500000464"
-
-    $carteira    = str_pad($config['carteira_codigo'] ?? '1', 2, '0', STR_PAD_LEFT);
-    $agencia     = str_pad(preg_replace('/\D/', '', $config['agencia']), 4, '0', STR_PAD_LEFT);
-    $conta       = str_pad(preg_replace('/\D/', '', $config['conta']), 5, '0', STR_PAD_LEFT);
+    // ── Montagem Sicoob conforme algoritmo oficial ──────────────────────────
     $banco       = '756';
+    $moeda       = '9';
+    $carteira    = str_pad(preg_replace('/\D/', '', $config['carteira_codigo'] ?? '1'), 2, '0', STR_PAD_LEFT);
+    $agencia     = str_pad(preg_replace('/\D/', '', $config['agencia']), 4, '0', STR_PAD_LEFT);
+    $modalidade  = str_pad(preg_replace('/\D/', '', $config['carteira_codigo'] ?? '1'), 2, '0', STR_PAD_LEFT);
+    $convenio    = str_pad(preg_replace('/\D/', '', $config['convenio']), 7, '0', STR_PAD_LEFT);
+    $seq         = str_pad($nossoNumero, 7, '0', STR_PAD_LEFT);
+    $parcela     = '001';
+    $conta       = str_pad(preg_replace('/\D/', '', $config['conta']), 5, '0', STR_PAD_LEFT);
 
-    // Fator de vencimento (dias desde 07/10/1997)
-    $base        = mktime(0,0,0,10,7,1997);
-    $vencTs      = strtotime($titulo['vencimento']);
-    $fatorVenc   = str_pad((int)(($vencTs - $base) / 86400), 4, '0', STR_PAD_LEFT);
+    // Fator de vencimento
+    $base      = mktime(0,0,0,10,7,1997);
+    $vencTs    = strtotime($titulo['vencimento']);
+    $fatorVenc = (int)(($vencTs - $base) / 86400);
+    if ($fatorVenc > 9999) $fatorVenc -= 9000;
+    if ($fatorVenc > 9999) $fatorVenc = 0;
+    $fatorVenc = str_pad($fatorVenc, 4, '0', STR_PAD_LEFT);
 
-    // Valor em centavos (10 digitos)
-    $valorCent   = str_pad(number_format($titulo['valor_total'], 2, '', ''), 10, '0', STR_PAD_LEFT);
+    // Valor (10 digitos sem virgula)
+    $valorCent = str_pad(number_format($titulo['valor_total'], 2, '', ''), 10, '0', STR_PAD_LEFT);
 
-    // Campo livre Sicoob (25 digitos): convenio7(7) + nossoNum(7) + agencia(4) + conta(5) + carteira(2)
-    $campoLivre  = $convenio7 . $seqFmt . $agencia . $conta . $carteira;
-    $campoLivre  = str_pad($campoLivre, 25, '0');
-    // Codigo de barras: Banco(3) + Moeda(1) + FatorVenc(4) + Valor(10) + CampoLivre(25)
-    $semDv       = $banco . '9' . $fatorVenc . $valorCent . $campoLivre;
+    // Sequencia base (43 digitos):
+    // BANCO(3)+MOEDA(1)+FATOR(4)+VALOR(10)+CARTEIRA(2)+AGENCIA(4)+MODALIDADE(2)+CONVENIO(7)+SEQ(7)+PARCELA(3)
+    $sequencia = $banco . $moeda . $fatorVenc . $valorCent . $carteira . $agencia . $modalidade . $convenio . $seq . $parcela;
+
+    // DV Nosso Numero (fator 3-7-9-1, Sicoob)
+    // Seq0 = agencia(4) + conta_cliente(10) + nosso_numero(7)
+    // No sistema: agencia(4=pos19-23) + convenio(7=pos25-32) + seq(7=pos33-39) usando pos da sequencia
+    $seq0 = substr($sequencia, 19, 4) . str_pad(substr($sequencia, 25, 7), 10, '0', STR_PAD_LEFT) . substr($sequencia, 32, 7);
+    $fatores = [3, 7, 9, 1];
+    $total = 0; $fi = 0;
+    for ($i = strlen($seq0) - 1; $i >= 0; $i--) {
+        $total += (int)$seq0[$i] * $fatores[$fi % 4];
+        $fi++;
+    }
+    $resto = $total % 11;
+    $dvnn  = (11 - $resto) >= 10 ? 0 : (11 - $resto);
+
+    $nossoNumeroFmt = $seq . '-' . $dvnn;
+
+    // Campo 1: pos1-4 + pos19-23 (5 digitos) → 9 digitos + DV mod10
+    $s1  = substr($sequencia, 0, 4) . substr($sequencia, 18, 5);
+    $dv1 = sicoobMod10($s1);
+    $campo1 = substr($s1, 0, 5) . '.' . substr($s1, 5) . $dv1;
+
+    // Campo 2: pos24-33 (10 digitos) + DV mod10
+    $s2  = substr($sequencia, 23, 10);
+    $dv2 = sicoobMod10($s2);
+    $campo2 = substr($s2, 0, 5) . '.' . substr($s2, 5) . $dv2;
+
+    // Campo 3: pos33-39(seq7) + dvnn + pos40-42(parcela) → 10 digitos + DV mod10
+    $s3  = str_pad(substr($sequencia, 32, 7), 6, '0', STR_PAD_LEFT) . $dvnn . substr($sequencia, 39, 3);
+    $dv3 = sicoobMod10($s3);
+    $campo3 = substr($s3, 0, 5) . '.' . substr($s3, 5) . $dv3;
+
+    // Codigo de barras base: sequencia(39) + dvnn + parcela(3) = 43 digitos
+    $seq4  = substr($sequencia, 0, 39) . $dvnn . substr($sequencia, 39, 3);
+    $dvcb  = 0;
+    $mult  = 2; $soma = 0;
+    for ($i = 42; $i >= 0; $i--) {
+        if ($mult > 9) $mult = 2;
+        $soma += (int)$seq4[$i] * $mult;
+        $mult++;
+    }
+    $resto = $soma % 11;
+    $dvcb  = (11 - $resto === 11 || 11 - $resto === 10) ? 1 : 11 - $resto;
+
+    // Codigo de barras final: pos1-4 + dvcb + pos5-43
+    $codigoBarras   = substr($seq4, 0, 4) . $dvcb . substr($seq4, 4);
+    $linhaDigitavel = $campo1 . ' ' . $campo2 . ' ' . $campo3 . ' ' . $dvcb . ' ' . substr($sequencia, 4, 14);
+    $semDv          = $seq4; // compatibilidade (nao usado apos este bloco)
 
     // Calcular dígito verificador do código de barras (módulo 11)
     $mult = 2; $soma = 0;
@@ -254,37 +302,29 @@ if ($action === 'boleto_imprimir') {
     $cliBairro = htmlspecialchars($titulo['cli_bairro'] ?? '');
     $cliCidade = htmlspecialchars(($titulo['cli_municipio'] ?? '') . '/' . ($titulo['cli_uf'] ?? '') . ($titulo['cli_cep'] ? ' — ' . $titulo['cli_cep'] : ''));
 
-    // Gerar código de barras I25 (Interleaved 2of5)
-    function i25Encode(string $num): string {
-        if (strlen($num) % 2 !== 0) $num = '0' . $num;
-        $narrow = 1; $wide = 3;
-        $patterns = ['0'=>'00110','1'=>'10001','2'=>'01001','3'=>'11000','4'=>'00101',
-                     '5'=>'10100','6'=>'01100','7'=>'00011','8'=>'10010','9'=>'01010'];
-        $bars = '';
-        // Start: 4 narrow bars
-        $bars .= str_repeat('B', $narrow) . str_repeat('S', $narrow) . str_repeat('B', $narrow) . str_repeat('S', $narrow);
-        for ($i = 0; $i < strlen($num); $i += 2) {
-            $p1 = $patterns[$num[$i]];
-            $p2 = $patterns[$num[$i+1]];
-            for ($j = 0; $j < 5; $j++) {
-                $bars .= ($p1[$j] === '1' ? 'W' : 'N') . 'B';
-                $bars .= ($p2[$j] === '1' ? 'W' : 'N') . 'S';
-            }
-        }
-        // Stop: wide bar + 2 narrow
-        $bars .= str_repeat('W', $wide) . 'B' . str_repeat('N', $narrow) . 'S';
-        return $bars;
-    }
+    // Gerar código de barras I25 exato conforme VBA original
+    // Padroes: 1=narrow(1px) 3=wide(3px), alternando barra/espaco
+    $i25patterns = ['0'=>'11331','1'=>'31113','2'=>'13113','3'=>'33111','4'=>'11313',
+                    '5'=>'31311','6'=>'13311','7'=>'11133','8'=>'31131','9'=>'13131'];
+    $i25start = '1111';
+    $i25stop  = '311';
     $barrasHtml = '';
-    $encoded = i25Encode($barras);
-    $isBar = true;
-    $i = 0;
-    while ($i < strlen($encoded)) {
-        $type = $encoded[$i]; $i++;
-        // tipo: B=bar S=space, N=narrow W=wide
-        $color = $isBar ? '#000' : '#fff';
-        $isBar = !$isBar;
-        $w = (in_array($type, ['W'])) ? 3 : 1;
+    // Garante numero par de digitos
+    $barrasNum = strlen($barras) % 2 !== 0 ? '0' . $barras : $barras;
+    // Monta sequencia de larguras: start + pares + stop
+    $widths = $i25start;
+    for ($bi = 0; $bi < strlen($barrasNum); $bi += 2) {
+        $p1 = $i25patterns[$barrasNum[$bi]];
+        $p2 = $i25patterns[$barrasNum[$bi+1]];
+        for ($bj = 0; $bj < 5; $bj++) {
+            $widths .= $p1[$bj] . $p2[$bj];
+        }
+    }
+    $widths .= $i25stop;
+    // Renderiza: posicoes pares=barra(preto), impares=espaco(branco)
+    for ($bi = 0; $bi < strlen($widths); $bi++) {
+        $w     = (int)$widths[$bi]; // 1 ou 3
+        $color = ($bi % 2 === 0) ? '#000' : '#fff';
         $barrasHtml .= "<span style='display:inline-block;width:{$w}px;height:50px;background:{$color};vertical-align:middle'></span>";
     }
 
