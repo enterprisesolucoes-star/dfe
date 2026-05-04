@@ -547,7 +547,7 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
                         <button key={c.id} onMouseDown={() => { setClienteId(String(c.id)); setClienteBusca(''); setShowDropCliente(false); }}
                           className="w-full text-left px-4 py-2.5 hover:bg-indigo-50 border-b border-gray-50 last:border-0">
                           <p className="text-xs font-bold text-gray-800">{c.nome || c.razao_social}</p>
-                          <p className="text-[10px] text-gray-400">{c.cpf_cnpj || 'Sem CPF/CNPJ'}</p>
+                          <p className="text-[10px] text-gray-400">{c.documento || 'Sem documento'}</p>
                         </button>
                       ))}
                     </div>

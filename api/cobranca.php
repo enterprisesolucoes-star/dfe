@@ -108,16 +108,15 @@ if ($action === 'boleto_gerar') {
     $pdo->prepare("UPDATE empresas_cobranca SET nosso_numero = nosso_numero + 1 WHERE empresa_id = ?")
         ->execute([$empresaId]);
 
-    // Formato Sicoob: convenio(7) + sequencial(7) = 14 dígitos
-    $convenio    = str_pad($config['convenio'], 7, '0', STR_PAD_LEFT);
-    $seqFmt      = str_pad($nossoNumero, 7, '0', STR_PAD_LEFT);
-    $nossoNumeroFmt = $convenio . $seqFmt; // ex: 1766050000461
+    // Formato Sicoob correto: convenio padded RIGHT para 7 digits + sequencial(7)
+    $convenioRaw = preg_replace('/\D/', '', $config['convenio']); // ex: "176605"
+    $convenio7   = str_pad($convenioRaw, 7, '0', STR_PAD_RIGHT);  // ex: "1766050"
+    $seqFmt      = str_pad($nossoNumero, 7, '0', STR_PAD_LEFT);   // ex: "0000464"
+    $nossoNumeroFmt = $convenio7 . $seqFmt;                        // ex: "17660500000464"
 
     $carteira    = str_pad($config['carteira_codigo'] ?? '1', 2, '0', STR_PAD_LEFT);
     $agencia     = str_pad(preg_replace('/\D/', '', $config['agencia']), 4, '0', STR_PAD_LEFT);
-    $agDig       = '0'; // dígito agência
     $conta       = str_pad(preg_replace('/\D/', '', $config['conta']), 5, '0', STR_PAD_LEFT);
-    $ctDig       = '0'; // dígito conta
     $banco       = '756';
 
     // Fator de vencimento (dias desde 07/10/1997)
@@ -125,13 +124,13 @@ if ($action === 'boleto_gerar') {
     $vencTs      = strtotime($titulo['vencimento']);
     $fatorVenc   = str_pad((int)(($vencTs - $base) / 86400), 4, '0', STR_PAD_LEFT);
 
-    // Valor em centavos (10 dígitos)
+    // Valor em centavos (10 digitos)
     $valorCent   = str_pad(number_format($titulo['valor_total'], 2, '', ''), 10, '0', STR_PAD_LEFT);
 
-    // ── Código de barras (44 dígitos) ──
-    // Banco(3) + Moeda(1) + FatorVenc(4) + Valor(10) + Convenio(7) + NossoNum(7) + Agencia(4) + DigAg(1) + Conta(5) + DigCt(1) + Carteira(2)
-    $campoLivre  = $convenio . $seqFmt . $agencia . $agDig . $conta . $ctDig . $carteira;
+    // Campo livre Sicoob (25 digitos): convenio7(7) + nossoNum(7) + agencia(4) + conta(5) + carteira(2)
+    $campoLivre  = $convenio7 . $seqFmt . $agencia . $conta . $carteira;
     $campoLivre  = str_pad($campoLivre, 25, '0');
+    // Codigo de barras: Banco(3) + Moeda(1) + FatorVenc(4) + Valor(10) + CampoLivre(25)
     $semDv       = $banco . '9' . $fatorVenc . $valorCent . $campoLivre;
 
     // Calcular dígito verificador do código de barras (módulo 11)
@@ -255,13 +254,38 @@ if ($action === 'boleto_imprimir') {
     $cliBairro = htmlspecialchars($titulo['cli_bairro'] ?? '');
     $cliCidade = htmlspecialchars(($titulo['cli_municipio'] ?? '') . '/' . ($titulo['cli_uf'] ?? '') . ($titulo['cli_cep'] ? ' — ' . $titulo['cli_cep'] : ''));
 
-    // Gerar barras visuais simples
+    // Gerar código de barras I25 (Interleaved 2of5)
+    function i25Encode(string $num): string {
+        if (strlen($num) % 2 !== 0) $num = '0' . $num;
+        $narrow = 1; $wide = 3;
+        $patterns = ['0'=>'00110','1'=>'10001','2'=>'01001','3'=>'11000','4'=>'00101',
+                     '5'=>'10100','6'=>'01100','7'=>'00011','8'=>'10010','9'=>'01010'];
+        $bars = '';
+        // Start: 4 narrow bars
+        $bars .= str_repeat('B', $narrow) . str_repeat('S', $narrow) . str_repeat('B', $narrow) . str_repeat('S', $narrow);
+        for ($i = 0; $i < strlen($num); $i += 2) {
+            $p1 = $patterns[$num[$i]];
+            $p2 = $patterns[$num[$i+1]];
+            for ($j = 0; $j < 5; $j++) {
+                $bars .= ($p1[$j] === '1' ? 'W' : 'N') . 'B';
+                $bars .= ($p2[$j] === '1' ? 'W' : 'N') . 'S';
+            }
+        }
+        // Stop: wide bar + 2 narrow
+        $bars .= str_repeat('W', $wide) . 'B' . str_repeat('N', $narrow) . 'S';
+        return $bars;
+    }
     $barrasHtml = '';
-    $chars = str_split($barras);
-    foreach ($chars as $i => $c) {
-        $w = in_array($c, ['1','3','5','7','9']) ? 3 : 1;
-        $color = ($i % 2 === 0) ? '#000' : '#fff';
-        $barrasHtml .= "<span style='display:inline-block;width:{$w}px;height:60px;background:{$color};vertical-align:middle'></span>";
+    $encoded = i25Encode($barras);
+    $isBar = true;
+    $i = 0;
+    while ($i < strlen($encoded)) {
+        $type = $encoded[$i]; $i++;
+        // tipo: B=bar S=space, N=narrow W=wide
+        $color = $isBar ? '#000' : '#fff';
+        $isBar = !$isBar;
+        $w = (in_array($type, ['W'])) ? 3 : 1;
+        $barrasHtml .= "<span style='display:inline-block;width:{$w}px;height:50px;background:{$color};vertical-align:middle'></span>";
     }
 
     header('Content-Type: text/html; charset=utf-8');
