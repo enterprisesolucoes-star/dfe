@@ -151,7 +151,7 @@ switch ($action) {
         $intervaloDias   = max(1, (int)($data['intervalo_dias'] ?? 30));
         $entidadeId      = !empty($data['entidade_id']) ? (int)$data['entidade_id'] : null;
         $observacoes     = $data['observacoes'] ?? null;
-        $formaPgto       = $data['forma_pagamento_prevista'] ?? '01';
+        $formaPgto       = $data['forma_pagamento'] ?? $data['forma_pagamento_prevista'] ?? '01';
         // Aceita parcelas customizadas (array de {valor, vencimento})
         $parcelasCustom  = $data['parcelas'] ?? null;
 

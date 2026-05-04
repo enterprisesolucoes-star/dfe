@@ -334,67 +334,155 @@ export const EditarTituloModal = ({ titulo, onClose, onSuccess, showAlert }: any
 
 export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: any) => {
   const tipoTexto = tipo === 'R' ? 'Receber' : 'Pagar';
-  const corBtn = tipo === 'R' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-red-600 hover:bg-red-700';
-  const [descricao, setDescricao] = useState('');
-  const [valorTotal, setValorTotal] = useState('');
-  const [numParcelas, setNumParcelas] = useState(1);
-  const [primeiroVenc, setPrimeiroVenc] = useState(new Date().toISOString().split('T')[0]);
-  const [intervaloDias, setIntervaloDias] = useState(30);
-  const [observacoes, setObservacoes] = useState('');
-  const [parcelas, setParcelas] = useState<any[]>([]);
-  const [showAjusteParcelas, setShowAjusteParcelas] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const corBtn    = tipo === 'R' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-red-600 hover:bg-red-700';
 
-  const valorNum = Number(String(valorTotal).replace(',','.')) || 0;
-  // Recalcula parcelas quando muda valor, num parcelas, primeira data ou intervalo
+  const [descricao,     setDescricao]     = useState('');
+  const [valorTotal,    setValorTotal]    = useState('');
+  const [numParcelas,   setNumParcelas]   = useState(1);
+  const [primeiroVenc,  setPrimeiroVenc]  = useState(new Date().toISOString().split('T')[0]);
+  const [intervaloDias, setIntervaloDias] = useState(30);
+  const [observacoes,   setObservacoes]   = useState('');
+  const [parcelas,      setParcelas]      = useState<any[]>([]);
+  const [saving,        setSaving]        = useState(false);
+  const [gerandoBoletos, setGerandoBoletos] = useState(false);
+  const [savedIds,      setSavedIds]      = useState<number[]>([]);
+  const [formaPgto,     setFormaPgto]     = useState('01');
+
+  // cliente
+  const [clientes,        setClientes]        = useState<any[]>([]);
+  const [clienteId,       setClienteId]       = useState('');
+  const [clienteBusca,    setClienteBusca]    = useState('');
+  const [showDropCliente, setShowDropCliente] = useState(false);
+  const clientesFiltrados = clientes.filter(c =>
+    clienteBusca.length < 2 ? false :
+    (c.nome || c.razao_social || '').toLowerCase().includes(clienteBusca.toLowerCase()) ||
+    (c.cpf_cnpj || '').includes(clienteBusca)
+  );
+
+  const isBoleto = formaPgto === '15';
+
+  useEffect(() => {
+    if (isBoleto && tipo === 'R') {
+      fetch('./api.php?action=listar_clientes&limit=500')
+        .then(r => r.json())
+        .then(d => setClientes(Array.isArray(d.clientes) ? d.clientes : Array.isArray(d) ? d : []))
+        .catch(() => {});
+    }
+  }, [isBoleto, tipo]);
+
+  const valorNum = Number(String(valorTotal).replace(',', '.')) || 0;
+
+  // Arredondamento correto: distribui centavos nas primeiras parcelas
   useEffect(() => {
     if (valorNum <= 0 || numParcelas < 1) { setParcelas([]); return; }
-    const valorBase = Math.floor((valorNum / numParcelas) * 100) / 100;
+    const totalCentavos = Math.round(valorNum * 100);
+    const baseCentavos  = Math.floor(totalCentavos / numParcelas);
+    const restoCentavos = totalCentavos - baseCentavos * numParcelas;
     const arr = [];
-    let soma = 0;
     for (let i = 1; i <= numParcelas; i++) {
       const data = new Date(primeiroVenc + 'T12:00:00');
-      data.setDate(data.getDate() + ((i-1) * intervaloDias));
-      let v = valorBase;
-      if (i === numParcelas) v = Number((valorNum - soma).toFixed(2));
-      else soma += valorBase;
-      arr.push({ numero: i, vencimento: data.toISOString().split('T')[0], valor: v });
+      data.setDate(data.getDate() + ((i - 1) * intervaloDias));
+      const centavos = baseCentavos + (i <= restoCentavos ? 1 : 0);
+      arr.push({ numero: i, vencimento: data.toISOString().split('T')[0], valor: centavos / 100 });
     }
     setParcelas(arr);
+    setSavedIds([]);
   }, [valorNum, numParcelas, primeiroVenc, intervaloDias]);
 
   const totalParcelas = parcelas.reduce((acc, p) => acc + Number(p.valor), 0);
-  const diferenca = Math.abs(totalParcelas - valorNum);
+  const diferenca     = Math.abs(Math.round(totalParcelas * 100) - Math.round(valorNum * 100));
 
   const handleSalvar = async () => {
     if (!descricao.trim()) { showAlert('Atenção', 'Descrição é obrigatória.'); return; }
-    if (valorNum <= 0) { showAlert('Atenção', 'Valor total deve ser maior que zero.'); return; }
-    if (diferenca > 0.01) { showAlert('Atenção', 'Soma das parcelas não confere com o valor total.'); return; }
+    if (valorNum <= 0)     { showAlert('Atenção', 'Valor total deve ser maior que zero.'); return; }
+    if (isBoleto && tipo === 'R' && !clienteId) { showAlert('Atenção', 'Selecione o cliente para boleto.'); return; }
+    if (diferenca > 0)     { showAlert('Atenção', 'Soma das parcelas não confere com o valor total.'); return; }
     setSaving(true);
     try {
       const res = await fetch('./api.php?action=fin_lancar_parcelado', {
-        method: 'POST', headers: {'Content-Type': 'application/json'},
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           tipo, descricao, categoria: descricao,
           valor_total: valorNum,
+          forma_pagamento: formaPgto,
+          entidade_id: clienteId || null,
           parcelas: parcelas.map(p => ({ valor: Number(p.valor), vencimento: p.vencimento })),
-          observacoes
-        })
+          observacoes,
+        }),
       });
       const data = await res.json();
       if (data.success) {
-        showAlert('Sucesso', `${parcelas.length} parcela(s) lançada(s) com sucesso.`);
-        onSuccess();
-      } else {
-        showAlert('Erro', data.message || 'Falha ao salvar.');
-      }
+        setSavedIds(data.ids || []);
+        if (!isBoleto) { showAlert('Sucesso', `${parcelas.length} parcela(s) lançada(s) com sucesso.`); onSuccess(); }
+      } else { showAlert('Erro', data.message || 'Falha ao salvar.'); }
     } catch { showAlert('Erro', 'Falha ao conectar.'); }
     setSaving(false);
   };
 
+  const handleGerarBoletos = async () => {
+    if (savedIds.length === 0) return;
+    setGerandoBoletos(true);
+    let ok = 0; let erro = 0;
+    for (const id of savedIds) {
+      try {
+        const res  = await fetch('./api.php?action=boleto_gerar', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id }),
+        });
+        const data = await res.json();
+        if (data.success) ok++; else erro++;
+      } catch { erro++; }
+    }
+    setGerandoBoletos(false);
+    if (erro === 0) showAlert('Sucesso', `${ok} boleto(s) gerado(s) com sucesso!`);
+    else showAlert('Atenção', `${ok} gerado(s), ${erro} com erro. Verifique configurações de cobrança.`);
+    onSuccess();
+  };
+
+  const clienteSelecionado = clientes.find(c => String(c.id) === String(clienteId));
+
+  // Tela pós-salvar com boleto: pergunta se gera agora
+  if (savedIds.length > 0 && isBoleto) {
+    return (
+      <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[200] p-4 backdrop-blur-sm">
+        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+          className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden">
+          <div className="p-6 border-b border-gray-100 bg-indigo-50 flex items-center gap-3">
+            <FileText className="w-5 h-5 text-indigo-600" />
+            <div>
+              <h3 className="font-bold text-gray-800 text-sm">{parcelas.length} Parcela(s) Lançada(s)!</h3>
+              <p className="text-xs text-indigo-600">Forma de pagamento: Boleto Bancário</p>
+            </div>
+          </div>
+          <div className="p-6 space-y-4">
+            <div className="bg-indigo-50 rounded-2xl p-4 space-y-1">
+              <p className="text-xs text-gray-500 font-bold uppercase">Resumo</p>
+              <p className="text-sm font-bold text-gray-800">{descricao}</p>
+              {clienteSelecionado && <p className="text-xs text-indigo-700">Cliente: {clienteSelecionado.nome || clienteSelecionado.razao_social}</p>}
+              <p className="text-xs text-gray-600">{parcelas.length}x · Total: <span className="font-bold text-indigo-700">R$ {valorNum.toFixed(2)}</span></p>
+            </div>
+            <p className="text-xs text-gray-500 text-center">Deseja gerar os boletos agora?<br/>Você também pode gerá-los depois na lista de títulos.</p>
+          </div>
+          <div className="p-4 bg-gray-50 border-t border-gray-100 flex gap-3">
+            <button onClick={onSuccess} className="flex-1 py-2.5 text-gray-500 font-bold uppercase text-xs border border-gray-200 rounded-xl hover:bg-gray-100">
+              Depois
+            </button>
+            <button onClick={handleGerarBoletos} disabled={gerandoBoletos}
+              className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 text-white font-bold uppercase text-xs rounded-xl flex items-center justify-center gap-2">
+              {gerandoBoletos
+                ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Gerando...</>
+                : <><FileText className="w-3.5 h-3.5" /> Gerar Boletos</>}
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[200] p-4 backdrop-blur-sm">
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+        className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
         <div className="p-6 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
           <div>
             <h3 className="font-bold text-gray-800 text-sm">Novo Lançamento — Contas a {tipoTexto}</h3>
@@ -402,38 +490,112 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
         </div>
+
         <div className="p-6 space-y-4 overflow-y-auto">
+
           <div>
             <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Descrição / Categoria</label>
-            <input type="text" value={descricao} onChange={e => setDescricao(e.target.value)} placeholder="Ex: Aluguel, Cliente João, Energia..." className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm" />
+            <input type="text" value={descricao} onChange={e => setDescricao(e.target.value)}
+              placeholder="Ex: Aluguel, Fatura #123, Energia..."
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm" />
           </div>
+
+          <div>
+            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Forma de Pagamento</label>
+            <select value={formaPgto} onChange={e => { setFormaPgto(e.target.value); setClienteId(''); setClienteBusca(''); }}
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm bg-white">
+              <option value="01">01 - Dinheiro</option>
+              <option value="02">02 - Cheque</option>
+              <option value="03">03 - Cartão de Crédito</option>
+              <option value="04">04 - Cartão de Débito</option>
+              <option value="05">05 - Crédito Loja</option>
+              <option value="10">10 - Vale Alimentação</option>
+              <option value="11">11 - Vale Refeição</option>
+              <option value="15">15 - Boleto Bancário</option>
+              <option value="17">17 - PIX</option>
+              <option value="90">90 - Sem Pagamento</option>
+              <option value="99">99 - Outros</option>
+            </select>
+          </div>
+
+          {isBoleto && tipo === 'R' && (
+            <div className="relative">
+              <label className="block text-[10px] font-bold text-indigo-500 uppercase mb-1">
+                Cliente <span className="text-red-500">*</span> (obrigatório para boleto)
+              </label>
+              {clienteSelecionado ? (
+                <div className="flex items-center gap-2 px-3 py-2 border border-indigo-300 bg-indigo-50 rounded-xl">
+                  <span className="flex-1 text-sm font-bold text-indigo-800">
+                    {clienteSelecionado.nome || clienteSelecionado.razao_social}
+                    <span className="ml-2 text-xs font-normal text-indigo-500">{clienteSelecionado.cpf_cnpj || ''}</span>
+                  </span>
+                  <button onClick={() => { setClienteId(''); setClienteBusca(''); }}
+                    className="text-indigo-400 hover:text-red-500 text-lg leading-none">×</button>
+                </div>
+              ) : (
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                  <input type="text" value={clienteBusca}
+                    onChange={e => { setClienteBusca(e.target.value); setShowDropCliente(true); }}
+                    onFocus={() => setShowDropCliente(true)}
+                    onBlur={() => setTimeout(() => setShowDropCliente(false), 200)}
+                    placeholder="Digite nome ou CPF/CNPJ do cliente..."
+                    className="w-full pl-9 pr-3 py-2 border border-indigo-200 rounded-xl text-sm focus:border-indigo-400 outline-none" />
+                  {showDropCliente && clientesFiltrados.length > 0 && (
+                    <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                      {clientesFiltrados.slice(0, 10).map(c => (
+                        <button key={c.id} onMouseDown={() => { setClienteId(String(c.id)); setClienteBusca(''); setShowDropCliente(false); }}
+                          className="w-full text-left px-4 py-2.5 hover:bg-indigo-50 border-b border-gray-50 last:border-0">
+                          <p className="text-xs font-bold text-gray-800">{c.nome || c.razao_social}</p>
+                          <p className="text-[10px] text-gray-400">{c.cpf_cnpj || 'Sem CPF/CNPJ'}</p>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Valor Total (R$)</label>
-              <input type="number" step="0.01" value={valorTotal} onChange={e => setValorTotal(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm font-bold" />
+              <input type="number" step="0.01" value={valorTotal} onChange={e => setValorTotal(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm font-bold" />
             </div>
             <div>
               <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Nº Parcelas</label>
-              <input type="number" min="1" max="120" value={numParcelas} onChange={e => setNumParcelas(Math.max(1, Number(e.target.value)))} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm font-bold" />
+              <input type="number" min="1" max="120" value={numParcelas}
+                onChange={e => setNumParcelas(Math.max(1, Number(e.target.value)))}
+                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm font-bold" />
             </div>
             <div>
               <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Intervalo (dias)</label>
-              <input type="number" min="1" value={intervaloDias} onChange={e => setIntervaloDias(Math.max(1, Number(e.target.value)))} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm" />
+              <input type="number" min="1" value={intervaloDias}
+                onChange={e => setIntervaloDias(Math.max(1, Number(e.target.value)))}
+                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm" />
             </div>
           </div>
+
           <div>
             <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Primeiro Vencimento</label>
-            <input type="date" value={primeiroVenc} onChange={e => setPrimeiroVenc(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm" />
+            <input type="date" value={primeiroVenc} onChange={e => setPrimeiroVenc(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm" />
           </div>
+
           <div>
             <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Observações</label>
-            <textarea value={observacoes} onChange={e => setObservacoes(e.target.value)} rows={2} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm resize-none" />
+            <textarea value={observacoes} onChange={e => setObservacoes(e.target.value)} rows={2}
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm resize-none" />
           </div>
+
           {parcelas.length > 0 && (
             <div className="border border-gray-200 rounded-xl overflow-hidden">
               <div className="bg-gray-50 px-4 py-2 flex justify-between items-center">
-                <span className="text-[10px] font-bold text-gray-500 uppercase">Parcelas Geradas ({parcelas.length})</span>
-                <span className={`text-xs font-bold ${diferenca > 0.01 ? 'text-red-600' : 'text-emerald-600'}`}>
+                <span className="text-[10px] font-bold text-gray-500 uppercase">
+                  Parcelas Geradas ({parcelas.length}){isBoleto && <span className="ml-2 text-indigo-500">· Boleto</span>}
+                </span>
+                <span className={`text-xs font-bold ${diferenca > 0 ? 'text-red-600' : 'text-emerald-600'}`}>
                   Total: R$ {totalParcelas.toFixed(2)}
                 </span>
               </div>
@@ -442,30 +604,49 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
                   <tr className="text-left">
                     <th className="px-4 py-2 font-bold text-[10px] text-gray-500 uppercase">#</th>
                     <th className="px-4 py-2 font-bold text-[10px] text-gray-500 uppercase">Vencimento</th>
-                    <th className="px-4 py-2 font-bold text-[10px] text-gray-500 uppercase text-right">Valor</th>
+                    <th className="px-4 py-2 font-bold text-[10px] text-gray-500 uppercase text-right">Valor (R$)</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {parcelas.map((p, idx) => (
-                    <tr key={idx}>
-                      <td className="px-4 py-2 font-bold">{p.numero}/{parcelas.length}</td>
+                    <tr key={idx} className="hover:bg-gray-50/50">
+                      <td className="px-4 py-2 font-bold text-gray-600">{p.numero}/{parcelas.length}</td>
                       <td className="px-4 py-2">
-                        <input type="date" value={p.vencimento} onChange={e => { const n = [...parcelas]; n[idx].vencimento = e.target.value; setParcelas(n); }} className="border-0 bg-transparent text-xs" />
+                        <input type="date" value={p.vencimento}
+                          onChange={e => { const n = [...parcelas]; n[idx].vencimento = e.target.value; setParcelas(n); }}
+                          className="border border-gray-200 rounded-lg px-2 py-0.5 text-xs bg-white" />
                       </td>
                       <td className="px-4 py-2 text-right">
-                        <input type="number" step="0.01" value={p.valor} onChange={e => { const n = [...parcelas]; n[idx].valor = Number(e.target.value); setParcelas(n); }} className="border-0 bg-transparent text-right w-24 text-xs font-bold" />
+                        <input type="number" step="0.01" value={p.valor}
+                          onChange={e => { const n = [...parcelas]; n[idx].valor = Number(e.target.value); setParcelas(n); }}
+                          className="border border-gray-200 rounded-lg px-2 py-0.5 text-right w-28 text-xs font-bold bg-white" />
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              {diferenca > 0 && (
+                <div className="bg-red-50 px-4 py-2 text-xs text-red-600 font-bold border-t border-red-100">
+                  ⚠ Diferença de R$ {(diferenca / 100).toFixed(2)} — ajuste os valores antes de salvar.
+                </div>
+              )}
             </div>
           )}
         </div>
+
         <div className="p-4 bg-gray-50 border-t border-gray-100 flex gap-3">
-          <button onClick={onClose} className="flex-1 py-2.5 text-gray-500 font-bold uppercase text-xs border border-gray-200 rounded-xl hover:bg-gray-100">Cancelar</button>
-          <button onClick={handleSalvar} disabled={saving || diferenca > 0.01 || !descricao.trim() || valorNum <= 0} className={`flex-1 py-2.5 ${corBtn} disabled:bg-gray-300 text-white font-bold uppercase text-xs rounded-xl`}>
-            {saving ? 'Salvando...' : `Lançar ${parcelas.length} Parcela(s)`}
+          <button onClick={onClose}
+            className="flex-1 py-2.5 text-gray-500 font-bold uppercase text-xs border border-gray-200 rounded-xl hover:bg-gray-100">
+            Cancelar
+          </button>
+          <button onClick={handleSalvar}
+            disabled={saving || diferenca > 0 || !descricao.trim() || valorNum <= 0 || (isBoleto && tipo === 'R' && !clienteId)}
+            className={`flex-1 py-2.5 ${corBtn} disabled:bg-gray-300 text-white font-bold uppercase text-xs rounded-xl flex items-center justify-center gap-2`}>
+            {saving
+              ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Salvando...</>
+              : isBoleto
+                ? <><FileText className="w-3.5 h-3.5" /> Lançar {parcelas.length || 1} Parcela(s)</>
+                : `Lançar ${parcelas.length || 1} Parcela(s)`}
           </button>
         </div>
       </motion.div>
