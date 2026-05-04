@@ -159,8 +159,8 @@ if ($action === 'boleto_gerar') {
     $dv2 = sicoobMod10($s2);
     $campo2 = substr($s2, 0, 5) . '.' . substr($s2, 5) . $dv2;
 
-    // Campo 3: pos34-39(seq6) + dvnn + pos40-42(parcela) → 10 digitos + DV mod10
-    $s3  = substr($sequencia, 33, 6) . $dvnn . substr($sequencia, 39, 3);
+    // Campo 3: pos35-40(seq6) + dvnn + pos41-43(parcela) → 10 digitos + DV mod10
+    $s3  = substr($sequencia, 34, 6) . $dvnn . substr($sequencia, 40, 3);
     $dv3 = sicoobMod10($s3);
     $campo3 = substr($s3, 0, 5) . '.' . substr($s3, 5) . $dv3;
 
