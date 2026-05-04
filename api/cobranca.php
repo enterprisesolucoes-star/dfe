@@ -137,7 +137,7 @@ if ($action === 'boleto_gerar') {
     // DV Nosso Numero (fator 3-7-9-1, Sicoob)
     // Seq0 = agencia(4) + conta_cliente(10) + nosso_numero(7)
     // No sistema: agencia(4=pos19-23) + convenio(7=pos25-32) + seq(7=pos33-39) usando pos da sequencia
-    $seq0 = substr($sequencia, 19, 4) . str_pad(substr($sequencia, 25, 7), 10, '0', STR_PAD_LEFT) . substr($sequencia, 32, 7);
+    $seq0 = substr($sequencia, 20, 4) . str_pad(substr($sequencia, 26, 7), 10, '0', STR_PAD_LEFT) . substr($sequencia, 33, 7);
     $fatores = [3, 7, 9, 1];
     $total = 0; $fi = 0;
     for ($i = strlen($seq0) - 1; $i >= 0; $i--) {
