@@ -180,42 +180,6 @@ if ($action === 'boleto_gerar') {
     $codigoBarras   = substr($seq4, 0, 4) . $dvcb . substr($seq4, 4);
     $linhaDigitavel = $campo1 . ' ' . $campo2 . ' ' . $campo3 . ' ' . $dvcb . ' ' . substr($sequencia, 4, 14);
     $semDv          = $seq4; // compatibilidade (nao usado apos este bloco)
-
-    // Calcular dígito verificador do código de barras (módulo 11)
-    $mult = 2; $soma = 0;
-    for ($i = strlen($semDv) - 1; $i >= 0; $i--) {
-        $soma += (int)$semDv[$i] * $mult;
-        $mult = ($mult == 9) ? 2 : $mult + 1;
-    }
-    $resto = $soma % 11;
-    $dv    = ($resto == 0 || $resto == 1) ? 1 : 11 - $resto;
-
-    $codigoBarras = substr($semDv, 0, 4) . $dv . substr($semDv, 4);
-
-    // ── Linha digitável (47 dígitos com pontos e espaços) ──
-    // Campo1: banco(3) + moeda(1) + campoLivre[0..4](5) + dv1
-    $c1     = $banco . '9' . substr($campoLivre, 0, 5);
-    $dv1    = sicoobMod10($c1);
-    $campo1 = substr($c1, 0, 5) . '.' . substr($c1, 5) . $dv1;
-
-    // Campo2: campoLivre[5..14](10) + dv2
-    $c2     = substr($campoLivre, 5, 10);
-    $dv2    = sicoobMod10($c2);
-    $campo2 = substr($c2, 0, 5) . '.' . substr($c2, 5) . $dv2;
-
-    // Campo3: campoLivre[15..24](10) + dv3
-    $c3     = substr($campoLivre, 15, 10);
-    $dv3    = sicoobMod10($c3);
-    $campo3 = substr($c3, 0, 5) . '.' . substr($c3, 5) . $dv3;
-
-    // Campo4: dígito verificador do código de barras
-    $campo4 = $dv;
-
-    // Campo5: fatorVenc + valor
-    $campo5 = $fatorVenc . $valorCent;
-
-    $linhaDigitavel = "$campo1 $campo2 $campo3 $campo4 $campo5";
-
     // Salvar no financeiro
     $pdo->prepare("
         UPDATE financeiro SET
