@@ -241,10 +241,10 @@ if ($action === 'boleto_imprimir') {
     $banco       = $config['banco_codigo'] ?? '756';
 
     // Nosso número formatado: 01/0000001-D
-    $nossoFmt = substr($carteira, 0, 2) . '/' . str_pad(substr($nossoN, strlen($convenio)), 7, '0', STR_PAD_LEFT) . '-0';
+    $nossoFmt = $nossoN; // salvo como "0000463-7" diretamente
 
     // Coop/Beneficiário: agencia/conta-digito
-    $coopBenef = $agencia . '/' . $conta . '-0';
+    $coopBenef = $agencia . '/' . $convenio;
 
     // Instruções
     $instrucoes = $config['instrucoes'] ?? '';
