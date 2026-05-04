@@ -149,18 +149,18 @@ if ($action === 'boleto_gerar') {
 
     $nossoNumeroFmt = $seq . '-' . $dvnn;
 
-    // Campo 1: pos1-4 + pos19-23 (5 digitos) → 9 digitos + DV mod10
-    $s1  = substr($sequencia, 0, 4) . substr($sequencia, 18, 5);
+    // Campo 1: pos1-4 + pos20-24 (5 digitos) → 9 digitos + DV mod10
+    $s1  = substr($sequencia, 0, 4) . substr($sequencia, 19, 5);
     $dv1 = sicoobMod10($s1);
     $campo1 = substr($s1, 0, 5) . '.' . substr($s1, 5) . $dv1;
 
-    // Campo 2: pos24-33 (10 digitos) + DV mod10
-    $s2  = substr($sequencia, 23, 10);
+    // Campo 2: pos25-34 (10 digitos) + DV mod10
+    $s2  = substr($sequencia, 24, 10);
     $dv2 = sicoobMod10($s2);
     $campo2 = substr($s2, 0, 5) . '.' . substr($s2, 5) . $dv2;
 
-    // Campo 3: pos33-39(seq7) + dvnn + pos40-42(parcela) → 10 digitos + DV mod10
-    $s3  = str_pad(substr($sequencia, 32, 7), 6, '0', STR_PAD_LEFT) . $dvnn . substr($sequencia, 39, 3);
+    // Campo 3: pos34-39(seq6) + dvnn + pos40-42(parcela) → 10 digitos + DV mod10
+    $s3  = substr($sequencia, 33, 6) . $dvnn . substr($sequencia, 39, 3);
     $dv3 = sicoobMod10($s3);
     $campo3 = substr($s3, 0, 5) . '.' . substr($s3, 5) . $dv3;
 
