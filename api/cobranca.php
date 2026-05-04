@@ -109,16 +109,22 @@ if ($action === 'boleto_gerar') {
         ->execute([$empresaId]);
 
     // ── Montagem Sicoob conforme algoritmo oficial ──────────────────────────
-    $banco       = '756';
-    $moeda       = '9';
-    $carteira    = preg_replace('/\D/', '', $config['carteira_codigo'] ?? '1'); // 1 digito
-    $agencia     = str_pad(preg_replace('/\D/', '', $config['agencia']), 4, '0', STR_PAD_LEFT);
-    $modalidade  = str_pad(preg_replace('/\D/', '', $config['carteira_codigo'] ?? '1'), 2, '0', STR_PAD_LEFT);
-    $convenio    = str_pad(preg_replace('/\D/', '', $config['convenio']), 7, '0', STR_PAD_LEFT);
-    $seq6        = str_pad($nossoNumero, 6, '0', STR_PAD_LEFT); // seq sem dvnn
-    $seq         = $seq6; // dvnn sera calculado e embutido depois
-    $parcela     = '001';
-    $conta       = str_pad(preg_replace('/\D/', '', $config['conta']), 5, '0', STR_PAD_LEFT);
+    $banco      = '756';
+    $moeda      = '9';
+    $carteira   = preg_replace('/\D/', '', $config['carteira_codigo'] ?? '1'); // 1 digito
+    $agencia    = str_pad(preg_replace('/\D/', '', $config['agencia']), 4, '0', STR_PAD_LEFT);
+    $modalidade = str_pad(preg_replace('/\D/', '', $config['carteira_codigo'] ?? '1'), 2, '0', STR_PAD_LEFT);
+    $convenio   = str_pad(preg_replace('/\D/', '', $config['convenio']), 7, '0', STR_PAD_LEFT);
+    $seq6       = str_pad($nossoNumero, 6, '0', STR_PAD_LEFT);
+    $parcela    = '001';
+    $agRaw      = str_pad(preg_replace('/\D/', '', $config['agencia']), 4, '0', STR_PAD_LEFT);
+    $ctRaw      = str_pad(preg_replace('/\D/', '', $config['conta']), 5, '0', STR_PAD_LEFT);
+
+    // Digito da conta: mod10(agencia+conta)
+    $agCt = $agRaw . $ctRaw;
+    $s=0;$d=2;$rev=strrev($agCt);
+    for($i=0;$i<strlen($rev);$i++){$r=(int)$rev[$i]*$d;$s+=($r>9?$r-9:$r);$d=($d==2?1:2);}
+    $digConta = (10-($s%10))%10;
 
     // Fator de vencimento
     $base      = mktime(0,0,0,10,7,1997);
@@ -132,14 +138,12 @@ if ($action === 'boleto_gerar') {
     $valorCent = str_pad(number_format($titulo['valor_total'], 2, '', ''), 10, '0', STR_PAD_LEFT);
 
     // Sequencia base (43 digitos):
-    // BANCO(3)+MOEDA(1)+FATOR(4)+VALOR(10)+CARTEIRA(1)+AGENCIA(4)+MODALIDADE(2)+CONVENIO(7)+SEQ6(6)+DVNN(1)+PARCELA(3)
-    // dvnn ainda nao calculado - usar placeholder 0
-    $sequencia = $banco . $moeda . $fatorVenc . $valorCent . $carteira . $agencia . $modalidade . $convenio . $seq6 . '0' . $parcela;
+    // BANCO(3)+MOEDA(1)+FATOR(4)+VALOR(10)+CARTEIRA(1)+AGENCIA(4)+MODALIDADE(2)+CONVENIO(7)+SEQ6(6)+DVNN_PLACEHOLDER(1)+PARCELA(3)+DIGCONTA(1)
+    $sequencia = $banco.$moeda.$fatorVenc.$valorCent.$carteira.$agencia.$modalidade.$convenio.$seq6.'0'.$parcela.$digConta;
 
-    // DV Nosso Numero (fator 3-7-9-1, Sicoob)
-    // Seq0 = agencia(4) + conta_cliente(10) + nosso_numero(7)
-    // No sistema: agencia(4=pos19-23) + convenio(7=pos25-32) + seq(7=pos33-39) usando pos da sequencia
-    $seq0 = substr($sequencia, 20, 4) . str_pad(substr($sequencia, 26, 7), 10, '0', STR_PAD_LEFT) . substr($sequencia, 33, 7);
+    // DV Nosso Numero: seq0 = agencia(4) + str_pad(convenio(7),10,LEFT) + seq6(6)+placeholder(1)
+    // Posicoes na sequencia: agencia pos18(1 cart)+19=19, convenio=23, seq6=30
+    $seq0 = substr($sequencia, 19, 4) . str_pad(substr($sequencia, 23, 7), 10, '0', STR_PAD_LEFT) . substr($sequencia, 30, 7);
     $fatores = [3, 7, 9, 1];
     $total = 0; $fi = 0;
     for ($i = strlen($seq0) - 1; $i >= 0; $i--) {
@@ -149,40 +153,44 @@ if ($action === 'boleto_gerar') {
     $resto = $total % 11;
     $dvnn  = (11 - $resto) >= 10 ? 0 : (11 - $resto);
 
-    $nossoNumeroFmt = $seq . '-' . $dvnn;
+    $nossoNumeroFmt = $seq6 . '-' . $dvnn;
 
-    // Campo 1: pos1-4 + pos20-24 (5 digitos) → 9 digitos + DV mod10
+    // Atualiza sequencia com dvnn real na posicao 36 (pos apos seq6)
+    $sequencia = substr($sequencia, 0, 36) . $dvnn . substr($sequencia, 37);
+
+    // Campo 1: banco(3)+moeda(1) + campoLivre[0..4] = substr(0,4)+substr(19,5)
     $s1  = substr($sequencia, 0, 4) . substr($sequencia, 19, 5);
     $dv1 = sicoobMod10($s1);
     $campo1 = substr($s1, 0, 5) . '.' . substr($s1, 5) . $dv1;
 
-    // Campo 2: pos25-34 (10 digitos) + DV mod10
+    // Campo 2: substr(24,10)
     $s2  = substr($sequencia, 24, 10);
     $dv2 = sicoobMod10($s2);
     $campo2 = substr($s2, 0, 5) . '.' . substr($s2, 5) . $dv2;
 
-    // Campo 3: pos35-40(seq6) + dvnn + pos41-43(parcela) → 10 digitos + DV mod10
-    $s3  = substr($sequencia, 34, 6) . $dvnn . substr($sequencia, 40, 3);
+    // Campo 3: seq6(6)+dvnn(1)+parcela(3) = substr(30,10)
+    $s3  = substr($sequencia, 30, 10);
     $dv3 = sicoobMod10($s3);
     $campo3 = substr($s3, 0, 5) . '.' . substr($s3, 5) . $dv3;
 
-    // Codigo de barras base: sequencia(39) + dvnn + parcela(3) = 43 digitos
-    $seq4  = substr($sequencia, 0, 39) . $dvnn . substr($sequencia, 40, 3);
-    // DV codigo de barras - algoritmo VBA exato (mult 2-9, reset quando >9 ANTES de multiplicar)
+    // seq4 = sequencia completa 43 digitos (dvnn ja embutido)
+    $seq4 = $sequencia;
+
+    // DV codigo de barras - algoritmo VBA exato
     $mult = 2; $soma = 0;
     for ($i = strlen($seq4) - 1; $i >= 0; $i--) {
         if ($mult > 9) $mult = 2;
         $soma += (int)$seq4[$i] * $mult;
         $mult++;
     }
-    $resto = $soma % 11;
+    $resto  = $soma % 11;
     $result = 11 - $resto;
-    $dvcb = ($result == 11 || $result == 10) ? 1 : $result;
+    $dvcb   = ($result == 11 || $result == 10) ? 1 : $result;
 
     // Codigo de barras final: pos1-4 + dvcb + pos5-43
     $codigoBarras   = substr($seq4, 0, 4) . $dvcb . substr($seq4, 4);
     $linhaDigitavel = $campo1 . ' ' . $campo2 . ' ' . $campo3 . ' ' . $dvcb . ' ' . substr($sequencia, 4, 14);
-    $semDv          = $seq4; // compatibilidade (nao usado apos este bloco)
+
     // Salvar no financeiro
     $pdo->prepare("
         UPDATE financeiro SET
