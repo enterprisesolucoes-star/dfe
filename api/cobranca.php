@@ -694,16 +694,10 @@ if ($action === 'boleto_retorno') {
             $dataPagtoFmt = (strlen($dataOcorr) === 8 && $dataOcorr !== '00000000')
                 ? substr($dataOcorr, 4, 4) . '-' . substr($dataOcorr, 2, 2) . '-' . substr($dataOcorr, 0, 2)
                 : date('Y-m-d');
-            $nossoBusca = $tituloPendente['nosso'];
-            $nossoLimpo = ltrim($nossoBusca, '0');
-            $stmt = $pdo->prepare("SELECT id, valor_total FROM financeiro WHERE empresa_id = ? AND boleto_status = 'registrado' AND REPLACE(REPLACE(boleto_nosso_numero, '-', ''), ' ', '') = ?");
-            $stmt->execute([$empresaId, $nossoLimpo]);
+            $nossoBusca = ltrim($tituloPendente['nosso'], '0');
+            $stmt = $pdo->prepare("SELECT id, valor_total FROM financeiro WHERE empresa_id = ? AND boleto_status = 'registrado' AND CAST(REPLACE(REPLACE(boleto_nosso_numero, '-', ''), ' ', '') AS UNSIGNED) = CAST(? AS UNSIGNED)");
+            $stmt->execute([$empresaId, $nossoBusca]);
             $titulo = $stmt->fetch(PDO::FETCH_ASSOC);
-            if (!$titulo) {
-                $stmt2 = $pdo->prepare("SELECT id, valor_total FROM financeiro WHERE empresa_id = ? AND boleto_status = 'registrado' AND REPLACE(REPLACE(boleto_nosso_numero, '-', ''), ' ', '') = ?");
-                $stmt2->execute([$empresaId, $nossoBusca]);
-                $titulo = $stmt2->fetch(PDO::FETCH_ASSOC);
-            }
             if ($titulo) {
                 if ($valorPago <= 0) $valorPago = (float)$titulo['valor_total'];
                 $pdo->prepare("UPDATE financeiro SET boleto_status = 'pago', boleto_pago_em = ?, status = 'Pago', valor_pago = ?, data_baixa = ? WHERE id = ?")
