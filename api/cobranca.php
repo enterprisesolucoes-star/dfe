@@ -669,45 +669,56 @@ if ($action === 'boleto_retorno') {
     $data     = json_decode(file_get_contents('php://input'), true) ?? [];
     $conteudo = base64_decode($data['conteudo'] ?? '');
     $nomeArq  = $data['nome'] ?? 'retorno.ret';
-
-    if (!$conteudo) { echo json_encode(['success' => false, 'message' => 'Arquivo inválido']); exit; }
-
-    $linhas  = explode("\n", str_replace("\r", "", $conteudo));
+    if (!$conteudo) { echo json_encode(['success' => false, 'message' => 'Arquivo invalido']); exit; }
+    $linhasArq = explode("\n", str_replace("\r", "", $conteudo));
     $pagos   = 0;
-    $erros   = [];
     $valorTotal = 0;
-
-    foreach ($linhas as $linha) {
+    $tituloPendente = null;
+    foreach ($linhasArq as $linha) {
         if (strlen($linha) < 240) continue;
         $tipoReg  = substr($linha, 7, 1);
         $segmento = substr($linha, 13, 1);
-
-        if ($tipoReg === '3' && $segmento === 'T') {
+        if ($tipoReg !== '3') continue;
+        if ($segmento === 'T') {
             $codMovimento = substr($linha, 15, 2);
-            // 06 = Liquidação
-            if ($codMovimento === '06') {
-                $nossoNumero = trim(substr($linha, 55, 20));
-                $valorPago   = (float)(substr($linha, 152, 15)) / 100;
-                $dataPagto   = substr($linha, 145, 8);
-                $dataPagtoFmt = strlen($dataPagto) === 8
-                    ? substr($dataPagto, 4, 4) . '-' . substr($dataPagto, 2, 2) . '-' . substr($dataPagto, 0, 2)
-                    : date('Y-m-d');
-
-                // Buscar título pelo nosso número
-                $stmt = $pdo->prepare("SELECT id FROM financeiro WHERE boleto_nosso_numero = ? AND empresa_id = ? AND boleto_status = 'registrado'");
-                $stmt->execute([$nossoNumero, $empresaId]);
-                $titulo = $stmt->fetch(PDO::FETCH_ASSOC);
-
-                if ($titulo) {
-                    $pdo->prepare("UPDATE financeiro SET boleto_status = 'pago', boleto_pago_em = ?, status = 'Pago', valor_pago = ?, data_baixa = ? WHERE id = ?")
-                        ->execute([$dataPagtoFmt, $valorPago, $dataPagtoFmt, $titulo['id']]);
-                    $pagos++;
-                    $valorTotal += $valorPago;
-                }
+            if ($codMovimento === '06' || $codMovimento === '17') {
+                $nossoCompleto = substr($linha, 37, 20);
+                $numTitulo = substr($nossoCompleto, 0, 10);
+                $tituloPendente = ['nosso' => $numTitulo];
+            } else {
+                $tituloPendente = null;
             }
+        } elseif ($segmento === 'U' && $tituloPendente) {
+            $valorPago = (float)substr($linha, 77, 15) / 100;
+            $dataOcorr = substr($linha, 137, 8);
+            $dataPagtoFmt = (strlen($dataOcorr) === 8 && $dataOcorr !== '00000000')
+                ? substr($dataOcorr, 4, 4) . '-' . substr($dataOcorr, 2, 2) . '-' . substr($dataOcorr, 0, 2)
+                : date('Y-m-d');
+            $nossoBusca = $tituloPendente['nosso'];
+            $nossoLimpo = ltrim($nossoBusca, '0');
+            $stmt = $pdo->prepare("SELECT id, valor_total FROM financeiro WHERE empresa_id = ? AND boleto_status = 'registrado' AND REPLACE(REPLACE(boleto_nosso_numero, '-', ''), ' ', '') = ?");
+            $stmt->execute([$empresaId, $nossoLimpo]);
+            $titulo = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$titulo) {
+                $stmt2 = $pdo->prepare("SELECT id, valor_total FROM financeiro WHERE empresa_id = ? AND boleto_status = 'registrado' AND REPLACE(REPLACE(boleto_nosso_numero, '-', ''), ' ', '') = ?");
+                $stmt2->execute([$empresaId, $nossoBusca]);
+                $titulo = $stmt2->fetch(PDO::FETCH_ASSOC);
+            }
+            if ($titulo) {
+                if ($valorPago <= 0) $valorPago = (float)$titulo['valor_total'];
+                $pdo->prepare("UPDATE financeiro SET boleto_status = 'pago', boleto_pago_em = ?, status = 'Pago', valor_pago = ?, data_baixa = ? WHERE id = ?")
+                    ->execute([$dataPagtoFmt, $valorPago, $dataPagtoFmt, $titulo['id']]);
+                $contaIdRet = garantirContaFinanceira($pdo, $empresaId);
+                if ($contaIdRet) {
+                    $pdo->prepare("INSERT INTO caixa_movimentos (empresa_id, conta_id, tipo, valor, forma_pagamento, historico, usuario_id, data_movimento) VALUES (?, ?, 'C', ?, '15', ?, ?, ?)")
+                        ->execute([$empresaId, $contaIdRet, $valorPago, "Boleto liquidado retorno CNAB - Titulo #{$titulo['id']}", $usuarioId ?? null, $dataPagtoFmt]);
+                }
+                $pagos++;
+                $valorTotal += $valorPago;
+            }
+            $tituloPendente = null;
         }
     }
-
     // Salvar retorno
     $pdo->prepare("INSERT INTO cobranca_retornos (empresa_id, banco_codigo, arquivo_nome, arquivo_conteudo, total_registros, total_pagos, valor_total_pago, status, processado_em, usuario_id) VALUES (?,?,?,?,?,?,?,'processado',NOW(),?)")
         ->execute([$empresaId, '756', $nomeArq, $conteudo, count($linhas), $pagos, $valorTotal, $usuarioId ?? null]);
