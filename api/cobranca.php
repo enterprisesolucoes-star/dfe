@@ -531,217 +531,127 @@ if ($action === 'boleto_cancelar') {
 // ── Gerar Remessa CNAB 240 ────────────────────────────────────────────────────
 if ($action === 'boleto_remessa') {
     $ids = json_decode(file_get_contents('php://input'), true)['ids'] ?? [];
-    if (empty($ids)) { echo json_encode(['success' => false, 'message' => 'Nenhum título selecionado']); exit; }
-
+    if (empty($ids)) { echo json_encode(['success' => false, 'message' => 'Nenhum titulo selecionado']); exit; }
     $cfg = $pdo->prepare("SELECT * FROM empresas_cobranca WHERE empresa_id = ? AND ativo = 1");
     $cfg->execute([$empresaId]);
     $config = $cfg->fetch(PDO::FETCH_ASSOC);
-    if (!$config) { echo json_encode(['success' => false, 'message' => 'Configuração de cobrança não encontrada']); exit; }
-
+    if (!$config) { echo json_encode(['success' => false, 'message' => 'Configuracao de cobranca nao encontrada']); exit; }
     $emp = $pdo->prepare("SELECT * FROM empresas WHERE id = ?");
     $emp->execute([$empresaId]);
     $empresa = $emp->fetch(PDO::FETCH_ASSOC);
-
-    // Buscar títulos
     $phs  = implode(',', array_fill(0, count($ids), '?'));
-    $stmt = $pdo->prepare("SELECT f.*, c.nome as cliente_nome, c.documento as cliente_documento, c.logradouro, c.municipio, c.uf, c.cep FROM financeiro f LEFT JOIN clientes c ON c.id = f.entidade_id WHERE f.id IN ($phs) AND f.empresa_id = ? AND f.boleto_status = 'registrado'");
+    $stmt = $pdo->prepare("SELECT f.*, c.nome as cli_nome, c.documento as cli_doc, c.logradouro as cli_logr, c.numero as cli_num, c.complemento as cli_compl, c.bairro as cli_bairro, c.municipio as cli_mun, c.uf as cli_uf, c.cep as cli_cep FROM financeiro f LEFT JOIN clientes c ON c.id = f.entidade_id WHERE f.id IN ($phs) AND f.empresa_id = ? AND f.boleto_status = 'registrado' ORDER BY f.id ASC");
     $stmt->execute(array_merge(array_map('intval', $ids), [$empresaId]));
     $titulos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    if (empty($titulos)) { echo json_encode(['success' => false, 'message' => 'Nenhum título válido encontrado']); exit; }
-
-    // Próximo número de remessa
+    if (empty($titulos)) { echo json_encode(['success' => false, 'message' => 'Nenhum titulo valido encontrado']); exit; }
     $numRemessa = (int)$config['ultima_remessa'] + 1;
-    $pdo->prepare("UPDATE empresas_cobranca SET ultima_remessa = ? WHERE empresa_id = ?")
-        ->execute([$numRemessa, $empresaId]);
-
-    $cnpjEmp    = preg_replace('/\D/', '', $empresa['cnpj'] ?? '');
-    $agencia    = str_pad(preg_replace('/\D/', '', $config['agencia']), 5, '0', STR_PAD_LEFT);
-    $conta      = str_pad(preg_replace('/\D/', '', $config['conta']), 12, '0', STR_PAD_LEFT);
-    $convenio   = str_pad($config['convenio'], 9, '0', STR_PAD_LEFT);
-    $nomeEmp    = str_pad(mb_strtoupper(substr($empresa['razao_social'] ?? '', 0, 30)), 30);
-    $banco      = str_pad($config['banco_codigo'], 3, '0', STR_PAD_LEFT);
+    $pdo->prepare("UPDATE empresas_cobranca SET ultima_remessa = ? WHERE empresa_id = ?")->execute([$numRemessa, $empresaId]);
+    $banco      = '756';
+    $cnpjEmp    = str_pad(preg_replace('/\\D/', '', $empresa['cnpj'] ?? ''), 14, '0', STR_PAD_LEFT);
+    $agencia    = str_pad(preg_replace('/\\D/', '', $config['agencia']), 5, '0', STR_PAD_LEFT);
+    $conta      = str_pad(preg_replace('/\\D/', '', $config['conta']), 12, '0', STR_PAD_LEFT);
+    $nomeEmp    = str_pad(mb_strtoupper(mb_substr($empresa['razao_social'] ?? '', 0, 30)), 30);
     $dataHoje   = date('dmY');
     $horaAgora  = date('His');
     $numRemPad  = str_pad($numRemessa, 6, '0', STR_PAD_LEFT);
-    $totalLotes = 1;
-    $totalReg   = count($titulos) + 4; // header + trailer empresa + header lote + trailer lote
-
-    // ── HEADER DE ARQUIVO (Segmento 0) ──
-    $cnab  = str_pad($banco, 3);                          // 001-003 Banco
-    $cnab .= '0000';                                       // 004-007 Lote
-    $cnab .= '0';                                          // 008 Tipo: Header
-    $cnab .= str_repeat(' ', 9);                           // 009-017 Brancos
-    $cnab .= '1';                                          // 018 Tipo Inscrição: CNPJ
-    $cnab .= str_pad($cnpjEmp, 14, '0', STR_PAD_LEFT);   // 019-032 CNPJ
-    $cnab .= str_pad($convenio, 20);                       // 033-052 Convênio
-    $cnab .= str_pad($agencia, 5, '0', STR_PAD_LEFT);     // 053-057 Agência
-    $cnab .= ' ';                                          // 058 Dígito agência
-    $cnab .= str_pad($conta, 12, '0', STR_PAD_LEFT);      // 059-070 Conta
-    $cnab .= ' ';                                          // 071 Dígito conta
-    $cnab .= ' ';                                          // 072 Dígito ag/conta
-    $cnab .= str_pad($nomeEmp, 30);                        // 073-102 Nome empresa
-    $cnab .= str_pad('SICOOB', 30);                        // 103-132 Nome banco
-    $cnab .= str_repeat(' ', 10);                          // 133-142 Brancos
-    $cnab .= '1';                                          // 143 Código remessa
-    $cnab .= $dataHoje;                                    // 144-151 Data geração
-    $cnab .= $horaAgora;                                   // 152-157 Hora geração
-    $cnab .= str_pad($numRemPad, 6, '0', STR_PAD_LEFT);   // 158-163 Sequência
-    $cnab .= '089';                                        // 164-166 Versão layout
-    $cnab .= '01600';                                      // 167-171 Densidade
-    $cnab .= str_repeat(' ', 20);                          // 172-191 Brancos
-    $cnab .= str_repeat(' ', 20);                          // 192-211 Brancos
-    $cnab .= str_repeat(' ', 29);                          // 212-240 Brancos
-    $linhas = [substr($cnab, 0, 240)];
-
-    // ── HEADER DE LOTE ──
-    $lote  = str_pad($banco, 3);
-    $lote .= '0001';
-    $lote .= '1';       // Tipo: Header lote
-    $lote .= 'R';       // Operação: Remessa
-    $lote .= '01';      // Tipo serviço: Cobrança
-    $lote .= '  ';
-    $lote .= '040';     // Versão lote
-    $lote .= ' ';
-    $lote .= '1';       // Tipo inscrição CNPJ
-    $lote .= str_pad($cnpjEmp, 15, '0', STR_PAD_LEFT);
-    $lote .= str_pad($convenio, 20);
-    $lote .= str_pad($agencia, 5, '0', STR_PAD_LEFT);
-    $lote .= ' ';
-    $lote .= str_pad($conta, 12, '0', STR_PAD_LEFT);
-    $lote .= ' ';
-    $lote .= ' ';
-    $lote .= str_pad($nomeEmp, 30);
-    $lote .= str_repeat(' ', 40);
-    $lote .= str_repeat(' ', 40);
-    $lote .= str_repeat(' ', 8);
-    $lote .= str_repeat(' ', 3);
-    $linhas[] = substr($lote, 0, 240);
-
-    // ── REGISTROS DE DETALHE ──
+    $totalTit   = count($titulos);
+    $valorTotal = array_sum(array_column($titulos, 'valor_total'));
+    $agCt = preg_replace('/\\D/', '', $config['agencia']) . preg_replace('/\\D/', '', $config['conta']);
+    $sm=0;$dg=2;$rev=strrev($agCt);
+    for($i=0;$i<strlen($rev);$i++){$rr=(int)$rev[$i]*$dg;$sm+=($rr>9?$rr-9:$rr);$dg=($dg==2?1:2);}
+    $contaDv = (string)((10-($sm%10))%10);
+    $linhas = [];
     $seqReg = 1;
+    $h  = $banco . '0000' . '0' . str_repeat(' ', 9) . '2' . $cnpjEmp . str_repeat(' ', 20);
+    $h .= $agencia . '0' . $conta . $contaDv . '0';
+    $h .= $nomeEmp . str_pad('SICOOB', 30) . str_repeat(' ', 10);
+    $h .= '1' . $dataHoje . $horaAgora . $numRemPad . '081' . '00000';
+    $h .= str_repeat(' ', 20) . str_repeat(' ', 20) . str_repeat(' ', 29);
+    $linhas[] = substr($h, 0, 240);
+    $hl  = $banco . '0001' . '1' . 'R' . '01' . '  ' . '040' . ' ';
+    $hl .= '2' . '0' . $cnpjEmp . str_repeat(' ', 20);
+    $hl .= $agencia . ' ' . $conta . $contaDv . ' ';
+    $hl .= $nomeEmp . str_repeat(' ', 40) . str_repeat(' ', 40);
+    $hl .= str_pad($numRemPad, 8, '0', STR_PAD_LEFT) . $dataHoje . '00000000';
+    $hl .= str_repeat(' ', 33);
+    $linhas[] = substr($hl, 0, 240);
     foreach ($titulos as $t) {
-        $cnpjCli  = preg_replace('/\D/', '', $t['cliente_documento'] ?? '');
-        $nomeCli  = str_pad(mb_strtoupper(substr($t['cliente_nome'] ?? 'NAO IDENTIFICADO', 0, 30)), 30);
-        $nossoN   = str_pad(preg_replace('/\D/', '', $t['boleto_nosso_numero'] ?? ''), 20, '0', STR_PAD_LEFT);
-        $vencDt   = date('dmY', strtotime($t['vencimento']));
-        $valorCt  = str_pad(number_format($t['valor_total'], 2, '', ''), 15, '0', STR_PAD_LEFT);
-        $seqPad   = str_pad($seqReg, 5, '0', STR_PAD_LEFT);
-
-        // Segmento P
-        $segP  = str_pad($banco, 3);
-        $segP .= '0001';
-        $segP .= '3';         // Detalhe
-        $segP .= $seqPad;
-        $segP .= 'P';         // Segmento P
-        $segP .= ' ';
-        $segP .= '01';        // Movimento: Inclusão
-        $segP .= str_pad($agencia, 5, '0', STR_PAD_LEFT);
-        $segP .= ' ';
-        $segP .= str_pad($conta, 12, '0', STR_PAD_LEFT);
-        $segP .= ' ';
-        $segP .= ' ';
-        $segP .= str_pad($nossoN, 20, '0', STR_PAD_LEFT);
-        $segP .= str_pad($config['carteira_codigo'] ?? '1', 3, '0', STR_PAD_LEFT);
-        $segP .= '0';         // Forma cadastramento: sem emissão
-        $segP .= '2';         // Distribuição: entregue pelo cedente
-        $segP .= ' ';         // Tipo documento
-        $segP .= $vencDt;
-        $segP .= $valorCt;
-        $segP .= '00000';     // Agência cobradora
-        $segP .= ' ';
-        $segP .= '00';        // Espécie
-        $segP .= 'N';         // Aceite
-        $segP .= date('dmY', strtotime($t['boleto_registrado_em'] ?? 'now'));
-        $segP .= '1';         // Código juros: valor ao dia
-        $segP .= date('dmY', strtotime($t['vencimento'] . ' +1 day'));
-        $segP .= str_pad(number_format($config['juros_valor'], 2, '', ''), 15, '0', STR_PAD_LEFT);
-        $segP .= '1';         // Código desconto
-        $segP .= '00000000';
-        $segP .= str_repeat('0', 15);
-        $segP .= $valorCt;    // Valor abatimento
-        $segP .= str_repeat('0', 15);
-        $segP .= strlen($cnpjCli) === 11 ? '1' : '2';
-        $segP .= str_pad($cnpjCli, 15, '0', STR_PAD_LEFT);
-        $segP .= str_pad($nossoN, 15, '0', STR_PAD_LEFT);
-        $segP .= str_repeat(' ', 10);
-        $segP .= '3';         // Código mora: taxa mensal
-        $segP .= date('dmY', strtotime($t['vencimento'] . ' +1 day'));
-        $segP .= str_pad(number_format($config['multa_valor'], 2, '', ''), 15, '0', STR_PAD_LEFT);
-        $segP .= str_repeat(' ', 10);
-        $linhas[] = substr($segP, 0, 240);
+        $cnpjCli   = str_pad(preg_replace('/\\D/', '', $t['cli_doc'] ?? ''), 14, '0', STR_PAD_LEFT);
+        $tpInscCli = strlen(preg_replace('/\\D/', '', $t['cli_doc'] ?? '')) === 11 ? '1' : '2';
+        $nomeCli   = str_pad(mb_strtoupper(mb_substr($t['cli_nome'] ?? 'NAO IDENTIFICADO', 0, 30)), 30);
+        $endCli    = str_pad(mb_strtoupper(mb_substr(($t['cli_logr'] ?? ''), 0, 40)), 40);
+        $numCli    = str_pad(mb_strtoupper(mb_substr(($t['cli_num'] ?? ''), 0, 5)), 5);
+        $complCli  = str_pad(mb_strtoupper(mb_substr(($t['cli_compl'] ?? ''), 0, 15)), 15);
+        $bairroCli = str_pad(mb_strtoupper(mb_substr(($t['cli_bairro'] ?? ''), 0, 15)), 15);
+        $cepCli    = str_pad(preg_replace('/\\D/', '', $t['cli_cep'] ?? ''), 8, '0', STR_PAD_LEFT);
+        $cidCli    = str_pad(mb_strtoupper(mb_substr(($t['cli_mun'] ?? ''), 0, 15)), 15);
+        $ufCli     = str_pad(strtoupper($t['cli_uf'] ?? ''), 2);
+        $nossoSemDv = preg_replace('/\\D/', '', $t['boleto_nosso_numero'] ?? '');
+        $numTitulo  = str_pad(substr($nossoSemDv, 0, -1), 7, '0', STR_PAD_LEFT);
+        $dvNosso    = substr($nossoSemDv, -1);
+        $nossoField = str_pad($numTitulo . $dvNosso, 10, '0', STR_PAD_LEFT) . '01' . str_pad($config['carteira_codigo'] ?? '1', 2, '0', STR_PAD_LEFT) . '4' . str_repeat(' ', 5);
+        $vencDt    = date('dmY', strtotime($t['vencimento']));
+        $emissaoDt = date('dmY', strtotime($t['boleto_registrado_em'] ?? 'now'));
+        $jurosDt   = date('dmY', strtotime($t['vencimento'] . ' +1 day'));
+        $multaDt   = date('dmY', strtotime($t['vencimento'] . ' +1 day'));
+        $valorCt   = str_pad(number_format($t['valor_total'], 2, '', ''), 15, '0', STR_PAD_LEFT);
+        $jurosDia  = str_pad(number_format($config['juros_valor'] ?? 0, 5, '', ''), 15, '0', STR_PAD_LEFT);
+        $multaVal  = str_pad(number_format($config['multa_valor'] ?? 0, 2, '', ''), 15, '0', STR_PAD_LEFT);
+        $numDoc    = str_pad($numTitulo . '01', 15);
+        $seqPad    = str_pad($seqReg, 5, '0', STR_PAD_LEFT);
+        $p  = $banco . '0001' . '3' . $seqPad . 'P' . ' ' . '01';
+        $p .= $agencia . ' ' . $conta . $contaDv . ' ' . $nossoField;
+        $p .= ($config['carteira_codigo'] ?? '1') . '0' . ' ' . '2' . '2';
+        $p .= $numDoc . $vencDt . $valorCt . '00000' . ' ' . '02' . 'N';
+        $p .= $emissaoDt . '2' . $jurosDt . $jurosDia;
+        $p .= '0' . '00000000' . str_repeat('0', 15) . str_repeat('0', 15) . str_repeat('0', 15);
+        $p .= str_pad($numDoc, 25) . '3' . str_pad($config['prazo_protesto'] ?? '30', 2, '0', STR_PAD_LEFT);
+        $p .= '0' . '   ' . '09' . '0000000000' . ' ';
+        $linhas[] = substr($p, 0, 240);
         $seqReg++;
-
-        // Segmento Q
-        $segQ  = str_pad($banco, 3);
-        $segQ .= '0001';
-        $segQ .= '3';
-        $segQ .= str_pad($seqReg, 5, '0', STR_PAD_LEFT);
-        $segQ .= 'Q';
-        $segQ .= ' ';
-        $segQ .= '01';
-        $segQ .= strlen($cnpjCli) === 11 ? '1' : '2';
-        $segQ .= str_pad($cnpjCli, 15, '0', STR_PAD_LEFT);
-        $segQ .= $nomeCli;
-        $segQ .= str_pad(mb_strtoupper(substr($t['logradouro'] ?? '', 0, 40)), 40);
-        $segQ .= str_pad('', 15);
-        $segQ .= str_pad(preg_replace('/\D/', '', $t['cep'] ?? ''), 8, '0', STR_PAD_LEFT);
-        $segQ .= str_pad(mb_strtoupper(substr($t['municipio'] ?? '', 0, 15)), 15);
-        $segQ .= str_pad(strtoupper($t['uf'] ?? ''), 2);
-        $segQ .= '0';
-        $segQ .= str_repeat('0', 15);
-        $segQ .= str_pad('', 30);
-        $segQ .= str_repeat(' ', 10);
-        $linhas[] = substr($segQ, 0, 240);
+        $seqPad = str_pad($seqReg, 5, '0', STR_PAD_LEFT);
+        $q  = $banco . '0001' . '3' . $seqPad . 'Q' . ' ' . '01';
+        $q .= $tpInscCli . '0' . $cnpjCli . $nomeCli . $endCli . $numCli . $complCli . $bairroCli . $cepCli . $cidCli . $ufCli;
+        $q .= '0' . str_repeat('0', 15) . str_repeat(' ', 30) . '000' . str_repeat(' ', 28);
+        $linhas[] = substr($q, 0, 240);
         $seqReg++;
-
-        // Marcar como em remessa
-        $pdo->prepare("UPDATE financeiro SET boleto_remessa_numero = ? WHERE id = ?")
-            ->execute([$numRemessa, $t['id']]);
+        $seqPad = str_pad($seqReg, 5, '0', STR_PAD_LEFT);
+        $r  = $banco . '0001' . '3' . $seqPad . 'R' . ' ' . '01';
+        $r .= '0' . '00000000' . str_repeat('0', 15) . '0' . '00000000' . str_repeat('0', 15);
+        $r .= '1' . $multaDt . $multaVal . str_repeat(' ', 10) . str_repeat(' ', 40) . str_repeat(' ', 40);
+        $r .= str_repeat(' ', 20) . '00000000' . '000' . '00000' . ' ' . str_repeat('0', 12) . ' ' . ' ' . '0' . str_repeat(' ', 9);
+        $linhas[] = substr($r, 0, 240);
+        $seqReg++;
+        $seqPad = str_pad($seqReg, 5, '0', STR_PAD_LEFT);
+        $dtJuros2 = date('d/m/Y', strtotime($t['vencimento'] . ' +1 day'));
+        $dtMulta2 = date('d/m/Y', strtotime($t['vencimento'] . ' +1 day'));
+        $pctJuros = number_format($config['juros_valor'] ?? 0, 2, ',', '');
+        $pctMulta = number_format($config['multa_valor'] ?? 0, 2, ',', '');
+        $msg5 = str_pad("A PARTIR $dtJuros2 JUROS $pctJuros% AO DIA", 40);
+        $msg6 = str_pad("A PARTIR $dtMulta2 MULTA $pctMulta%", 40);
+        $msg7 = str_pad("NAO CONCEDER DESCONTO", 40);
+        $s  = $banco . '0001' . '3' . $seqPad . 'S' . ' ' . '01' . '3';
+        $s .= substr($msg5, 0, 40) . substr($msg6, 0, 40) . substr($msg7, 0, 40);
+        $s .= str_repeat(' ', 40) . str_repeat(' ', 40) . str_repeat(' ', 22);
+        $linhas[] = substr($s, 0, 240);
+        $seqReg++;
+        $pdo->prepare("UPDATE financeiro SET boleto_remessa_numero = ? WHERE id = ?")->execute([$numRemessa, $t['id']]);
     }
-
-    // ── TRAILER DE LOTE ──
-    $tlote  = str_pad($banco, 3);
-    $tlote .= '0001';
-    $tlote .= '5';
-    $tlote .= str_repeat(' ', 9);
-    $tlote .= str_pad($seqReg - 1 + 2, 6, '0', STR_PAD_LEFT); // qtd registros lote
-    $tlote .= str_pad(count($titulos), 6, '0', STR_PAD_LEFT);
-    $tlote .= str_repeat('0', 17);
-    $tlote .= str_pad(number_format(array_sum(array_column($titulos, 'valor_total')), 2, '', ''), 18, '0', STR_PAD_LEFT);
-    $tlote .= str_repeat(' ', 31);
-    $tlote .= str_repeat(' ', 117);
-    $linhas[] = substr($tlote, 0, 240);
-
-    // ── TRAILER DE ARQUIVO ──
-    $tarq  = str_pad($banco, 3);
-    $tarq .= '9999';
-    $tarq .= '9';
-    $tarq .= str_repeat(' ', 9);
-    $tarq .= str_pad($totalLotes, 6, '0', STR_PAD_LEFT);
-    $tarq .= str_pad(count($linhas) + 1, 6, '0', STR_PAD_LEFT);
-    $tarq .= str_repeat('0', 6);
-    $tarq .= str_repeat(' ', 205);
-    $linhas[] = substr($tarq, 0, 240);
-
+    $qtdRegLote = 2 + ($totalTit * 4);
+    $vlTotalCent = str_pad(number_format($valorTotal, 2, '', ''), 17, '0', STR_PAD_LEFT);
+    $tl  = $banco . '0001' . '5' . str_repeat(' ', 9);
+    $tl .= str_pad($qtdRegLote, 6, '0', STR_PAD_LEFT) . str_pad($totalTit, 6, '0', STR_PAD_LEFT) . $vlTotalCent;
+    $tl .= str_repeat('0', 6) . str_repeat('0', 17) . str_repeat('0', 6) . str_repeat('0', 17) . str_repeat('0', 6) . str_repeat('0', 17);
+    $tl .= str_repeat(' ', 8) . str_repeat(' ', 117);
+    $linhas[] = substr($tl, 0, 240);
+    $qtdRegArq = count($linhas) + 1;
+    $ta  = $banco . '9999' . '9' . str_repeat(' ', 9);
+    $ta .= '000001' . str_pad($qtdRegArq, 6, '0', STR_PAD_LEFT) . '000000' . str_repeat(' ', 205);
+    $linhas[] = substr($ta, 0, 240);
     $conteudo = implode("\r\n", $linhas) . "\r\n";
     $nomeArq  = 'REMESSA' . str_pad($numRemessa, 6, '0', STR_PAD_LEFT) . '.REM';
-
-    // Salvar remessa
-    $pdo->prepare("INSERT INTO cobranca_remessas (empresa_id, banco_codigo, numero_remessa, total_titulos, valor_total, arquivo_nome, arquivo_conteudo, status, usuario_id) VALUES (?,?,?,?,?,?,?,'gerada',?)")
-        ->execute([
-            $empresaId, $config['banco_codigo'], $numRemessa,
-            count($titulos),
-            array_sum(array_column($titulos, 'valor_total')),
-            $nomeArq, $conteudo, $usuarioId ?? null
-        ]);
-
-    echo json_encode([
-        'success'    => true,
-        'arquivo'    => $nomeArq,
-        'conteudo'   => base64_encode($conteudo),
-        'remessa_id' => $pdo->lastInsertId(),
-        'total'      => count($titulos),
-    ]);
+    $pdo->prepare("INSERT INTO cobranca_remessas (empresa_id, banco_codigo, numero_remessa, total_titulos, valor_total, arquivo_nome, arquivo_conteudo, status, usuario_id) VALUES (?,?,?,?,?,?,?,'gerada',?)")->execute([$empresaId, $config['banco_codigo'], $numRemessa, $totalTit, $valorTotal, $nomeArq, $conteudo, $usuarioId ?? null]);
+    echo json_encode(['success' => true, 'arquivo' => $nomeArq, 'conteudo' => base64_encode($conteudo), 'remessa_id' => $pdo->lastInsertId(), 'total' => $totalTit]);
     exit;
 }
 
