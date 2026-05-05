@@ -138,6 +138,15 @@ switch ($action) {
         }
         break;
 
+    case 'fin_ids_por_lancamento':
+        $lancId = (int)($_GET['lancamento_id'] ?? 0);
+        if (!$lancId) { echo json_encode(['ids' => []]); break; }
+        $stmt = $pdo->prepare("SELECT id FROM financeiro WHERE lancamento_id=? AND empresa_id=? AND boleto_status='registrado' ORDER BY parcela_numero ASC");
+        $stmt->execute([$lancId, $empresaId]);
+        $ids = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'id');
+        echo json_encode(['ids' => $ids]);
+        break;
+
     case 'fin_lancar_parcelado':
         $data = json_decode(file_get_contents('php://input'), true);
         if (!$data) { echo json_encode(['success' => false, 'message' => 'Dados inválidos']); break; }
@@ -163,6 +172,7 @@ switch ($action) {
         try {
             $pdo->beginTransaction();
             $idsCriados = [];
+            $lancamentoId = null;
 
             if (is_array($parcelasCustom) && count($parcelasCustom) > 0) {
                 $totalParcelas = count($parcelasCustom);
@@ -170,10 +180,12 @@ switch ($action) {
                     $valorP = (float)($p['valor'] ?? 0);
                     $vencP  = $p['vencimento'] ?? $primeiroVenc;
                     $stmt = $pdo->prepare("INSERT INTO financeiro
-                        (empresa_id, tipo, status, entidade_id, valor_total, vencimento, parcela_numero, parcela_total, forma_pagamento_prevista, categoria, observacoes)
-                        VALUES (?, ?, 'Pendente', ?, ?, ?, ?, ?, ?, ?, ?)");
-                    $stmt->execute([$empresaId, $tipo, $entidadeId, $valorP, $vencP, $idx+1, $totalParcelas, $formaPgto, $categoria, $observacoes]);
-                    $idsCriados[] = (int)$pdo->lastInsertId();
+                        (empresa_id, tipo, status, entidade_id, valor_total, vencimento, parcela_numero, parcela_total, forma_pagamento_prevista, categoria, observacoes, lancamento_id)
+                        VALUES (?, ?, 'Pendente', ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    $stmt->execute([$empresaId, $tipo, $entidadeId, $valorP, $vencP, $idx+1, $totalParcelas, $formaPgto, $categoria, $observacoes, $lancamentoId]);
+                    $novoId = (int)$pdo->lastInsertId();
+                    $idsCriados[] = $novoId;
+                    if ($lancamentoId === null) { $lancamentoId = $novoId; $pdo->prepare("UPDATE financeiro SET lancamento_id=? WHERE id=?")->execute([$lancamentoId, $novoId]); }
                 }
             } else {
                 // Gera parcelas iguais
@@ -185,10 +197,12 @@ switch ($action) {
                     $valorP = ($i === $numParcelas) ? $ultimaParcela : $valorParcela;
                     $vencP = date('Y-m-d', strtotime($primeiroVenc . " +" . (($i-1) * $intervaloDias) . " days"));
                     $stmt = $pdo->prepare("INSERT INTO financeiro
-                        (empresa_id, tipo, status, entidade_id, valor_total, vencimento, parcela_numero, parcela_total, forma_pagamento_prevista, categoria, observacoes)
-                        VALUES (?, ?, 'Pendente', ?, ?, ?, ?, ?, ?, ?, ?)");
-                    $stmt->execute([$empresaId, $tipo, $entidadeId, $valorP, $vencP, $i, $numParcelas, $formaPgto, $categoria, $observacoes]);
-                    $idsCriados[] = (int)$pdo->lastInsertId();
+                        (empresa_id, tipo, status, entidade_id, valor_total, vencimento, parcela_numero, parcela_total, forma_pagamento_prevista, categoria, observacoes, lancamento_id)
+                        VALUES (?, ?, 'Pendente', ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    $stmt->execute([$empresaId, $tipo, $entidadeId, $valorP, $vencP, $i, $numParcelas, $formaPgto, $categoria, $observacoes, $lancamentoId]);
+                    $novoId = (int)$pdo->lastInsertId();
+                    $idsCriados[] = $novoId;
+                    if ($lancamentoId === null) { $lancamentoId = $novoId; $pdo->prepare("UPDATE financeiro SET lancamento_id=? WHERE id=?")->execute([$lancamentoId, $novoId]); }
                 }
             }
 

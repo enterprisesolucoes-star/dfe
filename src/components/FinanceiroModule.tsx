@@ -148,6 +148,14 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm }: { tip
       if ((await res.json()).success) { fetchTitulos(); }
     });
   };
+  const imprimirLote = async (lancamentoId: number) => {
+    const res = await fetch(`./api.php?action=fin_ids_por_lancamento&lancamento_id=${lancamentoId}`);
+    const data = await res.json();
+    if (data.ids && data.ids.length > 0) {
+      data.ids.forEach((id: number) => window.open(`./api.php?action=boleto_imprimir&id=${id}`, '_blank'));
+    }
+  };
+
   const handleEstornar = (id: number) => {
     showConfirm('Estornar Recebimento', 'Esta ação irá reverter o pagamento e remover o lançamento do caixa. Deseja continuar?', async () => {
       const res = await fetch('./api.php?action=fin_estornar_titulo', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ id }) });
@@ -235,6 +243,9 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm }: { tip
                       t.boleto_status === 'registrado'
                         ? <button onClick={() => setBoletoTitulo({ ...t, _modo: 'visualizar' })} className="p-1.5 text-gray-400 hover:text-indigo-600" title="Ver Boleto"><FileText className="w-3.5 h-3.5" /></button>
                         : <button onClick={() => setBoletoTitulo({ ...t, _modo: 'gerar' })} className="p-1.5 text-gray-400 hover:text-indigo-600" title="Gerar Boleto"><FileText className="w-3.5 h-3.5" /></button>
+                    )}
+                    {tipo === 'R' && t.lancamento_id && t.parcela_total > 1 && t.boleto_status === 'registrado' && (
+                      <button onClick={() => imprimirLote(t.lancamento_id)} className="p-1.5 text-gray-400 hover:text-purple-600" title="Imprimir Lote"><ExternalLink className="w-3.5 h-3.5" /></button>
                     )}
                     {t.status === 'Pago' && <button onClick={() => handleEstornar(t.id)} className="p-1.5 text-gray-400 hover:text-amber-600" title="Estornar"><RotateCcw className="w-3.5 h-3.5" /></button>}
                     <button onClick={() => handleExcluir(t.id)} className="p-1.5 text-gray-400 hover:text-red-600" title="Excluir"><Trash2 className="w-3.5 h-3.5" /></button>
@@ -434,9 +445,13 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
       } catch { erro++; }
     }
     setGerandoBoletos(false);
-    if (erro === 0) showAlert('Sucesso', `${ok} boleto(s) gerado(s) com sucesso!`);
-    else showAlert('Atenção', `${ok} gerado(s), ${erro} com erro. Verifique configurações de cobrança.`);
-    onSuccess();
+    if (erro === 0) {
+      // Abre impressão de todos os boletos gerados
+      savedIds.forEach(id => window.open(`./api.php?action=boleto_imprimir&id=${id}`, '_blank'));
+    } else {
+      showAlert('Atenção', `${ok} gerado(s), ${erro} com erro. Verifique configurações de cobrança.`);
+      onSuccess();
+    }
   };
 
   const clienteSelecionado = clientes.find(c => String(c.id) === String(clienteId));
@@ -471,7 +486,7 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
               className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 text-white font-bold uppercase text-xs rounded-xl flex items-center justify-center gap-2">
               {gerandoBoletos
                 ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Gerando...</>
-                : <><FileText className="w-3.5 h-3.5" /> Gerar Boletos</>}
+                : <><FileText className="w-3.5 h-3.5" /> Gerar e Imprimir Todos</>}
             </button>
           </div>
         </motion.div>

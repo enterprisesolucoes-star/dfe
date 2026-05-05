@@ -152,33 +152,18 @@ if ($action === 'salvar_pedido_completo') {
             // Financeiro (formas a prazo)
             if (in_array($forma, $formasReceber)) {
                 if (!empty($vencimentos)) {
+                    $lancIdPed1 = null;
                     foreach ($vencimentos as $v) {
-                        $pdo->prepare("
-                            INSERT INTO financeiro
-                                (empresa_id, venda_id, tipo, status, valor_total, vencimento,
-                                 parcela_numero, parcela_total, forma_pagamento_prevista,
-                                 entidade_id, categoria)
-                            VALUES (?, ?, 'R', 'Pendente', ?, ?, ?, ?, ?, ?, 'Pedido')
-                        ")->execute([
-                            $empresaId, $vendaId,
-                            (float)$v['valor'],
-                            $v['vencimento'],
-                            (int)$v['numero'],
-                            count($vencimentos),
-                            $forma,
-                            $clienteId
-                        ]);
+                        $stmtPed1 = $pdo->prepare("INSERT INTO financeiro (empresa_id, venda_id, tipo, status, valor_total, vencimento, parcela_numero, parcela_total, forma_pagamento_prevista, entidade_id, categoria, lancamento_id) VALUES (?, ?, 'R', 'Pendente', ?, ?, ?, ?, ?, ?, 'Pedido', ?)");
+                        $stmtPed1->execute([$empresaId, $vendaId, (float)$v['valor'], $v['vencimento'], (int)$v['numero'], count($vencimentos), $forma, $clienteId, $lancIdPed1]);
+                        $nIdPed1 = (int)$pdo->lastInsertId();
+                        if ($lancIdPed1 === null) { $lancIdPed1 = $nIdPed1; $pdo->prepare("UPDATE financeiro SET lancamento_id=? WHERE id=?")->execute([$lancIdPed1, $nIdPed1]); }
+                        if ($forma === '15') $boletoIdsPed[] = $nIdPed1;
                     }
                 } else {
                     // Sem parcelamento: vencimento em 30 dias
                     $venc = date('Y-m-d', strtotime('+30 days'));
-                    $pdo->prepare("
-                        INSERT INTO financeiro
-                            (empresa_id, venda_id, tipo, status, valor_total, vencimento,
-                             parcela_numero, parcela_total, forma_pagamento_prevista,
-                             entidade_id, categoria)
-                        VALUES (?, ?, 'R', 'Pendente', ?, ?, 1, 1, ?, ?, 'Pedido')
-                    ")->execute([$empresaId, $vendaId, $valor, $venc, $forma, $clienteId]);
+                    $pdo->prepare("INSERT INTO financeiro (empresa_id, venda_id, tipo, status, valor_total, vencimento, parcela_numero, parcela_total, forma_pagamento_prevista, entidade_id, categoria, lancamento_id) VALUES (?, ?, 'R', 'Pendente', ?, ?, 1, 1, ?, ?, 'Pedido', NULL)")->execute([$empresaId, $vendaId, $valor, $venc, $forma, $clienteId]);
                 }
             }
         }
@@ -357,12 +342,15 @@ if ($action === 'atualizar_pedido') {
                 if (in_array($forma, $formasReceber)) {
                     $vencimentos = $pag['vencimentos'] ?? [];
                     if (!empty($vencimentos)) {
+                        $lancIdPed2 = null;
                         foreach ($vencimentos as $v) {
-                            $pdo->prepare("INSERT INTO financeiro (empresa_id, venda_id, tipo, status, valor_total, vencimento, parcela_numero, parcela_total, forma_pagamento_prevista, entidade_id, categoria) VALUES (?,?,'R','Pendente',?,?,?,?,?,?,'Pedido')")
-                                ->execute([$empresaId, $id, (float)$v['valor'], $v['vencimento'], (int)$v['numero'], count($vencimentos), $forma, $clienteId]);
+                            $stmtPed2 = $pdo->prepare("INSERT INTO financeiro (empresa_id, venda_id, tipo, status, valor_total, vencimento, parcela_numero, parcela_total, forma_pagamento_prevista, entidade_id, categoria, lancamento_id) VALUES (?,?,'R','Pendente',?,?,?,?,?,?,'Pedido',?)");
+                            $stmtPed2->execute([$empresaId, $id, (float)$v['valor'], $v['vencimento'], (int)$v['numero'], count($vencimentos), $forma, $clienteId, $lancIdPed2]);
+                            $nIdPed2 = (int)$pdo->lastInsertId();
+                            if ($lancIdPed2 === null) { $lancIdPed2 = $nIdPed2; $pdo->prepare("UPDATE financeiro SET lancamento_id=? WHERE id=?")->execute([$lancIdPed2, $nIdPed2]); }
                         }
                     } else {
-                        $pdo->prepare("INSERT INTO financeiro (empresa_id, venda_id, tipo, status, valor_total, vencimento, parcela_numero, parcela_total, forma_pagamento_prevista, entidade_id, categoria) VALUES (?,?,'R','Pendente',?,?,1,1,?,?,'Pedido')")
+                        $pdo->prepare("INSERT INTO financeiro (empresa_id, venda_id, tipo, status, valor_total, vencimento, parcela_numero, parcela_total, forma_pagamento_prevista, entidade_id, categoria, lancamento_id) VALUES (?,?,'R','Pendente',?,?,1,1,?,?,'Pedido',NULL)")
                             ->execute([$empresaId, $id, $valor, date('Y-m-d', strtotime('+30 days')), $forma, $clienteId]);
                     }
                 }

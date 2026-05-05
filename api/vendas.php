@@ -377,10 +377,14 @@ switch ($action) {
 
                     if (!empty($parcelas)) {
                         $totalParts = count($parcelas);
+                        $lancIdNfce = null;
+                        $clienteIdFin = $venda['clienteId'] ?? $venda['destinatario']['id'] ?? null;
                         foreach ($parcelas as $p) {
-                            $stmtFin = $pdo->prepare("INSERT INTO financeiro (empresa_id, venda_id, tipo, status, valor_total, vencimento, parcela_numero, parcela_total, forma_pagamento_prevista, entidade_id, categoria) VALUES (?, ?, 'R', 'Pendente', ?, ?, ?, ?, ?, ?, 'Venda NFC-e')");
-                            $clienteIdFin = $venda['clienteId'] ?? $venda['destinatario']['id'] ?? null;
-                            $stmtFin->execute([$empresaDb['id'], $vendaId, $p['valor'], $p['vencimento'], $p['numero'], $totalParts, $fPag, $clienteIdFin]);
+                            $stmtFin = $pdo->prepare("INSERT INTO financeiro (empresa_id, venda_id, tipo, status, valor_total, vencimento, parcela_numero, parcela_total, forma_pagamento_prevista, entidade_id, categoria, lancamento_id) VALUES (?, ?, 'R', 'Pendente', ?, ?, ?, ?, ?, ?, 'Venda NFC-e', ?)");
+                            $stmtFin->execute([$empresaDb['id'], $vendaId, $p['valor'], $p['vencimento'], $p['numero'], $totalParts, $fPag, $clienteIdFin, $lancIdNfce]);
+                            $novoIdNfce = (int)$pdo->lastInsertId();
+                            if ($lancIdNfce === null) { $lancIdNfce = $novoIdNfce; $pdo->prepare("UPDATE financeiro SET lancamento_id=? WHERE id=?")->execute([$lancIdNfce, $novoIdNfce]); }
+                            if ($fPag === '15') $boletoIdsNfce[] = $novoIdNfce;
                         }
                     } elseif ($contaIdFin) {
                         $hist = "Venda NFC-e #" . $venda['numero'];
@@ -397,7 +401,8 @@ switch ($action) {
                     'status' => $statusSalvar,
                     'protocolo' => $resultado->protocolo,
                     'chaveAcesso' => $chaveAcesso,
-                    'xml' => base64_encode($resultado->xml_assinado)
+                    'xml' => base64_encode($resultado->xml_assinado),
+                    'boletoIds' => $boletoIdsNfce ?? [],
                 ]);
             } else {
                 $statusRej = ($resultado->status ?? 'Rejeitada');
@@ -484,13 +489,17 @@ switch ($action) {
                     }
                     $totalParts = count($parcelas);
                     $clienteIdFin = $venda['destinatario']['id'] ?? null;
+                    $lancIdPedido = null;
                     foreach ($parcelas as $p) {
-                        $pdo->prepare("INSERT INTO financeiro (empresa_id, venda_id, tipo, status, valor_total, vencimento, parcela_numero, parcela_total, forma_pagamento_prevista, entidade_id, categoria) VALUES (?,?,'R','Pendente',?,?,?,?,?,?,'Pedido')")
-                            ->execute([$empresaId, $vendaId, $p['valor'], $p['vencimento'], $p['numero'], $totalParts, $fPag, $clienteIdFin]);
+                        $stmtPed = $pdo->prepare("INSERT INTO financeiro (empresa_id, venda_id, tipo, status, valor_total, vencimento, parcela_numero, parcela_total, forma_pagamento_prevista, entidade_id, categoria, lancamento_id) VALUES (?,?,'R','Pendente',?,?,?,?,?,?,'Pedido',?)");
+                        $stmtPed->execute([$empresaId, $vendaId, $p['valor'], $p['vencimento'], $p['numero'], $totalParts, $fPag, $clienteIdFin, $lancIdPedido]);
+                        $novoIdPed = (int)$pdo->lastInsertId();
+                        if ($lancIdPedido === null) { $lancIdPedido = $novoIdPed; $pdo->prepare("UPDATE financeiro SET lancamento_id=? WHERE id=?")->execute([$lancIdPedido, $novoIdPed]); }
+                        if ($fPag === '15') $boletoIdsPedido[] = $novoIdPed;
                     }
                 }
             }
-            $pdo->commit();
+            echo json_encode(['success'=>true,'numero'=>$numPedido,'vendaId'=>$vendaId,'boletoIds'=>$boletoIdsPedido??[]]);
             echo json_encode(['success'=>true,'numero'=>$numPedido,'vendaId'=>$vendaId]);
         } catch (Exception $e) {
             $pdo->rollBack();

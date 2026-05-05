@@ -3,7 +3,7 @@ import {
   Search, Plus, Trash2, User, Package, Truck, CreditCard,
   CheckCircle, AlertCircle, ChevronRight, Save, X, CalendarDays,
   UserCheck, RefreshCw, Eye, Printer, Mail, Edit, MessageCircle,
-  AlertTriangle
+  AlertTriangle, FileText
 } from 'lucide-react';
 import { motion } from 'motion/react';
 
@@ -50,6 +50,8 @@ export const PedidoTab = ({ produtos, clientes, vendedores, emitente, showAlert,
   const [activeTab, setActiveTab] = useState<'identificacao'|'produtos'|'transporte'|'pagamento'>('identificacao');
   const [salvando, setSalvando]   = useState(false);
   const [pedidoSalvo, setPedidoSalvo] = useState<any>(null);
+  const [boletoIdsPedido, setBoletoIdsPedido] = useState<number[]>([]);
+  const [gerandoBoletosPedido, setGerandoBoletosPedido] = useState(false);
 
   const [clienteSel, setClienteSel]     = useState<Cliente | null>(null);
   const [buscaCliente, setBuscaCliente] = useState('');
@@ -336,6 +338,7 @@ ${v.observacao?`<div style="border:1px solid #ddd;border-radius:4px;padding:10px
       try { data = JSON.parse(text); } catch { showAlert('Erro', 'Resposta inválida: ' + text.substring(0, 200)); setSalvando(false); return; }
       if (data.success) {
         setPedidoSalvo({ ...payload, numero: data.numero, id: data.id, data: new Date().toLocaleString('pt-BR') });
+        if (data.boletoIds && data.boletoIds.length > 0) setBoletoIdsPedido(data.boletoIds);
         setModo('sucesso');
         carregarPedidos();
       } else showAlert('Erro', data.message || 'Erro ao salvar pedido.');
@@ -531,10 +534,29 @@ ${observacao?`<div style="border:1px solid #ddd;border-radius:4px;padding:10px;m
         <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-8 text-xs text-amber-700 font-medium">
           ⚠ Este documento não tem valor fiscal
         </div>
-        <div className="flex gap-3 justify-center">
+        <div className="flex gap-3 justify-center flex-wrap">
           <button onClick={handleImprimir} className="px-8 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow flex items-center gap-2">
             <Printer className="w-4 h-4" /> Imprimir (A4)
           </button>
+          {boletoIdsPedido.length > 0 && (
+            <button disabled={gerandoBoletosPedido} onClick={async () => {
+              setGerandoBoletosPedido(true);
+              let ok = 0;
+              for (const id of boletoIdsPedido) {
+                try {
+                  const r = await fetch('./api.php?action=boleto_gerar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ financeiro_id: id }) });
+                  const d = await r.json();
+                  if (d.success) ok++;
+                } catch {}
+              }
+              setGerandoBoletosPedido(false);
+              if (ok > 0) boletoIdsPedido.forEach(id => window.open(`./api.php?action=boleto_imprimir&id=${id}`, '_blank'));
+              setBoletoIdsPedido([]);
+            }} className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 text-white rounded-xl font-bold shadow flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              {gerandoBoletosPedido ? 'Gerando...' : `Gerar ${boletoIdsPedido.length} Boleto(s)`}
+            </button>
+          )}
           <button onClick={iniciarNovo} className="px-8 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 flex items-center gap-2">
             <Plus className="w-4 h-4" /> Novo Pedido
           </button>

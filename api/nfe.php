@@ -240,9 +240,13 @@ switch ($action) {
                     if (!empty($vencimentos)) {
                         // Parcelas em contas a receber
                         $totalParts = count($vencimentos);
+                        $lancIdNfe = null;
                         foreach ($vencimentos as $p) {
-                            $stmtFin = $pdo->prepare("INSERT INTO financeiro (empresa_id, venda_id, tipo, status, valor_total, vencimento, parcela_numero, parcela_total, forma_pagamento_prevista, entidade_id, categoria) VALUES (?, ?, 'R', 'Pendente', ?, ?, ?, ?, ?, ?, 'Venda NF-e')");
-                            $stmtFin->execute([$empresaDb['id'], $vendaId, $p['valor'], $p['vencimento'], $p['numero'], $totalParts, $fPag, $clienteId]);
+                            $stmtFin = $pdo->prepare("INSERT INTO financeiro (empresa_id, venda_id, tipo, status, valor_total, vencimento, parcela_numero, parcela_total, forma_pagamento_prevista, entidade_id, categoria, lancamento_id) VALUES (?, ?, 'R', 'Pendente', ?, ?, ?, ?, ?, ?, 'Venda NF-e', ?)");
+                            $stmtFin->execute([$empresaDb['id'], $vendaId, $p['valor'], $p['vencimento'], $p['numero'], $totalParts, $fPag, $clienteId, $lancIdNfe]);
+                            $novoIdNfe = (int)$pdo->lastInsertId();
+                            if ($lancIdNfe === null) { $lancIdNfe = $novoIdNfe; $pdo->prepare("UPDATE financeiro SET lancamento_id=? WHERE id=?")->execute([$lancIdNfe, $novoIdNfe]); }
+                            if ($fPag === '15') $boletoIdsNfe[] = $novoIdNfe;
                         }
                     } elseif ($contaIdFin) {
                         // Pagamento à vista: lança no caixa
@@ -262,7 +266,8 @@ switch ($action) {
                     'protocolo'   => $resultado->protocolo ?? '',
                     'chaveAcesso' => $chaveAcesso,
                     'xml'         => base64_encode($resultado->xml_assinado ?? '')
-                ]);
+                    'xml'         => base64_encode($resultado->xml_assinado ?? ''),
+                    'boletoIds'   => $boletoIdsNfe ?? [],
             } else {
                 $pdo->prepare("UPDATE vendas SET status = 'Rejeitada' WHERE id = ?")->execute([$vendaId]);
                 $pdo->commit();

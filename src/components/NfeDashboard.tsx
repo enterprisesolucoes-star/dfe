@@ -171,6 +171,8 @@ const NfeDashboard: React.FC<Props> = ({
   // Emissão
   const [emitindo, setEmitindo] = useState(false);
   const [resultadoEmissao, setResultadoEmissao] = useState<{ sucesso: boolean; msg: string; chave?: string; protocolo?: string; numero?: number; xml?: string } | null>(null);
+  const [boletoIdsEmissao, setBoletoIdsEmissao] = useState<number[]>([]);
+  const [gerandoBoletosNfe, setGerandoBoletosNfe] = useState(false);
   const [xmlCopiado, setXmlCopiado] = useState(false);
 
   // TEF (SMARTPOS) — para NF-e: ativa se SMARTPOS estiver configurado, independente do estado
@@ -446,6 +448,7 @@ const NfeDashboard: React.FC<Props> = ({
 
       if (data.success) {
         setResultadoEmissao({ sucesso: true, msg: 'NF-e emitida com sucesso!', chave: data.chaveAcesso, protocolo: data.protocolo, numero: data.numero, xml: data.xml });
+        if (data.boletoIds && data.boletoIds.length > 0) setBoletoIdsEmissao(data.boletoIds);
         resetFormulario();
         if (onEmitted) onEmitted(data.chaveAcesso, data.id);
       } else {
@@ -519,6 +522,34 @@ const NfeDashboard: React.FC<Props> = ({
         )}
         {resultadoEmissao?.protocolo && (
           <p className="text-gray-600 text-xs">Protocolo: {resultadoEmissao.protocolo} | Nº {resultadoEmissao.numero}</p>
+        )}
+        {resultadoEmissao?.sucesso && boletoIdsEmissao.length > 0 && (
+          <div className="mt-3 pt-3 border-t border-current/20 flex gap-3">
+            <button
+              disabled={gerandoBoletosNfe}
+              onClick={async () => {
+                setGerandoBoletosNfe(true);
+                let ok = 0;
+                for (const id of boletoIdsEmissao) {
+                  try {
+                    const r = await fetch('./api.php?action=boleto_gerar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ financeiro_id: id }) });
+                    const d = await r.json();
+                    if (d.success) ok++;
+                  } catch {}
+                }
+                setGerandoBoletosNfe(false);
+                if (ok > 0) boletoIdsEmissao.forEach(id => window.open(`./api.php?action=boleto_imprimir&id=${id}`, '_blank'));
+                setBoletoIdsEmissao([]);
+              }}
+              className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 text-white font-bold text-xs uppercase px-3 py-1.5 rounded-xl transition-all"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              {gerandoBoletosNfe ? 'Gerando...' : `Gerar e Imprimir ${boletoIdsEmissao.length} Boleto(s)`}
+            </button>
+            <button onClick={() => setBoletoIdsEmissao([])} className="text-xs text-gray-500 hover:text-gray-700 font-bold uppercase">
+              Depois
+            </button>
+          </div>
         )}
         {resultadoEmissao?.xml && (
           <div className="flex items-center gap-4 mt-3 pt-3 border-t border-current/20">
