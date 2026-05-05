@@ -111,11 +111,11 @@ if ($action === 'boleto_gerar') {
     // ── Montagem Sicoob - algoritmo VBA exato ───────────────────────────────
     $banco      = '756';
     $moeda      = '9';
-    $carteira   = preg_replace('/\D/', '', $config['carteira_codigo'] ?? '1'); // 1 digito
-    $agencia    = str_pad(preg_replace('/\D/', '', $config['agencia']),  4, '0', STR_PAD_LEFT);
+    $carteira   = preg_replace('/\D/', '', $config['carteira_codigo'] ?? '1');
+    $agencia    = str_pad(preg_replace('/\D/', '', $config['agencia']), 4, '0', STR_PAD_LEFT);
     $modalidade = str_pad(preg_replace('/\D/', '', $config['carteira_codigo'] ?? '1'), 2, '0', STR_PAD_LEFT);
     $convenio   = str_pad(preg_replace('/\D/', '', $config['convenio']), 7, '0', STR_PAD_LEFT);
-    $seq7       = str_pad($nossoNumero, 7, '0', STR_PAD_LEFT);
+    $nosso7     = str_pad($nossoNumero, 7, '0', STR_PAD_LEFT);
     $parcela    = '001';
 
     // Fator de vencimento
@@ -129,55 +129,54 @@ if ($action === 'boleto_gerar') {
     // Valor (10 digitos)
     $valorCent = str_pad(number_format($titulo['valor_total'], 2, '', ''), 10, '0', STR_PAD_LEFT);
 
-    // Sequencia base (42 digitos) - VBA exato:
+    // Sequencia base (42 digitos)
     // BANCO(3)+MOEDA(1)+FATOR(4)+VALOR(10)+CARTEIRA(1)+AGENCIA(4)+MODALIDADE(2)+CONVENIO(7)+NOSSO(7)+PARCELA(3)
-    $sequencia = $banco.$moeda.$fatorVenc.$valorCent.$carteira.$agencia.$modalidade.$convenio.$seq7.$parcela;
+    $sequencia = $banco.$moeda.$fatorVenc.$valorCent.$carteira.$agencia.$modalidade.$convenio.$nosso7.$parcela;
 
-    // VBA: Seq0 = Mid(seq,20,4) & Format(Mid(seq,26,7),"0000000000") & Mid(seq,33,7)
-    // PHP base 0: substr(19,4) & str_pad(substr(25,7),10,'0',LEFT) & substr(32,7)
+    // Seq0 = Mid(seq,20,4) & Format(Mid(seq,26,7),"0000000000") & Mid(seq,33,7)
     $seq0 = substr($sequencia,19,4) . str_pad(substr($sequencia,25,7),10,'0',STR_PAD_LEFT) . substr($sequencia,32,7);
-    $fatores = [3,7,9,1]; $total=0; $fi=0;
-    for ($i=strlen($seq0)-1; $i>=0; $i--) { $total += (int)$seq0[$i] * $fatores[$fi%4]; $fi++; }
-    $resto = $total % 11;
-    $dvnn  = (11-$resto) >= 10 ? 0 : (11-$resto);
+    $fatores=[3,7,9,1]; $total=0; $fi=0;
+    for($i=strlen($seq0)-1;$i>=0;$i--){$total+=(int)$seq0[$i]*$fatores[$fi%4];$fi++;}
+    $resto=$total%11;
+    $dvnn=($resto==0||$resto==1)?0:(11-$resto);
+    if((11-$resto)>=10) $dvnn=0; else $dvnn=11-$resto;
 
-    $nossoNumeroFmt = $seq7 . '-' . $dvnn;
+    $nossoNumeroFmt = $nosso7 . '-' . $dvnn;
 
-    // VBA: seq1 = Left(seq,4) & Mid(seq,19,5) → PHP: substr(0,4).substr(18,5)
+    // seq1 = Left(seq,4) & Mid(seq,19,5) → PHP: substr(0,4).substr(18,5)
     $s1  = substr($sequencia,0,4) . substr($sequencia,18,5);
     $dv1 = sicoobMod10($s1);
     $campo1 = substr($s1,0,5) . '.' . substr($s1,5) . $dv1;
 
-    // VBA: seq2 = Mid(seq,24,10) → PHP: substr(23,10)
+    // seq2 = Mid(seq,24,10) → PHP: substr(23,10)
     $s2  = substr($sequencia,23,10);
     $dv2 = sicoobMod10($s2);
     $campo2 = substr($s2,0,5) . '.' . substr($s2,5) . $dv2;
 
-    // VBA: seq3 = Format(Mid(seq,33,7),"000000") & dvnn & Mid(seq,40,3)
-    // PHP: str_pad(substr(32,7),6,'0',LEFT) & dvnn & substr(39,3) → mas Format("000000") = 6 chars do numero
-    $s3  = str_pad(substr($sequencia,32,7), 6, '0', STR_PAD_LEFT) . $dvnn . substr($sequencia,39,3);
+    // seq3 = Format(Mid(seq,33,7),"000000") & dvnn & Mid(seq,40,3)
+    // PHP: str_pad(substr(32,7),6,'0',LEFT) . dvnn . substr(39,3)
+    $s3  = str_pad(substr($sequencia,32,7),6,'0',STR_PAD_LEFT) . $dvnn . substr($sequencia,39,3);
     $dv3 = sicoobMod10($s3);
     $campo3 = substr($s3,0,5) . '.' . substr($s3,5) . $dv3;
 
-    // VBA: seq4 = Left(seq,39) & dvnn & Right(seq,3)
+    // seq4 = Left(seq,39) & dvnn & Right(seq,3)
     $seq4 = substr($sequencia,0,39) . $dvnn . substr($sequencia,39,3);
 
-    // DV codigo de barras - VBA CalculaDigitoVerificadorCodigoBarras
-    // Loop: For intContador=1 To 43, caracter=Mid(Right(seq4,intContador),1,1)
-    // = percorre seq4 da direita para esquerda
+    // DV codigo de barras - CalculaDigitoVerificadorCodigoBarras
     $intMult=2; $intTotal=0;
-    for ($intCont=1; $intCont<=43; $intCont++) {
-        $caracter = substr($seq4, 43-$intCont, 1);
-        if ($intMult > 9) $intMult = 2;
-        $intTotal += (int)$caracter * $intMult;
+    for($intCont=1;$intCont<=43;$intCont++){
+        $caracter=substr($seq4,43-$intCont,1);
+        if($intMult>9) $intMult=2;
+        $intTotal+=(int)$caracter*$intMult;
         $intMult++;
     }
-    $intResto    = $intTotal % 11;
-    $intResultado = 11 - $intResto;
-    $dvcb = ($intResultado==11 || $intResultado==10) ? 1 : $intResultado;
+    $intResto=$intTotal%11;
+    $intResultado=11-$intResto;
+    $dvcb=($intResultado==11||$intResultado==10)?1:$intResultado;
 
-    // Codigo de barras: Left(seq4,4) & dvcb & Right(seq4,39)
+    // Codigo de barras = Left(seq4,4) & dvcb & Right(seq4,39)
     $codigoBarras   = substr($seq4,0,4) . $dvcb . substr($seq4,4);
+    // Linha digitavel = seq1 & seq2 & seq3 & dvcb & Mid(seq,5,14)
     $linhaDigitavel = $campo1 . ' ' . $campo2 . ' ' . $campo3 . ' ' . $dvcb . ' ' . substr($sequencia,4,14);
 
     // Salvar no financeiro
