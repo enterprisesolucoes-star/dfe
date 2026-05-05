@@ -670,7 +670,7 @@ if ($action === 'boleto_retorno') {
     $conteudo = base64_decode($data['conteudo'] ?? '');
     $nomeArq  = $data['nome'] ?? 'retorno.ret';
     if (!$conteudo) { echo json_encode(['success' => false, 'message' => 'Arquivo invalido']); exit; }
-    $linhasArq = explode("\n", str_replace("\r", "", $conteudo));
+    $linhasArq = explode("\n", str_replace("\r", "", $conteudo)) ?: [];
     $pagos   = 0;
     $valorTotal = 0;
     $tituloPendente = null;
@@ -721,7 +721,7 @@ if ($action === 'boleto_retorno') {
     }
     // Salvar retorno
     $pdo->prepare("INSERT INTO cobranca_retornos (empresa_id, banco_codigo, arquivo_nome, arquivo_conteudo, total_registros, total_pagos, valor_total_pago, status, processado_em, usuario_id) VALUES (?,?,?,?,?,?,?,'processado',NOW(),?)")
-        ->execute([$empresaId, '756', $nomeArq, $conteudo, count($linhas), $pagos, $valorTotal, $usuarioId ?? null]);
+        ->execute([$empresaId, '756', $nomeArq, $conteudo, count($linhasArq), $pagos, $valorTotal, $usuarioId ?? null]);
 
     echo json_encode(['success' => true, 'pagos' => $pagos, 'valor_total' => $valorTotal]);
     exit;
