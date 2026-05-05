@@ -27,6 +27,7 @@ export const Sidebar = ({
   onLogout,
   financeiroOpen,
   setFinanceiroOpen,
+  cobrancaAtiva,
   dfeNfeOpen,
   setDfeNfeOpen,
   dfeNfceOpen,
@@ -59,7 +60,7 @@ export const Sidebar = ({
           <button
             onClick={() => setFinanceiroOpen(!financeiroOpen)}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-              financeiroOpen || ['fin_receber', 'fin_pagar', 'fin_caixa'].includes(activeTab) ? 'text-blue-600 font-bold bg-blue-50/50' : 'text-gray-500 hover:bg-gray-50'
+              financeiroOpen || ['fin_receber', 'fin_pagar', 'fin_caixa', 'cobranca_boletos', 'cobranca_historico'].includes(activeTab) ? 'text-blue-600 font-bold bg-blue-50/50' : 'text-gray-500 hover:bg-gray-50'
             }`}
           >
             <DollarSign className="w-5 h-5" />
@@ -72,6 +73,10 @@ export const Sidebar = ({
                 { id: 'fin_receber', label: 'Receber', icon: ArrowUpCircle },
                 { id: 'fin_pagar', label: 'Pagar', icon: ArrowDownCircle },
                 { id: 'fin_caixa', label: 'Caixa', icon: History },
+                ...(cobrancaAtiva ? [
+                  { id: 'cobranca_boletos', label: 'Boletos', icon: FileText },
+                  { id: 'cobranca_historico', label: 'Hist. Remessas', icon: Archive },
+                ] : []),
               ].map(sub => (
                 <button
                   key={sub.id}
@@ -147,7 +152,7 @@ export const Sidebar = ({
           <button
             onClick={() => setCadastrosOpen(!cadastrosOpen)}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-              cadastrosOpen || ['ncm', 'usuarios', 'medidas', 'bandeiras', 'transportadores', 'vendedores', 'comissoes', 'cobranca_config', 'cobranca_boletos', 'cobranca_historico', 'config_integracao', 'dfe_config', 'dfe_nfe_dados', 'dfe_nfce_dados', 'dfe_provedor'].includes(activeTab) ? 'text-blue-600 font-bold bg-blue-50/50' : 'text-gray-500 hover:bg-gray-50'
+              cadastrosOpen || ['ncm', 'usuarios', 'medidas', 'bandeiras', 'transportadores', 'vendedores', 'comissoes', 'cobranca_config', 'config_integracao', 'dfe_config', 'dfe_nfe_dados', 'dfe_nfce_dados', 'dfe_provedor'].includes(activeTab) ? 'text-blue-600 font-bold bg-blue-50/50' : 'text-gray-500 hover:bg-gray-50'
             }`}
           >
             <FolderOpen className="w-5 h-5" />
@@ -164,8 +169,7 @@ export const Sidebar = ({
                 { id: 'vendedores', label: 'Vendedores', icon: UserCircle },
                 { id: 'comissoes', label: 'Comissões', icon: TrendingUp },
                 { id: 'cobranca_config', label: 'Cobrança', icon: Landmark },
-                { id: 'cobranca_boletos', label: 'Boletos', icon: FileText },
-                { id: 'cobranca_historico', label: 'Histórico Remessas', icon: Archive },
+
                 ...(isFiscal ? [{ id: 'config_integracao', label: 'Integração', icon: Zap }] : []),
                 ...(isFiscal ? [{ id: 'dfe_config', label: 'DFe', icon: Settings }] : []),
                 { id: 'usuarios', label: 'Usuários', icon: ShieldCheck },

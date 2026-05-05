@@ -111,7 +111,7 @@ export const BaixaModal = ({ titulo, emitente, onClose, onSuccess, showAlert }: 
 };
 
 // ─── Componente de Listagem Financeiro ───────────────────────────────────────
-export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm }: { tipo: 'R' | 'P', emitente: any, showAlert: any, showConfirm: any }) => {
+export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobrancaAtiva = false }: { tipo: 'R' | 'P', emitente: any, showAlert: any, showConfirm: any, cobrancaAtiva?: boolean }) => {
   const [titulos, setTitulos] = useState<any[]>([]);
   const [totPendente, setTotPendente] = useState(0);
   const [totPago, setTotPago] = useState(0);
@@ -239,12 +239,12 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm }: { tip
                   <div className="flex items-center justify-center gap-2">
                     {t.status !== 'Pago' && <button onClick={() => setBaixaTitulo(t)} className="p-1.5 text-gray-400 hover:text-emerald-600" title="Baixar"><CheckCircle className="w-3.5 h-3.5" /></button>}
                     {t.status !== 'Pago' && <button onClick={() => setEditTitulo(t)} className="p-1.5 text-gray-400 hover:text-blue-600" title="Editar"><Edit2 className="w-3.5 h-3.5" /></button>}
-                    {tipo === 'R' && t.status !== 'Pago' && t.entidade_id && (
+                    {cobrancaAtiva && tipo === 'R' && t.status !== 'Pago' && t.entidade_id && (
                       t.boleto_status === 'registrado'
                         ? <button onClick={() => setBoletoTitulo({ ...t, _modo: 'visualizar' })} className="p-1.5 text-gray-400 hover:text-indigo-600" title="Ver Boleto"><FileText className="w-3.5 h-3.5" /></button>
                         : <button onClick={() => setBoletoTitulo({ ...t, _modo: 'gerar' })} className="p-1.5 text-gray-400 hover:text-indigo-600" title="Gerar Boleto"><FileText className="w-3.5 h-3.5" /></button>
                     )}
-                    {tipo === 'R' && t.lancamento_id && t.parcela_total > 1 && t.boleto_status === 'registrado' && (
+                    {cobrancaAtiva && tipo === 'R' && t.lancamento_id && t.parcela_total > 1 && t.boleto_status === 'registrado' && (
                       <button onClick={() => imprimirLote(t.lancamento_id)} className="p-1.5 text-gray-400 hover:text-purple-600" title="Imprimir Lote"><ExternalLink className="w-3.5 h-3.5" /></button>
                     )}
                     {t.status === 'Pago' && <button onClick={() => handleEstornar(t.id)} className="p-1.5 text-gray-400 hover:text-amber-600" title="Estornar"><RotateCcw className="w-3.5 h-3.5" /></button>}

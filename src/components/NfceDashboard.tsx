@@ -136,6 +136,14 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
   const [configEmpresaOpen, setConfigEmpresaOpen] = useState(false);
   const [configDfeOpen, setConfigDfeOpen] = useState(false);
   const [financeiroOpen, setFinanceiroOpen] = useState(false);
+  const [cobrancaAtiva, setCobrancaAtiva] = useState(false);
+
+  useEffect(() => {
+    fetch('./api.php?action=cobranca_config_buscar')
+      .then(r => r.json())
+      .then(d => { if (d.success && d.data && d.data.ativo == 1) setCobrancaAtiva(true); })
+      .catch(() => {});
+  }, []);
   const [showCaixaModal, setShowCaixaModal] = useState(false);
   const [showFecharCaixaModal, setShowFecharCaixaModal] = useState(false);
   const [produtos, setProdutos] = useState<Produto[]>([]);
@@ -719,7 +727,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
   const renderTab = () => {
     switch (activeTab) {
       case 'dashboard': return <DashboardTab isFiscal={isFiscal} />;
-      case 'fin_receber': return <FinanceiroView tipo="R" emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} />;
+      case 'fin_receber': return <FinanceiroView tipo="R" emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} cobrancaAtiva={cobrancaAtiva} />;
       case 'fin_pagar': return <FinanceiroView tipo="P" emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} />;
       case 'fin_caixa': return <CaixaView emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} />;
       case 'vendas_geral': return <GeralNfceTab showAlert={showAlert} showConfirm={showConfirm} showPrompt={showPrompt} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} onCancelar={handleCancelar} onRetryTef={handleRetryTef} onExcluir={handleExcluirVenda} emitente={emitente} />;
@@ -1010,6 +1018,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           onLogout={onLogout}
           financeiroOpen={financeiroOpen}
           setFinanceiroOpen={setFinanceiroOpen}
+          cobrancaAtiva={cobrancaAtiva}
           dfeNfeOpen={dfeNfeOpen}
           setDfeNfeOpen={setDfeNfeOpen}
           dfeNfceOpen={dfeNfceOpen}
