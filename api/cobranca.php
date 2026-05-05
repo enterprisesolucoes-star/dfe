@@ -155,7 +155,7 @@ if ($action === 'boleto_gerar') {
 
     // seq3 = Format(Mid(seq,33,7),"000000") & dvnn & Mid(seq,40,3)
     // PHP: str_pad(substr(32,7),6,'0',LEFT) . dvnn . substr(39,3)
-    $s3  = str_pad(substr($sequencia,32,7),6,'0',STR_PAD_LEFT) . $dvnn . substr($sequencia,39,3);
+    $s3  = substr(str_pad(substr($sequencia,32,7),6,'0',STR_PAD_LEFT),-6) . $dvnn . substr($sequencia,39,3);
     $dv3 = sicoobMod10($s3);
     $campo3 = substr($s3,0,5) . '.' . substr($s3,5) . $dv3;
 
