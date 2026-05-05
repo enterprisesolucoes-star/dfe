@@ -549,17 +549,16 @@ if ($action === 'boleto_remessa') {
     $banco      = '756';
     $cnpjEmp    = str_pad(preg_replace('/\\D/', '', $empresa['cnpj'] ?? ''), 14, '0', STR_PAD_LEFT);
     $agencia    = str_pad(preg_replace('/\\D/', '', $config['agencia']), 5, '0', STR_PAD_LEFT);
-    $conta      = str_pad(preg_replace('/\\D/', '', $config['conta']), 12, '0', STR_PAD_LEFT);
+    $contaCompleta = preg_replace('/\\D/', '', $config['conta']);
+    $contaDv    = substr($contaCompleta, -1);
+    $contaSemDv = substr($contaCompleta, 0, -1);
+    $conta      = str_pad($contaSemDv, 12, '0', STR_PAD_LEFT);
     $nomeEmp    = str_pad(mb_strtoupper(mb_substr($empresa['razao_social'] ?? '', 0, 30)), 30);
     $dataHoje   = date('dmY');
     $horaAgora  = date('His');
     $numRemPad  = str_pad($numRemessa, 6, '0', STR_PAD_LEFT);
     $totalTit   = count($titulos);
     $valorTotal = array_sum(array_column($titulos, 'valor_total'));
-    $agCt = preg_replace('/\\D/', '', $config['agencia']) . preg_replace('/\\D/', '', $config['conta']);
-    $sm=0;$dg=2;$rev=strrev($agCt);
-    for($i=0;$i<strlen($rev);$i++){$rr=(int)$rev[$i]*$dg;$sm+=($rr>9?$rr-9:$rr);$dg=($dg==2?1:2);}
-    $contaDv = (string)((10-($sm%10))%10);
     $linhas = [];
     $seqReg = 1;
     $h  = $banco . '0000' . '0' . str_repeat(' ', 9) . '2' . $cnpjEmp . str_repeat(' ', 20);
@@ -578,7 +577,7 @@ if ($action === 'boleto_remessa') {
     foreach ($titulos as $t) {
         $cnpjCli   = str_pad(preg_replace('/\\D/', '', $t['cli_doc'] ?? ''), 14, '0', STR_PAD_LEFT);
         $tpInscCli = strlen(preg_replace('/\\D/', '', $t['cli_doc'] ?? '')) === 11 ? '1' : '2';
-        $nomeCli   = str_pad(mb_strtoupper(mb_substr($t['cli_nome'] ?? 'NAO IDENTIFICADO', 0, 30)), 30);
+        $nomeCli   = str_pad(mb_strtoupper(mb_substr($t['cli_nome'] ?? 'NAO IDENTIFICADO', 0, 40)), 40);
         $endCli    = str_pad(mb_strtoupper(mb_substr(($t['cli_logr'] ?? ''), 0, 40)), 40);
         $numCli    = str_pad(mb_strtoupper(mb_substr(($t['cli_num'] ?? ''), 0, 5)), 5);
         $complCli  = str_pad(mb_strtoupper(mb_substr(($t['cli_compl'] ?? ''), 0, 15)), 15);
@@ -605,14 +604,24 @@ if ($action === 'boleto_remessa') {
         $p .= $numDoc . $vencDt . $valorCt . '00000' . ' ' . '02' . 'N';
         $p .= $emissaoDt . '2' . $jurosDt . $jurosDia;
         $p .= '0' . '00000000' . str_repeat('0', 15) . str_repeat('0', 15) . str_repeat('0', 15);
-        $p .= str_pad($numDoc, 25) . '3' . str_pad($config['prazo_protesto'] ?? '30', 2, '0', STR_PAD_LEFT);
+        $p .= str_pad($numDoc, 25) . '3' . '00';
         $p .= '0' . '   ' . '09' . '0000000000' . ' ';
         $linhas[] = substr($p, 0, 240);
         $seqReg++;
         $seqPad = str_pad($seqReg, 5, '0', STR_PAD_LEFT);
+        $cepNum = preg_replace('/\\D/', '', $t['cli_cep'] ?? '');
+        $cepNum = str_pad($cepNum, 8, '0', STR_PAD_LEFT);
+        $cep5   = substr($cepNum, 0, 5);
+        $cepSuf = substr($cepNum, 5, 3);
         $q  = $banco . '0001' . '3' . $seqPad . 'Q' . ' ' . '01';
-        $q .= $tpInscCli . '0' . $cnpjCli . $nomeCli . $endCli . $numCli . $complCli . $bairroCli . $cepCli . $cidCli . $ufCli;
-        $q .= '0' . str_repeat('0', 15) . str_repeat(' ', 30) . '000' . str_repeat(' ', 28);
+        $q .= $tpInscCli . '0' . $cnpjCli;
+        $q .= $nomeCli;
+        $q .= $endCli;
+        $q .= $bairroCli;
+        $q .= $cep5 . $cepSuf;
+        $q .= $cidCli;
+        $q .= $ufCli;
+        $q .= '0' . str_repeat('0', 15) . str_repeat(' ', 40) . '000' . str_repeat(' ', 20) . str_repeat(' ', 8);
         $linhas[] = substr($q, 0, 240);
         $seqReg++;
         $seqPad = str_pad($seqReg, 5, '0', STR_PAD_LEFT);
