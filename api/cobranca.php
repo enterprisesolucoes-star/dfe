@@ -721,4 +721,50 @@ if ($action === 'boleto_retorno') {
     exit;
 }
 
-echo json_encode(['success' => false, 'message' => 'Ação inválida']);
+// ── Listar Remessas ────────────────────────────────────────────────────────────
+if ($action === 'remessa_listar') {
+    $stmt = $pdo->prepare("SELECT id, banco_codigo, numero_remessa, total_titulos, valor_total, arquivo_nome, status, gerada_em, enviada_em FROM cobranca_remessas WHERE empresa_id = ? ORDER BY id DESC LIMIT 200");
+    $stmt->execute([$empresaId]);
+    echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+    exit;
+}
+
+// ── Baixar Remessa ─────────────────────────────────────────────────────────────
+if ($action === 'remessa_baixar') {
+    $id = (int)($_GET['id'] ?? 0);
+    $stmt = $pdo->prepare("SELECT arquivo_nome, arquivo_conteudo FROM cobranca_remessas WHERE id = ? AND empresa_id = ?");
+    $stmt->execute([$id, $empresaId]);
+    $r = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$r) { echo json_encode(['success' => false, 'message' => 'Remessa nao encontrada']); exit; }
+    echo json_encode(['success' => true, 'arquivo' => $r['arquivo_nome'], 'conteudo' => base64_encode($r['arquivo_conteudo'])]);
+    exit;
+}
+
+// ── Marcar Remessa como Enviada ────────────────────────────────────────────────
+if ($action === 'remessa_marcar_enviada') {
+    $id = (int)($_GET['id'] ?? 0);
+    $pdo->prepare("UPDATE cobranca_remessas SET status='enviada', enviada_em=NOW() WHERE id=? AND empresa_id=?")->execute([$id, $empresaId]);
+    echo json_encode(['success' => true]);
+    exit;
+}
+
+// ── Listar Retornos ────────────────────────────────────────────────────────────
+if ($action === 'retorno_listar') {
+    $stmt = $pdo->prepare("SELECT id, banco_codigo, arquivo_nome, total_registros, total_pagos, valor_total_pago, status, importado_em, processado_em FROM cobranca_retornos WHERE empresa_id = ? ORDER BY id DESC LIMIT 200");
+    $stmt->execute([$empresaId]);
+    echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+    exit;
+}
+
+// ── Baixar Retorno ─────────────────────────────────────────────────────────────
+if ($action === 'retorno_baixar') {
+    $id = (int)($_GET['id'] ?? 0);
+    $stmt = $pdo->prepare("SELECT arquivo_nome, arquivo_conteudo FROM cobranca_retornos WHERE id = ? AND empresa_id = ?");
+    $stmt->execute([$id, $empresaId]);
+    $r = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$r) { echo json_encode(['success' => false, 'message' => 'Retorno nao encontrado']); exit; }
+    echo json_encode(['success' => true, 'arquivo' => $r['arquivo_nome'], 'conteudo' => base64_encode($r['arquivo_conteudo'])]);
+    exit;
+}
+
+echo json_encode(['success' => false, 'message' => 'Acao invalida']);

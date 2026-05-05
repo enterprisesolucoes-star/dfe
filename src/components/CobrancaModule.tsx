@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Building2, CreditCard, FileText, AlertCircle, RefreshCw, Eye, EyeOff, Download, Upload, Printer, X } from 'lucide-react';
+import { Save, Building2, CreditCard, FileText, AlertCircle, RefreshCw, Eye, EyeOff, Download, Upload, Printer, X, CheckCircle } from 'lucide-react';
 
 interface ConfigCobranca {
   id?: number;
@@ -584,6 +584,170 @@ export const CobrancaBoletosTab = ({ showAlert, showConfirm }: {
           </tbody>
         </table>
       </div>
+    </div>
+  );
+};
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// HISTÓRICO DE REMESSAS E RETORNOS
+// ═══════════════════════════════════════════════════════════════════════════════
+export const CobrancaHistoricoTab = ({ showAlert }: { showAlert: (t: string, m: string) => void }) => {
+  const [aba, setAba] = useState<'remessas' | 'retornos'>('remessas');
+  const [remessas, setRemessas] = useState<any[]>([]);
+  const [retornos, setRetornos] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const brl = (v: number) => Number(v)?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || 'R$ 0,00';
+  const fmtData = (d: string) => d ? new Date(d).toLocaleString('pt-BR') : '-';
+
+  const carregarRemessas = async () => {
+    setLoading(true);
+    try {
+      const r = await fetch('./api.php?action=remessa_listar');
+      const d = await r.json();
+      if (d.success) setRemessas(d.data || []);
+    } catch {} finally { setLoading(false); }
+  };
+
+  const carregarRetornos = async () => {
+    setLoading(true);
+    try {
+      const r = await fetch('./api.php?action=retorno_listar');
+      const d = await r.json();
+      if (d.success) setRetornos(d.data || []);
+    } catch {} finally { setLoading(false); }
+  };
+
+  useEffect(() => { aba === 'remessas' ? carregarRemessas() : carregarRetornos(); }, [aba]);
+
+  const baixar = async (tipo: 'remessa' | 'retorno', id: number) => {
+    const r = await fetch(`./api.php?action=${tipo}_baixar&id=${id}`);
+    const d = await r.json();
+    if (!d.success) { showAlert('Erro', d.message || 'Falha ao baixar'); return; }
+    const blob = new Blob([atob(d.conteudo)], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = d.arquivo; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const marcarEnviada = async (id: number) => {
+    await fetch(`./api.php?action=remessa_marcar_enviada&id=${id}`);
+    carregarRemessas();
+  };
+
+  const statusStyle: Record<string, string> = {
+    gerada: 'bg-yellow-100 text-yellow-700',
+    enviada: 'bg-blue-100 text-blue-700',
+    processada: 'bg-green-100 text-green-700',
+    importado: 'bg-yellow-100 text-yellow-700',
+    processado: 'bg-green-100 text-green-700',
+    erro: 'bg-red-100 text-red-700',
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <h2 className="text-xl font-bold text-gray-800">Histórico de Remessas e Retornos</h2>
+        <p className="text-xs text-gray-500 mt-0.5">Visualize e faça download dos arquivos CNAB enviados e recebidos</p>
+      </div>
+
+      <div className="flex gap-2">
+        <button onClick={() => setAba('remessas')}
+          className={`px-4 py-2 rounded-xl text-sm font-bold ${aba === 'remessas' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
+          Remessas Enviadas
+        </button>
+        <button onClick={() => setAba('retornos')}
+          className={`px-4 py-2 rounded-xl text-sm font-bold ${aba === 'retornos' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
+          Retornos Importados
+        </button>
+      </div>
+
+      {loading && <div className="text-center py-12 text-gray-400 text-sm">Carregando...</div>}
+
+      {!loading && aba === 'remessas' && (
+        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 text-xs text-gray-500 uppercase">
+              <tr>
+                <th className="px-4 py-3 text-left">Nº</th>
+                <th className="px-4 py-3 text-left">Arquivo</th>
+                <th className="px-4 py-3 text-center">Banco</th>
+                <th className="px-4 py-3 text-center">Títulos</th>
+                <th className="px-4 py-3 text-right">Valor Total</th>
+                <th className="px-4 py-3 text-center">Status</th>
+                <th className="px-4 py-3 text-center">Gerada Em</th>
+                <th className="px-4 py-3 text-center">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {remessas.length === 0 ? (
+                <tr><td colSpan={8} className="text-center py-12 text-gray-400 text-sm italic">Nenhuma remessa encontrada</td></tr>
+              ) : remessas.map(r => (
+                <tr key={r.id} className="border-t border-gray-100 hover:bg-gray-50">
+                  <td className="px-4 py-3 font-bold text-gray-700">#{r.numero_remessa}</td>
+                  <td className="px-4 py-3 font-mono text-xs">{r.arquivo_nome}</td>
+                  <td className="px-4 py-3 text-center text-xs text-gray-500">{r.banco_codigo}</td>
+                  <td className="px-4 py-3 text-center font-bold">{r.total_titulos}</td>
+                  <td className="px-4 py-3 text-right font-bold text-indigo-700">{brl(r.valor_total)}</td>
+                  <td className="px-4 py-3 text-center">
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusStyle[r.status] || 'bg-gray-100 text-gray-600'}`}>{r.status}</span>
+                  </td>
+                  <td className="px-4 py-3 text-center text-xs text-gray-500">{fmtData(r.gerada_em)}</td>
+                  <td className="px-4 py-3 text-center">
+                    <div className="flex items-center justify-center gap-1">
+                      <button onClick={() => baixar('remessa', r.id)} className="p-1.5 text-gray-400 hover:text-blue-600" title="Baixar Arquivo"><Download className="w-3.5 h-3.5" /></button>
+                      {r.status === 'gerada' && (
+                        <button onClick={() => marcarEnviada(r.id)} className="p-1.5 text-gray-400 hover:text-green-600" title="Marcar como Enviada"><CheckCircle className="w-3.5 h-3.5" /></button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {!loading && aba === 'retornos' && (
+        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 text-xs text-gray-500 uppercase">
+              <tr>
+                <th className="px-4 py-3 text-left">Arquivo</th>
+                <th className="px-4 py-3 text-center">Banco</th>
+                <th className="px-4 py-3 text-center">Registros</th>
+                <th className="px-4 py-3 text-center">Pagos</th>
+                <th className="px-4 py-3 text-right">Valor Pago</th>
+                <th className="px-4 py-3 text-center">Status</th>
+                <th className="px-4 py-3 text-center">Importado Em</th>
+                <th className="px-4 py-3 text-center">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {retornos.length === 0 ? (
+                <tr><td colSpan={8} className="text-center py-12 text-gray-400 text-sm italic">Nenhum retorno encontrado</td></tr>
+              ) : retornos.map(r => (
+                <tr key={r.id} className="border-t border-gray-100 hover:bg-gray-50">
+                  <td className="px-4 py-3 font-mono text-xs">{r.arquivo_nome}</td>
+                  <td className="px-4 py-3 text-center text-xs text-gray-500">{r.banco_codigo}</td>
+                  <td className="px-4 py-3 text-center">{r.total_registros}</td>
+                  <td className="px-4 py-3 text-center font-bold text-green-700">{r.total_pagos}</td>
+                  <td className="px-4 py-3 text-right font-bold text-emerald-700">{brl(r.valor_total_pago)}</td>
+                  <td className="px-4 py-3 text-center">
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusStyle[r.status] || 'bg-gray-100 text-gray-600'}`}>{r.status}</span>
+                  </td>
+                  <td className="px-4 py-3 text-center text-xs text-gray-500">{fmtData(r.importado_em)}</td>
+                  <td className="px-4 py-3 text-center">
+                    <button onClick={() => baixar('retorno', r.id)} className="p-1.5 text-gray-400 hover:text-blue-600" title="Baixar Arquivo"><Download className="w-3.5 h-3.5" /></button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
