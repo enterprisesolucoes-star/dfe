@@ -1,25 +1,49 @@
 <?php
-// Configurações de Banco de Dados (Hostinger)
-// Substitua pelos dados reais do seu painel Hostinger
+// Carregar variáveis de ambiente do arquivo seguro (fora do webroot)
+$_envFile = '/etc/dfe/.env';
+if (file_exists($_envFile)) {
+    $_lines = file($_envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($_lines as $_line) {
+        if (strpos(trim($_line), '#') === 0) continue;
+        if (strpos($_line, '=') !== false) {
+            [$_k, $_v] = explode('=', $_line, 2);
+            putenv(trim($_k) . '=' . trim($_v));
+        }
+    }
+    unset($_lines, $_line, $_k, $_v);
+}
+unset($_envFile);
 
-define('SUPERTEF_TOKEN', '2491b4ac5ff2de78029368bda9327049b86bdc07d653874871770266e9b9e977');
-define('IBPT_TOKEN', 'SKiPF85FG6K_5OetPRjij4LpjG7K1TLHeuAWSppzWmpzW-lz6ohCSGALOidfdWtFE');
-define('IBPT_CNPJ', '00952147000181'); // CNPJ registrado no portal IBPT (diferente do CNPJ da empresa)
+// Validar variáveis obrigatórias
+foreach (['DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASS'] as $_var) {
+    if (!getenv($_var)) {
+        error_log('[DFe CRÍTICO] Variável de ambiente ausente: ' . $_var);
+        http_response_code(500);
+        exit('Erro de configuração do servidor.');
+    }
+}
+unset($_var);
 
+define('SUPERTEF_TOKEN', getenv('SUPERTEF_TOKEN'));
+define('IBPT_TOKEN',     getenv('IBPT_TOKEN'));
+define('IBPT_CNPJ',      getenv('IBPT_CNPJ'));
 
-
-define('DB_HOST', '127.0.0.1');
-define('DB_NAME', 'dfe_db');   // Substitua pelo nome do banco criado na Hostinger
-define('DB_USER', 'dfe_user'); // Substitua pelo usuário do banco
-define('DB_PASS', '123456');   // Substitua pela senha do banco
+define('DB_HOST', getenv('DB_HOST'));
+define('DB_NAME', getenv('DB_NAME'));
+define('DB_USER', getenv('DB_USER'));
+define('DB_PASS', getenv('DB_PASS'));
 
 try {
-    $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4", DB_USER, DB_PASS);
+    $pdo = new PDO(
+        'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4',
+        DB_USER,
+        DB_PASS
+    );
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-    // Força horário oficial do Brasil (UTC-3) em todas as queries da sessão
     $pdo->exec("SET time_zone = '-03:00'");
-}
-catch (PDOException $e) {
-    die("Erro de conexão: " . $e->getMessage());
+} catch (PDOException $e) {
+    error_log('[DFe] Erro de conexão: ' . $e->getMessage());
+    http_response_code(500);
+    exit('Erro de conexão com o banco de dados.');
 }
