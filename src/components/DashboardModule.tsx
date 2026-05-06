@@ -497,16 +497,8 @@ export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
       </motion.div>
 
       {/* ─── A Receber / A Pagar + Previsão ─── */}
-      <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.5 }} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="flex flex-col gap-6">
-          <StatCard label="Total a Receber"
-            value={finSummary.total_receber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-            icon={DollarSign} trend={finSummary.trendReceber} color="green" />
-          <StatCard label="Total a Pagar"
-            value={finSummary.total_pagar.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-            icon={TrendingDown} trend={finSummary.trendPagar} color="red" />
-        </div>
-        <div className="lg:col-span-2 bg-white dark:bg-gray-800 dark:bg-gray-800 p-8 rounded-[2rem] shadow-xl border border-gray-100 dark:border-gray-700 dark:border-gray-700">
+      <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.5 }}>
+        <div className="bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-xl border border-gray-100 dark:border-gray-700">
           <div className="flex items-center justify-between mb-8">
             <div>
               <h4 className="text-xl font-bold text-gray-800 dark:text-gray-100 dark:text-white">Previsão Financeira</h4>

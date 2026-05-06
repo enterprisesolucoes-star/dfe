@@ -339,8 +339,8 @@ switch ($action) {
             ")->fetchAll(PDO::FETCH_ASSOC);
 
             $mapa = [
-                'Autorizada'  => ['nome' => 'Autorizadas',  'cor' => '#10b981', 'qtd' => 0, 'val' => 0],
-                'Contingencia'=> ['nome' => 'Contingência', 'cor' => '#06b6d4', 'qtd' => 0, 'val' => 0],
+                'Autorizada'  => ['nome' => 'Autorizadas',  'cor' => '#22c55e', 'qtd' => 0, 'val' => 0],
+                'Contingencia'=> ['nome' => 'Contingência', 'cor' => '#0ea5e9', 'qtd' => 0, 'val' => 0],
                 'Pendente'    => ['nome' => 'Pendentes',    'cor' => '#f59e0b', 'qtd' => 0, 'val' => 0],
                 'Cancelada'   => ['nome' => 'Canceladas',   'cor' => '#ef4444', 'qtd' => 0, 'val' => 0],
                 'Rejeitada'   => ['nome' => 'Rejeitadas',   'cor' => '#a855f7', 'qtd' => 0, 'val' => 0],
