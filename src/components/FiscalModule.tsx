@@ -84,7 +84,7 @@ export const VendasTab = ({ vendas, onCancelar, onSincronizar, onRetryTef, onExc
                                     <td className="px-4 py-3 text-xs text-gray-600 dark:text-gray-300">{v.clienteNome || 'Consumidor Final'}</td>
                                     <td className="px-4 py-3 text-xs font-bold text-right">{Number(v.valorTotal || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                                     <td className="px-4 py-3 text-center">
-                                        <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${v.status === 'Autorizada' ? 'bg-green-100 text-green-700 dark:text-green-300' : v.status === 'Cancelada' ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400' : 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300'}`}>{v.status}</span>
+                                        <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${v.status === 'Autorizada' ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' : v.status === 'Cancelada' ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400' : 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300'}`}>{v.status}</span>
                                     </td>
                                     <td className="px-4 py-3 text-right">
                                         <div className="flex items-center justify-end gap-1">
@@ -172,7 +172,7 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
                                 <td className="px-6 py-4 text-xs text-gray-600 dark:text-gray-300"><div>{n.natureza_operacao || '-'}</div><div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{n.cliente_nome || ''}{n.cliente_documento ? ` · ${n.cliente_documento}` : ''}</div></td>
                                 <td className="px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-200 text-right">{Number(n.valor_total || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                                 <td className="px-6 py-4">
-                                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${n.status === 'Autorizada' ? 'bg-green-100 text-green-700 dark:text-green-300' : n.status === 'Cancelada' ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400' : 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300'}`}>{n.status}</span>
+                                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${n.status === 'Autorizada' ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' : n.status === 'Cancelada' ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400' : 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300'}`}>{n.status}</span>
                                 </td>
                                 <td className="px-6 py-4 text-right">
                                     <div className="flex items-center justify-end gap-1">
@@ -266,7 +266,7 @@ const CceModal = ({ nfe, showAlert, onClose }: any) => {
                                     <div key={c.id} className="border border-gray-100 dark:border-gray-700 rounded-xl p-3">
                                         <div className="flex items-center justify-between mb-1">
                                             <span className="text-xs font-bold text-gray-700 dark:text-gray-200">CCe #{c.numero_sequencia}</span>
-                                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${c.status === 'Autorizada' ? 'bg-green-100 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400'}`}>{c.status}</span>
+                                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${c.status === 'Autorizada' ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400'}`}>{c.status}</span>
                                         </div>
                                         <p className="text-xs text-gray-600 dark:text-gray-300 mb-1">{c.correcao}</p>
                                         <div className="flex items-center justify-between">
@@ -342,7 +342,7 @@ export const NfeDashboardTab = ({ nfeList, showAlert, showPrompt, onNovaNfe, onC
                                 <td className="px-6 py-4 text-xs text-gray-600 dark:text-gray-300"><div>{n.natureza_operacao || '-'}</div><div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{n.cliente_nome || ''}{n.cliente_documento ? ` · ${n.cliente_documento}` : ''}</div></td>
                                 <td className="px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-200 text-right">{Number(n.valor_total || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                                 <td className="px-6 py-4">
-                                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${n.status === 'Autorizada' ? 'bg-green-100 text-green-700 dark:text-green-300' : n.status === 'Cancelada' ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400' : 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300'}`}>{n.status}</span>
+                                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${n.status === 'Autorizada' ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' : n.status === 'Cancelada' ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400' : 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300'}`}>{n.status}</span>
                                 </td>
                                 <td className="px-6 py-4 text-right">
                                     <div className="flex items-center justify-end gap-1">
@@ -433,7 +433,7 @@ export const GeralNfceTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, o
                                 <td className="px-6 py-4 text-xs text-gray-600 dark:text-gray-300">{n.cliente_nome || n.clienteNome || 'Consumidor Final'}</td>
                                 <td className="px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-200 text-right">{Number(n.valor_total || n.valorTotal || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                                 <td className="px-6 py-4">
-                                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${n.status === 'Autorizada' ? 'bg-green-100 text-green-700 dark:text-green-300' : n.status === 'Cancelada' ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400' : 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300'}`}>{n.status}</span>
+                                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${n.status === 'Autorizada' ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' : n.status === 'Cancelada' ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400' : 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300'}`}>{n.status}</span>
                                 </td>
                                 <td className="px-6 py-4 text-right">
                                     <div className="flex items-center justify-end gap-1">
