@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/comissoes_helper.php';
 /** @var PDO $pdo */
 /** @var int $empresaId */
 /** @var string $action */
@@ -319,12 +320,23 @@ switch ($action) {
             $ficouCancelada    = $status === 'Cancelada';
 
             if ($ficouConcluida && !$eraConcluidaAntes) {
+                // HOOK: gerar comissão
+                try {
+                    $usrId = (int)($_SESSION['user_id'] ?? 0);
+                    gerarComissaoSeEmissao($pdo, 'os', (int)$id, $empresaId, $usrId);
+                } catch (Exception $e) { error_log('[comissao os] ' . $e->getMessage()); }
+
                 // Baixa estoque das peças
                 foreach ($itensParaEstoque as $item) {
                     $pdo->prepare("UPDATE produtos SET estoque = GREATEST(0, estoque - ?) WHERE id = ?")
                         ->execute([(float)($item['quantidade'] ?? 1), (int)$item['produto_id']]);
                 }
             } elseif ($ficouCancelada && $eraConcluidaAntes) {
+                // HOOK: cancelar comissão
+                try {
+                    cancelarComissao($pdo, 'os', (int)$id, $empresaId, 'OS cancelada');
+                } catch (Exception $e) { error_log('[comissao os cancel] ' . $e->getMessage()); }
+
                 // Estorna estoque (era concluída e foi cancelada)
                 foreach ($itensParaEstoque as $item) {
                     $pdo->prepare("UPDATE produtos SET estoque = estoque + ? WHERE id = ?")

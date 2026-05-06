@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/comissoes_helper.php';
 // ── Cria tabelas na primeira execução ────────────────────────────────────────
 $pdo->exec("CREATE TABLE IF NOT EXISTS orcamentos (
     id              INT AUTO_INCREMENT PRIMARY KEY,
@@ -277,6 +278,12 @@ switch ($action) {
 
             // Geração automática de comissão
             if ($status === 'Aprovado') {
+                // HOOK: gerar comissão (respeitando momento_comissao)
+                try {
+                    $usrId = (int)($_SESSION['user_id'] ?? 0);
+                    gerarComissaoSeEmissao($pdo, 'orcamento', (int)$id, $empresaId, $usrId);
+                } catch (Exception $e) { error_log('[comissao orcamento] ' . $e->getMessage()); }
+
                 require_once __DIR__ . '/comissoes.php';
                 $docId = $id > 0 ? $id : (int)$pdo->lastInsertId();
                 gerarComissao($pdo, 'orcamento', $docId, $empresaId ?: 0, 0);

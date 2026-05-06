@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/comissoes_helper.php';
 // api/pedidos.php — Pedido completo para empresa sem fiscal
 
 $empresaId = (int)($_REQUEST['empresa_id'] ?? 0);
@@ -258,7 +259,12 @@ if ($action === 'excluir_pedido') {
         // Apagar venda
         $pdo->prepare("DELETE FROM vendas WHERE id = ? AND empresa_id = ?")->execute([$id, $empresaId]);
         // Auditoria
-        $pdo->prepare("INSERT INTO auditoria_log (emitente_id, usuario_id, acao, entidade, entidade_id, descricao, criado_em) VALUES (?,?,'excluir_pedido','pedido',?,?,NOW())")
+        // HOOK: cancelar comissão do pedido excluído
+    try {
+        cancelarComissao($pdo, 'pedido', (int)$id, $empresaId, 'Pedido excluído');
+    } catch (Exception $e) { error_log('[comissao pedido cancel] ' . $e->getMessage()); }
+
+    $pdo->prepare("INSERT INTO auditoria_log (emitente_id, usuario_id, acao, entidade, entidade_id, descricao, criado_em) VALUES (?,?,'excluir_pedido','pedido',?,?,NOW())")
             ->execute([$empresaId, null, $id, "Pedido #{$venda['numero']} excluído"]);
         $pdo->commit();
         echo json_encode(['success' => true]);

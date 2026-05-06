@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/comissoes_helper.php';
 use App\Services\NfeService;
 
 /**
@@ -201,6 +202,18 @@ switch ($action) {
                 $chaveAcesso = (string)($resultado->chave_acesso ?? '');
                 $pdo->prepare("UPDATE vendas SET status = ?, protocolo = ?, chave_acesso = ?, xml_autorizado = ? WHERE id = ?")
                     ->execute([$statusSalvar, $resultado->protocolo ?? '', $chaveAcesso, $resultado->xml_assinado ?? '', $vendaId]);
+                // HOOK: gerar comissão (NFe/NFCe autorizada)
+                try {
+                    $modeloStmt = $pdo->prepare("SELECT modelo, empresa_id FROM vendas WHERE id = ?");
+                    $modeloStmt->execute([$vendaId]);
+                    $vRow = $modeloStmt->fetch(PDO::FETCH_ASSOC);
+                    if ($vRow && !empty($vRow['empresa_id'])) {
+                        $tipoComiss = ((int)$vRow['modelo'] === 65) ? 'nfce' : 'nfe';
+                        $usrId = (int)($_SESSION['user_id'] ?? 0);
+                        gerarComissaoSeEmissao($pdo, $tipoComiss, (int)$vendaId, (int)$vRow['empresa_id'], $usrId);
+                    }
+                } catch (Exception $e) { error_log('[comissao nfe] ' . $e->getMessage()); }
+
 
                 $pdo->prepare("UPDATE empresas SET numero_nfe = ? WHERE id = ?")
                     ->execute([$venda['numero'], $empresaDb['id']]);
@@ -265,9 +278,9 @@ switch ($action) {
                     'status'      => $statusSalvar,
                     'protocolo'   => $resultado->protocolo ?? '',
                     'chaveAcesso' => $chaveAcesso,
-                    'xml'         => base64_encode($resultado->xml_assinado ?? '')
                     'xml'         => base64_encode($resultado->xml_assinado ?? ''),
                     'boletoIds'   => $boletoIdsNfe ?? [],
+                ]);
             } else {
                 $pdo->prepare("UPDATE vendas SET status = 'Rejeitada' WHERE id = ?")->execute([$vendaId]);
                 $pdo->commit();
@@ -1111,6 +1124,18 @@ switch ($action) {
                 $chaveAcesso = (string)($resultado->chave_acesso ?? '');
                 $pdo->prepare("UPDATE vendas SET status = ?, protocolo = ?, chave_acesso = ?, xml_autorizado = ? WHERE id = ?")
                     ->execute([$statusSalvar, $resultado->protocolo ?? '', $chaveAcesso, $resultado->xml_assinado ?? '', $vendaId]);
+                // HOOK: gerar comissão (NFe/NFCe autorizada)
+                try {
+                    $modeloStmt = $pdo->prepare("SELECT modelo, empresa_id FROM vendas WHERE id = ?");
+                    $modeloStmt->execute([$vendaId]);
+                    $vRow = $modeloStmt->fetch(PDO::FETCH_ASSOC);
+                    if ($vRow && !empty($vRow['empresa_id'])) {
+                        $tipoComiss = ((int)$vRow['modelo'] === 65) ? 'nfce' : 'nfe';
+                        $usrId = (int)($_SESSION['user_id'] ?? 0);
+                        gerarComissaoSeEmissao($pdo, $tipoComiss, (int)$vendaId, (int)$vRow['empresa_id'], $usrId);
+                    }
+                } catch (Exception $e) { error_log('[comissao nfe] ' . $e->getMessage()); }
+
                 $pdo->prepare("UPDATE empresas SET numero_nfe = ? WHERE id = ?")
                     ->execute([$venda['numero'], $empresaDb['id']]);
                 // Auditoria — devolução NF-e
