@@ -174,7 +174,7 @@ switch ($action) {
             $tools = new \NFePHP\NFe\Tools(json_encode($arr), \NFePHP\Common\Certificate::readPfx($pfx, $config['certificado_senha']));
 
             $nsu = (int)($_GET['nsu'] ?? $config['ultimo_nsu'] ?? 0);
-            @file_put_contents(__DIR__ . '/../nsu_log.txt', "[" . date('Y-m-d H:i:s') . "] Enviando consulta para NSU: " . $nsu . "\n", FILE_APPEND);
+            @file_put_contents('/var/log/dfe/nsu_log.txt', "[" . date('Y-m-d H:i:s') . "] Enviando consulta para NSU: " . $nsu . "\n", FILE_APPEND);
             $response = $tools->sefazDistDFe($nsu);
             $response = trim($response);
             if (empty($response)) throw new Exception("SEFAZ retornou uma resposta vazia.");
@@ -189,7 +189,7 @@ switch ($action) {
             $cStat = (string)($xmlResp->cStat ?? 'ERRO');
             $xMotivo = (string)($xmlResp->xMotivo ?? 'Sem Motivo');
             $ultimoNsu = (string)($xmlResp->ultNSU ?? '0');
-            @file_put_contents(__DIR__ . '/../nsu_log.txt', "[" . date('Y-m-d H:i:s') . "] SEFAZ respondeu cStat: " . $cStat . " | Motivo: " . $xMotivo . " | Proximo NSU: " . $ultimoNsu . "\n", FILE_APPEND);
+            @file_put_contents('/var/log/dfe/nsu_log.txt', "[" . date('Y-m-d H:i:s') . "] SEFAZ respondeu cStat: " . $cStat . " | Motivo: " . $xMotivo . " | Proximo NSU: " . $ultimoNsu . "\n", FILE_APPEND);
 
             // Tenta criar as colunas se não existirem
             try {
@@ -213,7 +213,7 @@ switch ($action) {
             $stmtUpd = $pdo->prepare($sqlUpd);
             if (!$stmtUpd->execute($paramsUpd)) {
                 $error = $stmtUpd->errorInfo();
-                @file_put_contents(__DIR__ . '/../nsu_log.txt', "[" . date('Y-m-d H:i:s') . "] ERRO AO SALVAR NO BANCO: " . $error[2] . "\n", FILE_APPEND);
+                @file_put_contents('/var/log/dfe/nsu_log.txt', "[" . date('Y-m-d H:i:s') . "] ERRO AO SALVAR NO BANCO: " . $error[2] . "\n", FILE_APPEND);
             }
 
             if ($cStat == '656') {
@@ -306,7 +306,7 @@ switch ($action) {
             $xmlRes = @simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOERROR | LIBXML_NOWARNING);
             if (!$xmlRes) {
                 // Grava log para diagnóstico
-                @file_put_contents(__DIR__ . '/../debug_sefaz.log', "DATA: " . date('Y-m-d H:i:s') . "\nRESPOSTA: " . $res . "\n\n", FILE_APPEND);
+                @file_put_contents('/var/log/dfe/debug_sefaz.log', "DATA: " . date('Y-m-d H:i:s') . "\nRESPOSTA: " . $res . "\n\n", FILE_APPEND);
                 throw new Exception("Resposta XML do manifesto é inválida. O log foi gerado para análise.");
             }
             
