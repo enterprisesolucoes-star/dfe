@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { DollarSign, CheckCircle, XCircle, TrendingDown, RefreshCw } from 'lucide-react';
+import { DollarSign, CheckCircle, XCircle, TrendingDown, RefreshCw, FileText, Wrench, TrendingUp, Users, Package, AlertTriangle, Clock } from 'lucide-react';
 import { StatCard } from './UIComponents';
 
 // ─────────────────────────────────────────
@@ -17,6 +17,15 @@ export const DashboardTab = ({ isFiscal }: { isFiscal: boolean }) => {
     trendTotal: 0, trendCount: 0
   });
   const [finSummary, setFinSummary] = useState({ total_receber: 0, total_pagar: 0, trendReceber: 0, trendPagar: 0 });
+  const [kpis, setKpis] = useState<any>({
+    orcamentos_pendentes: { qtd: 0, valor: 0 },
+    taxa_conversao: { percentual: 0, aprovados: 0, total: 0 },
+    os_andamento: { qtd: 0 },
+    ticket_medio: { orcamento: 0, os: 0 },
+    top_clientes: [], top_produtos: [],
+    contas_receber: { vencendo_7d: { qtd: 0, valor: 0 }, vencidas: { qtd: 0, valor: 0 } },
+    contas_pagar:   { vencendo_7d: { qtd: 0, valor: 0 }, vencidas: { qtd: 0, valor: 0 } },
+  });
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -50,6 +59,10 @@ export const DashboardTab = ({ isFiscal }: { isFiscal: boolean }) => {
             });
           }
         }
+
+        const kpiRes = await fetch('./api.php?action=dashboard_kpis');
+        const kpiJson = await kpiRes.json();
+        if (kpiJson && kpiJson.success !== false) setKpis(kpiJson);
 
         const finRes = await fetch('./api.php?action=dashboard_financeiro');
         const finJson = await finRes.json();
@@ -138,6 +151,127 @@ export const DashboardTab = ({ isFiscal }: { isFiscal: boolean }) => {
           />
         )}
       </div>
+
+      {/* ─── KPIs Operacionais ──────────────────────── */}
+      <div>
+        <h4 className="text-xs uppercase font-bold text-gray-400 mb-3 tracking-wider">Operacional</h4>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <StatCard
+            label="Orçamentos Pendentes"
+            value={`${kpis.orcamentos_pendentes.qtd} (${kpis.orcamentos_pendentes.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })})`}
+            icon={FileText}
+            color="orange"
+          />
+          <StatCard
+            label="OS em Andamento"
+            value={kpis.os_andamento.qtd.toString()}
+            icon={Wrench}
+            color="blue"
+          />
+          <StatCard
+            label="Taxa de Conversão"
+            value={`${kpis.taxa_conversao.percentual}%`}
+            icon={TrendingUp}
+            color={kpis.taxa_conversao.percentual >= 50 ? 'green' : 'orange'}
+          />
+          <StatCard
+            label="Ticket Médio"
+            value={(kpis.ticket_medio.orcamento || kpis.ticket_medio.os || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            icon={DollarSign}
+            color="blue"
+          />
+        </div>
+      </div>
+
+      {/* ─── Alertas de Vencimento ──────────────────── */}
+      {(kpis.contas_receber.vencidas.qtd > 0 || kpis.contas_pagar.vencidas.qtd > 0 ||
+        kpis.contas_receber.vencendo_7d.qtd > 0 || kpis.contas_pagar.vencendo_7d.qtd > 0) && (
+        <div>
+          <h4 className="text-xs uppercase font-bold text-gray-400 mb-3 tracking-wider">Alertas Financeiros</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {kpis.contas_receber.vencidas.qtd > 0 && (
+              <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-5">
+                <div className="flex items-center gap-2 mb-2"><AlertTriangle className="w-4 h-4 text-red-600" /><p className="text-[10px] uppercase font-bold text-red-600">A Receber — Vencidas</p></div>
+                <p className="text-2xl font-bold text-red-700">{kpis.contas_receber.vencidas.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                <p className="text-xs text-red-500 mt-1">{kpis.contas_receber.vencidas.qtd} título(s)</p>
+              </div>
+            )}
+            {kpis.contas_receber.vencendo_7d.qtd > 0 && (
+              <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5">
+                <div className="flex items-center gap-2 mb-2"><Clock className="w-4 h-4 text-amber-600" /><p className="text-[10px] uppercase font-bold text-amber-600">A Receber — Próx. 7 dias</p></div>
+                <p className="text-2xl font-bold text-amber-700">{kpis.contas_receber.vencendo_7d.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                <p className="text-xs text-amber-500 mt-1">{kpis.contas_receber.vencendo_7d.qtd} título(s)</p>
+              </div>
+            )}
+            {kpis.contas_pagar.vencidas.qtd > 0 && (
+              <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-5">
+                <div className="flex items-center gap-2 mb-2"><AlertTriangle className="w-4 h-4 text-red-600" /><p className="text-[10px] uppercase font-bold text-red-600">A Pagar — Vencidas</p></div>
+                <p className="text-2xl font-bold text-red-700">{kpis.contas_pagar.vencidas.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                <p className="text-xs text-red-500 mt-1">{kpis.contas_pagar.vencidas.qtd} título(s)</p>
+              </div>
+            )}
+            {kpis.contas_pagar.vencendo_7d.qtd > 0 && (
+              <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5">
+                <div className="flex items-center gap-2 mb-2"><Clock className="w-4 h-4 text-amber-600" /><p className="text-[10px] uppercase font-bold text-amber-600">A Pagar — Próx. 7 dias</p></div>
+                <p className="text-2xl font-bold text-amber-700">{kpis.contas_pagar.vencendo_7d.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                <p className="text-xs text-amber-500 mt-1">{kpis.contas_pagar.vencendo_7d.qtd} título(s)</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ─── Top 5 Clientes e Produtos ──────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
+          <div className="flex items-center gap-2 mb-4">
+            <Users className="w-5 h-5 text-blue-600" />
+            <h4 className="text-base font-bold text-gray-800 dark:text-white">Top 5 Clientes do Mês</h4>
+          </div>
+          {kpis.top_clientes.length === 0 ? (
+            <p className="text-xs text-gray-400 text-center py-8">Nenhum cliente no período</p>
+          ) : (
+            <div className="space-y-2">
+              {kpis.top_clientes.map((c: any, i: number) => (
+                <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                  <div className="flex items-center gap-3">
+                    <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">{i + 1}</div>
+                    <p className="text-sm font-medium text-gray-700 truncate max-w-[200px]">{c.cliente_nome}</p>
+                  </div>
+                  <p className="text-sm font-bold text-blue-700">{Number(c.total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
+          <div className="flex items-center gap-2 mb-4">
+            <Package className="w-5 h-5 text-emerald-600" />
+            <h4 className="text-base font-bold text-gray-800 dark:text-white">Top 5 Produtos do Mês</h4>
+          </div>
+          {kpis.top_produtos.length === 0 ? (
+            <p className="text-xs text-gray-400 text-center py-8">Nenhum produto vendido no período</p>
+          ) : (
+            <div className="space-y-2">
+              {kpis.top_produtos.map((p: any, i: number) => (
+                <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs font-bold">{i + 1}</div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-700 truncate max-w-[180px]">{p.descricao}</p>
+                      <p className="text-xs text-gray-400">{Number(p.qtd).toLocaleString('pt-BR')} un.</p>
+                    </div>
+                  </div>
+                  <p className="text-sm font-bold text-emerald-700">{Number(p.total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+
 
       <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.4 }} className="bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-xl border border-gray-100 dark:border-gray-700">
         <div className="flex items-center justify-between mb-8">
