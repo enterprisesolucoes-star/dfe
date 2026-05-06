@@ -254,7 +254,7 @@ export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
       {/* ─── Cards Vendas + Donut Chart Status ─── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Card Vendas + Total a Receber + Total a Pagar (coluna esquerda) */}
-        <div className="space-y-6">
+        <div className="flex flex-col gap-6">
           <StatCard
             label="Vendas do Mês"
             value={summary.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
