@@ -18,7 +18,7 @@ const ESTADOS_BR = [
   { sigla: 'SP', nome: 'São Paulo' }, { sigla: 'SE', nome: 'Sergipe' }, { sigla: 'TO', nome: 'Tocantins' }
 ];
 
-const selClass = 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500';
+const selClass = 'w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400';
 
 const useMunicipios = (ufInicial?: string) => {
   const [municipios, setMunicipios] = useState<{ id: number; nome: string }[]>([]);
@@ -48,44 +48,44 @@ export const ProdutosTab = ({ produtos, onEdit, onDelete, onRefresh }: { produto
     p.ncm.includes(busca)
   );
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-      <div className="p-4 border-b border-gray-50 bg-gray-50/30">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
+      <div className="p-4 border-b border-gray-50 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/30">
         <div className="flex items-center gap-2">
           <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar Código ou Nome..." className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+            <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar Código ou Nome..." className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none" />
           </div>
           {onRefresh && <button onClick={onRefresh} className="px-3 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all flex items-center gap-1"><RefreshCw className="w-3.5 h-3.5" /> Atualizar</button>}
         </div>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left">
-          <thead className="bg-gray-50/50 border-b border-gray-100">
+          <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
             <tr>
-              <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase">Código</th>
-              <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase">Descrição</th>
-              <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase">NCM</th>
-              <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase text-right">Preço</th>
-              <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase text-right">Estoque</th>
-              <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase text-right">Ações</th>
+              <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Código</th>
+              <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Descrição</th>
+              <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">NCM</th>
+              <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase text-right">Preço</th>
+              <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase text-right">Estoque</th>
+              <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase text-right">Ações</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
             {filtrados.length === 0 ? (
-              <tr><td colSpan={6} className="px-4 py-10 text-center text-gray-400 italic">Nenhum produto cadastrado.</td></tr>
+              <tr><td colSpan={6} className="px-4 py-10 text-center text-gray-400 dark:text-gray-500 italic">Nenhum produto cadastrado.</td></tr>
             ) : filtrados.map(p => (
-              <tr key={p.id} className="hover:bg-gray-50/50 transition-colors group">
-                <td className="px-4 py-3 text-xs font-mono text-gray-500">{p.codigoInterno}</td>
-                <td className="px-4 py-3 text-sm font-semibold text-gray-700">{p.descricao}</td>
-                <td className="px-4 py-3 text-xs text-gray-400">{p.ncm}</td>
-                <td className="px-4 py-3 text-right text-sm font-bold text-blue-600">{Number(p.valorUnitario || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+              <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group">
+                <td className="px-4 py-3 text-xs font-mono text-gray-500 dark:text-gray-400">{p.codigoInterno}</td>
+                <td className="px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200">{p.descricao}</td>
+                <td className="px-4 py-3 text-xs text-gray-400 dark:text-gray-500">{p.ncm}</td>
+                <td className="px-4 py-3 text-right text-sm font-bold text-blue-600 dark:text-blue-400">{Number(p.valorUnitario || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                 <td className="px-4 py-3 text-right">
-                  <span className={`px-2 py-0.5 rounded-lg text-xs font-bold ${Number(p.estoque || 0) <= 0 ? 'bg-red-50 text-red-500' : 'bg-emerald-50 text-emerald-600'}`}>{Number(p.estoque || 0).toFixed(0)}</span>
+                  <span className={`px-2 py-0.5 rounded-lg text-xs font-bold ${Number(p.estoque || 0) <= 0 ? 'bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400' : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400'}`}>{Number(p.estoque || 0).toFixed(0)}</span>
                 </td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => onEdit(p)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"><Edit className="w-4 h-4" /></button>
-                    <button onClick={() => p.id && onDelete(p.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => onEdit(p)} className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg"><Edit className="w-4 h-4" /></button>
+                    <button onClick={() => p.id && onDelete(p.id)} className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 </td>
               </tr>
@@ -105,38 +105,38 @@ export const ClientesTab = ({ clientes, onEdit, onDelete }: { clientes: Cliente[
     (c.documento || '').includes(busca)
   );
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-      <div className="p-4 border-b border-gray-50 bg-gray-50/30">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
+      <div className="p-4 border-b border-gray-50 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/30">
         <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Filtrar clientes..." className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+          <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Filtrar clientes..." className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none" />
         </div>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left">
-          <thead className="bg-gray-50/50 border-b border-gray-100">
+          <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
             <tr>
-              <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase">Cliente</th>
-              <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase">Telefone</th>
-              <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase">Email</th>
-              <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase text-right">Ações</th>
+              <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Cliente</th>
+              <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Telefone</th>
+              <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Email</th>
+              <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase text-right">Ações</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
             {filtrados.length === 0 ? (
-              <tr><td colSpan={4} className="px-4 py-10 text-center text-gray-400 italic">Nenhum cliente cadastrado.</td></tr>
+              <tr><td colSpan={4} className="px-4 py-10 text-center text-gray-400 dark:text-gray-500 italic">Nenhum cliente cadastrado.</td></tr>
             ) : filtrados.map(c => (
-              <tr key={c.id} className="hover:bg-gray-50/50 transition-colors group">
+              <tr key={c.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group">
                 <td className="px-4 py-3">
-                  <div className="font-bold text-gray-700">{c.nome}</div>
-                  <div className="text-[10px] text-gray-400 font-mono">{c.documento}</div>
+                  <div className="font-bold text-gray-700 dark:text-gray-200">{c.nome}</div>
+                  <div className="text-[10px] text-gray-400 dark:text-gray-500 font-mono">{c.documento}</div>
                 </td>
-                <td className="px-4 py-3 text-xs text-gray-500">{c.telefone || '---'}</td>
-                <td className="px-4 py-3 text-xs text-gray-500">{c.email || '---'}</td>
+                <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400">{c.telefone || '---'}</td>
+                <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400">{c.email || '---'}</td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => onEdit(c)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"><Edit className="w-4 h-4" /></button>
-                    <button onClick={() => c.id && onDelete(c.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => onEdit(c)} className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg"><Edit className="w-4 h-4" /></button>
+                    <button onClick={() => c.id && onDelete(c.id)} className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 </td>
               </tr>
@@ -153,38 +153,38 @@ export const FornecedoresTab = ({ fornecedores, onEdit, onDelete }: { fornecedor
   const [busca, setBusca] = useState('');
   const filtrados = fornecedores.filter(f => (f.nome || '').toLowerCase().includes(busca.toLowerCase()) || (f.documento || '').includes(busca));
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-      <div className="p-4 border-b border-gray-50 bg-gray-50/30">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
+      <div className="p-4 border-b border-gray-50 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/30">
         <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Filtrar fornecedores..." className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+          <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Filtrar fornecedores..." className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none" />
         </div>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left">
-          <thead className="bg-gray-50/50 border-b border-gray-100">
+          <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
             <tr>
-              <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase">Fornecedor</th>
-              <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase">Telefone</th>
-              <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase">Email</th>
-              <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase text-right">Ações</th>
+              <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Fornecedor</th>
+              <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Telefone</th>
+              <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Email</th>
+              <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase text-right">Ações</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
             {filtrados.length === 0 ? (
-              <tr><td colSpan={4} className="px-4 py-10 text-center text-gray-400 italic">Nenhum fornecedor cadastrado.</td></tr>
+              <tr><td colSpan={4} className="px-4 py-10 text-center text-gray-400 dark:text-gray-500 italic">Nenhum fornecedor cadastrado.</td></tr>
             ) : filtrados.map(f => (
-              <tr key={f.id} className="hover:bg-gray-50/50 transition-colors group">
+              <tr key={f.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group">
                 <td className="px-4 py-3">
-                  <div className="font-bold text-gray-700">{f.nome}</div>
-                  <div className="text-[10px] text-gray-400 font-mono">{f.documento}</div>
+                  <div className="font-bold text-gray-700 dark:text-gray-200">{f.nome}</div>
+                  <div className="text-[10px] text-gray-400 dark:text-gray-500 font-mono">{f.documento}</div>
                 </td>
-                <td className="px-4 py-3 text-xs text-gray-500">{f.telefone || '---'}</td>
-                <td className="px-4 py-3 text-xs text-gray-500">{f.email || '---'}</td>
+                <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400">{f.telefone || '---'}</td>
+                <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400">{f.email || '---'}</td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => onEdit(f)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"><Edit className="w-4 h-4" /></button>
-                    <button onClick={() => f.id && onDelete(f.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => onEdit(f)} className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg"><Edit className="w-4 h-4" /></button>
+                    <button onClick={() => f.id && onDelete(f.id)} className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 </td>
               </tr>
@@ -201,38 +201,38 @@ export const TransportadoresTab = ({ transportadores, onEdit, onDelete }: { tran
   const [busca, setBusca] = useState('');
   const filtrados = transportadores.filter(t => (t.nome || '').toLowerCase().includes(busca.toLowerCase()) || (t.documento || '').includes(busca));
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-      <div className="p-4 border-b border-gray-50 bg-gray-50/30">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
+      <div className="p-4 border-b border-gray-50 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/30">
         <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Filtrar transportadores..." className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+          <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Filtrar transportadores..." className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none" />
         </div>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left">
-          <thead className="bg-gray-50/50 border-b border-gray-100">
+          <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
             <tr>
-              <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase">Transportador</th>
-              <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase">IE</th>
-              <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase">Telefone</th>
-              <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase text-right">Ações</th>
+              <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Transportador</th>
+              <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">IE</th>
+              <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Telefone</th>
+              <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase text-right">Ações</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
             {filtrados.length === 0 ? (
-              <tr><td colSpan={4} className="px-4 py-10 text-center text-gray-400 italic">Nenhum transportador cadastrado.</td></tr>
+              <tr><td colSpan={4} className="px-4 py-10 text-center text-gray-400 dark:text-gray-500 italic">Nenhum transportador cadastrado.</td></tr>
             ) : filtrados.map(t => (
-              <tr key={t.id} className="hover:bg-gray-50/50 transition-colors group">
+              <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group">
                 <td className="px-4 py-3">
-                  <div className="font-bold text-gray-700">{t.nome}</div>
-                  <div className="text-[10px] text-gray-400 font-mono">{t.documento}</div>
+                  <div className="font-bold text-gray-700 dark:text-gray-200">{t.nome}</div>
+                  <div className="text-[10px] text-gray-400 dark:text-gray-500 font-mono">{t.documento}</div>
                 </td>
-                <td className="px-4 py-3 text-xs text-gray-500">{t.ie || '---'}</td>
-                <td className="px-4 py-3 text-xs text-gray-500">{t.telefone || '---'}</td>
+                <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400">{t.ie || '---'}</td>
+                <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400">{t.telefone || '---'}</td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => onEdit(t)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"><Edit className="w-4 h-4" /></button>
-                    <button onClick={() => t.id && onDelete(t.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => onEdit(t)} className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg"><Edit className="w-4 h-4" /></button>
+                    <button onClick={() => t.id && onDelete(t.id)} className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 </td>
               </tr>
@@ -253,29 +253,29 @@ const TPAG_LABELS: Record<string, string> = {
 };
 
 export const BandeirasTab = ({ bandeiras, onEdit, onDelete }: { bandeiras: Bandeira[]; onEdit: (b: Bandeira) => void; onDelete: (id: number) => void }) => (
-  <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+  <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
     <div className="overflow-x-auto">
       <table className="w-full text-left">
-        <thead className="bg-gray-50/50 border-b border-gray-100">
+        <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
           <tr>
-            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase">Forma de Pagamento</th>
-            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase">Bandeira / Credenciadora</th>
-            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase">CNPJ Credenciadora</th>
-            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase text-right">Ações</th>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Forma de Pagamento</th>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Bandeira / Credenciadora</th>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">CNPJ Credenciadora</th>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase text-right">Ações</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-50">
+        <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
           {bandeiras.length === 0 ? (
-            <tr><td colSpan={4} className="px-4 py-10 text-center text-gray-400 italic">Nenhuma bandeira cadastrada.</td></tr>
+            <tr><td colSpan={4} className="px-4 py-10 text-center text-gray-400 dark:text-gray-500 italic">Nenhuma bandeira cadastrada.</td></tr>
           ) : bandeiras.map(b => (
-            <tr key={b.id} className="hover:bg-gray-50/50 transition-colors group">
-              <td className="px-4 py-3 text-sm font-semibold text-gray-700">{TPAG_LABELS[b.tpag] || b.tpag}</td>
-              <td className="px-4 py-3 text-xs text-gray-500">{b.tband_opc || '---'}</td>
-              <td className="px-4 py-3 text-xs font-mono text-gray-400">{b.cnpj_opc || '---'}</td>
+            <tr key={b.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group">
+              <td className="px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200">{TPAG_LABELS[b.tpag] || b.tpag}</td>
+              <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400">{b.tband_opc || '---'}</td>
+              <td className="px-4 py-3 text-xs font-mono text-gray-400 dark:text-gray-500">{b.cnpj_opc || '---'}</td>
               <td className="px-4 py-3 text-right">
                 <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => onEdit(b)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"><Edit className="w-4 h-4" /></button>
-                  <button onClick={() => b.id && onDelete(b.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
+                  <button onClick={() => onEdit(b)} className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg"><Edit className="w-4 h-4" /></button>
+                  <button onClick={() => b.id && onDelete(b.id)} className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg"><Trash2 className="w-4 h-4" /></button>
                 </div>
               </td>
             </tr>
@@ -288,37 +288,37 @@ export const BandeirasTab = ({ bandeiras, onEdit, onDelete }: { bandeiras: Bande
 
 // ── Listagem: Medidas ─────────────────────────────────────────────────────────
 export const MedidasTab = ({ medidas, onEdit, onDelete }: { medidas: Medida[]; onEdit: (m: Medida) => void; onDelete: (id: number) => void }) => (
-  <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+  <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
     <div className="overflow-x-auto">
       <table className="w-full text-left">
-        <thead className="bg-gray-50/50 border-b border-gray-100">
+        <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
           <tr>
-            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase">Código</th>
-            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase">Descrição</th>
-            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase text-center">Fator</th>
-            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase text-center">Pesável</th>
-            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase text-center">Ativo</th>
-            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase text-right">Ações</th>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Código</th>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Descrição</th>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase text-center">Fator</th>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase text-center">Pesável</th>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase text-center">Ativo</th>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase text-right">Ações</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-50">
+        <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
           {medidas.length === 0 ? (
-            <tr><td colSpan={6} className="px-4 py-10 text-center text-gray-400 italic">Nenhuma medida cadastrada.</td></tr>
+            <tr><td colSpan={6} className="px-4 py-10 text-center text-gray-400 dark:text-gray-500 italic">Nenhuma medida cadastrada.</td></tr>
           ) : medidas.map(m => (
-            <tr key={m.id} className="hover:bg-gray-50/50 transition-colors group">
-              <td className="px-4 py-3 font-mono font-bold text-gray-700">{m.codigo}</td>
-              <td className="px-4 py-3 text-sm text-gray-600">{m.descricao}</td>
-              <td className="px-4 py-3 text-center text-xs text-gray-500">{m.fator}</td>
+            <tr key={m.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group">
+              <td className="px-4 py-3 font-mono font-bold text-gray-700 dark:text-gray-200">{m.codigo}</td>
+              <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{m.descricao}</td>
+              <td className="px-4 py-3 text-center text-xs text-gray-500 dark:text-gray-400">{m.fator}</td>
               <td className="px-4 py-3 text-center">
-                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${m.pesavel ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-400'}`}>{m.pesavel ? 'Sim' : 'Não'}</span>
+                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${m.pesavel ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500'}`}>{m.pesavel ? 'Sim' : 'Não'}</span>
               </td>
               <td className="px-4 py-3 text-center">
-                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${m.ativo !== false ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-500'}`}>{m.ativo !== false ? 'Ativo' : 'Inativo'}</span>
+                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${m.ativo !== false ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400'}`}>{m.ativo !== false ? 'Ativo' : 'Inativo'}</span>
               </td>
               <td className="px-4 py-3 text-right">
                 <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => onEdit(m)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"><Edit className="w-4 h-4" /></button>
-                  <button onClick={() => m.id && onDelete(m.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
+                  <button onClick={() => onEdit(m)} className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg"><Edit className="w-4 h-4" /></button>
+                  <button onClick={() => m.id && onDelete(m.id)} className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg"><Trash2 className="w-4 h-4" /></button>
                 </div>
               </td>
             </tr>
@@ -367,10 +367,10 @@ export const NcmTab = ({ ufEmpresa }: { ufEmpresa?: string }) => {
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-2xl border border-gray-100 p-4 flex flex-wrap gap-3 items-center shadow-sm">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 flex flex-wrap gap-3 items-center shadow-sm">
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input type="text" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && buscar(query, 0)} placeholder="Buscar NCM..." className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+          <input type="text" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && buscar(query, 0)} placeholder="Buscar NCM..." className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400" />
         </div>
         <button onClick={() => buscar(query, 0)} className="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 flex items-center gap-2">
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Buscar
@@ -380,35 +380,35 @@ export const NcmTab = ({ ufEmpresa }: { ufEmpresa?: string }) => {
         </button>
       </div>
       {!temDados && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
+        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 text-sm text-amber-800">
           Tabela IBPT não importada. Clique em <strong>Importar IBPT</strong> para carregar as alíquotas.
         </div>
       )}
-      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
         <table className="w-full text-left text-sm">
-          <thead className="bg-gray-50/50 border-b border-gray-100">
+          <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
             <tr>
-              <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase">NCM</th>
-              <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase">Descrição</th>
-              <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase text-right">Alíquota Total</th>
+              <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">NCM</th>
+              <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Descrição</th>
+              <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase text-right">Alíquota Total</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
             {loading ? (
-              <tr><td colSpan={3} className="px-4 py-10 text-center text-gray-400"><RefreshCw className="w-5 h-5 animate-spin mx-auto" /></td></tr>
+              <tr><td colSpan={3} className="px-4 py-10 text-center text-gray-400 dark:text-gray-500"><RefreshCw className="w-5 h-5 animate-spin mx-auto" /></td></tr>
             ) : rows.length === 0 ? (
-              <tr><td colSpan={3} className="px-4 py-10 text-center text-gray-400 italic">Nenhum resultado.</td></tr>
+              <tr><td colSpan={3} className="px-4 py-10 text-center text-gray-400 dark:text-gray-500 italic">Nenhum resultado.</td></tr>
             ) : rows.map((r, i) => (
-              <tr key={i} className="hover:bg-gray-50/50 transition-colors">
-                <td className="px-4 py-3 font-mono text-gray-500">{r.codigo}</td>
-                <td className="px-4 py-3 text-xs text-gray-600 truncate max-w-xs">{r.descricao}</td>
-                <td className="px-4 py-3 text-right font-bold text-blue-600">{(parseFloat(r.aliquota_nacional || 0) + parseFloat(r.aliquota_estadual || 0)).toFixed(2)}%</td>
+              <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                <td className="px-4 py-3 font-mono text-gray-500 dark:text-gray-400">{r.codigo}</td>
+                <td className="px-4 py-3 text-xs text-gray-600 dark:text-gray-300 truncate max-w-xs">{r.descricao}</td>
+                <td className="px-4 py-3 text-right font-bold text-blue-600 dark:text-blue-400">{(parseFloat(r.aliquota_nacional || 0) + parseFloat(r.aliquota_estadual || 0)).toFixed(2)}%</td>
               </tr>
             ))}
           </tbody>
         </table>
         {total > LIMIT && (
-          <div className="p-3 border-t border-gray-100 flex justify-between items-center text-xs text-gray-400">
+          <div className="p-3 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center text-xs text-gray-400 dark:text-gray-500">
             <span>{offset + 1}–{Math.min(offset + LIMIT, total)} de {total}</span>
             <div className="flex gap-2">
               <button disabled={offset === 0} onClick={() => { setOffset(offset - LIMIT); buscar(query, offset - LIMIT); }} className="px-3 py-1 border rounded-lg disabled:opacity-40">Anterior</button>
@@ -442,20 +442,20 @@ const NcmImportModal = ({ defaultUf, onClose }: { defaultUf: string; onClose: ()
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[300] p-4">
-      <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-bold text-gray-800">Importar Tabela IBPT</h3>
-          <button onClick={onClose}><X className="w-5 h-5 text-gray-400" /></button>
+          <h3 className="font-bold text-gray-800 dark:text-gray-100">Importar Tabela IBPT</h3>
+          <button onClick={onClose}><X className="w-5 h-5 text-gray-400 dark:text-gray-500" /></button>
         </div>
-        <p className="text-xs text-gray-500 mb-4">Selecione o estado para importar as alíquotas de tributos (IBPT) do servidor.</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Selecione o estado para importar as alíquotas de tributos (IBPT) do servidor.</p>
         <div className="mb-4">
-          <label className="block text-xs font-medium text-gray-600 mb-1">Estado (UF)</label>
+          <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Estado (UF)</label>
           <select value={uf} onChange={e => setUf(e.target.value)} className={selClass}>
             <option value="">Selecione...</option>
             {ESTADOS_BR.map(e => <option key={e.sigla} value={e.sigla}>{e.sigla} — {e.nome}</option>)}
           </select>
         </div>
-        {msg && <p className={`text-sm mb-4 ${msg.includes('sucesso') ? 'text-green-600' : 'text-red-600'}`}>{msg}</p>}
+        {msg && <p className={`text-sm mb-4 ${msg.includes('sucesso') ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>{msg}</p>}
         <button onClick={handleImport} disabled={loading} className="w-full py-2 bg-orange-500 text-white rounded-xl font-bold text-sm hover:bg-orange-600 disabled:opacity-50 flex items-center justify-center gap-2">
           {loading ? <><RefreshCw className="w-4 h-4 animate-spin" /> Importando...</> : <><Upload className="w-4 h-4" /> Importar</>}
         </button>
@@ -481,10 +481,10 @@ export const ClienteModal = ({ cliente, onClose, onSave, showAlert }: any) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[200] p-4 backdrop-blur-sm">
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-        <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-          <h3 className="text-lg font-bold text-gray-800">{cliente ? 'Editar Cliente' : 'Novo Cliente'}</h3>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl"><X className="w-5 h-5 text-gray-400" /></button>
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+        <div className="p-5 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-900/50">
+          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">{cliente ? 'Editar Cliente' : 'Novo Cliente'}</h3>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl"><X className="w-5 h-5 text-gray-400 dark:text-gray-500" /></button>
         </div>
         <div className="p-5 space-y-4 overflow-y-auto flex-1">
           <div className="grid grid-cols-2 gap-4">
@@ -498,7 +498,7 @@ export const ClienteModal = ({ cliente, onClose, onSave, showAlert }: any) => {
           <div className="grid grid-cols-2 gap-4">
             <Input label="Inscrição Estadual" value={form.ie || ''} onChange={(e: any) => setForm({ ...form, ie: e.target.value })} />
             <div>
-              <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Indicador IE Destinatário</label>
+              <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">Indicador IE Destinatário</label>
               <select value={form.indIEDest || '9'} onChange={e => setForm({ ...form, indIEDest: e.target.value })} className={selClass}>
                 <option value="1">1 – Contribuinte ICMS</option>
                 <option value="2">2 – Contribuinte isento</option>
@@ -508,7 +508,7 @@ export const ClienteModal = ({ cliente, onClose, onSave, showAlert }: any) => {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Regime Tributário</label>
+              <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">Regime Tributário</label>
               <select value={form.regimeTributario || '1'} onChange={e => setForm({ ...form, regimeTributario: e.target.value })} className={selClass}>
                 <option value="1">1 – Simples Nacional</option>
                 <option value="2">2 – Simples Nacional – Excesso</option>
@@ -516,7 +516,7 @@ export const ClienteModal = ({ cliente, onClose, onSave, showAlert }: any) => {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Entidade Governamental</label>
+              <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">Entidade Governamental</label>
               <select value={form.entidadeGovernamental || '0'} onChange={e => setForm({ ...form, entidadeGovernamental: e.target.value })} className={selClass}>
                 <option value="0">0 – Não é entidade governamental</option>
                 <option value="1">1 – Administração Pública Federal</option>
@@ -525,8 +525,8 @@ export const ClienteModal = ({ cliente, onClose, onSave, showAlert }: any) => {
               </select>
             </div>
           </div>
-          <div className="pt-2 border-t border-gray-100">
-            <p className="text-xs font-bold text-gray-400 uppercase mb-3">Endereço</p>
+          <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
+            <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-3">Endereço</p>
             <div className="grid grid-cols-3 gap-4">
               <div className="col-span-2">
                 <Input label="Logradouro" value={form.endereco?.logradouro || ''} onChange={(e: any) => setEnd('logradouro', e.target.value)} />
@@ -540,13 +540,13 @@ export const ClienteModal = ({ cliente, onClose, onSave, showAlert }: any) => {
             </div>
             <div className="grid grid-cols-3 gap-4 mt-3">
               <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">UF</label>
+                <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">UF</label>
                 <select value={form.endereco?.uf || 'GO'} onChange={e => { setEnd('uf', e.target.value); carregar(e.target.value); }} className={selClass}>
                   {ESTADOS_BR.map(e => <option key={e.sigla} value={e.sigla}>{e.sigla}</option>)}
                 </select>
               </div>
               <div className="col-span-2">
-                <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Município</label>
+                <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">Município</label>
                 <select disabled={loadingMun} value={form.endereco?.codigoMunicipio || ''} onChange={e => {
                   const m = municipios.find(x => String(x.id) === e.target.value);
                   if (m) { setEnd('municipio', m.nome); setEnd('codigoMunicipio', String(m.id)); }
@@ -558,8 +558,8 @@ export const ClienteModal = ({ cliente, onClose, onSave, showAlert }: any) => {
             </div>
           </div>
         </div>
-        <div className="p-5 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/30">
-          <button onClick={onClose} className="px-6 py-2 text-gray-500 font-bold uppercase text-[11px] hover:bg-gray-100 rounded-xl">Cancelar</button>
+        <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/30">
+          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl">Cancelar</button>
           <button onClick={() => {
             const end = form.endereco || {};
             if (!end.logradouro?.trim() || !end.numero?.trim() || !end.bairro?.trim() || !end.codigoMunicipio || !end.cep?.trim()) {
@@ -709,16 +709,16 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[200] p-4 backdrop-blur-sm">
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-        <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-          <h3 className="text-lg font-bold text-gray-800">{produto ? 'Editar Produto' : 'Novo Produto'}</h3>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl"><X className="w-5 h-5 text-gray-400" /></button>
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+        <div className="p-5 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-900/50">
+          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">{produto ? 'Editar Produto' : 'Novo Produto'}</h3>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl"><X className="w-5 h-5 text-gray-400 dark:text-gray-500" /></button>
         </div>
-        <div className="flex border-b border-gray-100">
+        <div className="flex border-b border-gray-100 dark:border-gray-700">
           {(['geral', 'fiscal'] as const).map(t => {
             if (t === 'fiscal' && !isFiscal) return null;
             return (
-              <button key={t} onClick={() => setAba(t)} className={`flex-1 py-3 text-xs font-bold uppercase transition-all text-center ${aba === t ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}>
+              <button key={t} onClick={() => setAba(t)} className={`flex-1 py-3 text-xs font-bold uppercase transition-all text-center ${aba === t ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500 hover:text-gray-600'}`}>
                 {t === 'geral' ? 'Geral' : 'Fiscal'}
               </button>
             );
@@ -735,7 +735,7 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
                 <Input label="Código Interno *" value={form.codigoInterno} onChange={(e: any) => set('codigoInterno', e.target.value)} />
                 <Input label="Código de Barras (EAN)" value={form.codigoBarras || ''} onChange={(e: any) => set('codigoBarras', e.target.value)} />
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Unidade</label>
+                  <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">Unidade</label>
                   <select value={form.unidadeComercial || 'UN'} onChange={e => set('unidadeComercial', e.target.value)} className={selClass}>
                     {['UN', 'KG', 'G', 'L', 'ML', 'MT', 'CM', 'CX', 'PCT', 'PAR', 'DZ', 'PC'].map(u => <option key={u} value={u}>{u}</option>)}
                   </select>
@@ -745,21 +745,21 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
                 <Input label="Estoque" type="number" step="0.001" value={form.estoque || 0} onChange={(e: any) => set('estoque', Number(e.target.value))} />
                 <Input label="Cód. Fornecedor" value={form.codigoFornecedor || ''} onChange={(e: any) => set('codigoFornecedor', e.target.value)} />
               </div>
-              <div className="border border-blue-100 bg-blue-50/30 rounded-xl p-4 space-y-3">
-                <p className="text-[10px] font-bold text-blue-600 uppercase tracking-wide">Formação do Preço de Venda — Markup Divisor</p>
+              <div className="border border-blue-100 bg-blue-50 dark:bg-blue-900/20/30 rounded-xl p-4 space-y-3">
+                <p className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wide">Formação do Preço de Venda — Markup Divisor</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Custo de Compra (R$)</label>
+                    <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">Custo de Compra (R$)</label>
                     <NumInput value={form.custoCopra || 0}
                       onChange={custo => {
                         const soma = Number(form.simplesNacional||0) + Number(form.despesasOperacionais||0) + Number(form.freteSeguro||0) + Number(form.margemLucro||0);
                         const div = 1 - soma / 100;
                         setForm((p: any) => ({ ...p, custoCopra: custo, valorUnitario: custo > 0 && div > 0 ? parseFloat((custo / div).toFixed(2)) : p.valorUnitario }));
                       }}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400" />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Simples Nacional (%)</label>
+                    <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">Simples Nacional (%)</label>
                     <NumInput value={form.simplesNacional || 0}
                       onChange={val => {
                         const custo = Number(form.custoCopra || 0);
@@ -767,10 +767,10 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
                         const div = 1 - soma / 100;
                         setForm((p: any) => ({ ...p, simplesNacional: val, valorUnitario: custo > 0 && div > 0 ? parseFloat((custo / div).toFixed(2)) : p.valorUnitario }));
                       }}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400" />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Despesas Operacionais (%)</label>
+                    <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">Despesas Operacionais (%)</label>
                     <NumInput value={form.despesasOperacionais || 0}
                       onChange={val => {
                         const custo = Number(form.custoCopra || 0);
@@ -778,10 +778,10 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
                         const div = 1 - soma / 100;
                         setForm((p: any) => ({ ...p, despesasOperacionais: val, valorUnitario: custo > 0 && div > 0 ? parseFloat((custo / div).toFixed(2)) : p.valorUnitario }));
                       }}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400" />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Frete e Seguro (%)</label>
+                    <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">Frete e Seguro (%)</label>
                     <NumInput value={form.freteSeguro || 0}
                       onChange={val => {
                         const custo = Number(form.custoCopra || 0);
@@ -789,10 +789,10 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
                         const div = 1 - soma / 100;
                         setForm((p: any) => ({ ...p, freteSeguro: val, valorUnitario: custo > 0 && div > 0 ? parseFloat((custo / div).toFixed(2)) : p.valorUnitario }));
                       }}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400" />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Margem de Lucro (%)</label>
+                    <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">Margem de Lucro (%)</label>
                     <NumInput value={form.margemLucro || 0}
                       onChange={val => {
                         const custo = Number(form.custoCopra || 0);
@@ -800,10 +800,10 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
                         const div = 1 - soma / 100;
                         setForm((p: any) => ({ ...p, margemLucro: val, valorUnitario: custo > 0 && div > 0 ? parseFloat((custo / div).toFixed(2)) : p.valorUnitario }));
                       }}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400" />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-blue-700 uppercase mb-1 ml-1">Preço de Venda (R$) *</label>
+                    <label className="block text-xs font-bold text-blue-700 dark:text-blue-300 uppercase mb-1 ml-1">Preço de Venda (R$) *</label>
                     <NumInput value={form.valorUnitario || 0}
                       onChange={preco => {
                         const custo = Number(form.custoCopra || 0);
@@ -811,7 +811,7 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
                         const margem = preco > 0 && custo > 0 ? parseFloat(((1 - custo / preco) * 100 - fixo).toFixed(2)) : form.margemLucro;
                         setForm((p: any) => ({ ...p, valorUnitario: preco, margemLucro: margem > 0 ? margem : p.margemLucro }));
                       }}
-                      className="w-full border-2 border-blue-400 rounded-lg px-3 py-2 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 font-bold text-blue-700 bg-blue-50" />
+                      className="w-full border-2 border-blue-400 rounded-lg px-3 py-2 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20" />
                   </div>
                 </div>
                 {Number(form.custoCopra) > 0 && Number(form.valorUnitario) > 0 && (() => {
@@ -822,10 +822,10 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
                   const markup = ((preco / custo) - 1) * 100;
                   return (
                     <div className="border-t border-blue-100 pt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-                      <span className="text-gray-500">Markup Divisor: <strong className="text-gray-700">{(1 - soma/100).toFixed(4)}</strong></span>
-                      <span className="text-gray-500">Markup: <strong className="text-blue-600">{markup.toFixed(2)}%</strong></span>
-                      <span className="text-gray-500">Lucro bruto: <strong className="text-green-600">R$ {lucro.toFixed(2).replace('.', ',')}</strong></span>
-                      <span className="text-gray-500">Margem real: <strong className="text-purple-600">{((lucro / preco) * 100).toFixed(2)}%</strong></span>
+                      <span className="text-gray-500 dark:text-gray-400">Markup Divisor: <strong className="text-gray-700 dark:text-gray-200">{(1 - soma/100).toFixed(4)}</strong></span>
+                      <span className="text-gray-500 dark:text-gray-400">Markup: <strong className="text-blue-600 dark:text-blue-400">{markup.toFixed(2)}%</strong></span>
+                      <span className="text-gray-500 dark:text-gray-400">Lucro bruto: <strong className="text-green-600 dark:text-green-400">R$ {lucro.toFixed(2).replace('.', ',')}</strong></span>
+                      <span className="text-gray-500 dark:text-gray-400">Margem real: <strong className="text-purple-600">{((lucro / preco) * 100).toFixed(2)}%</strong></span>
                     </div>
                   );
                 })()}
@@ -841,15 +841,15 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
                 <Input label="CEST" value={form.cest || ''} onChange={(e: any) => set('cest', e.target.value)} placeholder="Ex: 0300200" />
               </div>
               {ncmDetect && (
-                <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-3 space-y-2">
+                <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 rounded-xl p-3 space-y-2">
                   {ncmDetect.ibpt && (
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <p className="text-[10px] font-bold text-indigo-500 uppercase mb-0.5">IBPT — {ncmDetect.ibpt.codigo}</p>
-                        <p className="text-sm font-semibold text-gray-800 leading-snug">{ncmDetect.ibpt.descricao}</p>
+                        <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 leading-snug">{ncmDetect.ibpt.descricao}</p>
                         <div className="flex flex-wrap gap-3 mt-1.5">
-                          <span className="text-[11px] text-gray-500">Nacional: <strong className="text-gray-700">{Number(ncmDetect.ibpt.aliquota_nacional || 0).toFixed(2)}%</strong></span>
-                          <span className="text-[11px] text-gray-500">Estadual: <strong className="text-gray-700">{Number(ncmDetect.ibpt.aliquota_estadual || 0).toFixed(2)}%</strong></span>
+                          <span className="text-[11px] text-gray-500 dark:text-gray-400">Nacional: <strong className="text-gray-700 dark:text-gray-200">{Number(ncmDetect.ibpt.aliquota_nacional || 0).toFixed(2)}%</strong></span>
+                          <span className="text-[11px] text-gray-500 dark:text-gray-400">Estadual: <strong className="text-gray-700 dark:text-gray-200">{Number(ncmDetect.ibpt.aliquota_estadual || 0).toFixed(2)}%</strong></span>
                         </div>
                       </div>
                     </div>
@@ -858,24 +858,24 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
                     <div className="border-t border-indigo-200 pt-2">
                       <p className="text-[10px] font-bold text-purple-600 uppercase mb-2">
                         LC 214/2025 — Sugestões IBS/CBS
-                        {ncmDetect.rtc.length > 1 && <span className="normal-case font-normal text-gray-400 ml-1">({ncmDetect.rtc.length} enquadramentos — selecione a finalidade de uso)</span>}
+                        {ncmDetect.rtc.length > 1 && <span className="normal-case font-normal text-gray-400 dark:text-gray-500 ml-1">({ncmDetect.rtc.length} enquadramentos — selecione a finalidade de uso)</span>}
                       </p>
                       <div className="space-y-2">
                         {ncmDetect.rtc.map((r: any, i: number) => {
                           const specific = isRtcContextSpecific(r);
                           const isPadrao = !!r._padrao;
                           const confirming = rtcConfirmIdx === i;
-                          const cardCls = specific ? 'border-amber-300 bg-amber-50' : isPadrao ? 'border-gray-200 bg-gray-50' : 'border-purple-100 bg-purple-50';
+                          const cardCls = specific ? 'border-amber-300 bg-amber-50 dark:bg-amber-900/20' : isPadrao ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900' : 'border-purple-100 bg-purple-50 dark:bg-purple-900/20';
                           return (
                             <div key={i} className={`rounded-lg border ${cardCls}`}>
                               <div className="flex items-center justify-between gap-2 px-2 py-1.5">
-                                <div className="flex flex-wrap gap-1.5 text-[11px] text-gray-600 flex-1 min-w-0">
-                                  <span className={`font-mono px-1.5 rounded ${specific ? 'bg-amber-200 text-amber-800' : isPadrao ? 'bg-gray-200 text-gray-700' : 'bg-purple-100 text-purple-700'}`}>{r.cst || '—'}</span>
-                                  <span className="text-gray-700 font-medium">{r.classtrib || ''}</span>
-                                  <span className="bg-blue-100 text-blue-700 px-1.5 rounded font-bold">CBS</span>
-                                  <span className="bg-green-100 text-green-700 px-1.5 rounded font-bold">IBS</span>
-                                  {r.nome_classtrib ? <span className={`text-[10px] ${specific ? 'text-amber-700 font-medium' : isPadrao ? 'text-gray-500 italic' : 'text-gray-500'}`}>{r.nome_classtrib}</span> : null}
-                                  {r.legislacao ? <span className="text-gray-400 text-[10px]">{r.legislacao}{r.anexo ? ` Anx.${r.anexo}` : ''}</span> : null}
+                                <div className="flex flex-wrap gap-1.5 text-[11px] text-gray-600 dark:text-gray-300 flex-1 min-w-0">
+                                  <span className={`font-mono px-1.5 rounded ${specific ? 'bg-amber-200 text-amber-800' : isPadrao ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200' : 'bg-purple-100 text-purple-700'}`}>{r.cst || '—'}</span>
+                                  <span className="text-gray-700 dark:text-gray-200 font-medium">{r.classtrib || ''}</span>
+                                  <span className="bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-1.5 rounded font-bold">CBS</span>
+                                  <span className="bg-green-100 text-green-700 dark:text-green-300 px-1.5 rounded font-bold">IBS</span>
+                                  {r.nome_classtrib ? <span className={`text-[10px] ${specific ? 'text-amber-700 dark:text-amber-300 font-medium' : isPadrao ? 'text-gray-500 dark:text-gray-400 italic' : 'text-gray-500 dark:text-gray-400'}`}>{r.nome_classtrib}</span> : null}
+                                  {r.legislacao ? <span className="text-gray-400 dark:text-gray-500 text-[10px]">{r.legislacao}{r.anexo ? ` Anx.${r.anexo}` : ''}</span> : null}
                                   {specific && <span className="text-[9px] font-bold bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded-full uppercase">Finalidade específica</span>}
                                 </div>
                                 <button type="button"
@@ -885,28 +885,28 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
                                 </button>
                               </div>
                               {confirming && specific && (
-                                <div className="px-3 pb-3 pt-2 border-t border-amber-200 space-y-2">
+                                <div className="px-3 pb-3 pt-2 border-t border-amber-200 dark:border-amber-800 space-y-2">
                                   {/* Título e cClassTrib */}
                                   <div className="flex items-center gap-2 flex-wrap">
                                     <span className="text-[10px] font-bold bg-amber-200 text-amber-800 px-2 py-0.5 rounded font-mono">{r.classtrib}</span>
-                                    {r.lc_referencia && <span className="text-[10px] text-amber-700 font-medium">{r.lc_referencia}</span>}
+                                    {r.lc_referencia && <span className="text-[10px] text-amber-700 dark:text-amber-300 font-medium">{r.lc_referencia}</span>}
                                   </div>
                                   {/* Redução CBS / IBS */}
                                   <div className="flex gap-4">
-                                    <div className="flex flex-col items-center bg-amber-100 rounded px-3 py-1">
-                                      <span className="text-[9px] font-bold text-amber-700 uppercase tracking-wide">% Red. CBS</span>
+                                    <div className="flex flex-col items-center bg-amber-100 dark:bg-amber-900/40 rounded px-3 py-1">
+                                      <span className="text-[9px] font-bold text-amber-700 dark:text-amber-300 uppercase tracking-wide">% Red. CBS</span>
                                       <span className="text-[15px] font-extrabold text-amber-900">{r.pred_cbs != null ? Number(r.pred_cbs).toFixed(0) : '—'}</span>
                                     </div>
-                                    <div className="flex flex-col items-center bg-amber-100 rounded px-3 py-1">
-                                      <span className="text-[9px] font-bold text-amber-700 uppercase tracking-wide">% Red. IBS</span>
+                                    <div className="flex flex-col items-center bg-amber-100 dark:bg-amber-900/40 rounded px-3 py-1">
+                                      <span className="text-[9px] font-bold text-amber-700 dark:text-amber-300 uppercase tracking-wide">% Red. IBS</span>
                                       <span className="text-[15px] font-extrabold text-amber-900">{r.pred_ibs != null ? Number(r.pred_ibs).toFixed(0) : '—'}</span>
                                     </div>
                                   </div>
                                   {/* Link para averiguação */}
                                   {r.link && (
-                                    <div className="bg-blue-50 border border-blue-200 rounded px-2 py-1.5">
-                                      <p className="text-[9px] font-bold text-blue-600 uppercase tracking-wide mb-0.5">Link (clique para abrir no navegador)</p>
-                                      <a href={r.link} target="_blank" rel="noreferrer" className="text-[10px] text-blue-700 hover:text-blue-900 hover:underline break-all">{r.link}</a>
+                                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded px-2 py-1.5">
+                                      <p className="text-[9px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wide mb-0.5">Link (clique para abrir no navegador)</p>
+                                      <a href={r.link} target="_blank" rel="noreferrer" className="text-[10px] text-blue-700 dark:text-blue-300 hover:text-blue-900 hover:underline break-all">{r.link}</a>
                                     </div>
                                   )}
                                   {/* Nome */}
@@ -920,11 +920,11 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
                                   {/* Redação da lei */}
                                   {r.lc_redacao && (
                                     <details className="text-[10px]">
-                                      <summary className="cursor-pointer text-amber-700 font-medium hover:text-amber-900">Redação da LC 214/2025 ▾</summary>
-                                      <pre className="mt-1 whitespace-pre-wrap text-amber-800 bg-amber-100 rounded p-2 leading-relaxed">{r.lc_redacao}</pre>
+                                      <summary className="cursor-pointer text-amber-700 dark:text-amber-300 font-medium hover:text-amber-900">Redação da LC 214/2025 ▾</summary>
+                                      <pre className="mt-1 whitespace-pre-wrap text-amber-800 bg-amber-100 dark:bg-amber-900/40 rounded p-2 leading-relaxed">{r.lc_redacao}</pre>
                                     </details>
                                   )}
-                                  <p className="text-[11px] text-amber-900 font-medium pt-1 border-t border-amber-200">
+                                  <p className="text-[11px] text-amber-900 font-medium pt-1 border-t border-amber-200 dark:border-amber-800">
                                     ⚠️ Este enquadramento aplica-se <strong>exclusivamente</strong> às operações descritas acima. Confirme antes de aplicar ao produto.
                                   </p>
                                   <div className="flex justify-end pt-1">
@@ -945,7 +945,7 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
               )}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">CFOP *</label>
+                  <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">CFOP *</label>
                   <select value={form.cfop} onChange={e => set('cfop', e.target.value)} className={selClass}>
                     <option value="5102">5102 – Venda de mercadoria (dentro UF)</option>
                     <option value="5405">5405 – Venda com ST (dentro UF)</option>
@@ -954,7 +954,7 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Origem da Mercadoria *</label>
+                  <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">Origem da Mercadoria *</label>
                   <select value={form.origemMercadoria} onChange={e => set('origemMercadoria', e.target.value)} className={selClass}>
                     <option value="0">0 – Nacional</option>
                     <option value="1">1 – Estrangeira (importação direta)</option>
@@ -967,7 +967,7 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">ICMS CST/CSOSN *</label>
+                  <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">ICMS CST/CSOSN *</label>
                   <select value={form.icmsCstCsosn} onChange={e => set('icmsCstCsosn', e.target.value)} className={selClass}>
                     <option value="102">102 – Tributada SN s/ crédito</option>
                     <option value="202">202 – Tributada SN s/ crédito + ST</option>
@@ -981,13 +981,13 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Alíquota ICMS (%)</label>
-                  <input type="number" step="0.01" value={form.icmsAliquota || 0} onChange={(e: any) => set('icmsAliquota', Number(e.target.value))} className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-right" />
+                  <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">Alíquota ICMS (%)</label>
+                  <input type="number" step="0.01" value={form.icmsAliquota || 0} onChange={(e: any) => set('icmsAliquota', Number(e.target.value))} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-all text-right" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">PIS CST *</label>
+                  <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">PIS CST *</label>
                   <select value={form.pisCst} onChange={e => set('pisCst', e.target.value)} className={selClass}>
                     <option value="07">07 – Operação isenta</option>
                     <option value="01">01 – Operação tributável alíquota básica</option>
@@ -998,13 +998,13 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Alíquota PIS (%)</label>
-                  <input type="number" step="0.01" value={form.pisAliquota || 0} onChange={(e: any) => set('pisAliquota', Number(e.target.value))} className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-right" />
+                  <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">Alíquota PIS (%)</label>
+                  <input type="number" step="0.01" value={form.pisAliquota || 0} onChange={(e: any) => set('pisAliquota', Number(e.target.value))} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-all text-right" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">COFINS CST *</label>
+                  <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">COFINS CST *</label>
                   <select value={form.cofinsCst} onChange={e => set('cofinsCst', e.target.value)} className={selClass}>
                     <option value="07">07 – Operação isenta</option>
                     <option value="01">01 – Operação tributável alíquota básica</option>
@@ -1015,13 +1015,13 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Alíquota COFINS (%)</label>
-                  <input type="number" step="0.01" value={form.cofinsAliquota || 0} onChange={(e: any) => set('cofinsAliquota', Number(e.target.value))} className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-right" />
+                  <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">Alíquota COFINS (%)</label>
+                  <input type="number" step="0.01" value={form.cofinsAliquota || 0} onChange={(e: any) => set('cofinsAliquota', Number(e.target.value))} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-all text-right" />
                 </div>
               </div>
 
               {/* Reforma Tributária - IBS/CBS */}
-              <div className="pt-2 border-t border-gray-100">
+              <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[10px] font-bold text-purple-500 uppercase flex items-center gap-1">
                     Reforma Tributária (IBS / CBS){rtcCstList.length > 0 && <span className="ml-1 text-[9px] bg-purple-100 text-purple-600 px-1.5 py-0.5 rounded-full">LC 214 importada</span>}
@@ -1032,14 +1032,14 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
                 <p className="text-[10px] font-semibold text-blue-500 uppercase mb-2">CBS — Contribuição sobre Bens e Serviços</p>
                 <div className="grid grid-cols-2 gap-4 mb-3">
                   <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">CBS CST</label>
+                    <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">CBS CST</label>
                     <select value={form.cbsCst || ''} onChange={e => set('cbsCst', e.target.value)} className={selClass}>
                       <option value="">— Não informar —</option>
                       {cstOpts.map((o: any) => <option key={o.cst} value={o.cst}>{o.cst} – {o.descricao_cst}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">CBS cClassTrib</label>
+                    <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">CBS cClassTrib</label>
                     <select value={form.cbsClasstrib || ''} onChange={e => set('cbsClasstrib', e.target.value)} className={selClass}>
                       <option value="">— Não informar —</option>
                       {classOpts.map((o: any) => <option key={o.classtrib} value={o.classtrib}>{o.classtrib} – {o.nome_classtrib}</option>)}
@@ -1048,17 +1048,17 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
                 </div>
 
                 {/* IBS */}
-                <p className="text-[10px] font-semibold text-green-600 uppercase mb-2">IBS — Imposto sobre Bens e Serviços</p>
+                <p className="text-[10px] font-semibold text-green-600 dark:text-green-400 uppercase mb-2">IBS — Imposto sobre Bens e Serviços</p>
                 <div className="grid grid-cols-2 gap-4 mb-3">
                   <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">IBS CST</label>
+                    <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">IBS CST</label>
                     <select value={form.ibsCst || ''} onChange={e => set('ibsCst', e.target.value)} className={selClass}>
                       <option value="">— Não informar —</option>
                       {cstOpts.map((o: any) => <option key={o.cst} value={o.cst}>{o.cst} – {o.descricao_cst}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">IBS cClassTrib</label>
+                    <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">IBS cClassTrib</label>
                     <select value={form.ibsClasstrib || ''} onChange={e => set('ibsClasstrib', e.target.value)} className={selClass}>
                       <option value="">— Não informar —</option>
                       {classOpts.map((o: any) => <option key={o.classtrib} value={o.classtrib}>{o.classtrib} – {o.nome_classtrib}</option>)}
@@ -1068,7 +1068,7 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
 
                 {/* cCredPres */}
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">cCredPres — Crédito Presumido</label>
+                  <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">cCredPres — Crédito Presumido</label>
                   <select value={form.cCredPres || ''} onChange={e => set('cCredPres', e.target.value)} className={selClass}>
                     <option value="">— Não informar —</option>
                     {ccredOpts.map((o: any) => <option key={o.ccredpres} value={o.ccredpres}>{o.ccredpres} – {o.descricao}</option>)}
@@ -1078,8 +1078,8 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
             </>
           )}
         </div>
-        <div className="p-5 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/30">
-          <button onClick={onClose} className="px-6 py-2 text-gray-500 font-bold uppercase text-[11px] hover:bg-gray-100 rounded-xl">Cancelar</button>
+        <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/30">
+          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl">Cancelar</button>
           <button onClick={() => onSave(form)} className="px-8 py-2 bg-blue-600 text-white font-bold uppercase text-[11px] rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700">
             {produto ? 'Salvar' : 'Cadastrar'}
           </button>
@@ -1101,10 +1101,10 @@ export const FornecedorModal = ({ fornecedor, onClose, onSave, showAlert }: any)
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[200] p-4 backdrop-blur-sm">
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-        <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-          <h3 className="text-lg font-bold text-gray-800">{fornecedor ? 'Editar Fornecedor' : 'Novo Fornecedor'}</h3>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl"><X className="w-5 h-5 text-gray-400" /></button>
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+        <div className="p-5 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-900/50">
+          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">{fornecedor ? 'Editar Fornecedor' : 'Novo Fornecedor'}</h3>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl"><X className="w-5 h-5 text-gray-400 dark:text-gray-500" /></button>
         </div>
         <div className="p-5 space-y-4 overflow-y-auto flex-1">
           <div className="grid grid-cols-2 gap-4">
@@ -1115,8 +1115,8 @@ export const FornecedorModal = ({ fornecedor, onClose, onSave, showAlert }: any)
             <Input label="Email" type="email" value={form.email || ''} onChange={(e: any) => set('email', e.target.value)} />
             <Input label="Telefone" value={form.telefone || ''} onChange={(e: any) => set('telefone', e.target.value)} />
           </div>
-          <div className="pt-2 border-t border-gray-100">
-            <p className="text-xs font-bold text-gray-400 uppercase mb-3">Endereço</p>
+          <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
+            <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-3">Endereço</p>
             <div className="grid grid-cols-3 gap-4">
               <div className="col-span-2">
                 <Input label="Logradouro" value={form.endereco?.logradouro || ''} onChange={(e: any) => setEnd('logradouro', e.target.value)} />
@@ -1130,13 +1130,13 @@ export const FornecedorModal = ({ fornecedor, onClose, onSave, showAlert }: any)
             </div>
             <div className="grid grid-cols-3 gap-4 mt-3">
               <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">UF</label>
+                <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">UF</label>
                 <select value={form.endereco?.uf || 'GO'} onChange={e => { setEnd('uf', e.target.value); carregar(e.target.value); }} className={selClass}>
                   {ESTADOS_BR.map(e => <option key={e.sigla} value={e.sigla}>{e.sigla}</option>)}
                 </select>
               </div>
               <div className="col-span-2">
-                <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Município</label>
+                <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">Município</label>
                 <select disabled={loadingMun} value={form.endereco?.codigoMunicipio || ''} onChange={e => {
                   const m = municipios.find(x => String(x.id) === e.target.value);
                   if (m) { setEnd('municipio', m.nome); setEnd('codigoMunicipio', String(m.id)); }
@@ -1148,8 +1148,8 @@ export const FornecedorModal = ({ fornecedor, onClose, onSave, showAlert }: any)
             </div>
           </div>
         </div>
-        <div className="p-5 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/30">
-          <button onClick={onClose} className="px-6 py-2 text-gray-500 font-bold uppercase text-[11px] hover:bg-gray-100 rounded-xl">Cancelar</button>
+        <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/30">
+          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl">Cancelar</button>
           <button onClick={() => {
             const end = form.endereco || {};
             if (!end.logradouro?.trim() || !end.numero?.trim() || !end.bairro?.trim() || !end.codigoMunicipio || !end.cep?.trim()) {
@@ -1176,10 +1176,10 @@ export const TransportadorModal = ({ transportador, onClose, onSave }: any) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[200] p-4 backdrop-blur-sm">
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-        <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-          <h3 className="text-lg font-bold text-gray-800">{transportador ? 'Editar Transportador' : 'Novo Transportador'}</h3>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl"><X className="w-5 h-5 text-gray-400" /></button>
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+        <div className="p-5 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-900/50">
+          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">{transportador ? 'Editar Transportador' : 'Novo Transportador'}</h3>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl"><X className="w-5 h-5 text-gray-400 dark:text-gray-500" /></button>
         </div>
         <div className="p-5 space-y-4 overflow-y-auto flex-1">
           <div className="grid grid-cols-2 gap-4">
@@ -1191,8 +1191,8 @@ export const TransportadorModal = ({ transportador, onClose, onSave }: any) => {
             <Input label="Email" type="email" value={form.email || ''} onChange={(e: any) => set('email', e.target.value)} />
             <Input label="Telefone" value={form.telefone || ''} onChange={(e: any) => set('telefone', e.target.value)} />
           </div>
-          <div className="pt-2 border-t border-gray-100">
-            <p className="text-xs font-bold text-gray-400 uppercase mb-3">Endereço</p>
+          <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
+            <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-3">Endereço</p>
             <div className="grid grid-cols-3 gap-4">
               <div className="col-span-2">
                 <Input label="Logradouro" value={form.endereco?.logradouro || ''} onChange={(e: any) => setEnd('logradouro', e.target.value)} />
@@ -1206,13 +1206,13 @@ export const TransportadorModal = ({ transportador, onClose, onSave }: any) => {
             </div>
             <div className="grid grid-cols-3 gap-4 mt-3">
               <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">UF</label>
+                <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">UF</label>
                 <select value={form.endereco?.uf || 'GO'} onChange={e => { setEnd('uf', e.target.value); carregar(e.target.value); }} className={selClass}>
                   {ESTADOS_BR.map(e => <option key={e.sigla} value={e.sigla}>{e.sigla}</option>)}
                 </select>
               </div>
               <div className="col-span-2">
-                <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Município</label>
+                <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">Município</label>
                 <select disabled={loadingMun} value={form.endereco?.codigoMunicipio || ''} onChange={e => {
                   const m = municipios.find(x => String(x.id) === e.target.value);
                   if (m) { setEnd('municipio', m.nome); setEnd('codigoMunicipio', String(m.id)); }
@@ -1224,8 +1224,8 @@ export const TransportadorModal = ({ transportador, onClose, onSave }: any) => {
             </div>
           </div>
         </div>
-        <div className="p-5 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/30">
-          <button onClick={onClose} className="px-6 py-2 text-gray-500 font-bold uppercase text-[11px] hover:bg-gray-100 rounded-xl">Cancelar</button>
+        <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/30">
+          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl">Cancelar</button>
           <button onClick={() => onSave(form)} className="px-8 py-2 bg-blue-600 text-white font-bold uppercase text-[11px] rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700">Salvar</button>
         </div>
       </motion.div>
@@ -1240,10 +1240,10 @@ export const MedidaModal = ({ medida, onClose, onSave }: any) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[200] p-4 backdrop-blur-sm">
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
-        <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-          <h3 className="text-lg font-bold text-gray-800">{medida ? 'Editar Medida' : 'Nova Medida'}</h3>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl"><X className="w-5 h-5 text-gray-400" /></button>
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
+        <div className="p-5 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-900/50">
+          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">{medida ? 'Editar Medida' : 'Nova Medida'}</h3>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl"><X className="w-5 h-5 text-gray-400 dark:text-gray-500" /></button>
         </div>
         <div className="p-5 space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -1253,17 +1253,17 @@ export const MedidaModal = ({ medida, onClose, onSave }: any) => {
           <Input label="Descrição *" value={form.descricao} onChange={(e: any) => set('descricao', e.target.value)} placeholder="Ex: Quilograma" />
           <div className="flex gap-6">
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={form.pesavel} onChange={e => set('pesavel', e.target.checked)} className="w-4 h-4 text-blue-600 rounded" />
-              <span className="text-sm text-gray-700">Pesável (balança)</span>
+              <input type="checkbox" checked={form.pesavel} onChange={e => set('pesavel', e.target.checked)} className="w-4 h-4 text-blue-600 dark:text-blue-400 rounded" />
+              <span className="text-sm text-gray-700 dark:text-gray-200">Pesável (balança)</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={form.ativo !== false} onChange={e => set('ativo', e.target.checked)} className="w-4 h-4 text-blue-600 rounded" />
-              <span className="text-sm text-gray-700">Ativo</span>
+              <input type="checkbox" checked={form.ativo !== false} onChange={e => set('ativo', e.target.checked)} className="w-4 h-4 text-blue-600 dark:text-blue-400 rounded" />
+              <span className="text-sm text-gray-700 dark:text-gray-200">Ativo</span>
             </label>
           </div>
         </div>
-        <div className="p-5 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/30">
-          <button onClick={onClose} className="px-6 py-2 text-gray-500 font-bold uppercase text-[11px] hover:bg-gray-100 rounded-xl">Cancelar</button>
+        <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/30">
+          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl">Cancelar</button>
           <button onClick={() => onSave(form)} className="px-8 py-2 bg-blue-600 text-white font-bold uppercase text-[11px] rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700">Salvar</button>
         </div>
       </motion.div>
@@ -1278,14 +1278,14 @@ export const BandeiraModal = ({ bandeira, onClose, onSave }: any) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[200] p-4 backdrop-blur-sm">
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
-        <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-          <h3 className="text-lg font-bold text-gray-800">{bandeira ? 'Editar Bandeira' : 'Nova Bandeira'}</h3>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl"><X className="w-5 h-5 text-gray-400" /></button>
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
+        <div className="p-5 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-900/50">
+          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">{bandeira ? 'Editar Bandeira' : 'Nova Bandeira'}</h3>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl"><X className="w-5 h-5 text-gray-400 dark:text-gray-500" /></button>
         </div>
         <div className="p-5 space-y-4">
           <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Forma de Pagamento *</label>
+            <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">Forma de Pagamento *</label>
             <select value={form.tpag} onChange={e => set('tpag', e.target.value)} className={selClass}>
               {Object.entries(TPAG_LABELS).map(([k, v]) => <option key={k} value={k}>{k} – {v}</option>)}
             </select>
@@ -1293,8 +1293,8 @@ export const BandeiraModal = ({ bandeira, onClose, onSave }: any) => {
           <Input label="Bandeira / Credenciadora" value={form.tband_opc || ''} onChange={(e: any) => set('tband_opc', e.target.value)} placeholder="Ex: Visa, Mastercard, Cielo..." />
           <Input label="CNPJ da Credenciadora" value={form.cnpj_opc || ''} onChange={(e: any) => set('cnpj_opc', e.target.value)} placeholder="Ex: 00000000000000" />
         </div>
-        <div className="p-5 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/30">
-          <button onClick={onClose} className="px-6 py-2 text-gray-500 font-bold uppercase text-[11px] hover:bg-gray-100 rounded-xl">Cancelar</button>
+        <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/30">
+          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl">Cancelar</button>
           <button onClick={() => onSave(form)} className="px-8 py-2 bg-blue-600 text-white font-bold uppercase text-[11px] rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700">Salvar</button>
         </div>
       </motion.div>
