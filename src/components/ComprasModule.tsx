@@ -73,16 +73,16 @@ export const ComprasTab = ({
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-xl border border-gray-100 p-4 flex flex-wrap gap-3 items-center shadow-sm">
-        <div className="flex items-center gap-2 text-sm text-gray-600">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4 flex flex-wrap gap-3 items-center shadow-sm">
+        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
           <span>De:</span>
-          <input type="date" value={di} onChange={e => setDi(e.target.value)} className="border border-gray-200 rounded-lg px-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+          <input type="date" value={di} onChange={e => setDi(e.target.value)} className="border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
           <span>Até:</span>
-          <input type="date" value={df} onChange={e => setDf(e.target.value)} className="border border-gray-200 rounded-lg px-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+          <input type="date" value={df} onChange={e => setDf(e.target.value)} className="border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
         </div>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Fornecedor ou NF..." className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none w-56" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+          <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Fornecedor ou NF..." className="pl-9 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none w-56" />
         </div>
         <div className="flex-1" />
         <button onClick={() => setShowSourceModal(true)} className="flex items-center gap-2 px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-sm">
@@ -102,35 +102,35 @@ export const ComprasTab = ({
         )}
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
         <table className="w-full text-left text-sm">
-          <thead className="bg-gray-50 border-b border-gray-100">
+          <thead className="bg-gray-50 dark:bg-gray-900 border-b border-gray-100 dark:border-gray-700">
             <tr>
-              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase">NF</th>
-              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Fornecedor</th>
-              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Entrada</th>
-              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-right">Total</th>
-              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-center">Itens</th>
-              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-center">Ações</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">NF</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Fornecedor</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Entrada</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase text-right">Total</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase text-center">Itens</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase text-center">Ações</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
             {loading ? (
-              <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">Carregando...</td></tr>
+              <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400 dark:text-gray-500">Carregando...</td></tr>
             ) : filtradas.length === 0 ? (
-              <tr><td colSpan={6} className="px-4 py-12 text-center text-gray-400">Nenhuma compra localizada no período.</td></tr>
+              <tr><td colSpan={6} className="px-4 py-12 text-center text-gray-400 dark:text-gray-500">Nenhuma compra localizada no período.</td></tr>
             ) : filtradas.map(c => (
-              <tr key={c.id} className="hover:bg-gray-50 transition-all">
-                <td className="px-4 py-3 font-medium text-gray-800">#{c.numero_nf}</td>
+              <tr key={c.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-all">
+                <td className="px-4 py-3 font-medium text-gray-800 dark:text-gray-100">#{c.numero_nf}</td>
                 <td className="px-4 py-3">
-                  <p className="font-semibold text-gray-700">{c.fornecedor_nome}</p>
-                  <p className="text-[10px] text-gray-400">{c.fornecedor_documento}</p>
+                  <p className="font-semibold text-gray-700 dark:text-gray-200">{c.fornecedor_nome}</p>
+                  <p className="text-[10px] text-gray-400 dark:text-gray-500">{c.fornecedor_documento}</p>
                 </td>
-                <td className="px-4 py-3 text-gray-500">{new Date(c.data_entrada + 'T12:00:00').toLocaleDateString('pt-BR')}</td>
-                <td className="px-4 py-3 text-right font-bold text-blue-600">R$ {Number(c.valor_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-                <td className="px-4 py-3 text-center"><span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-[10px] font-bold">{c.qtd_itens}</span></td>
+                <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{new Date(c.data_entrada + 'T12:00:00').toLocaleDateString('pt-BR')}</td>
+                <td className="px-4 py-3 text-right font-bold text-blue-600 dark:text-blue-400">R$ {Number(c.valor_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+                <td className="px-4 py-3 text-center"><span className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded-full text-[10px] font-bold">{c.qtd_itens}</span></td>
                 <td className="px-4 py-3 text-center">
-                  <button onClick={() => onViewCompra(c.id)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"><Eye className="w-4 h-4" /></button>
+                  <button onClick={() => onViewCompra(c.id)} className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"><Eye className="w-4 h-4" /></button>
                 </td>
               </tr>
             ))}
@@ -276,28 +276,28 @@ export const ImportXmlModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-2xl w-full max-w-6xl overflow-hidden flex flex-col max-h-[95vh] shadow-2xl border border-gray-100">
-        <div className="p-6 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-6xl overflow-hidden flex flex-col max-h-[95vh] shadow-2xl border border-gray-100 dark:border-gray-700">
+        <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex justify-between items-center">
           <div>
-            <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-              <FileText className="w-6 h-6 text-green-600" /> Revisar Importação de XML
+            <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+              <FileText className="w-6 h-6 text-green-600 dark:text-green-400" /> Revisar Importação de XML
             </h3>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               NF #{xmlData.nota.numero} • {xmlData.nota.emitente.nome} ({xmlData.nota.emitente.cnpj})
             </p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-lg transition-colors"><X className="w-5 h-5 text-gray-400" /></button>
+          <button onClick={onClose} className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"><X className="w-5 h-5 text-gray-400 dark:text-gray-500" /></button>
         </div>
 
         {!xmlData.nota.cnpj_valido && (
-          <div className="bg-amber-50 border-b border-amber-200 p-3 flex items-center gap-2 text-amber-800 text-xs font-medium">
+          <div className="bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800 p-3 flex items-center gap-2 text-amber-800 text-xs font-medium">
             <AlertCircle className="w-4 h-4" /> ATENÇÃO: O CNPJ destinatário deste XML não confere com o CNPJ do sistema. Verifique a procedência.
           </div>
         )}
 
         <div className="p-6 overflow-auto flex-1">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-xs text-gray-500 uppercase font-bold tracking-wider">
+            <thead className="bg-gray-50 dark:bg-gray-900 text-xs text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider">
               <tr>
                 <th className="px-4 py-3 text-left">Dados do XML (Fornecedor)</th>
                 <th className="px-4 py-3 text-left">Produto no Sistema (Matching)</th>
@@ -307,38 +307,38 @@ export const ImportXmlModal = ({
                 <th className="px-4 py-3 text-center">Ações</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
               {itens.map((it, idx) => (
-                <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
-                  <td className="px-4 py-3 border-r border-gray-50 italic text-gray-600 max-w-[250px]">
-                    <p className="font-bold text-gray-700">{it.nome_xml}</p>
-                    <p className="text-[10px] text-gray-400">Cód: {it.codigo_xml} • EAN: {it.barras_xml}</p>
+                <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                  <td className="px-4 py-3 border-r border-gray-50 dark:border-gray-700 italic text-gray-600 dark:text-gray-300 max-w-[250px]">
+                    <p className="font-bold text-gray-700 dark:text-gray-200">{it.nome_xml}</p>
+                    <p className="text-[10px] text-gray-400 dark:text-gray-500">Cód: {it.codigo_xml} • EAN: {it.barras_xml}</p>
                   </td>
-                  <td className={`px-4 py-3 ${!it.matching_id ? 'bg-red-50/30' : ''}`}>
+                  <td className={`px-4 py-3 ${!it.matching_id ? 'bg-red-50 dark:bg-red-900/20/30' : ''}`}>
                     {it.matching_id ? (
                       <div className="flex items-center justify-between group">
                         <div>
                           <p className="font-semibold text-blue-800">{it.matching_desc}</p>
-                          <p className="text-[10px] text-gray-400">Interno: {it.matching_cod} • Preço Venda: R$ {Number(it.valor_venda_atual).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                          <p className="text-[10px] text-gray-400 dark:text-gray-500">Interno: {it.matching_cod} • Preço Venda: R$ {Number(it.valor_venda_atual).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                         </div>
 
                       </div>
                     ) : (
-                      <div className="flex items-center gap-2 text-red-500 font-bold uppercase text-[10px]">
+                      <div className="flex items-center gap-2 text-red-500 dark:text-red-400 font-bold uppercase text-[10px]">
                         <AlertCircle className="w-3.5 h-3.5" /> Não localizado no sistema
                       </div>
                     )}
                   </td>
                   <td className="px-4 py-3 text-right font-mono">{Number(it.qtd_xml).toLocaleString('pt-BR')} <span className="text-[10px]">{it.un_xml}</span></td>
-                  <td className="px-4 py-3 text-right font-mono text-gray-500">R$ {it.vun_xml.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-                  <td className="px-4 py-3 text-right font-bold text-gray-800 font-mono">R$ {it.total_xml.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+                  <td className="px-4 py-3 text-right font-mono text-gray-500 dark:text-gray-400">R$ {it.vun_xml.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+                  <td className="px-4 py-3 text-right font-bold text-gray-800 dark:text-gray-100 font-mono">R$ {it.total_xml.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
                   <td className="px-4 py-3 text-center">
                     <div className="flex justify-center gap-1">
-                      <button onClick={() => handleVincularManual(idx)} title="Vincular Manualmente" className="p-1.5 hover:bg-blue-100 rounded text-blue-600 transition-colors"><Pencil className="w-4 h-4" /></button>
+                      <button onClick={() => handleVincularManual(idx)} title="Vincular Manualmente" className="p-1.5 hover:bg-blue-100 rounded text-blue-600 dark:text-blue-400 transition-colors"><Pencil className="w-4 h-4" /></button>
                       {it.matching_id ? (
-                        <button onClick={() => handlesUnlink(idx)} title="Desfazer Vínculo" className="p-1.5 hover:bg-gray-100 rounded text-gray-400 transition-colors"><X className="w-4 h-4" /></button>
+                        <button onClick={() => handlesUnlink(idx)} title="Desfazer Vínculo" className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-400 dark:text-gray-500 transition-colors"><X className="w-4 h-4" /></button>
                       ) : (
-                        <button onClick={() => handleAutoCadastrar(idx)} title="Cadastrar Automaticamente" className="p-1.5 hover:bg-green-100 rounded text-green-600 transition-colors"><Package className="w-4 h-4" /></button>
+                        <button onClick={() => handleAutoCadastrar(idx)} title="Cadastrar Automaticamente" className="p-1.5 hover:bg-green-100 rounded text-green-600 dark:text-green-400 transition-colors"><Package className="w-4 h-4" /></button>
                       )}
                     </div>
                   </td>
@@ -349,56 +349,56 @@ export const ImportXmlModal = ({
         </div>
 
         {vinculandoIdx !== null && (
-          <div className="absolute inset-0 bg-white/95 flex items-center justify-center p-12 z-[110] backdrop-blur-sm">
-            <div className="w-full max-w-lg bg-white shadow-2xl border border-gray-100 rounded-3xl p-8">
-              <h4 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                <Search className="w-6 h-6 text-blue-600" /> Localizar Produto
+          <div className="absolute inset-0 bg-white dark:bg-gray-800/95 flex items-center justify-center p-12 z-[110] backdrop-blur-sm">
+            <div className="w-full max-w-lg bg-white dark:bg-gray-800 shadow-2xl border border-gray-100 dark:border-gray-700 rounded-3xl p-8">
+              <h4 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-6 flex items-center gap-2">
+                <Search className="w-6 h-6 text-blue-600 dark:text-blue-400" /> Localizar Produto
               </h4>
-              <p className="text-xs text-gray-400 uppercase font-black mb-2">Item do XML:</p>
-              <p className="text-sm font-semibold text-gray-700 bg-gray-50 p-4 rounded-xl border border-gray-100 mb-6 italic">
+              <p className="text-xs text-gray-400 dark:text-gray-500 uppercase font-black mb-2">Item do XML:</p>
+              <p className="text-sm font-semibold text-gray-700 dark:text-gray-200 bg-gray-50 dark:bg-gray-900 p-4 rounded-xl border border-gray-100 dark:border-gray-700 mb-6 italic">
                 "{itens[vinculandoIdx].nome_xml}"
               </p>
               
               <div className="relative mb-6">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                 <input 
                   autoFocus
                   type="text" 
                   value={buscaProd} 
                   onChange={e => setBuscaProd(e.target.value)} 
                   placeholder="Pesquise por nome, código ou EAN..." 
-                  className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-2xl text-base focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+                  className="w-full pl-12 pr-4 py-4 border border-gray-200 dark:border-gray-700 rounded-2xl text-base focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
                 />
               </div>
 
               <div className="space-y-2 mb-8">
                 {prodsFiltrados.map(p => (
-                  <button key={p.id} onClick={() => selecionarProduto(p)} className="w-full text-left p-4 rounded-2xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50 transition-all flex justify-between items-center group">
+                  <button key={p.id} onClick={() => selecionarProduto(p)} className="w-full text-left p-4 rounded-2xl border border-gray-100 dark:border-gray-700 hover:border-blue-200 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all flex justify-between items-center group">
                     <div>
-                      <p className="font-bold text-gray-800 group-hover:text-blue-700">{p.descricao}</p>
-                      <p className="text-[10px] text-gray-400">Cód: {p.codigoInterno} • Barra: {p.codigoBarras || '-'}</p>
+                      <p className="font-bold text-gray-800 dark:text-gray-100 group-hover:text-blue-700">{p.descricao}</p>
+                      <p className="text-[10px] text-gray-400 dark:text-gray-500">Cód: {p.codigoInterno} • Barra: {p.codigoBarras || '-'}</p>
                     </div>
-                    <ArrowRight className="w-5 h-5 text-gray-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
+                    <ArrowRight className="w-5 h-5 text-gray-300 dark:text-gray-600 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
                   </button>
                 ))}
                 {buscaProd && prodsFiltrados.length === 0 && (
-                  <p className="text-center py-8 text-gray-400 italic">Nenhum produto encontrado...</p>
+                  <p className="text-center py-8 text-gray-400 dark:text-gray-500 italic">Nenhum produto encontrado...</p>
                 )}
               </div>
 
-              <button onClick={() => setVinculandoIdx(null)} className="w-full py-4 text-gray-500 font-bold uppercase text-xs tracking-widest hover:bg-gray-50 rounded-2xl transition-all">Cancelar</button>
+              <button onClick={() => setVinculandoIdx(null)} className="w-full py-4 text-gray-500 dark:text-gray-400 font-bold uppercase text-xs tracking-widest hover:bg-gray-50 dark:hover:bg-gray-700 rounded-2xl transition-all">Cancelar</button>
             </div>
           </div>
         )}
 
-        <div className="p-6 border-t border-gray-100 bg-gray-50 flex justify-between items-center">
+        <div className="p-6 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex justify-between items-center">
           <div className="flex gap-8">
             <div className="text-center">
-              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1">Total da Nota</p>
-              <p className="text-2xl font-semibold text-blue-600 tracking-tight">R$ {Number(xmlData.nota.valor_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+              <p className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Total da Nota</p>
+              <p className="text-2xl font-semibold text-blue-600 dark:text-blue-400 tracking-tight">R$ {Number(xmlData.nota.valor_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
             </div>
             <div className="text-center">
-              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1">Itens</p>
+              <p className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Itens</p>
               <p className="text-2xl font-semibold text-slate-700">{itens.length}</p>
             </div>
           </div>
@@ -422,30 +422,30 @@ const ImportSourceModal = ({ onClose, onSelectLocal, onSelectSefaz, onNewManual 
   onNewManual: () => void
 }) => (
   <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[110] p-4">
-    <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl shadow-blue-900/20">
-      <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-        <h4 className="text-lg font-bold text-gray-800 uppercase tracking-tight">Origem da Importação</h4>
-        <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors"><X className="w-5 h-5 text-gray-400" /></button>
+    <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl shadow-blue-900/20">
+      <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+        <h4 className="text-lg font-bold text-gray-800 dark:text-gray-100 uppercase tracking-tight">Origem da Importação</h4>
+        <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"><X className="w-5 h-5 text-gray-400 dark:text-gray-500" /></button>
       </div>
       <div className="p-6 grid grid-cols-1 gap-4">
-        <button onClick={onSelectSefaz} className="p-6 bg-blue-50 border-2 border-blue-100 rounded-2xl text-left hover:border-blue-400 transition-all group">
-          <Globe className="w-8 h-8 text-blue-600 mb-3 group-hover:scale-110 transition-transform" />
+        <button onClick={onSelectSefaz} className="p-6 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-100 rounded-2xl text-left hover:border-blue-400 transition-all group">
+          <Globe className="w-8 h-8 text-blue-600 dark:text-blue-400 mb-3 group-hover:scale-110 transition-transform" />
           <p className="text-sm font-bold text-blue-900 uppercase">Consultar SEFAZ</p>
-          <p className="text-[10px] text-blue-600 font-medium">Baixar notas emitidas contra o CNPJ (via NSU)</p>
+          <p className="text-[10px] text-blue-600 dark:text-blue-400 font-medium">Baixar notas emitidas contra o CNPJ (via NSU)</p>
         </button>
-        <button onClick={onSelectLocal} className="p-6 bg-green-50 border-2 border-green-100 rounded-2xl text-left hover:border-green-400 transition-all group">
-          <Upload className="w-8 h-8 text-green-600 mb-3 group-hover:scale-110 transition-transform" />
+        <button onClick={onSelectLocal} className="p-6 bg-green-50 dark:bg-green-900/20 border-2 border-green-100 rounded-2xl text-left hover:border-green-400 transition-all group">
+          <Upload className="w-8 h-8 text-green-600 dark:text-green-400 mb-3 group-hover:scale-110 transition-transform" />
           <p className="text-sm font-bold text-green-900 uppercase">Arquivo XML Local</p>
-          <p className="text-[10px] text-green-600 font-medium">Importar arquivo XML salvo em seu computador</p>
+          <p className="text-[10px] text-green-600 dark:text-green-400 font-medium">Importar arquivo XML salvo em seu computador</p>
         </button>
-        <button onClick={onNewManual} className="p-6 bg-amber-50 border-2 border-amber-100 rounded-2xl text-left hover:border-amber-400 transition-all group">
-          <Edit className="w-8 h-8 text-amber-600 mb-3 group-hover:scale-110 transition-transform" />
+        <button onClick={onNewManual} className="p-6 bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-100 rounded-2xl text-left hover:border-amber-400 transition-all group">
+          <Edit className="w-8 h-8 text-amber-600 dark:text-amber-400 mb-3 group-hover:scale-110 transition-transform" />
           <p className="text-sm font-bold text-amber-900 uppercase">Lançamento Manual</p>
-          <p className="text-[10px] text-amber-600 font-medium">Digitar os dados da nota manualmente</p>
+          <p className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">Digitar os dados da nota manualmente</p>
         </button>
       </div>
-      <div className="px-6 py-4 bg-gray-50 text-center">
-        <p className="text-[10px] text-gray-400 font-medium">Selecione uma opção para continuar o processo de entrada</p>
+      <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900 text-center">
+        <p className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">Selecione uma opção para continuar o processo de entrada</p>
       </div>
     </motion.div>
   </div>
@@ -555,33 +555,33 @@ export const CompraModal = ({
     { id: 'finalizar',     label: '4. Finalizar',     icon: ClipboardCheck },
   ];
 
-  const inputCls = 'w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all';
-  const labelCls = 'block text-xs font-semibold text-gray-500 uppercase mb-1';
+  const inputCls = 'w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all';
+  const labelCls = 'block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1';
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[110] p-4">
       <style>{`b, strong, h1, h2, h3 { font-weight: 600 !important; color: #334155; }`}</style>
       <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-        className="bg-white rounded-3xl w-full max-w-5xl overflow-hidden shadow-2xl flex flex-col h-[88vh]">
+        className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-5xl overflow-hidden shadow-2xl flex flex-col h-[88vh]">
 
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 shrink-0">
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-900/50 shrink-0">
           <div className="flex items-center gap-3">
-            <ShoppingCart className="w-5 h-5 text-blue-600" />
+            <ShoppingCart className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             <div>
-              <h3 className="text-base font-semibold text-gray-800">Nota de Entrada</h3>
-              <p className="text-xs text-gray-400">{fornecedores.find(f => String(f.id) === String(fornecedorId))?.nome || 'Selecione o fornecedor'}</p>
+              <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100">Nota de Entrada</h3>
+              <p className="text-xs text-gray-400 dark:text-gray-500">{fornecedores.find(f => String(f.id) === String(fornecedorId))?.nome || 'Selecione o fornecedor'}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors"><X className="w-5 h-5 text-gray-400" /></button>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"><X className="w-5 h-5 text-gray-400 dark:text-gray-500" /></button>
         </div>
 
         {/* Tabs */}
         <div className="px-6 pt-4 shrink-0">
-          <div className="flex gap-1 p-1 bg-gray-100 rounded-xl border border-gray-200">
+          <div className="flex gap-1 p-1 bg-gray-100 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-700">
             {tabs.map(t => (
               <button key={t.id} onClick={() => setActiveTab(t.id)}
-                className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all flex-1 justify-center ${activeTab === t.id ? 'bg-blue-600 text-white shadow-md' : 'text-gray-500 hover:bg-white hover:text-blue-600'}`}>
+                className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all flex-1 justify-center ${activeTab === t.id ? 'bg-blue-600 text-white shadow-md' : 'text-gray-500 dark:text-gray-400 hover:bg-white hover:text-blue-600 dark:hover:text-blue-400'}`}>
                 <t.icon className="w-4 h-4" />{t.label}
               </button>
             ))}
@@ -593,9 +593,9 @@ export const CompraModal = ({
 
           {/* ── Aba 1: Identificação ────────────────────────────────────────── */}
           {activeTab === 'identificacao' && (
-            <section className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-5">
-              <h4 className="text-base font-semibold text-gray-800 flex items-center gap-2 border-b border-gray-100 pb-3">
-                <User className="w-4 h-4 text-blue-600" /> Dados da Nota Fiscal
+            <section className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm space-y-5">
+              <h4 className="text-base font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2 border-b border-gray-100 dark:border-gray-700 pb-3">
+                <User className="w-4 h-4 text-blue-600 dark:text-blue-400" /> Dados da Nota Fiscal
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="md:col-span-2">
@@ -631,23 +631,23 @@ export const CompraModal = ({
 
           {/* ── Aba 2: Produtos ─────────────────────────────────────────────── */}
           {activeTab === 'produtos' && (
-            <section className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-4">
-              <h4 className="text-base font-semibold text-gray-800 flex items-center gap-2 border-b border-gray-100 pb-3">
-                <Package className="w-4 h-4 text-blue-600" /> Produtos da Entrada
+            <section className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm space-y-4">
+              <h4 className="text-base font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2 border-b border-gray-100 dark:border-gray-700 pb-3">
+                <Package className="w-4 h-4 text-blue-600 dark:text-blue-400" /> Produtos da Entrada
               </h4>
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
                 <input type="text" value={buscaProd} onChange={e => setBuscaProd(e.target.value)}
                   placeholder="Buscar por nome, código ou EAN..."
-                  className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none shadow-sm" />
+                  className="w-full pl-11 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none shadow-sm" />
                 {prodsFiltrados.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden">
+                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden">
                     {prodsFiltrados.map(p => (
                       <button key={p.id} onClick={() => handleAddItem(p)}
-                        className="w-full text-left px-4 py-3 hover:bg-blue-50 flex justify-between items-center transition-colors border-b border-gray-50 last:border-0">
+                        className="w-full text-left px-4 py-3 hover:bg-blue-50 dark:hover:bg-blue-900/30 flex justify-between items-center transition-colors border-b border-gray-50 dark:border-gray-700 last:border-0">
                         <div>
-                          <p className="text-sm font-medium text-gray-800">{p.descricao}</p>
-                          <p className="text-xs text-gray-400">Cód: {p.codigoInterno} · EAN: {p.codigoBarras || '—'}</p>
+                          <p className="text-sm font-medium text-gray-800 dark:text-gray-100">{p.descricao}</p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500">Cód: {p.codigoInterno} · EAN: {p.codigoBarras || '—'}</p>
                         </div>
                         <Plus className="w-4 h-4 text-blue-500" />
                       </button>
@@ -655,48 +655,48 @@ export const CompraModal = ({
                   </div>
                 )}
               </div>
-              <div className="rounded-xl border border-gray-200 overflow-hidden">
+              <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <table className="w-full text-sm">
-                  <thead className="bg-gray-50 border-b border-gray-200">
+                  <thead className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
                     <tr>
-                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">Produto</th>
-                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-center w-28">Qtd</th>
-                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-right w-36">Custo Unit.</th>
-                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-right w-36">Total</th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase text-left">Produto</th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase text-center w-28">Qtd</th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase text-right w-36">Custo Unit.</th>
+                      <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase text-right w-36">Total</th>
                       <th className="px-4 py-3 w-12"></th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                     {itens.length === 0 ? (
-                      <tr><td colSpan={5} className="px-4 py-12 text-center text-gray-400">Use o campo acima para adicionar produtos.</td></tr>
+                      <tr><td colSpan={5} className="px-4 py-12 text-center text-gray-400 dark:text-gray-500">Use o campo acima para adicionar produtos.</td></tr>
                     ) : itens.map((it, idx) => (
-                      <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-4 py-3 font-medium text-gray-800">{it.descricao}</td>
+                      <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <td className="px-4 py-3 font-medium text-gray-800 dark:text-gray-100">{it.descricao}</td>
                         <td className="px-4 py-3 text-center">
                           <input type="number" step="0.001" min="0.001" value={it.quantidade}
                             onChange={e => handleUpdateItem(idx, 'quantidade', e.target.value)}
-                            className="w-20 border-b-2 border-transparent focus:border-blue-500 outline-none text-center bg-transparent font-medium text-gray-700" />
+                            className="w-20 border-b-2 border-transparent focus:border-blue-500 outline-none text-center bg-transparent font-medium text-gray-700 dark:text-gray-200" />
                         </td>
                         <td className="px-4 py-3 text-right">
                           <input type="number" step="0.01" min="0" value={it.valorUnitario}
                             onChange={e => handleUpdateItem(idx, 'valorUnitario', e.target.value)}
-                            className="w-28 border-b-2 border-transparent focus:border-blue-500 outline-none text-right bg-transparent font-medium text-blue-700" />
+                            className="w-28 border-b-2 border-transparent focus:border-blue-500 outline-none text-right bg-transparent font-medium text-blue-700 dark:text-blue-300" />
                         </td>
-                        <td className="px-4 py-3 text-right font-semibold text-gray-800">
+                        <td className="px-4 py-3 text-right font-semibold text-gray-800 dark:text-gray-100">
                           {it.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                         </td>
                         <td className="px-4 py-3 text-center">
                           <button onClick={() => setItens(p => p.filter((_, i) => i !== idx))}
-                            className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>
+                            className="p-1.5 text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                   {itens.length > 0 && (
-                    <tfoot className="bg-blue-50 border-t-2 border-blue-200">
+                    <tfoot className="bg-blue-50 dark:bg-blue-900/20 border-t-2 border-blue-200 dark:border-blue-800">
                       <tr>
-                        <td colSpan={3} className="px-4 py-3 text-xs font-semibold text-blue-700 uppercase">Total — {itens.length} produto(s)</td>
-                        <td className="px-4 py-3 text-right text-base font-bold text-blue-700">{totalNota.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                        <td colSpan={3} className="px-4 py-3 text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase">Total — {itens.length} produto(s)</td>
+                        <td className="px-4 py-3 text-right text-base font-bold text-blue-700 dark:text-blue-300">{totalNota.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                         <td />
                       </tr>
                     </tfoot>
@@ -708,9 +708,9 @@ export const CompraModal = ({
 
           {/* ── Aba 3: Financeiro ───────────────────────────────────────────── */}
           {activeTab === 'financeiro' && (
-            <section className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-6">
-              <h4 className="text-base font-semibold text-gray-800 flex items-center gap-2 border-b border-gray-100 pb-3">
-                <Wallet className="w-4 h-4 text-blue-600" /> Lançamento Financeiro
+            <section className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm space-y-6">
+              <h4 className="text-base font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2 border-b border-gray-100 dark:border-gray-700 pb-3">
+                <Wallet className="w-4 h-4 text-blue-600 dark:text-blue-400" /> Lançamento Financeiro
               </h4>
 
               {/* Escolha do tipo */}
@@ -722,25 +722,25 @@ export const CompraModal = ({
                 ] as const).map(op => (
                   <button key={op.v} onClick={() => setLancamento(op.v)}
                     className={`p-5 rounded-2xl border-2 text-left transition-all ${lancamento === op.v
-                      ? op.cor === 'gray'  ? 'border-gray-400  bg-gray-50'
-                      : op.cor === 'blue'  ? 'border-blue-500  bg-blue-50'
-                      :                     'border-green-500 bg-green-50'
-                      : 'border-gray-200 hover:border-gray-300'}`}>
+                      ? op.cor === 'gray'  ? 'border-gray-400  bg-gray-50 dark:bg-gray-900'
+                      : op.cor === 'blue'  ? 'border-blue-500  bg-blue-50 dark:bg-blue-900/20'
+                      :                     'border-green-500 bg-green-50 dark:bg-green-900/20'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'}`}>
                     <op.icon className={`w-7 h-7 mb-3 ${lancamento === op.v
-                      ? op.cor === 'gray' ? 'text-gray-600' : op.cor === 'blue' ? 'text-blue-600' : 'text-green-600'
-                      : 'text-gray-400'}`} />
+                      ? op.cor === 'gray' ? 'text-gray-600 dark:text-gray-300' : op.cor === 'blue' ? 'text-blue-600 dark:text-blue-400' : 'text-green-600 dark:text-green-400'
+                      : 'text-gray-400 dark:text-gray-500'}`} />
                     <p className={`text-sm font-semibold ${lancamento === op.v
-                      ? op.cor === 'gray' ? 'text-gray-800' : op.cor === 'blue' ? 'text-blue-800' : 'text-green-800'
-                      : 'text-gray-700'}`}>{op.label}</p>
-                    <p className="text-xs text-gray-500 mt-1">{op.desc}</p>
+                      ? op.cor === 'gray' ? 'text-gray-800 dark:text-gray-100' : op.cor === 'blue' ? 'text-blue-800' : 'text-green-800'
+                      : 'text-gray-700 dark:text-gray-200'}`}>{op.label}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{op.desc}</p>
                   </button>
                 ))}
               </div>
 
               {/* Contas a Pagar */}
               {lancamento === 'financeiro' && (
-                <div className="bg-blue-50 rounded-2xl p-5 border border-blue-100 space-y-4">
-                  <p className="text-xs font-semibold text-blue-700 uppercase">Parâmetros do Título</p>
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-5 border border-blue-100 space-y-4">
+                  <p className="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase">Parâmetros do Título</p>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className={labelCls}>1º Vencimento</label>
@@ -750,7 +750,7 @@ export const CompraModal = ({
                       <label className={labelCls}>Parcelas</label>
                       <input type="number" min={1} max={60} value={finParcelas} onChange={e => setFinParcelas(Math.max(1, Number(e.target.value)))} className={inputCls} />
                       {finParcelas > 1 && (
-                        <p className="text-xs text-blue-600 mt-1">
+                        <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
                           {finParcelas}× {(totalNota / finParcelas).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} — intervalo 30 dias
                         </p>
                       )}
@@ -767,8 +767,8 @@ export const CompraModal = ({
 
               {/* Caixa */}
               {lancamento === 'caixa' && (
-                <div className="bg-green-50 rounded-2xl p-5 border border-green-100 space-y-4">
-                  <p className="text-xs font-semibold text-green-700 uppercase">Parâmetros do Débito</p>
+                <div className="bg-green-50 dark:bg-green-900/20 rounded-2xl p-5 border border-green-100 space-y-4">
+                  <p className="text-xs font-semibold text-green-700 dark:text-green-300 uppercase">Parâmetros do Débito</p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className={labelCls}>Conta / Caixa</label>
@@ -792,9 +792,9 @@ export const CompraModal = ({
 
           {/* ── Aba 4: Finalizar ────────────────────────────────────────────── */}
           {activeTab === 'finalizar' && (
-            <section className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-6">
-              <h4 className="text-base font-semibold text-gray-800 flex items-center gap-2 border-b border-gray-100 pb-3">
-                <ClipboardCheck className="w-4 h-4 text-blue-600" /> Resumo da Entrada
+            <section className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm space-y-6">
+              <h4 className="text-base font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2 border-b border-gray-100 dark:border-gray-700 pb-3">
+                <ClipboardCheck className="w-4 h-4 text-blue-600 dark:text-blue-400" /> Resumo da Entrada
               </h4>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
@@ -803,29 +803,29 @@ export const CompraModal = ({
                   { label: 'Data Entrada',value: dataEntrada ? new Date(dataEntrada + 'T12:00:00').toLocaleDateString('pt-BR') : '—' },
                   { label: 'Itens',       value: `${itens.length} produto(s)` },
                 ].map(s => (
-                  <div key={s.label} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                    <p className="text-xs font-semibold text-gray-400 uppercase mb-1">{s.label}</p>
-                    <p className="text-sm font-medium text-gray-800 truncate">{s.value}</p>
+                  <div key={s.label} className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
+                    <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase mb-1">{s.label}</p>
+                    <p className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">{s.value}</p>
                   </div>
                 ))}
               </div>
 
               {/* Tabela de itens resumida */}
-              <div className="rounded-xl border border-gray-200 overflow-hidden">
+              <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <table className="w-full text-sm">
-                  <thead className="bg-gray-50 border-b border-gray-200">
+                  <thead className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
                     <tr>
-                      <th className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase text-left">Produto</th>
-                      <th className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase text-center">Qtd</th>
-                      <th className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase text-right">Total</th>
+                      <th className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase text-left">Produto</th>
+                      <th className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase text-center">Qtd</th>
+                      <th className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase text-right">Total</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                     {itens.map((it, i) => (
-                      <tr key={i} className="hover:bg-gray-50">
-                        <td className="px-4 py-2 text-gray-800">{it.descricao}</td>
-                        <td className="px-4 py-2 text-center text-gray-600">{it.quantidade}</td>
-                        <td className="px-4 py-2 text-right font-medium text-gray-800">{it.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                      <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td className="px-4 py-2 text-gray-800 dark:text-gray-100">{it.descricao}</td>
+                        <td className="px-4 py-2 text-center text-gray-600 dark:text-gray-300">{it.quantidade}</td>
+                        <td className="px-4 py-2 text-right font-medium text-gray-800 dark:text-gray-100">{it.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -834,9 +834,9 @@ export const CompraModal = ({
 
               {/* Lançamento */}
               <div className={`flex items-center gap-3 p-4 rounded-xl border text-sm font-medium ${
-                lancamento === 'financeiro' ? 'bg-blue-50 border-blue-200 text-blue-800' :
-                lancamento === 'caixa'      ? 'bg-green-50 border-green-200 text-green-800' :
-                                             'bg-gray-50 border-gray-200 text-gray-600'}`}>
+                lancamento === 'financeiro' ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-800' :
+                lancamento === 'caixa'      ? 'bg-green-50 dark:bg-green-900/20 border-green-200 text-green-800' :
+                                             'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300'}`}>
                 {lancamento === 'financeiro' && <><Landmark className="w-4 h-4" /> Contas a Pagar: {finParcelas}× de {(totalNota / finParcelas).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} — {FORMAS_PAG.find(f => f.v === finForma)?.l}</>}
                 {lancamento === 'caixa'      && <><CreditCard className="w-4 h-4" /> Débito no caixa: {totalNota.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} — {FORMAS_PAG.find(f => f.v === finForma)?.l}</>}
                 {lancamento === 'nenhum'     && <><Ban className="w-4 h-4" /> Sem lançamento financeiro — somente atualização de estoque</>}
@@ -844,8 +844,8 @@ export const CompraModal = ({
 
               <div className="flex justify-between items-center pt-2">
                 <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase mb-1">Total da Entrada</p>
-                  <p className="text-3xl font-bold text-blue-600">{totalNota.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                  <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase mb-1">Total da Entrada</p>
+                  <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{totalNota.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
                 </div>
                 <div className="flex gap-3">
                   <button onClick={handleSalvar} disabled={loading || itens.length === 0}

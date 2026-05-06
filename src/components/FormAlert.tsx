@@ -63,23 +63,23 @@ const DARK: VariantMap = {
 
 const LIGHT: VariantMap = {
   error: {
-    wrapper:    'border-red-200 bg-red-50',
-    iconColor:  'text-red-500',
-    textColor:  'text-red-700',
-    closeColor: 'text-red-400 hover:text-red-600 hover:bg-red-100',
+    wrapper:    'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20',
+    iconColor:  'text-red-500 dark:text-red-400',
+    textColor:  'text-red-700 dark:text-red-300',
+    closeColor: 'text-red-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-100',
     Icon: AlertCircle,
   },
   warning: {
-    wrapper:    'border-amber-200 bg-amber-50',
+    wrapper:    'border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20',
     iconColor:  'text-amber-500',
-    textColor:  'text-amber-700',
+    textColor:  'text-amber-700 dark:text-amber-300',
     closeColor: 'text-amber-400 hover:text-amber-600 hover:bg-amber-100',
     Icon: TriangleAlert,
   },
   success: {
-    wrapper:    'border-emerald-200 bg-emerald-50',
+    wrapper:    'border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20',
     iconColor:  'text-emerald-500',
-    textColor:  'text-emerald-700',
+    textColor:  'text-emerald-700 dark:text-emerald-300',
     closeColor: 'text-emerald-400 hover:text-emerald-600 hover:bg-emerald-100',
     Icon: CheckCircle,
   },

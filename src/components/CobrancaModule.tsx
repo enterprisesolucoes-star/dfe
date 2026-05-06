@@ -42,8 +42,8 @@ const FORM_INICIAL: ConfigCobranca = {
   ambiente: 'sandbox', ativo: 1,
 };
 
-const ic = 'w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none shadow-sm bg-white';
-const lb = 'block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider';
+const ic = 'w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none shadow-sm bg-white dark:bg-gray-800';
+const lb = 'block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wider';
 
 export const CobrancaConfigTab = ({ showAlert }: { showAlert: (t: string, m: string) => void }) => {
   const [form, setForm]         = useState<ConfigCobranca>(FORM_INICIAL);
@@ -96,7 +96,7 @@ export const CobrancaConfigTab = ({ showAlert }: { showAlert: (t: string, m: str
 
   if (loading) return (
     <div className="flex items-center justify-center py-20">
-      <RefreshCw className="w-6 h-6 animate-spin text-blue-600" />
+      <RefreshCw className="w-6 h-6 animate-spin text-blue-600 dark:text-blue-400" />
     </div>
   );
 
@@ -104,11 +104,11 @@ export const CobrancaConfigTab = ({ showAlert }: { showAlert: (t: string, m: str
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-gray-800">Configuração de Cobrança</h2>
-          <p className="text-xs text-gray-500 mt-0.5">Dados do cedente para emissão de boletos</p>
+          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">Configuração de Cobrança</h2>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Dados do cedente para emissão de boletos</p>
         </div>
         <button onClick={handleSalvar} disabled={saving}
-          className={`px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 ${saving ? 'bg-gray-200 text-gray-400' : 'bg-blue-600 text-white hover:bg-blue-700 shadow-md'}`}>
+          className={`px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 ${saving ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500' : 'bg-blue-600 text-white hover:bg-blue-700 shadow-md'}`}>
           {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           {saving ? 'Salvando...' : 'Salvar Configurações'}
         </button>
@@ -118,9 +118,9 @@ export const CobrancaConfigTab = ({ showAlert }: { showAlert: (t: string, m: str
         {ABAS.map((a, idx) => (
           <button key={a.id} onClick={() => setAba(a.id)}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all ${
-              aba === a.id ? 'bg-white text-blue-600 border-blue-200 shadow-sm' : 'bg-gray-50 text-gray-400 border-gray-100 hover:text-gray-600 hover:bg-white'
+              aba === a.id ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800 shadow-sm' : 'bg-gray-50 dark:bg-gray-900 text-gray-400 dark:text-gray-500 border-gray-100 dark:border-gray-700 hover:text-gray-600 hover:bg-white'
             }`}>
-            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${aba === a.id ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'}`}>{idx + 1}</span>
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${aba === a.id ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}>{idx + 1}</span>
             <a.icon className="w-4 h-4" />
             {a.label}
           </button>
@@ -129,9 +129,9 @@ export const CobrancaConfigTab = ({ showAlert }: { showAlert: (t: string, m: str
 
       {aba === 'banco' && (
         <div className="space-y-4">
-          <section className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-            <h3 className="text-base font-semibold text-gray-800 mb-6 flex items-center gap-2 border-b border-gray-100 pb-3">
-              <Building2 className="w-5 h-5 text-blue-600" /> Dados do Banco
+          <section className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+            <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100 mb-6 flex items-center gap-2 border-b border-gray-100 dark:border-gray-700 pb-3">
+              <Building2 className="w-5 h-5 text-blue-600 dark:text-blue-400" /> Dados do Banco
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               <div>
@@ -163,9 +163,9 @@ export const CobrancaConfigTab = ({ showAlert }: { showAlert: (t: string, m: str
             </div>
           </section>
 
-          <section className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-            <h3 className="text-base font-semibold text-gray-800 mb-6 flex items-center gap-2 border-b border-gray-100 pb-3">
-              <CreditCard className="w-5 h-5 text-blue-600" /> Configuração da Carteira
+          <section className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+            <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100 mb-6 flex items-center gap-2 border-b border-gray-100 dark:border-gray-700 pb-3">
+              <CreditCard className="w-5 h-5 text-blue-600 dark:text-blue-400" /> Configuração da Carteira
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               <div>
@@ -205,77 +205,77 @@ export const CobrancaConfigTab = ({ showAlert }: { showAlert: (t: string, m: str
             </div>
           </section>
 
-          <section className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-            <h3 className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2 border-b border-gray-100 pb-3">
-              <FileText className="w-5 h-5 text-blue-600" /> Instruções do Boleto
+          <section className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+            <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2 border-b border-gray-100 dark:border-gray-700 pb-3">
+              <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" /> Instruções do Boleto
             </h3>
             <textarea value={form.instrucoes} onChange={e => set('instrucoes', e.target.value)} rows={4}
               placeholder="Ex: Não receber após o vencimento. Cobrar multa de 2% após vencimento..."
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm resize-none" />
+              className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm resize-none" />
           </section>
         </div>
       )}
 
       {aba === 'prazos' && (
         <div className="space-y-4">
-          <section className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-            <h3 className="text-base font-semibold text-gray-800 mb-6 flex items-center gap-2 border-b border-gray-100 pb-3">
-              <CreditCard className="w-5 h-5 text-blue-600" /> Prazos
+          <section className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+            <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100 mb-6 flex items-center gap-2 border-b border-gray-100 dark:border-gray-700 pb-3">
+              <CreditCard className="w-5 h-5 text-blue-600 dark:text-blue-400" /> Prazos
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <label className={lb}>Prazo de Devolução (dias)</label>
                 <input type="number" min="0" value={form.prazo_devolucao} onChange={e => set('prazo_devolucao', parseInt(e.target.value) || 0)} className={ic} />
-                <p className="text-xs text-gray-400 mt-1">Dias após vencimento para devolução do título</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Dias após vencimento para devolução do título</p>
               </div>
               <div>
                 <label className={lb}>Prazo de Protesto (dias)</label>
                 <input type="number" min="0" value={form.prazo_protesto} onChange={e => set('prazo_protesto', parseInt(e.target.value) || 0)} className={ic} />
-                <p className="text-xs text-gray-400 mt-1">Dias após vencimento para protesto automático</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Dias após vencimento para protesto automático</p>
               </div>
             </div>
           </section>
 
-          <section className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-            <h3 className="text-base font-semibold text-gray-800 mb-6 flex items-center gap-2 border-b border-gray-100 pb-3">
-              <CreditCard className="w-5 h-5 text-blue-600" /> Encargos por Atraso
+          <section className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+            <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100 mb-6 flex items-center gap-2 border-b border-gray-100 dark:border-gray-700 pb-3">
+              <CreditCard className="w-5 h-5 text-blue-600 dark:text-blue-400" /> Encargos por Atraso
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-red-50 rounded-xl p-4 border border-red-100">
-                <p className="text-xs font-bold text-red-600 uppercase mb-3">Multa</p>
+              <div className="bg-red-50 dark:bg-red-900/20 rounded-xl p-4 border border-red-100">
+                <p className="text-xs font-bold text-red-600 dark:text-red-400 uppercase mb-3">Multa</p>
                 <div className="flex gap-2 mb-3">
                   {['%','R$'].map(t => (
                     <button key={t} onClick={() => set('multa_tipo', t)}
-                      className={`flex-1 py-2 rounded-lg text-xs font-bold border transition-all ${form.multa_tipo === t ? 'bg-red-500 text-white border-red-500' : 'bg-white text-gray-500 border-gray-200'}`}>{t}</button>
+                      className={`flex-1 py-2 rounded-lg text-xs font-bold border transition-all ${form.multa_tipo === t ? 'bg-red-500 text-white border-red-500' : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700'}`}>{t}</button>
                   ))}
                 </div>
                 <input type="number" step="0.01" min="0" value={form.multa_valor}
                   onChange={e => set('multa_valor', parseFloat(e.target.value) || 0)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-right font-semibold outline-none bg-white" />
+                  className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm text-right font-semibold outline-none bg-white dark:bg-gray-800" />
               </div>
-              <div className="bg-orange-50 rounded-xl p-4 border border-orange-100">
-                <p className="text-xs font-bold text-orange-600 uppercase mb-3">Juros ao Dia</p>
+              <div className="bg-orange-50 dark:bg-orange-900/20 rounded-xl p-4 border border-orange-100">
+                <p className="text-xs font-bold text-orange-600 dark:text-orange-400 uppercase mb-3">Juros ao Dia</p>
                 <div className="flex gap-2 mb-3">
                   {['%','R$'].map(t => (
                     <button key={t} onClick={() => set('juros_tipo', t)}
-                      className={`flex-1 py-2 rounded-lg text-xs font-bold border transition-all ${form.juros_tipo === t ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-gray-500 border-gray-200'}`}>{t}</button>
+                      className={`flex-1 py-2 rounded-lg text-xs font-bold border transition-all ${form.juros_tipo === t ? 'bg-orange-500 text-white border-orange-500' : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700'}`}>{t}</button>
                   ))}
                 </div>
                 <input type="number" step="0.0001" min="0" value={form.juros_valor}
                   onChange={e => set('juros_valor', parseFloat(e.target.value) || 0)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-right font-semibold outline-none bg-white" />
+                  className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm text-right font-semibold outline-none bg-white dark:bg-gray-800" />
               </div>
-              <div className="bg-green-50 rounded-xl p-4 border border-green-100">
-                <p className="text-xs font-bold text-green-600 uppercase mb-3">Desconto</p>
+              <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-4 border border-green-100">
+                <p className="text-xs font-bold text-green-600 dark:text-green-400 uppercase mb-3">Desconto</p>
                 <div className="flex gap-2 mb-3">
                   {['%','R$'].map(t => (
                     <button key={t} onClick={() => set('desconto_tipo', t)}
-                      className={`flex-1 py-2 rounded-lg text-xs font-bold border transition-all ${form.desconto_tipo === t ? 'bg-green-500 text-white border-green-500' : 'bg-white text-gray-500 border-gray-200'}`}>{t}</button>
+                      className={`flex-1 py-2 rounded-lg text-xs font-bold border transition-all ${form.desconto_tipo === t ? 'bg-green-500 text-white border-green-500' : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700'}`}>{t}</button>
                   ))}
                 </div>
                 <input type="number" step="0.01" min="0" value={form.desconto_valor}
                   onChange={e => set('desconto_valor', parseFloat(e.target.value) || 0)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-right font-semibold outline-none bg-white" />
+                  className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm text-right font-semibold outline-none bg-white dark:bg-gray-800" />
               </div>
             </div>
           </section>
@@ -284,17 +284,17 @@ export const CobrancaConfigTab = ({ showAlert }: { showAlert: (t: string, m: str
 
       {aba === 'api' && (
         <div className="space-y-4">
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex gap-3">
-            <AlertCircle className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-            <div className="text-sm text-blue-700">
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 flex gap-3">
+            <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+            <div className="text-sm text-blue-700 dark:text-blue-300">
               <p className="font-semibold mb-1">Credenciais para Registro Automático</p>
               <p className="text-xs">Necessário para gerar boletos individualmente em tempo real via API REST. Obtenha no portal do desenvolvedor do banco.</p>
             </div>
           </div>
 
-          <section className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-            <h3 className="text-base font-semibold text-gray-800 mb-6 flex items-center gap-2 border-b border-gray-100 pb-3">
-              <FileText className="w-5 h-5 text-blue-600" /> Credenciais OAuth2
+          <section className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+            <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100 mb-6 flex items-center gap-2 border-b border-gray-100 dark:border-gray-700 pb-3">
+              <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" /> Credenciais OAuth2
             </h3>
             <div className="space-y-4">
               <div>
@@ -307,7 +307,7 @@ export const CobrancaConfigTab = ({ showAlert }: { showAlert: (t: string, m: str
                   <input type={showSecret ? 'text' : 'password'} value={form.client_secret}
                     onChange={e => set('client_secret', e.target.value)}
                     className={ic + ' pr-10'} placeholder="client_secret fornecido pelo banco" />
-                  <button onClick={() => setShowSecret(!showSecret)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                  <button onClick={() => setShowSecret(!showSecret)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600">
                     {showSecret ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
@@ -315,16 +315,16 @@ export const CobrancaConfigTab = ({ showAlert }: { showAlert: (t: string, m: str
             </div>
           </section>
 
-          <section className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-            <h3 className="text-base font-semibold text-gray-800 mb-6 flex items-center gap-2 border-b border-gray-100 pb-3">
-              <FileText className="w-5 h-5 text-blue-600" /> Certificado mTLS
+          <section className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+            <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100 mb-6 flex items-center gap-2 border-b border-gray-100 dark:border-gray-700 pb-3">
+              <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" /> Certificado mTLS
             </h3>
             <div className="space-y-4">
               <div>
                 <label className={lb}>Certificado (.pem)</label>
                 <textarea value={form.certificado_pem} onChange={e => set('certificado_pem', e.target.value)} rows={5}
                   placeholder="-----BEGIN CERTIFICATE-----&#10;...&#10;-----END CERTIFICATE-----"
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-xs font-mono outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm resize-none" />
+                  className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-xs font-mono outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm resize-none" />
               </div>
               <div>
                 <label className={lb}>Chave Privada (.key)</label>
@@ -334,8 +334,8 @@ export const CobrancaConfigTab = ({ showAlert }: { showAlert: (t: string, m: str
                     onChange={e => showKey && set('certificado_key', e.target.value)}
                     readOnly={!showKey} rows={5}
                     placeholder="-----BEGIN PRIVATE KEY-----&#10;...&#10;-----END PRIVATE KEY-----"
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-xs font-mono outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm resize-none" />
-                  <button onClick={() => setShowKey(!showKey)} className="absolute right-3 top-3 text-gray-400 hover:text-gray-600">
+                    className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-xs font-mono outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm resize-none" />
+                  <button onClick={() => setShowKey(!showKey)} className="absolute right-3 top-3 text-gray-400 dark:text-gray-500 hover:text-gray-600">
                     {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
@@ -439,21 +439,21 @@ export const CobrancaBoletosTab = ({ showAlert, showConfirm }: {
       ? [] : boletos.filter(b => b.boleto_status === 'registrado').map(b => b.id));
 
   const statusStyle: Record<string, string> = {
-    registrado: 'bg-blue-100 text-blue-700',
-    pago:       'bg-green-100 text-green-700',
-    cancelado:  'bg-red-100 text-red-600',
-    devolvido:  'bg-gray-100 text-gray-600',
+    registrado: 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300',
+    pago:       'bg-green-100 text-green-700 dark:text-green-300',
+    cancelado:  'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400',
+    devolvido:  'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300',
   };
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-gray-800">Administração de Boletos</h2>
-          <p className="text-xs text-gray-500 mt-0.5">Gerencie boletos, remessas e retornos</p>
+          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">Administração de Boletos</h2>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Gerencie boletos, remessas e retornos</p>
         </div>
         <div className="flex gap-2">
-          <label className={`px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 cursor-pointer ${importando ? 'bg-gray-200 text-gray-400' : 'bg-purple-600 text-white hover:bg-purple-700'}`}>
+          <label className={`px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 cursor-pointer ${importando ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500' : 'bg-purple-600 text-white hover:bg-purple-700'}`}>
             <Upload className="w-4 h-4" />
             {importando ? 'Processando...' : 'Importar Retorno'}
             <input type="file" accept=".ret,.RET,.txt" onChange={handleImportarRetorno} className="hidden" disabled={importando} />
@@ -475,8 +475,8 @@ export const CobrancaBoletosTab = ({ showAlert, showConfirm }: {
           { label: 'Pagos', valor: totais.pago || 0, cor: 'green', tipo: 'num' },
           { label: 'Valor Total', valor: totais.valor_total || 0, cor: 'indigo', tipo: 'brl' },
         ].map(c => (
-          <div key={c.label} className="bg-white rounded-xl border border-gray-200 p-4">
-            <p className="text-xs text-gray-500 mb-1">{c.label}</p>
+          <div key={c.label} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{c.label}</p>
             <p className={`text-lg font-bold text-${c.cor}-600`}>
               {c.tipo === 'brl' ? brl(c.valor as number) : c.valor}
             </p>
@@ -485,23 +485,23 @@ export const CobrancaBoletosTab = ({ showAlert, showConfirm }: {
       </div>
 
       {/* Filtros */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 flex flex-wrap gap-3 items-end">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 flex flex-wrap gap-3 items-end">
         <div className="flex gap-2 flex-wrap">
           {['', 'registrado', 'pago', 'cancelado'].map(s => (
             <button key={s} onClick={() => setFiltroStatus(s)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${filtroStatus === s ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${filtroStatus === s ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'}`}>
               {s === '' ? 'Todos' : s.charAt(0).toUpperCase() + s.slice(1)}
             </button>
           ))}
         </div>
         <div className="flex gap-2 items-center ml-auto">
-          <label className="text-xs text-gray-500">De</label>
+          <label className="text-xs text-gray-500 dark:text-gray-400">De</label>
           <input type="date" value={dtInicio} onChange={e => setDtInicio(e.target.value)}
-            className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
-          <label className="text-xs text-gray-500">Até</label>
+            className="border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+          <label className="text-xs text-gray-500 dark:text-gray-400">Até</label>
           <input type="date" value={dtFim} onChange={e => setDtFim(e.target.value)}
-            className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
-          <button onClick={carregar} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
+            className="border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+          <button onClick={carregar} className="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg">
             <RefreshCw className="w-4 h-4" />
           </button>
         </div>
@@ -509,8 +509,8 @@ export const CobrancaBoletosTab = ({ showAlert, showConfirm }: {
 
       {/* Seleção em massa */}
       {selecionados.length > 0 && (
-        <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-3 flex items-center gap-3">
-          <span className="text-sm text-indigo-700 font-medium">{selecionados.length} selecionado(s)</span>
+        <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 rounded-xl p-3 flex items-center gap-3">
+          <span className="text-sm text-indigo-700 dark:text-indigo-300 font-medium">{selecionados.length} selecionado(s)</span>
           <button onClick={handleGerarRemessa}
             className="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700 flex items-center gap-1">
             <Download className="w-3 h-3" /> Gerar Remessa CNAB 240
@@ -519,61 +519,61 @@ export const CobrancaBoletosTab = ({ showAlert, showConfirm }: {
       )}
 
       {/* Tabela */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
         <table className="w-full text-left text-sm">
-          <thead className="bg-gray-50 border-b border-gray-200">
+          <thead className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
             <tr>
               <th className="px-4 py-3">
                 <input type="checkbox"
                   checked={selecionados.length > 0 && selecionados.length === boletos.filter(b => b.boleto_status === 'registrado').length}
                   onChange={toggleTodos} className="rounded" />
               </th>
-              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Nosso Nº</th>
-              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Cliente</th>
-              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Vencimento</th>
-              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-right">Valor</th>
-              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-center">Status</th>
-              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Remessa</th>
-              <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-center">Ações</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Nosso Nº</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Cliente</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Vencimento</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase text-right">Valor</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase text-center">Status</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Remessa</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase text-center">Ações</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
             {loading ? (
-              <tr><td colSpan={8} className="px-4 py-10 text-center"><RefreshCw className="w-5 h-5 animate-spin mx-auto text-gray-300" /></td></tr>
+              <tr><td colSpan={8} className="px-4 py-10 text-center"><RefreshCw className="w-5 h-5 animate-spin mx-auto text-gray-300 dark:text-gray-600" /></td></tr>
             ) : boletos.length === 0 ? (
-              <tr><td colSpan={8} className="px-4 py-10 text-center text-gray-400">Nenhum boleto encontrado.</td></tr>
+              <tr><td colSpan={8} className="px-4 py-10 text-center text-gray-400 dark:text-gray-500">Nenhum boleto encontrado.</td></tr>
             ) : boletos.map(b => (
-              <tr key={b.id} className="hover:bg-gray-50">
+              <tr key={b.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                 <td className="px-4 py-3">
                   {b.boleto_status === 'registrado' && (
                     <input type="checkbox" checked={selecionados.includes(b.id)}
                       onChange={() => toggleSel(b.id)} className="rounded" />
                   )}
                 </td>
-                <td className="px-4 py-3 font-mono text-xs text-gray-600">{b.boleto_nosso_numero}</td>
+                <td className="px-4 py-3 font-mono text-xs text-gray-600 dark:text-gray-300">{b.boleto_nosso_numero}</td>
                 <td className="px-4 py-3">
-                  <p className="font-medium text-gray-800 text-xs">{b.cliente_nome || '—'}</p>
-                  <p className="text-gray-400 text-[10px]">{b.cliente_documento}</p>
+                  <p className="font-medium text-gray-800 dark:text-gray-100 text-xs">{b.cliente_nome || '—'}</p>
+                  <p className="text-gray-400 dark:text-gray-500 text-[10px]">{b.cliente_documento}</p>
                 </td>
-                <td className="px-4 py-3 text-xs text-gray-500">{new Date(b.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</td>
-                <td className="px-4 py-3 text-right font-semibold text-gray-800 text-sm">{brl(Number(b.valor_total))}</td>
+                <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400">{new Date(b.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</td>
+                <td className="px-4 py-3 text-right font-semibold text-gray-800 dark:text-gray-100 text-sm">{brl(Number(b.valor_total))}</td>
                 <td className="px-4 py-3 text-center">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusStyle[b.boleto_status] || 'bg-gray-100 text-gray-600'}`}>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusStyle[b.boleto_status] || 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>
                     {b.boleto_status}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-xs text-gray-400">
+                <td className="px-4 py-3 text-xs text-gray-400 dark:text-gray-500">
                   {b.boleto_remessa_numero ? `#${b.boleto_remessa_numero}` : '—'}
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex gap-1 justify-center">
                     <button onClick={() => handleImprimir(b.id)} title="Imprimir"
-                      className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
+                      className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg">
                       <Printer className="w-4 h-4" />
                     </button>
                     {b.boleto_status === 'registrado' && (
                       <button onClick={() => handleCancelar(b.id)} title="Cancelar"
-                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
+                        className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg">
                         <X className="w-4 h-4" />
                       </button>
                     )}
@@ -638,38 +638,38 @@ export const CobrancaHistoricoTab = ({ showAlert }: { showAlert: (t: string, m: 
   };
 
   const statusStyle: Record<string, string> = {
-    gerada: 'bg-yellow-100 text-yellow-700',
-    enviada: 'bg-blue-100 text-blue-700',
-    processada: 'bg-green-100 text-green-700',
-    importado: 'bg-yellow-100 text-yellow-700',
-    processado: 'bg-green-100 text-green-700',
-    erro: 'bg-red-100 text-red-700',
+    gerada: 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300',
+    enviada: 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300',
+    processada: 'bg-green-100 text-green-700 dark:text-green-300',
+    importado: 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300',
+    processado: 'bg-green-100 text-green-700 dark:text-green-300',
+    erro: 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300',
   };
 
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-xl font-bold text-gray-800">Histórico de Remessas e Retornos</h2>
-        <p className="text-xs text-gray-500 mt-0.5">Visualize e faça download dos arquivos CNAB enviados e recebidos</p>
+        <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">Histórico de Remessas e Retornos</h2>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Visualize e faça download dos arquivos CNAB enviados e recebidos</p>
       </div>
 
       <div className="flex gap-2">
         <button onClick={() => setAba('remessas')}
-          className={`px-4 py-2 rounded-xl text-sm font-bold ${aba === 'remessas' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
+          className={`px-4 py-2 rounded-xl text-sm font-bold ${aba === 'remessas' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'}`}>
           Remessas Enviadas
         </button>
         <button onClick={() => setAba('retornos')}
-          className={`px-4 py-2 rounded-xl text-sm font-bold ${aba === 'retornos' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
+          className={`px-4 py-2 rounded-xl text-sm font-bold ${aba === 'retornos' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'}`}>
           Retornos Importados
         </button>
       </div>
 
-      {loading && <div className="text-center py-12 text-gray-400 text-sm">Carregando...</div>}
+      {loading && <div className="text-center py-12 text-gray-400 dark:text-gray-500 text-sm">Carregando...</div>}
 
       {!loading && aba === 'remessas' && (
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-xs text-gray-500 uppercase">
+            <thead className="bg-gray-50 dark:bg-gray-900 text-xs text-gray-500 dark:text-gray-400 uppercase">
               <tr>
                 <th className="px-4 py-3 text-left">Nº</th>
                 <th className="px-4 py-3 text-left">Arquivo</th>
@@ -683,23 +683,23 @@ export const CobrancaHistoricoTab = ({ showAlert }: { showAlert: (t: string, m: 
             </thead>
             <tbody>
               {remessas.length === 0 ? (
-                <tr><td colSpan={8} className="text-center py-12 text-gray-400 text-sm italic">Nenhuma remessa encontrada</td></tr>
+                <tr><td colSpan={8} className="text-center py-12 text-gray-400 dark:text-gray-500 text-sm italic">Nenhuma remessa encontrada</td></tr>
               ) : remessas.map(r => (
-                <tr key={r.id} className="border-t border-gray-100 hover:bg-gray-50">
-                  <td className="px-4 py-3 font-bold text-gray-700">#{r.numero_remessa}</td>
+                <tr key={r.id} className="border-t border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <td className="px-4 py-3 font-bold text-gray-700 dark:text-gray-200">#{r.numero_remessa}</td>
                   <td className="px-4 py-3 font-mono text-xs">{r.arquivo_nome}</td>
-                  <td className="px-4 py-3 text-center text-xs text-gray-500">{r.banco_codigo}</td>
+                  <td className="px-4 py-3 text-center text-xs text-gray-500 dark:text-gray-400">{r.banco_codigo}</td>
                   <td className="px-4 py-3 text-center font-bold">{r.total_titulos}</td>
-                  <td className="px-4 py-3 text-right font-bold text-indigo-700">{brl(r.valor_total)}</td>
+                  <td className="px-4 py-3 text-right font-bold text-indigo-700 dark:text-indigo-300">{brl(r.valor_total)}</td>
                   <td className="px-4 py-3 text-center">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusStyle[r.status] || 'bg-gray-100 text-gray-600'}`}>{r.status}</span>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusStyle[r.status] || 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>{r.status}</span>
                   </td>
-                  <td className="px-4 py-3 text-center text-xs text-gray-500">{fmtData(r.gerada_em)}</td>
+                  <td className="px-4 py-3 text-center text-xs text-gray-500 dark:text-gray-400">{fmtData(r.gerada_em)}</td>
                   <td className="px-4 py-3 text-center">
                     <div className="flex items-center justify-center gap-1">
-                      <button onClick={() => baixar('remessa', r.id)} className="p-1.5 text-gray-400 hover:text-blue-600" title="Baixar Arquivo"><Download className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => baixar('remessa', r.id)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400" title="Baixar Arquivo"><Download className="w-3.5 h-3.5" /></button>
                       {r.status === 'gerada' && (
-                        <button onClick={() => marcarEnviada(r.id)} className="p-1.5 text-gray-400 hover:text-green-600" title="Marcar como Enviada"><CheckCircle className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => marcarEnviada(r.id)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-green-600" title="Marcar como Enviada"><CheckCircle className="w-3.5 h-3.5" /></button>
                       )}
                     </div>
                   </td>
@@ -711,9 +711,9 @@ export const CobrancaHistoricoTab = ({ showAlert }: { showAlert: (t: string, m: 
       )}
 
       {!loading && aba === 'retornos' && (
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-xs text-gray-500 uppercase">
+            <thead className="bg-gray-50 dark:bg-gray-900 text-xs text-gray-500 dark:text-gray-400 uppercase">
               <tr>
                 <th className="px-4 py-3 text-left">Arquivo</th>
                 <th className="px-4 py-3 text-center">Banco</th>
@@ -727,20 +727,20 @@ export const CobrancaHistoricoTab = ({ showAlert }: { showAlert: (t: string, m: 
             </thead>
             <tbody>
               {retornos.length === 0 ? (
-                <tr><td colSpan={8} className="text-center py-12 text-gray-400 text-sm italic">Nenhum retorno encontrado</td></tr>
+                <tr><td colSpan={8} className="text-center py-12 text-gray-400 dark:text-gray-500 text-sm italic">Nenhum retorno encontrado</td></tr>
               ) : retornos.map(r => (
-                <tr key={r.id} className="border-t border-gray-100 hover:bg-gray-50">
+                <tr key={r.id} className="border-t border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="px-4 py-3 font-mono text-xs">{r.arquivo_nome}</td>
-                  <td className="px-4 py-3 text-center text-xs text-gray-500">{r.banco_codigo}</td>
+                  <td className="px-4 py-3 text-center text-xs text-gray-500 dark:text-gray-400">{r.banco_codigo}</td>
                   <td className="px-4 py-3 text-center">{r.total_registros}</td>
-                  <td className="px-4 py-3 text-center font-bold text-green-700">{r.total_pagos}</td>
-                  <td className="px-4 py-3 text-right font-bold text-emerald-700">{brl(r.valor_total_pago)}</td>
+                  <td className="px-4 py-3 text-center font-bold text-green-700 dark:text-green-300">{r.total_pagos}</td>
+                  <td className="px-4 py-3 text-right font-bold text-emerald-700 dark:text-emerald-300">{brl(r.valor_total_pago)}</td>
                   <td className="px-4 py-3 text-center">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusStyle[r.status] || 'bg-gray-100 text-gray-600'}`}>{r.status}</span>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusStyle[r.status] || 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>{r.status}</span>
                   </td>
-                  <td className="px-4 py-3 text-center text-xs text-gray-500">{fmtData(r.importado_em)}</td>
+                  <td className="px-4 py-3 text-center text-xs text-gray-500 dark:text-gray-400">{fmtData(r.importado_em)}</td>
                   <td className="px-4 py-3 text-center">
-                    <button onClick={() => baixar('retorno', r.id)} className="p-1.5 text-gray-400 hover:text-blue-600" title="Baixar Arquivo"><Download className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => baixar('retorno', r.id)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400" title="Baixar Arquivo"><Download className="w-3.5 h-3.5" /></button>
                   </td>
                 </tr>
               ))}

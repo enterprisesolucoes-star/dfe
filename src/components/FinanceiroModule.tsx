@@ -60,49 +60,49 @@ export const BaixaModal = ({ titulo, emitente, onClose, onSuccess, showAlert }: 
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[300] p-4 backdrop-blur-sm">
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
-        <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
-          <h3 className="font-bold text-gray-800 uppercase text-sm">Baixar {titulo.tipo === 'R' ? 'Recebimento' : 'Pagamento'}</h3>
-          <span className="text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded font-bold">TITULO #{titulo.id}</span>
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
+        <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 flex items-center justify-between">
+          <h3 className="font-bold text-gray-800 dark:text-gray-100 uppercase text-sm">Baixar {titulo.tipo === 'R' ? 'Recebimento' : 'Pagamento'}</h3>
+          <span className="text-[10px] bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded font-bold">TITULO #{titulo.id}</span>
         </div>
         <div className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Valor Original</label>
-              <p className="text-xl font-bold text-gray-800">R$ {Number(titulo.valor_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+              <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Valor Original</label>
+              <p className="text-xl font-bold text-gray-800 dark:text-gray-100">R$ {Number(titulo.valor_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Vencimento</label>
-              <p className="text-sm font-bold text-gray-600">{new Date(titulo.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
+              <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Vencimento</label>
+              <p className="text-sm font-bold text-gray-600 dark:text-gray-300">{new Date(titulo.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
             </div>
           </div>
-          <div className="p-4 bg-gray-50 rounded-2xl space-y-3">
+          <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-xs text-gray-500">Multa / Juros (+)</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">Multa / Juros (+)</span>
               <div className="flex gap-2">
-                <input type="number" step="0.01" value={valorMulta} onChange={e => setValorMulta(Number(e.target.value))} className="w-20 text-right bg-white border border-gray-200 rounded-lg px-2 py-1 text-xs font-bold text-red-500" />
-                <input type="number" step="0.01" value={valorJuros} onChange={e => setValorJuros(Number(e.target.value))} className="w-20 text-right bg-white border border-gray-200 rounded-lg px-2 py-1 text-xs font-bold text-red-500" />
+                <input type="number" step="0.01" value={valorMulta} onChange={e => setValorMulta(Number(e.target.value))} className="w-20 text-right bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1 text-xs font-bold text-red-500 dark:text-red-400" />
+                <input type="number" step="0.01" value={valorJuros} onChange={e => setValorJuros(Number(e.target.value))} className="w-20 text-right bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1 text-xs font-bold text-red-500 dark:text-red-400" />
               </div>
             </div>
-            <div className="flex justify-between items-center text-emerald-600">
+            <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-400">
               <span className="text-xs font-medium">Desconto (-)</span>
-              <input type="number" step="0.01" value={valorDesconto} onChange={e => setValorDesconto(Number(e.target.value))} className="w-20 text-right bg-white border border-gray-200 rounded-lg px-2 py-1 text-xs font-bold text-emerald-600" />
+              <input type="number" step="0.01" value={valorDesconto} onChange={e => setValorDesconto(Number(e.target.value))} className="w-20 text-right bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400" />
             </div>
-            <div className="pt-2 border-t border-gray-200 flex justify-between items-center">
-              <span className="text-sm font-bold text-gray-800">TOTAL A LIQUIDAR</span>
-              <span className="text-lg font-bold text-blue-700">R$ {valorFinal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            <div className="pt-2 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
+              <span className="text-sm font-bold text-gray-800 dark:text-gray-100">TOTAL A LIQUIDAR</span>
+              <span className="text-lg font-bold text-blue-700 dark:text-blue-300">R$ {valorFinal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
             </div>
           </div>
           <div className="space-y-3">
-            <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Conta de Destino / Data</label>
-            <select value={contaId} onChange={e => setContaId(e.target.value)} className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none">
+            <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Conta de Destino / Data</label>
+            <select value={contaId} onChange={e => setContaId(e.target.value)} className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none">
               {contas.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
             </select>
             <Input label="Data Baixa" type="date" value={dataPagamento} onChange={(e:any) => setDataPagamento(e.target.value)} />
           </div>
         </div>
-        <div className="p-6 bg-gray-50 flex gap-3">
-          <button onClick={onClose} className="flex-1 py-3 text-gray-500 font-bold text-xs uppercase">Cancelar</button>
+        <div className="p-6 bg-gray-50 dark:bg-gray-900 flex gap-3">
+          <button onClick={onClose} className="flex-1 py-3 text-gray-500 dark:text-gray-400 font-bold text-xs uppercase">Cancelar</button>
           <button onClick={handleConfirmar} disabled={loading} className="flex-1 py-3 bg-blue-600 text-white font-bold text-xs uppercase rounded-xl">{loading ? 'Aguarde...' : 'Confirmar'}</button>
         </div>
       </motion.div>
@@ -175,32 +175,32 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobranc
         <StatCard label={tipo === 'R' ? "Recebido no Período" : "Pago no Período"} value={Number(totPago).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} icon={CheckCircle} color="green" />
       </div>
 
-      <div className="flex flex-wrap items-center justify-between bg-white p-4 rounded-3xl shadow-sm border border-gray-100 gap-4">
+      <div className="flex flex-wrap items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 gap-4">
         <div className="flex items-center gap-2">
           {([['', 'TODOS'], ['Pendente', 'PENDENTE'], ['Pago', 'PAGOS']] as [string, string][]).map(([val, label]) => (
-            <button key={val} onClick={() => setFiltroStatus(val as any)} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${filtroStatus === val ? 'bg-blue-600 text-white' : 'bg-gray-50 text-gray-500 hover:bg-gray-100'}`}>
+            <button key={val} onClick={() => setFiltroStatus(val as any)} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${filtroStatus === val ? 'bg-blue-600 text-white' : 'bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
               {label}
             </button>
           ))}
-          <span className="text-gray-300 text-xs">|</span>
-          <span className="text-[10px] text-gray-400 font-bold uppercase">De:</span>
-          <input type="date" value={di} onChange={e => setDi(e.target.value)} className="border border-gray-200 rounded-xl px-2 py-1.5 text-xs outline-none" />
-          <span className="text-[10px] text-gray-400 font-bold uppercase">Até:</span>
-          <input type="date" value={df} onChange={e => setDf(e.target.value)} className="border border-gray-200 rounded-xl px-2 py-1.5 text-xs outline-none" />
+          <span className="text-gray-300 dark:text-gray-600 text-xs">|</span>
+          <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase">De:</span>
+          <input type="date" value={di} onChange={e => setDi(e.target.value)} className="border border-gray-200 dark:border-gray-700 rounded-xl px-2 py-1.5 text-xs outline-none" />
+          <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase">Até:</span>
+          <input type="date" value={df} onChange={e => setDf(e.target.value)} className="border border-gray-200 dark:border-gray-700 rounded-xl px-2 py-1.5 text-xs outline-none" />
           <button onClick={fetchTitulos} className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all">Atualizar</button>
           <button onClick={() => setShowLancamento(true)} className="flex items-center gap-1 px-3 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition-all"><Plus className="w-3 h-3" /> Novo Lançamento</button>
         </div>
         <div className="flex items-center gap-2">
           <div className="relative">
-            <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input type="text" placeholder={`Buscar ${tipo === 'P' ? 'fornecedor' : 'cliente'}...`} value={busca} onChange={e => setBusca(e.target.value)} onKeyDown={e => e.key === 'Enter' && fetchTitulos()} className="border border-gray-200 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none w-48" />
+            <Search className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input type="text" placeholder={`Buscar ${tipo === 'P' ? 'fornecedor' : 'cliente'}...`} value={busca} onChange={e => setBusca(e.target.value)} onKeyDown={e => e.key === 'Enter' && fetchTitulos()} className="border border-gray-200 dark:border-gray-700 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none w-48" />
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden overflow-x-auto">
         <table className="w-full text-left text-sm">
-          <thead className="bg-gray-50 text-gray-500">
+          <thead className="bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400">
             <tr>
               <th className="px-6 py-4 font-bold uppercase text-[10px]">Descrição / Cliente</th>
               <th className="px-6 py-4 font-bold uppercase text-[10px]">Vencimento</th>
@@ -209,46 +209,46 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobranc
               <th className="px-6 py-4 font-bold uppercase text-[10px] text-center">Ações</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
             {loading && (
-              <tr><td colSpan={5} className="px-6 py-8 text-center text-xs text-gray-400">Carregando...</td></tr>
+              <tr><td colSpan={5} className="px-6 py-8 text-center text-xs text-gray-400 dark:text-gray-500">Carregando...</td></tr>
             )}
             {!loading && titulos.length === 0 && (
-              <tr><td colSpan={5} className="px-6 py-8 text-center text-xs text-gray-400">Nenhum registro encontrado.</td></tr>
+              <tr><td colSpan={5} className="px-6 py-8 text-center text-xs text-gray-400 dark:text-gray-500">Nenhum registro encontrado.</td></tr>
             )}
             {!loading && titulos.map((t) => (
-              <tr key={t.id} className="hover:bg-gray-50/50 transition-all">
+              <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
                 <td className="px-6 py-4">
-                  <p className="text-xs font-bold text-gray-700">{t.categoria}</p>
-                  <p className="text-[10px] text-blue-600 font-bold">{t.nome_entidade}</p>
+                  <p className="text-xs font-bold text-gray-700 dark:text-gray-200">{t.categoria}</p>
+                  <p className="text-[10px] text-blue-600 dark:text-blue-400 font-bold">{t.nome_entidade}</p>
                 </td>
                 <td className="px-6 py-4">
-                  <p className="text-xs text-gray-600">{t.vencimento ? new Date(t.vencimento + 'T12:00:00').toLocaleDateString('pt-BR') : '-'}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-300">{t.vencimento ? new Date(t.vencimento + 'T12:00:00').toLocaleDateString('pt-BR') : '-'}</p>
                 </td>
                 <td className="px-6 py-4">
-                  <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${t.status === 'Pago' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                  <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${t.status === 'Pago' ? 'bg-green-100 text-green-700 dark:text-green-300' : 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300'}`}>
                     {t.status || 'Pendente'}
                   </span>
                 </td>
                 <td className="px-6 py-4 text-right">
-                  <p className={`text-xs font-bold ${tipo === 'R' ? 'text-blue-600' : 'text-red-600'}`}>
+                  <p className={`text-xs font-bold ${tipo === 'R' ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}>
                     {Number(t.valor_total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                   </p>
                 </td>
                 <td className="px-6 py-4 text-center">
                   <div className="flex items-center justify-center gap-2">
-                    {t.status !== 'Pago' && <button onClick={() => setBaixaTitulo(t)} className="p-1.5 text-gray-400 hover:text-emerald-600" title="Baixar"><CheckCircle className="w-3.5 h-3.5" /></button>}
-                    {t.status !== 'Pago' && <button onClick={() => setEditTitulo(t)} className="p-1.5 text-gray-400 hover:text-blue-600" title="Editar"><Edit2 className="w-3.5 h-3.5" /></button>}
+                    {t.status !== 'Pago' && <button onClick={() => setBaixaTitulo(t)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-emerald-600" title="Baixar"><CheckCircle className="w-3.5 h-3.5" /></button>}
+                    {t.status !== 'Pago' && <button onClick={() => setEditTitulo(t)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400" title="Editar"><Edit2 className="w-3.5 h-3.5" /></button>}
                     {cobrancaAtiva && tipo === 'R' && t.status !== 'Pago' && t.entidade_id && (
                       t.boleto_status === 'registrado'
-                        ? <button onClick={() => setBoletoTitulo({ ...t, _modo: 'visualizar' })} className="p-1.5 text-gray-400 hover:text-indigo-600" title="Ver Boleto"><FileText className="w-3.5 h-3.5" /></button>
-                        : <button onClick={() => setBoletoTitulo({ ...t, _modo: 'gerar' })} className="p-1.5 text-gray-400 hover:text-indigo-600" title="Gerar Boleto"><FileText className="w-3.5 h-3.5" /></button>
+                        ? <button onClick={() => setBoletoTitulo({ ...t, _modo: 'visualizar' })} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-indigo-600" title="Ver Boleto"><FileText className="w-3.5 h-3.5" /></button>
+                        : <button onClick={() => setBoletoTitulo({ ...t, _modo: 'gerar' })} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-indigo-600" title="Gerar Boleto"><FileText className="w-3.5 h-3.5" /></button>
                     )}
                     {cobrancaAtiva && tipo === 'R' && t.lancamento_id && t.parcela_total > 1 && t.boleto_status === 'registrado' && (
-                      <button onClick={() => imprimirLote(t.lancamento_id)} className="p-1.5 text-gray-400 hover:text-purple-600" title="Imprimir Lote"><ExternalLink className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => imprimirLote(t.lancamento_id)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-purple-600" title="Imprimir Lote"><ExternalLink className="w-3.5 h-3.5" /></button>
                     )}
-                    {t.status === 'Pago' && <button onClick={() => handleEstornar(t.id)} className="p-1.5 text-gray-400 hover:text-amber-600" title="Estornar"><RotateCcw className="w-3.5 h-3.5" /></button>}
-                    <button onClick={() => handleExcluir(t.id)} className="p-1.5 text-gray-400 hover:text-red-600" title="Excluir"><Trash2 className="w-3.5 h-3.5" /></button>
+                    {t.status === 'Pago' && <button onClick={() => handleEstornar(t.id)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-amber-600" title="Estornar"><RotateCcw className="w-3.5 h-3.5" /></button>}
+                    <button onClick={() => handleExcluir(t.id)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400" title="Excluir"><Trash2 className="w-3.5 h-3.5" /></button>
                   </div>
                 </td>
               </tr>
@@ -293,32 +293,32 @@ export const EditarTituloModal = ({ titulo, onClose, onSuccess, showAlert }: any
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[200] p-4 backdrop-blur-sm">
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden">
-        <div className="p-6 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden">
+        <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex justify-between items-center">
           <div>
-            <h3 className="font-bold text-gray-800 text-sm">Editar Título — {tipoTexto}</h3>
-            <p className="text-xs text-gray-500">Parcela {titulo.parcela_numero}/{titulo.parcela_total}</p>
+            <h3 className="font-bold text-gray-800 dark:text-gray-100 text-sm">Editar Título — {tipoTexto}</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Parcela {titulo.parcela_numero}/{titulo.parcela_total}</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+          <button onClick={onClose} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 text-2xl leading-none">×</button>
         </div>
         <div className="p-6 space-y-3">
           <div>
-            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Descrição</label>
-            <input type="text" value={categoria} onChange={e => setCategoria(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm" />
+            <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Descrição</label>
+            <input type="text" value={categoria} onChange={e => setCategoria(e.target.value)} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Valor (R$)</label>
-              <input type="number" step="0.01" value={valorTotal} onChange={e => setValorTotal(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm font-bold" />
+              <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Valor (R$)</label>
+              <input type="number" step="0.01" value={valorTotal} onChange={e => setValorTotal(e.target.value)} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-bold" />
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Vencimento</label>
-              <input type="date" value={vencimento} onChange={e => setVencimento(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm" />
+              <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Vencimento</label>
+              <input type="date" value={vencimento} onChange={e => setVencimento(e.target.value)} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm" />
             </div>
           </div>
           <div>
-            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Forma de Pagamento Prevista</label>
-            <select value={formaPgto} onChange={e => setFormaPgto(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm">
+            <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Forma de Pagamento Prevista</label>
+            <select value={formaPgto} onChange={e => setFormaPgto(e.target.value)} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm">
               <option value="01">01 - Dinheiro</option>
               <option value="03">03 - Crédito</option>
               <option value="04">04 - Débito</option>
@@ -328,12 +328,12 @@ export const EditarTituloModal = ({ titulo, onClose, onSuccess, showAlert }: any
             </select>
           </div>
           <div>
-            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Observações</label>
-            <textarea value={observacoes} onChange={e => setObservacoes(e.target.value)} rows={2} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm resize-none" />
+            <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Observações</label>
+            <textarea value={observacoes} onChange={e => setObservacoes(e.target.value)} rows={2} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm resize-none" />
           </div>
         </div>
-        <div className="p-4 bg-gray-50 border-t border-gray-100 flex gap-3">
-          <button onClick={onClose} className="flex-1 py-2.5 text-gray-500 font-bold uppercase text-xs border border-gray-200 rounded-xl hover:bg-gray-100">Cancelar</button>
+        <div className="p-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex gap-3">
+          <button onClick={onClose} className="flex-1 py-2.5 text-gray-500 dark:text-gray-400 font-bold uppercase text-xs border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">Cancelar</button>
           <button onClick={handleSalvar} disabled={saving} className={`flex-1 py-2.5 ${corBtn} disabled:bg-gray-300 text-white font-bold uppercase text-xs rounded-xl`}>
             {saving ? 'Salvando...' : 'Salvar'}
           </button>
@@ -462,25 +462,25 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
     return (
       <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[200] p-4 backdrop-blur-sm">
         <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-          className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden">
-          <div className="p-6 border-b border-gray-100 bg-indigo-50 flex items-center gap-3">
-            <FileText className="w-5 h-5 text-indigo-600" />
+          className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden">
+          <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-indigo-50 dark:bg-indigo-900/20 flex items-center gap-3">
+            <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             <div>
-              <h3 className="font-bold text-gray-800 text-sm">{parcelas.length} Parcela(s) Lançada(s)!</h3>
-              <p className="text-xs text-indigo-600">Forma de pagamento: Boleto Bancário</p>
+              <h3 className="font-bold text-gray-800 dark:text-gray-100 text-sm">{parcelas.length} Parcela(s) Lançada(s)!</h3>
+              <p className="text-xs text-indigo-600 dark:text-indigo-400">Forma de pagamento: Boleto Bancário</p>
             </div>
           </div>
           <div className="p-6 space-y-4">
-            <div className="bg-indigo-50 rounded-2xl p-4 space-y-1">
-              <p className="text-xs text-gray-500 font-bold uppercase">Resumo</p>
-              <p className="text-sm font-bold text-gray-800">{descricao}</p>
-              {clienteSelecionado && <p className="text-xs text-indigo-700">Cliente: {clienteSelecionado.nome || clienteSelecionado.razao_social}</p>}
-              <p className="text-xs text-gray-600">{parcelas.length}x · Total: <span className="font-bold text-indigo-700">R$ {valorNum.toFixed(2)}</span></p>
+            <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl p-4 space-y-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase">Resumo</p>
+              <p className="text-sm font-bold text-gray-800 dark:text-gray-100">{descricao}</p>
+              {clienteSelecionado && <p className="text-xs text-indigo-700 dark:text-indigo-300">Cliente: {clienteSelecionado.nome || clienteSelecionado.razao_social}</p>}
+              <p className="text-xs text-gray-600 dark:text-gray-300">{parcelas.length}x · Total: <span className="font-bold text-indigo-700 dark:text-indigo-300">R$ {valorNum.toFixed(2)}</span></p>
             </div>
-            <p className="text-xs text-gray-500 text-center">Deseja gerar os boletos agora?<br/>Você também pode gerá-los depois na lista de títulos.</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 text-center">Deseja gerar os boletos agora?<br/>Você também pode gerá-los depois na lista de títulos.</p>
           </div>
-          <div className="p-4 bg-gray-50 border-t border-gray-100 flex gap-3">
-            <button onClick={onSuccess} className="flex-1 py-2.5 text-gray-500 font-bold uppercase text-xs border border-gray-200 rounded-xl hover:bg-gray-100">
+          <div className="p-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex gap-3">
+            <button onClick={onSuccess} className="flex-1 py-2.5 text-gray-500 dark:text-gray-400 font-bold uppercase text-xs border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
               Depois
             </button>
             <button onClick={handleGerarBoletos} disabled={gerandoBoletos}
@@ -498,28 +498,28 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[200] p-4 backdrop-blur-sm">
       <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-        className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
-        <div className="p-6 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+        className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+        <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex justify-between items-center">
           <div>
-            <h3 className="font-bold text-gray-800 text-sm">Novo Lançamento — Contas a {tipoTexto}</h3>
-            <p className="text-xs text-gray-500">Lançamento manual com parcelamento opcional</p>
+            <h3 className="font-bold text-gray-800 dark:text-gray-100 text-sm">Novo Lançamento — Contas a {tipoTexto}</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Lançamento manual com parcelamento opcional</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+          <button onClick={onClose} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 text-2xl leading-none">×</button>
         </div>
 
         <div className="p-6 space-y-4 overflow-y-auto">
 
           <div>
-            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Descrição / Categoria</label>
+            <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Descrição / Categoria</label>
             <input type="text" value={descricao} onChange={e => setDescricao(e.target.value)}
               placeholder="Ex: Aluguel, Fatura #123, Energia..."
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm" />
+              className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm" />
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Forma de Pagamento</label>
+            <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Forma de Pagamento</label>
             <select value={formaPgto} onChange={e => { setFormaPgto(e.target.value); setClienteId(''); setClienteBusca(''); }}
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm bg-white">
+              className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm bg-white dark:bg-gray-800">
               <option value="01">01 - Dinheiro</option>
               <option value="02">02 - Cheque</option>
               <option value="03">03 - Cartão de Crédito</option>
@@ -537,10 +537,10 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
           {isBoleto && tipo === 'R' && (
             <div className="relative">
               <label className="block text-[10px] font-bold text-indigo-500 uppercase mb-1">
-                Cliente <span className="text-red-500">*</span> (obrigatório para boleto)
+                Cliente <span className="text-red-500 dark:text-red-400">*</span> (obrigatório para boleto)
               </label>
               {clienteSelecionado ? (
-                <div className="flex items-center gap-2 px-3 py-2 border border-indigo-300 bg-indigo-50 rounded-xl">
+                <div className="flex items-center gap-2 px-3 py-2 border border-indigo-300 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl">
                   <span className="flex-1 text-sm font-bold text-indigo-800">
                     {clienteSelecionado.nome || clienteSelecionado.razao_social}
                     <span className="ml-2 text-xs font-normal text-indigo-500">{clienteSelecionado.cpf_cnpj || ''}</span>
@@ -550,7 +550,7 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
                 </div>
               ) : (
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
                   <input type="text" value={clienteBusca}
                     onChange={e => { setClienteBusca(e.target.value); setShowDropCliente(true); }}
                     onFocus={() => setShowDropCliente(true)}
@@ -558,12 +558,12 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
                     placeholder="Digite nome ou CPF/CNPJ do cliente..."
                     className="w-full pl-9 pr-3 py-2 border border-indigo-200 rounded-xl text-sm focus:border-indigo-400 outline-none" />
                   {showDropCliente && clientesFiltrados.length > 0 && (
-                    <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                    <div className="absolute z-50 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg max-h-48 overflow-y-auto">
                       {clientesFiltrados.slice(0, 10).map(c => (
                         <button key={c.id} onMouseDown={() => { setClienteId(String(c.id)); setClienteBusca(''); setShowDropCliente(false); }}
-                          className="w-full text-left px-4 py-2.5 hover:bg-indigo-50 border-b border-gray-50 last:border-0">
-                          <p className="text-xs font-bold text-gray-800">{c.nome || c.razao_social}</p>
-                          <p className="text-[10px] text-gray-400">{c.documento || 'Sem documento'}</p>
+                          className="w-full text-left px-4 py-2.5 hover:bg-indigo-50 border-b border-gray-50 dark:border-gray-700 last:border-0">
+                          <p className="text-xs font-bold text-gray-800 dark:text-gray-100">{c.nome || c.razao_social}</p>
+                          <p className="text-[10px] text-gray-400 dark:text-gray-500">{c.documento || 'Sem documento'}</p>
                         </button>
                       ))}
                     </div>
@@ -575,74 +575,74 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
 
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Valor Total (R$)</label>
+              <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Valor Total (R$)</label>
               <input type="number" step="0.01" value={valorTotal} onChange={e => setValorTotal(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm font-bold" />
+                className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-bold" />
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Nº Parcelas</label>
+              <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Nº Parcelas</label>
               <input type="number" min="1" max="120" value={numParcelas}
                 onChange={e => setNumParcelas(Math.max(1, Number(e.target.value)))}
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm font-bold" />
+                className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-bold" />
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Intervalo (dias)</label>
+              <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Intervalo (dias)</label>
               <input type="number" min="1" value={intervaloDias}
                 onChange={e => setIntervaloDias(Math.max(1, Number(e.target.value)))}
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm" />
+                className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm" />
             </div>
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Primeiro Vencimento</label>
+            <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Primeiro Vencimento</label>
             <input type="date" value={primeiroVenc} onChange={e => setPrimeiroVenc(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm" />
+              className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm" />
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Observações</label>
+            <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Observações</label>
             <textarea value={observacoes} onChange={e => setObservacoes(e.target.value)} rows={2}
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm resize-none" />
+              className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm resize-none" />
           </div>
 
           {parcelas.length > 0 && (
-            <div className="border border-gray-200 rounded-xl overflow-hidden">
-              <div className="bg-gray-50 px-4 py-2 flex justify-between items-center">
-                <span className="text-[10px] font-bold text-gray-500 uppercase">
+            <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+              <div className="bg-gray-50 dark:bg-gray-900 px-4 py-2 flex justify-between items-center">
+                <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">
                   Parcelas Geradas ({parcelas.length}){isBoleto && <span className="ml-2 text-indigo-500">· Boleto</span>}
                 </span>
-                <span className={`text-xs font-bold ${diferenca > 0 ? 'text-red-600' : 'text-emerald-600'}`}>
+                <span className={`text-xs font-bold ${diferenca > 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                   Total: R$ {totalParcelas.toFixed(2)}
                 </span>
               </div>
               <table className="w-full text-xs">
-                <thead className="bg-gray-50 border-t border-gray-100">
+                <thead className="bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700">
                   <tr className="text-left">
-                    <th className="px-4 py-2 font-bold text-[10px] text-gray-500 uppercase">#</th>
-                    <th className="px-4 py-2 font-bold text-[10px] text-gray-500 uppercase">Vencimento</th>
-                    <th className="px-4 py-2 font-bold text-[10px] text-gray-500 uppercase text-right">Valor (R$)</th>
+                    <th className="px-4 py-2 font-bold text-[10px] text-gray-500 dark:text-gray-400 uppercase">#</th>
+                    <th className="px-4 py-2 font-bold text-[10px] text-gray-500 dark:text-gray-400 uppercase">Vencimento</th>
+                    <th className="px-4 py-2 font-bold text-[10px] text-gray-500 dark:text-gray-400 uppercase text-right">Valor (R$)</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                   {parcelas.map((p, idx) => (
-                    <tr key={idx} className="hover:bg-gray-50/50">
-                      <td className="px-4 py-2 font-bold text-gray-600">{p.numero}/{parcelas.length}</td>
+                    <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                      <td className="px-4 py-2 font-bold text-gray-600 dark:text-gray-300">{p.numero}/{parcelas.length}</td>
                       <td className="px-4 py-2">
                         <input type="date" value={p.vencimento}
                           onChange={e => { const n = [...parcelas]; n[idx].vencimento = e.target.value; setParcelas(n); }}
-                          className="border border-gray-200 rounded-lg px-2 py-0.5 text-xs bg-white" />
+                          className="border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-0.5 text-xs bg-white dark:bg-gray-800" />
                       </td>
                       <td className="px-4 py-2 text-right">
                         <input type="number" step="0.01" value={p.valor}
                           onChange={e => { const n = [...parcelas]; n[idx].valor = Number(e.target.value); setParcelas(n); }}
-                          className="border border-gray-200 rounded-lg px-2 py-0.5 text-right w-28 text-xs font-bold bg-white" />
+                          className="border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-0.5 text-right w-28 text-xs font-bold bg-white dark:bg-gray-800" />
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
               {diferenca > 0 && (
-                <div className="bg-red-50 px-4 py-2 text-xs text-red-600 font-bold border-t border-red-100">
+                <div className="bg-red-50 dark:bg-red-900/20 px-4 py-2 text-xs text-red-600 dark:text-red-400 font-bold border-t border-red-100">
                   ⚠ Diferença de R$ {(diferenca / 100).toFixed(2)} — ajuste os valores antes de salvar.
                 </div>
               )}
@@ -650,9 +650,9 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
           )}
         </div>
 
-        <div className="p-4 bg-gray-50 border-t border-gray-100 flex gap-3">
+        <div className="p-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex gap-3">
           <button onClick={onClose}
-            className="flex-1 py-2.5 text-gray-500 font-bold uppercase text-xs border border-gray-200 rounded-xl hover:bg-gray-100">
+            className="flex-1 py-2.5 text-gray-500 dark:text-gray-400 font-bold uppercase text-xs border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
             Cancelar
           </button>
           <button onClick={handleSalvar}
@@ -693,14 +693,14 @@ export const ParcelamentoModal = ({ total, initialParcelas, onConfirm, onCancel 
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[300] p-4 backdrop-blur-sm">
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden">
-        <div className="p-6 border-b border-gray-100 flex justify-between bg-gray-50">
-          <h3 className="font-bold text-gray-800 uppercase text-xs">Parcelamento</h3>
-          <span className="font-bold text-blue-600">Total: R$ {total.toFixed(2)}</span>
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden">
+        <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between bg-gray-50 dark:bg-gray-900">
+          <h3 className="font-bold text-gray-800 dark:text-gray-100 uppercase text-xs">Parcelamento</h3>
+          <span className="font-bold text-blue-600 dark:text-blue-400">Total: R$ {total.toFixed(2)}</span>
         </div>
         <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
           <div className="flex items-center gap-4">
-            <label className="text-xs font-bold text-gray-400 uppercase">Parcelas:</label>
+            <label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Parcelas:</label>
             <input type="number" value={numParcelas} onChange={e => setNumParcelas(Math.max(1, Number(e.target.value)))} className="w-20 border rounded-xl px-3 py-1 text-sm font-bold" />
           </div>
           <table className="w-full text-left text-xs">
@@ -716,8 +716,8 @@ export const ParcelamentoModal = ({ total, initialParcelas, onConfirm, onCancel 
             </tbody>
           </table>
         </div>
-        <div className="p-6 bg-gray-50 flex gap-4">
-          <button onClick={onCancel} className="flex-1 py-3 text-gray-500 font-bold uppercase text-xs">Cancelar</button>
+        <div className="p-6 bg-gray-50 dark:bg-gray-900 flex gap-4">
+          <button onClick={onCancel} className="flex-1 py-3 text-gray-500 dark:text-gray-400 font-bold uppercase text-xs">Cancelar</button>
           <button onClick={() => onConfirm(parcelas)} disabled={Math.abs(tP - total) > 0.01} className="flex-1 py-3 bg-blue-600 text-white font-bold uppercase text-xs rounded-xl">Salvar</button>
         </div>
       </motion.div>
@@ -790,33 +790,33 @@ export const CaixaView = ({ emitente, showAlert, showConfirm }: { emitente: any,
     <div className="space-y-4">
       {showModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[300] p-4 backdrop-blur-sm">
-          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
-            <div className="p-6 border-b border-gray-100 bg-gray-50/50">
-              <h3 className="font-bold text-gray-800 uppercase text-sm">Lançamento Manual</h3>
+          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
+            <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+              <h3 className="font-bold text-gray-800 dark:text-gray-100 uppercase text-sm">Lançamento Manual</h3>
             </div>
             <div className="p-6 space-y-4">
               <div className="flex gap-2">
                 {[['E','Entrada'],['S','Saída']].map(([v,l]) => (
-                  <button key={v} onClick={() => setTipoMov(v as 'E'|'S')} className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${tipoMov === v ? (v === 'E' ? 'bg-emerald-600 text-white' : 'bg-red-500 text-white') : 'bg-gray-100 text-gray-500'}`}>{l}</button>
+                  <button key={v} onClick={() => setTipoMov(v as 'E'|'S')} className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${tipoMov === v ? (v === 'E' ? 'bg-emerald-600 text-white' : 'bg-red-500 text-white') : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}>{l}</button>
                 ))}
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Descrição</label>
-                <input value={descricao} onChange={e => setDescricao(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none" placeholder="Ex: Pagamento de aluguel" />
+                <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Descrição</label>
+                <input value={descricao} onChange={e => setDescricao(e.target.value)} className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none" placeholder="Ex: Pagamento de aluguel" />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Valor (R$)</label>
-                <input type="number" step="0.01" value={valor} onChange={e => setValor(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none" placeholder="0,00" />
+                <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Valor (R$)</label>
+                <input type="number" step="0.01" value={valor} onChange={e => setValor(e.target.value)} className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none" placeholder="0,00" />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Conta</label>
-                <select value={contaId} onChange={e => setContaId(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none">
+                <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Conta</label>
+                <select value={contaId} onChange={e => setContaId(e.target.value)} className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none">
                   {contas.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
                 </select>
               </div>
             </div>
-            <div className="p-6 bg-gray-50 flex gap-3">
-              <button onClick={() => setShowModal(false)} className="flex-1 py-3 text-gray-500 font-bold text-xs uppercase">Cancelar</button>
+            <div className="p-6 bg-gray-50 dark:bg-gray-900 flex gap-3">
+              <button onClick={() => setShowModal(false)} className="flex-1 py-3 text-gray-500 dark:text-gray-400 font-bold text-xs uppercase">Cancelar</button>
               <button onClick={handleSalvar} disabled={savingMov} className="flex-1 py-3 bg-blue-600 text-white font-bold text-xs uppercase rounded-xl">{savingMov ? 'Salvando...' : 'Salvar'}</button>
             </div>
           </motion.div>
@@ -829,12 +829,12 @@ export const CaixaView = ({ emitente, showAlert, showConfirm }: { emitente: any,
         <StatCard label="Saídas (Débito)" value={Number(totSaidas).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} icon={TrendingDown} color="red" />
       </div>
 
-      <div className="flex flex-wrap items-center justify-between bg-white p-4 rounded-3xl shadow-sm border border-gray-100 gap-4">
+      <div className="flex flex-wrap items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 gap-4">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-gray-400 font-bold uppercase">De:</span>
-          <input type="date" value={di} onChange={e => setDi(e.target.value)} className="border border-gray-200 rounded-xl px-2 py-1.5 text-xs outline-none" />
-          <span className="text-[10px] text-gray-400 font-bold uppercase">Até:</span>
-          <input type="date" value={df} onChange={e => setDf(e.target.value)} className="border border-gray-200 rounded-xl px-2 py-1.5 text-xs outline-none" />
+          <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase">De:</span>
+          <input type="date" value={di} onChange={e => setDi(e.target.value)} className="border border-gray-200 dark:border-gray-700 rounded-xl px-2 py-1.5 text-xs outline-none" />
+          <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase">Até:</span>
+          <input type="date" value={df} onChange={e => setDf(e.target.value)} className="border border-gray-200 dark:border-gray-700 rounded-xl px-2 py-1.5 text-xs outline-none" />
           <button onClick={fetchMovimentos} className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all">Atualizar</button>
         </div>
         <button onClick={() => setShowModal(true)} className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition-all">
@@ -842,9 +842,9 @@ export const CaixaView = ({ emitente, showAlert, showConfirm }: { emitente: any,
         </button>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden overflow-x-auto">
         <table className="w-full text-left text-sm">
-          <thead className="bg-gray-50 text-gray-500">
+          <thead className="bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400">
             <tr>
               <th className="px-6 py-4 font-bold uppercase text-[10px]">Data</th>
               <th className="px-6 py-4 font-bold uppercase text-[10px]">Descrição</th>
@@ -854,18 +854,18 @@ export const CaixaView = ({ emitente, showAlert, showConfirm }: { emitente: any,
               <th className="px-6 py-4 font-bold uppercase text-[10px] text-center">Ações</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
-            {loading && <tr><td colSpan={6} className="px-6 py-8 text-center text-xs text-gray-400">Carregando...</td></tr>}
-            {!loading && movimentos.length === 0 && <tr><td colSpan={6} className="px-6 py-8 text-center text-xs text-gray-400">Nenhum movimento encontrado.</td></tr>}
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+            {loading && <tr><td colSpan={6} className="px-6 py-8 text-center text-xs text-gray-400 dark:text-gray-500">Carregando...</td></tr>}
+            {!loading && movimentos.length === 0 && <tr><td colSpan={6} className="px-6 py-8 text-center text-xs text-gray-400 dark:text-gray-500">Nenhum movimento encontrado.</td></tr>}
             {!loading && movimentos.map((m) => (
-              <tr key={m.id} className="hover:bg-gray-50/50 transition-all">
-                <td className="px-6 py-4 text-xs text-gray-600">{m.data_movimento ? new Date(m.data_movimento).toLocaleDateString('pt-BR') : '-'}</td>
-                <td className="px-6 py-4 text-xs font-bold text-gray-700">{m.historico}</td>
-                <td className="px-6 py-4 text-xs text-gray-500">{m.conta_nome || 'CAIXA GERAL'}</td>
-                <td className="px-6 py-4 text-right text-xs font-bold text-emerald-600">{m.tipo === 'C' ? Number(m.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : ''}</td>
-                <td className="px-6 py-4 text-right text-xs font-bold text-red-500">{m.tipo === 'D' ? Number(m.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : ''}</td>
+              <tr key={m.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
+                <td className="px-6 py-4 text-xs text-gray-600 dark:text-gray-300">{m.data_movimento ? new Date(m.data_movimento).toLocaleDateString('pt-BR') : '-'}</td>
+                <td className="px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-200">{m.historico}</td>
+                <td className="px-6 py-4 text-xs text-gray-500 dark:text-gray-400">{m.conta_nome || 'CAIXA GERAL'}</td>
+                <td className="px-6 py-4 text-right text-xs font-bold text-emerald-600 dark:text-emerald-400">{m.tipo === 'C' ? Number(m.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : ''}</td>
+                <td className="px-6 py-4 text-right text-xs font-bold text-red-500 dark:text-red-400">{m.tipo === 'D' ? Number(m.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : ''}</td>
                 <td className="px-6 py-4 text-center">
-                  {!m.venda_id && !m.compra_id && !m.financeiro_id && <button onClick={() => handleExcluir(m.id)} className="p-1.5 text-gray-400 hover:text-red-600"><svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>}
+                  {!m.venda_id && !m.compra_id && !m.financeiro_id && <button onClick={() => handleExcluir(m.id)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400"><svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>}
                 </td>
               </tr>
             ))}
@@ -916,30 +916,30 @@ const BoletoModal = ({ titulo, onClose, showAlert }: { titulo: any; onClose: () 
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[200] p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg">
         {/* Header */}
-        <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-          <h3 className="text-base font-bold text-gray-800 flex items-center gap-2">
-            <FileText className="w-5 h-5 text-indigo-600" />
+        <div className="p-5 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+          <h3 className="text-base font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+            <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             {loading ? 'Gerando Boleto...' : 'Boleto Gerado'}
           </h3>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600">✕</button>
+          <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-400 dark:text-gray-500 hover:text-gray-600">✕</button>
         </div>
 
         {/* Conteúdo */}
         <div className="p-6">
           {loading ? (
             <div className="flex flex-col items-center py-10 gap-4">
-              <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
-              <p className="text-gray-500 text-sm">Registrando boleto no banco...</p>
+              <Loader2 className="w-10 h-10 text-indigo-600 dark:text-indigo-400 animate-spin" />
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Registrando boleto no banco...</p>
             </div>
           ) : boleto ? (
             <div className="space-y-4">
               {/* Info do título */}
-              <div className="bg-indigo-50 rounded-xl p-4 border border-indigo-100">
+              <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-4 border border-indigo-100">
                 <div className="flex justify-between items-center mb-2">
-                  <p className="text-xs text-indigo-600 font-semibold uppercase">Valor do Boleto</p>
-                  <p className="text-2xl font-bold text-indigo-700">{brl(boleto.valor_total)}</p>
+                  <p className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold uppercase">Valor do Boleto</p>
+                  <p className="text-2xl font-bold text-indigo-700 dark:text-indigo-300">{brl(boleto.valor_total)}</p>
                 </div>
                 <div className="flex justify-between text-xs text-indigo-500">
                   <span>Vencimento: {new Date(boleto.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</span>
@@ -950,32 +950,32 @@ const BoletoModal = ({ titulo, onClose, showAlert }: { titulo: any; onClose: () 
               {/* Linha digitável */}
               {boleto.boleto_linha_digitavel && (
                 <div>
-                  <p className="text-xs font-semibold text-gray-500 uppercase mb-1.5">Linha Digitável</p>
-                  <div className="flex gap-2 items-center bg-gray-50 rounded-xl p-3 border border-gray-200">
-                    <p className="flex-1 text-xs font-mono text-gray-700 break-all">{boleto.boleto_linha_digitavel}</p>
-                    <button onClick={copiarLinha} className={`shrink-0 p-2 rounded-lg transition-all ${copiado ? 'bg-green-100 text-green-600' : 'bg-white text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 border border-gray-200'}`}>
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1.5">Linha Digitável</p>
+                  <div className="flex gap-2 items-center bg-gray-50 dark:bg-gray-900 rounded-xl p-3 border border-gray-200 dark:border-gray-700">
+                    <p className="flex-1 text-xs font-mono text-gray-700 dark:text-gray-200 break-all">{boleto.boleto_linha_digitavel}</p>
+                    <button onClick={copiarLinha} className={`shrink-0 p-2 rounded-lg transition-all ${copiado ? 'bg-green-100 text-green-600 dark:text-green-400' : 'bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 border border-gray-200 dark:border-gray-700'}`}>
                       {copiado ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                     </button>
                   </div>
-                  {copiado && <p className="text-xs text-green-600 mt-1">✓ Copiado!</p>}
+                  {copiado && <p className="text-xs text-green-600 dark:text-green-400 mt-1">✓ Copiado!</p>}
                 </div>
               )}
 
               {/* Código de barras */}
               {boleto.boleto_codigo_barras && (
                 <div>
-                  <p className="text-xs font-semibold text-gray-500 uppercase mb-1.5">Código de Barras</p>
-                  <p className="text-xs font-mono text-gray-500 bg-gray-50 rounded-xl p-3 border border-gray-100 break-all">{boleto.boleto_codigo_barras}</p>
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1.5">Código de Barras</p>
+                  <p className="text-xs font-mono text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 rounded-xl p-3 border border-gray-100 dark:border-gray-700 break-all">{boleto.boleto_codigo_barras}</p>
                 </div>
               )}
 
               {/* Status */}
               <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-500">Status:</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">Status:</span>
                 <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                  boleto.boleto_status === 'registrado' ? 'bg-green-100 text-green-700' :
-                  boleto.boleto_status === 'pago'       ? 'bg-blue-100 text-blue-700' :
-                  'bg-yellow-100 text-yellow-700'
+                  boleto.boleto_status === 'registrado' ? 'bg-green-100 text-green-700 dark:text-green-300' :
+                  boleto.boleto_status === 'pago'       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300' :
+                  'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300'
                 }`}>{boleto.boleto_status || 'pendente'}</span>
               </div>
             </div>
@@ -984,12 +984,12 @@ const BoletoModal = ({ titulo, onClose, showAlert }: { titulo: any; onClose: () 
 
         {/* Rodapé */}
         {!loading && boleto && (
-          <div className="p-5 border-t border-gray-100 flex gap-3">
+          <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex gap-3">
             <button onClick={() => window.open(`./api.php?action=boleto_imprimir&id=${boleto.id}`, '_blank')}
               className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700">
               <ExternalLink className="w-4 h-4" /> Imprimir Boleto
             </button>
-            <button onClick={onClose} className="flex-1 py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-50">
+            <button onClick={onClose} className="flex-1 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700">
               Fechar
             </button>
           </div>

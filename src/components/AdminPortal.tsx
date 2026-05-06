@@ -236,30 +236,30 @@ const AdminPortal = () => {
   if (!loggedIn) return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-700 p-4">
       <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8">
+        className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm p-8">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-2xl mb-4">
-            <FileText className="w-8 h-8 text-blue-600" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 dark:bg-blue-900/40 rounded-2xl mb-4">
+            <FileText className="w-8 h-8 text-blue-600 dark:text-blue-400" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-800">DFe IA</h1>
-          <p className="text-sm text-gray-500 mt-1">Painel Administrativo</p>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">DFe IA</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Painel Administrativo</p>
         </div>
-        {erro && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm mb-4">{erro}</div>}
+        {erro && <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-lg px-4 py-3 text-sm mb-4">{erro}</div>}
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Login</label>
+            <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Login</label>
             <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
               <input type="text" value={login} onChange={e => setLogin(e.target.value)} placeholder="admin"
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-400" />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Senha</label>
+            <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Senha</label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
               <input type="password" value={senha} onChange={e => setSenha(e.target.value)} placeholder="••••••"
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-400" />
             </div>
           </div>
           <button type="submit" disabled={loading}
@@ -267,30 +267,30 @@ const AdminPortal = () => {
             {loading ? 'Autenticando...' : 'Entrar'}
           </button>
         </form>
-        <p className="text-center text-xs mt-6 text-gray-400">Enterprise Soluções</p>
+        <p className="text-center text-xs mt-6 text-gray-400 dark:text-gray-500">Enterprise Soluções</p>
       </motion.div>
     </div>
   );
 
   // ─── PAINEL ──────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between shadow-sm">
+      <header className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 px-6 py-4 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
             <FileText className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="font-bold text-gray-800 text-sm">DFe IA — Admin</h1>
-            <p className="text-xs text-gray-400">Gerenciamento de Empresas</p>
+            <h1 className="font-bold text-gray-800 dark:text-gray-100 text-sm">DFe IA — Admin</h1>
+            <p className="text-xs text-gray-400 dark:text-gray-500">Gerenciamento de Empresas</p>
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <button onClick={() => setShowBackup(true)} className="flex items-center gap-2 text-xs text-gray-500 hover:text-blue-600 font-bold transition-colors">
+          <button onClick={() => setShowBackup(true)} className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 font-bold transition-colors">
             <HardDrive className="w-4 h-4" /> Backup
           </button>
-          <button onClick={handleLogout} className="flex items-center gap-2 text-xs text-gray-500 hover:text-red-600 font-bold transition-colors">
+          <button onClick={handleLogout} className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 font-bold transition-colors">
             <LogOut className="w-4 h-4" /> Sair
           </button>
         </div>
@@ -299,7 +299,7 @@ const AdminPortal = () => {
       <main className="max-w-7xl mx-auto px-6 py-8">
         {/* Toolbar */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-bold text-gray-800">Empresas Cadastradas</h2>
+          <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">Empresas Cadastradas</h2>
           <div className="flex gap-2">
             <button onClick={() => manutencaoGlobal(true)} className="px-3 py-1.5 bg-orange-500 text-white text-xs font-bold rounded-lg hover:bg-orange-600 flex items-center gap-1">
               Manutenção ON
@@ -310,11 +310,11 @@ const AdminPortal = () => {
           </div>
           <div className="flex items-center gap-3">
             <div className="relative">
-              <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" />
               <input type="text" placeholder="Buscar empresa..." value={busca} onChange={e => setBusca(e.target.value)}
-                className="border border-gray-200 rounded-xl pl-9 pr-4 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-400 w-56" />
+                className="border border-gray-200 dark:border-gray-700 rounded-xl pl-9 pr-4 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-400 w-56" />
             </div>
-            <button onClick={() => fetchEmpresas()} className="p-2 bg-gray-100 text-gray-500 hover:bg-gray-200 rounded-xl transition-colors">
+            <button onClick={() => fetchEmpresas()} className="p-2 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-xl transition-colors">
               <RefreshCw className="w-4 h-4" />
             </button>
             <button onClick={() => abrirModal()}
@@ -325,9 +325,9 @@ const AdminPortal = () => {
         </div>
 
         {/* Tabela */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
           <table className="w-full text-left text-sm">
-            <thead className="bg-gray-50 text-gray-400 text-[10px] uppercase">
+            <thead className="bg-gray-50 dark:bg-gray-900 text-gray-400 dark:text-gray-500 text-[10px] uppercase">
               <tr>
                 <th className="px-6 py-4 font-bold">Empresa</th>
                 <th className="px-6 py-4 font-bold">CNPJ</th>
@@ -337,31 +337,31 @@ const AdminPortal = () => {
                 <th className="px-6 py-4 font-bold text-center">Ações</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
               {lista.length === 0 && (
-                <tr><td colSpan={6} className="px-6 py-8 text-center text-xs text-gray-400">Nenhuma empresa encontrada.</td></tr>
+                <tr><td colSpan={6} className="px-6 py-8 text-center text-xs text-gray-400 dark:text-gray-500">Nenhuma empresa encontrada.</td></tr>
               )}
               {lista.map(e => (
-                <tr key={e.id} className="hover:bg-gray-50/50 transition-colors">
+                <tr key={e.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                   <td className="px-6 py-4">
-                    <p className="text-xs font-bold text-gray-800">{e.razao_social || '—'}</p>
-                    <p className="text-[10px] text-gray-400">{e.nome_fantasia || ''}</p>
+                    <p className="text-xs font-bold text-gray-800 dark:text-gray-100">{e.razao_social || '—'}</p>
+                    <p className="text-[10px] text-gray-400 dark:text-gray-500">{e.nome_fantasia || ''}</p>
                   </td>
-                  <td className="px-6 py-4 text-xs text-gray-600">{e.cnpj ? e.cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5') : '—'}</td>
-                  <td className="px-6 py-4 text-xs text-gray-600">{e.uf || '—'}</td>
+                  <td className="px-6 py-4 text-xs text-gray-600 dark:text-gray-300">{e.cnpj ? e.cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5') : '—'}</td>
+                  <td className="px-6 py-4 text-xs text-gray-600 dark:text-gray-300">{e.uf || '—'}</td>
                   <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${e.usuario_dfe == 4 ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
+                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${e.usuario_dfe == 4 ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300' : 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'}`}>
                       {RECURSOS[e.usuario_dfe] || '—'}
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${e.status === 'Ativo' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${e.status === 'Ativo' ? 'bg-green-100 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'}`}>
                       {e.status || 'Ativo'}
                     </span>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-center gap-1">
-                      <button onClick={() => abrirModal(e)} className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors" title="Editar">
+                      <button onClick={() => abrirModal(e)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" title="Editar">
                         <Edit className="w-3.5 h-3.5" />
                       </button>
                       <button onClick={() => bloquear(e.id, e.razao_social || e.cnpj, e.status)}
@@ -370,10 +370,10 @@ const AdminPortal = () => {
                         <Shield className="w-3.5 h-3.5" />
                       </button>
                       <button onClick={() => setAuditoriaEmpresa({ id: e.id, nome: e.razao_social || e.cnpj || '—' })}
-                        className="p-1.5 text-gray-400 hover:text-purple-600 transition-colors" title="Auditoria de Ações">
+                        className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-purple-600 transition-colors" title="Auditoria de Ações">
                         <FileSearch className="w-3.5 h-3.5" />
                       </button>
-                      <button onClick={() => excluir(e.id, e.razao_social || e.cnpj)} className="p-1.5 text-gray-400 hover:text-red-600 transition-colors" title="Inativar">
+                      <button onClick={() => excluir(e.id, e.razao_social || e.cnpj)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-colors" title="Inativar">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -389,12 +389,12 @@ const AdminPortal = () => {
       {modal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-            className="bg-white rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col" style={{height: 'calc(100vh - 4rem)', maxHeight: '750px'}}>
+            className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col" style={{height: 'calc(100vh - 4rem)', maxHeight: '750px'}}>
             {/* Modal Header */}
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50 rounded-t-2xl">
-              <h3 className="font-bold text-gray-800">{empresaId ? `Editar Empresa — ${form.razao_social || form.nome_fantasia || ''}` : 'Nova Empresa'}</h3>
-              <button onClick={() => setModal(false)} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-                <X className="w-5 h-5 text-gray-400" />
+            <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between bg-gray-50 dark:bg-gray-900/50 rounded-t-2xl">
+              <h3 className="font-bold text-gray-800 dark:text-gray-100">{empresaId ? `Editar Empresa — ${form.razao_social || form.nome_fantasia || ''}` : 'Nova Empresa'}</h3>
+              <button onClick={() => setModal(false)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors">
+                <X className="w-5 h-5 text-gray-400 dark:text-gray-500" />
               </button>
             </div>
 
@@ -408,75 +408,75 @@ const AdminPortal = () => {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="col-span-2">
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Razão Social</label>
+                      <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Razão Social</label>
                       <input value={form.razao_social || ''} onChange={e => set('razao_social', e.target.value)}
-                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                        className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Nome Fantasia</label>
+                      <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Nome Fantasia</label>
                       <input value={form.nome_fantasia || ''} onChange={e => set('nome_fantasia', e.target.value)}
-                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                        className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">CNPJ</label>
+                      <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">CNPJ</label>
                       <input value={form.cnpj || ''} onChange={e => set('cnpj', e.target.value)}
-                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                        className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Inscrição Estadual</label>
+                      <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Inscrição Estadual</label>
                       <input value={form.inscricao_estadual ?? form.ie ?? ''} onChange={e => { set('inscricao_estadual', e.target.value); set('ie', e.target.value); }}
-                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                        className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">UF</label>
+                      <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">UF</label>
                       <select value={form.uf || 'GO'} onChange={e => handleUfChange(e.target.value)}
-                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400">
+                        className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400">
                         {ESTADOS.map(u => <option key={u} value={u}>{u}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Município</label>
+                      <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Município</label>
                       <select value={form.municipio || ''} onChange={e => set('municipio', e.target.value)}
-                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400">
+                        className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400">
                         <option value="">Selecione...</option>
                         {municipios.map(m => <option key={m} value={m}>{m}</option>)}
                         {form.municipio && !municipios.includes(form.municipio) && <option value={form.municipio}>{form.municipio}</option>}
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">CEP</label>
+                      <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">CEP</label>
                       <input value={form.cep || ''} onChange={e => set('cep', e.target.value)}
-                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                        className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Logradouro</label>
+                      <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Logradouro</label>
                       <input value={form.logradouro || ''} onChange={e => set('logradouro', e.target.value)}
-                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                        className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Número</label>
+                      <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Número</label>
                       <input value={form.numero || ''} onChange={e => set('numero', e.target.value)}
-                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                        className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Bairro</label>
+                      <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Bairro</label>
                       <input value={form.bairro || ''} onChange={e => set('bairro', e.target.value)}
-                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                        className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Telefone</label>
+                      <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Telefone</label>
                       <input value={form.telefone || ''} onChange={e => set('telefone', e.target.value)}
-                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                        className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">E-mail</label>
+                      <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">E-mail</label>
                       <input type="email" value={form.email || ''} onChange={e => set('email', e.target.value)}
-                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
+                        className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Recurso DFe</label>
+                      <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Recurso DFe</label>
                       <select value={form.usuario_dfe ?? 2} onChange={e => set('usuario_dfe', Number(e.target.value))}
-                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400">
+                        className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400">
                         <option value={0}>S/ Recurso Fiscal</option>
                         <option value={1}>NFe</option>
                         <option value={2}>NFe + NFCe</option>
@@ -485,9 +485,9 @@ const AdminPortal = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Status</label>
+                      <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Status</label>
                       <select value={form.status || 'Ativo'} onChange={e => set('status', e.target.value)}
-                        className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400">
+                        className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400">
                         <option value="Ativo">Ativo</option>
                         <option value="Bloqueado">Bloqueado (Inadimplente)</option>
                         <option value="Suspenso">Suspenso</option>
@@ -500,30 +500,30 @@ const AdminPortal = () => {
 
 
               {/* Tab SmartPOS */}
-              {empresaId && (<div className="mt-8 pt-6 border-t border-gray-100 mb-4"><h3 className="text-sm font-bold text-gray-700 uppercase tracking-wide">SmartPOS / TEF</h3></div>)}
+              {empresaId && (<div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700 mb-4"><h3 className="text-sm font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wide">SmartPOS / TEF</h3></div>)}
               {empresaId && Number(form.tem_tef) === 1 && (
                 <div className="space-y-6">
-                  <div className="border border-gray-100 rounded-2xl p-4 bg-gray-50/50">
+                  <div className="border border-gray-100 dark:border-gray-700 rounded-2xl p-4 bg-gray-50 dark:bg-gray-900/50">
                     <label className="flex items-center gap-3 cursor-pointer">
                       <input type="checkbox" checked={Number(form.tem_tef) === 1}
                         onChange={e => set('tem_tef', e.target.checked ? 1 : 0)}
-                        className="w-4 h-4 rounded text-blue-600" />
+                        className="w-4 h-4 rounded text-blue-600 dark:text-blue-400" />
                       <div>
-                        <p className="text-sm font-bold text-gray-700">Integração TEF ativa</p>
-                        <p className="text-xs text-gray-400">Empresa utiliza terminal SmartPOS para pagamentos</p>
+                        <p className="text-sm font-bold text-gray-700 dark:text-gray-200">Integração TEF ativa</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">Empresa utiliza terminal SmartPOS para pagamentos</p>
                       </div>
                     </label>
                   </div>
 
                   {empresaId && Number(form.tem_tef) === 1 && (
                     <div>
-                      <p className="text-[10px] font-bold text-gray-400 uppercase mb-3">Máquinas SmartPOS</p>
+                      <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-3">Máquinas SmartPOS</p>
                       <div className="grid grid-cols-4 gap-2 mb-3">
                         {[['codigo','ID *'],['numero_serie','Nº Série *'],['integradora','Integradora *'],['apelido','Apelido']].map(([f,l]) => (
                           <div key={f}>
-                            <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">{l}</label>
+                            <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">{l}</label>
                             <input value={(spForm as any)[f]} onChange={e => setSpForm(p => ({ ...p, [f]: e.target.value }))}
-                              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-400" />
+                              className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-400" />
                           </div>
                         ))}
                       </div>
@@ -534,14 +534,14 @@ const AdminPortal = () => {
                         </button>
                         {editingSp && (
                           <button onClick={cancelarEditSp}
-                            className="bg-gray-100 text-gray-600 px-4 py-2 rounded-xl text-xs font-bold hover:bg-gray-200 transition-colors">
+                            className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-4 py-2 rounded-xl text-xs font-bold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                             Cancelar
                           </button>
                         )}
                       </div>
-                      <div className="mt-4 border border-gray-100 rounded-xl overflow-hidden">
+                      <div className="mt-4 border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden">
                         <table className="w-full text-xs text-left">
-                          <thead className="bg-gray-50 text-gray-400">
+                          <thead className="bg-gray-50 dark:bg-gray-900 text-gray-400 dark:text-gray-500">
                             <tr>
                               <th className="px-4 py-3 font-bold uppercase text-[10px]">ID</th>
                               <th className="px-4 py-3 font-bold uppercase text-[10px]">Nº Série</th>
@@ -550,22 +550,22 @@ const AdminPortal = () => {
                               <th className="px-4 py-3 text-center font-bold uppercase text-[10px]">Ação</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-gray-50">
+                          <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
                             {smartPosList.length === 0 && (
-                              <tr><td colSpan={5} className="px-4 py-4 text-center text-gray-400">Nenhuma máquina cadastrada.</td></tr>
+                              <tr><td colSpan={5} className="px-4 py-4 text-center text-gray-400 dark:text-gray-500">Nenhuma máquina cadastrada.</td></tr>
                             )}
                             {smartPosList.map(sp => (
-                              <tr key={sp.id} className="hover:bg-gray-50">
+                              <tr key={sp.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <td className="px-4 py-3">{sp.codigo}</td>
                                 <td className="px-4 py-3">{sp.numero_serie}</td>
                                 <td className="px-4 py-3">{sp.integradora}</td>
                                 <td className="px-4 py-3">{sp.apelido}</td>
                                 <td className="px-4 py-3 text-center">
                                   <div className="flex items-center justify-center gap-2">
-                                    <button onClick={() => editSmartPos(sp)} className="text-gray-400 hover:text-blue-600 transition-colors" title="Editar">
+                                    <button onClick={() => editSmartPos(sp)} className="text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" title="Editar">
                                       <Edit className="w-3.5 h-3.5" />
                                     </button>
-                                    <button onClick={() => delSmartPos(sp.id)} className="text-gray-400 hover:text-red-600 transition-colors" title="Excluir">
+                                    <button onClick={() => delSmartPos(sp.id)} className="text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-colors" title="Excluir">
                                       <Trash2 className="w-3.5 h-3.5" />
                                     </button>
                                   </div>
@@ -577,21 +577,21 @@ const AdminPortal = () => {
                       </div>
                     </div>
                   )}
-                  {!empresaId && <p className="text-xs text-gray-400 text-center py-4">Salve a empresa primeiro para cadastrar máquinas SmartPOS.</p>}
-                  {empresaId && Number(form.tem_tef) !== 1 && <p className="text-xs text-gray-400 text-center py-4">Ative a Integração TEF acima para cadastrar máquinas SmartPOS.</p>}
+                  {!empresaId && <p className="text-xs text-gray-400 dark:text-gray-500 text-center py-4">Salve a empresa primeiro para cadastrar máquinas SmartPOS.</p>}
+                  {empresaId && Number(form.tem_tef) !== 1 && <p className="text-xs text-gray-400 dark:text-gray-500 text-center py-4">Ative a Integração TEF acima para cadastrar máquinas SmartPOS.</p>}
                 </div>
               )}
-              {empresaId && (<div className="mt-8 pt-6 border-t border-gray-100 mb-4"><h3 className="text-sm font-bold text-gray-700 uppercase tracking-wide">Usuários</h3></div>)}
+              {empresaId && (<div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700 mb-4"><h3 className="text-sm font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wide">Usuários</h3></div>)}
               {empresaId && (
                 <div className="space-y-4">
-                  {!empresaId && <p className="text-xs text-gray-400 text-center py-4">Salve a empresa primeiro para gerenciar usuários.</p>}
+                  {!empresaId && <p className="text-xs text-gray-400 dark:text-gray-500 text-center py-4">Salve a empresa primeiro para gerenciar usuários.</p>}
                   {empresaId && (<>
                     <div className="grid grid-cols-2 gap-2">
-                      <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Nome</label><input value={userForm.nome} onChange={e => setUserForm(p => ({...p, nome: e.target.value}))} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-400" /></div>
-                      <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Login</label><input value={userForm.login} onChange={e => setUserForm(p => ({...p, login: e.target.value}))} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-400" /></div>
-                      <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Senha</label><input type="password" value={userForm.senha} onChange={e => setUserForm(p => ({...p, senha: e.target.value}))} placeholder={userEdit ? "Deixe vazio para manter" : "Senha"} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-400" /></div>
-                      <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Perfil</label>
-                        <select value={userForm.perfil} onChange={e => setUserForm(p => ({...p, perfil: e.target.value}))} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-400">
+                      <div><label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Nome</label><input value={userForm.nome} onChange={e => setUserForm(p => ({...p, nome: e.target.value}))} className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-400" /></div>
+                      <div><label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Login</label><input value={userForm.login} onChange={e => setUserForm(p => ({...p, login: e.target.value}))} className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-400" /></div>
+                      <div><label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Senha</label><input type="password" value={userForm.senha} onChange={e => setUserForm(p => ({...p, senha: e.target.value}))} placeholder={userEdit ? "Deixe vazio para manter" : "Senha"} className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-400" /></div>
+                      <div><label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Perfil</label>
+                        <select value={userForm.perfil} onChange={e => setUserForm(p => ({...p, perfil: e.target.value}))} className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-400">
                           <option value="admin">Admin</option><option value="operador">Operador</option>
                         </select>
                       </div>
@@ -615,21 +615,21 @@ const AdminPortal = () => {
                       }} className="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-blue-700 flex items-center gap-1">
                         {userEdit ? 'Salvar Alteração' : 'Adicionar Usuário'}
                       </button>
-                      {userEdit && <button onClick={() => { setUserForm({ nome: '', login: '', senha: '', perfil: 'operador' }); setUserEdit(null); }} className="bg-gray-100 text-gray-600 px-4 py-2 rounded-xl text-xs font-bold">Cancelar</button>}
+                      {userEdit && <button onClick={() => { setUserForm({ nome: '', login: '', senha: '', perfil: 'operador' }); setUserEdit(null); }} className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-4 py-2 rounded-xl text-xs font-bold">Cancelar</button>}
                     </div>
-                    <div className="border border-gray-100 rounded-xl overflow-hidden">
+                    <div className="border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden">
                       <table className="w-full text-xs text-left">
-                        <thead className="bg-gray-50 text-gray-400"><tr><th className="px-3 py-2">Nome</th><th className="px-3 py-2">Login</th><th className="px-3 py-2">Perfil</th><th className="px-3 py-2 text-center">Ações</th></tr></thead>
-                        <tbody className="divide-y divide-gray-50">
-                          {usuarios.length === 0 && <tr><td colSpan={4} className="px-3 py-4 text-center text-gray-400">Nenhum usuário cadastrado.</td></tr>}
-                          {usuarios.map((u: any) => <tr key={u.id} className="hover:bg-gray-50">
+                        <thead className="bg-gray-50 dark:bg-gray-900 text-gray-400 dark:text-gray-500"><tr><th className="px-3 py-2">Nome</th><th className="px-3 py-2">Login</th><th className="px-3 py-2">Perfil</th><th className="px-3 py-2 text-center">Ações</th></tr></thead>
+                        <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
+                          {usuarios.length === 0 && <tr><td colSpan={4} className="px-3 py-4 text-center text-gray-400 dark:text-gray-500">Nenhum usuário cadastrado.</td></tr>}
+                          {usuarios.map((u: any) => <tr key={u.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td className="px-3 py-2">{u.nome}</td>
                             <td className="px-3 py-2">{u.login}</td>
                             <td className="px-3 py-2">{u.perfil}</td>
                             <td className="px-3 py-2 text-center">
                               <div className="flex items-center justify-center gap-2">
-                                <button onClick={() => { setUserForm({ nome: u.nome, login: u.login, senha: '', perfil: u.perfil }); setUserEdit(u.id); }} className="text-gray-400 hover:text-blue-600"><Edit2 className="w-3.5 h-3.5" /></button>
-                                <button onClick={() => setConfirmExcluirUser({ id: u.id, nome: u.nome })} className="text-gray-400 hover:text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
+                                <button onClick={() => { setUserForm({ nome: u.nome, login: u.login, senha: '', perfil: u.perfil }); setUserEdit(u.id); }} className="text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400"><Edit2 className="w-3.5 h-3.5" /></button>
+                                <button onClick={() => setConfirmExcluirUser({ id: u.id, nome: u.nome })} className="text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
                               </div>
                             </td>
                           </tr>)}
@@ -642,8 +642,8 @@ const AdminPortal = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-3">
-              <button onClick={() => setModal(false)} className="px-6 py-2.5 text-gray-500 font-bold text-xs uppercase hover:bg-gray-100 rounded-xl transition-colors">Cancelar</button>
+            <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3">
+              <button onClick={() => setModal(false)} className="px-6 py-2.5 text-gray-500 dark:text-gray-400 font-bold text-xs uppercase hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors">Cancelar</button>
               <button onClick={salvar} className="px-8 py-2.5 bg-blue-600 text-white font-bold text-xs uppercase rounded-xl hover:bg-blue-700 transition-colors">Salvar</button>
             </div>
           </motion.div>
@@ -653,20 +653,20 @@ const AdminPortal = () => {
       {confirmSmartPos.open && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[80] p-4">
           <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-            className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6">
+            className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-sm shadow-2xl p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
-                <Trash2 className="w-5 h-5 text-red-600" />
+              <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/40 flex items-center justify-center">
+                <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400" />
               </div>
               <div>
-                <p className="font-bold text-gray-800 text-sm">Excluir Máquina</p>
-                <p className="text-xs text-gray-500">Esta ação não pode ser desfeita</p>
+                <p className="font-bold text-gray-800 dark:text-gray-100 text-sm">Excluir Máquina</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Esta ação não pode ser desfeita</p>
               </div>
             </div>
-            <p className="text-xs text-gray-600 mb-5">Tem certeza que deseja excluir esta máquina SmartPOS?</p>
+            <p className="text-xs text-gray-600 dark:text-gray-300 mb-5">Tem certeza que deseja excluir esta máquina SmartPOS?</p>
             <div className="flex gap-2 justify-end">
               <button onClick={() => setConfirmSmartPos({open: false, id: null})}
-                className="px-4 py-2 text-gray-500 font-bold text-xs uppercase hover:bg-gray-100 rounded-xl transition-colors">
+                className="px-4 py-2 text-gray-500 dark:text-gray-400 font-bold text-xs uppercase hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors">
                 Cancelar
               </button>
               <button onClick={confirmarDelSmartPos}
@@ -680,19 +680,19 @@ const AdminPortal = () => {
       {/* Modal Confirmação */}
       {confirmExcluirUser && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[70] p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-sm shadow-2xl p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
-                <Trash2 className="w-5 h-5 text-red-600" />
+              <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/40 flex items-center justify-center">
+                <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400" />
               </div>
               <div>
-                <p className="font-bold text-gray-800 text-sm">Excluir Usuário</p>
-                <p className="text-xs text-gray-400">Esta ação não pode ser desfeita</p>
+                <p className="font-bold text-gray-800 dark:text-gray-100 text-sm">Excluir Usuário</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">Esta ação não pode ser desfeita</p>
               </div>
             </div>
-            <p className="text-sm text-gray-600 mb-6">Deseja excluir o usuário <strong>{confirmExcluirUser.nome}</strong>?</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">Deseja excluir o usuário <strong>{confirmExcluirUser.nome}</strong>?</p>
             <div className="flex gap-3">
-              <button onClick={() => setConfirmExcluirUser(null)} className="flex-1 py-2.5 text-gray-500 font-bold text-xs uppercase hover:bg-gray-100 rounded-xl">Cancelar</button>
+              <button onClick={() => setConfirmExcluirUser(null)} className="flex-1 py-2.5 text-gray-500 dark:text-gray-400 font-bold text-xs uppercase hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl">Cancelar</button>
               <button onClick={async () => {
                 await api('excluir_usuario_admin', 'POST', { id: confirmExcluirUser.id });
                 setConfirmExcluirUser(null);
@@ -704,14 +704,14 @@ const AdminPortal = () => {
       )}
       {alertModal.open && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[80] p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-sm shadow-2xl p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${alertModal.tipo === 'error' ? 'bg-red-100' : alertModal.tipo === 'warning' ? 'bg-amber-100' : alertModal.tipo === 'success' ? 'bg-green-100' : 'bg-blue-100'}`}>
-                {alertModal.tipo === 'error' ? <X className="w-5 h-5 text-red-600" /> : alertModal.tipo === 'warning' ? <Shield className="w-5 h-5 text-amber-600" /> : alertModal.tipo === 'success' ? <CheckCircle className="w-5 h-5 text-green-600" /> : <Shield className="w-5 h-5 text-blue-600" />}
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${alertModal.tipo === 'error' ? 'bg-red-100 dark:bg-red-900/40' : alertModal.tipo === 'warning' ? 'bg-amber-100 dark:bg-amber-900/40' : alertModal.tipo === 'success' ? 'bg-green-100' : 'bg-blue-100 dark:bg-blue-900/40'}`}>
+                {alertModal.tipo === 'error' ? <X className="w-5 h-5 text-red-600 dark:text-red-400" /> : alertModal.tipo === 'warning' ? <Shield className="w-5 h-5 text-amber-600 dark:text-amber-400" /> : alertModal.tipo === 'success' ? <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" /> : <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400" />}
               </div>
-              <p className="font-bold text-gray-800 text-sm">{alertModal.titulo}</p>
+              <p className="font-bold text-gray-800 dark:text-gray-100 text-sm">{alertModal.titulo}</p>
             </div>
-            <p className="text-sm text-gray-600 mb-6 whitespace-pre-line">{alertModal.msg}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 whitespace-pre-line">{alertModal.msg}</p>
             <div className="flex justify-end">
               <button onClick={() => setAlertModal({...alertModal, open: false})} className="px-6 py-2.5 bg-blue-600 text-white font-bold text-xs uppercase rounded-xl hover:bg-blue-700">OK</button>
             </div>
@@ -720,19 +720,19 @@ const AdminPortal = () => {
       )}
       {modalManutencao && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-sm shadow-2xl p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${modalManutencao.ativar ? 'bg-orange-100' : 'bg-green-100'}`}>
-                <svg className={`w-5 h-5 ${modalManutencao.ativar ? 'text-orange-500' : 'text-green-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${modalManutencao.ativar ? 'bg-orange-100 dark:bg-orange-900/40' : 'bg-green-100'}`}>
+                <svg className={`w-5 h-5 ${modalManutencao.ativar ? 'text-orange-500' : 'text-green-600 dark:text-green-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
               </div>
               <div>
-                <p className="font-bold text-gray-800 text-sm">{modalManutencao.ativar ? 'Ativar Manutenção Global' : 'Desativar Manutenção'}</p>
-                <p className="text-xs text-gray-400">{modalManutencao.ativar ? 'Todas as empresas ativas serão afetadas' : 'Todas as empresas em manutenção serão reativadas'}</p>
+                <p className="font-bold text-gray-800 dark:text-gray-100 text-sm">{modalManutencao.ativar ? 'Ativar Manutenção Global' : 'Desativar Manutenção'}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">{modalManutencao.ativar ? 'Todas as empresas ativas serão afetadas' : 'Todas as empresas em manutenção serão reativadas'}</p>
               </div>
             </div>
-            <p className="text-sm text-gray-600 mb-6">{modalManutencao.ativar ? 'Deseja colocar TODAS as empresas ativas em modo manutenção? Os usuários não conseguirão fazer login.' : 'Deseja reativar TODAS as empresas que estão em manutenção?'}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">{modalManutencao.ativar ? 'Deseja colocar TODAS as empresas ativas em modo manutenção? Os usuários não conseguirão fazer login.' : 'Deseja reativar TODAS as empresas que estão em manutenção?'}</p>
             <div className="flex gap-3">
-              <button onClick={() => setModalManutencao(null)} className="flex-1 py-2.5 text-gray-500 font-bold text-xs uppercase hover:bg-gray-100 rounded-xl transition-colors">Cancelar</button>
+              <button onClick={() => setModalManutencao(null)} className="flex-1 py-2.5 text-gray-500 dark:text-gray-400 font-bold text-xs uppercase hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors">Cancelar</button>
               <button onClick={confirmarManutencao} className={`flex-1 py-2.5 text-white font-bold text-xs uppercase rounded-xl transition-colors ${modalManutencao.ativar ? 'bg-orange-500 hover:bg-orange-600' : 'bg-green-600 hover:bg-green-700'}`}>{modalManutencao.ativar ? 'Ativar' : 'Reativar'}</button>
             </div>
           </div>
@@ -746,9 +746,9 @@ const AdminPortal = () => {
         }[confirmModal.tipo];
         const Icon = cfg.icon;
         const cores: Record<string,string> = {
-          red:    'bg-red-100 text-red-600',
-          orange: 'bg-orange-100 text-orange-600',
-          green:  'bg-green-100 text-green-600',
+          red:    'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400',
+          orange: 'bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400',
+          green:  'bg-green-100 text-green-600 dark:text-green-400',
         };
         const btnCores: Record<string,string> = {
           red:    'bg-red-600 hover:bg-red-700',
@@ -758,22 +758,22 @@ const AdminPortal = () => {
         return (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-              className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6">
+              className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-sm shadow-2xl p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${cores[cfg.cor]}`}>
                   <Icon className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="font-bold text-gray-800 text-sm">{cfg.titulo}</p>
-                  <p className="text-xs text-gray-400">{cfg.subtitulo}</p>
+                  <p className="font-bold text-gray-800 dark:text-gray-100 text-sm">{cfg.titulo}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">{cfg.subtitulo}</p>
                 </div>
               </div>
-              <p className="text-sm text-gray-600 mb-6">
-                Deseja {cfg.acao.toLowerCase()} <span className="font-bold text-gray-800">{confirmModal.nome}</span>?
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
+                Deseja {cfg.acao.toLowerCase()} <span className="font-bold text-gray-800 dark:text-gray-100">{confirmModal.nome}</span>?
               </p>
               <div className="flex gap-3">
                 <button onClick={() => setConfirmModal({ open: false, id: null, nome: '', tipo: 'inativar' })}
-                  className="flex-1 py-2.5 text-gray-500 font-bold text-xs uppercase hover:bg-gray-100 rounded-xl transition-colors">
+                  className="flex-1 py-2.5 text-gray-500 dark:text-gray-400 font-bold text-xs uppercase hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors">
                   Cancelar
                 </button>
                 <button onClick={confirmarAcao}
@@ -859,45 +859,45 @@ const AuditoriaModal = ({ empresa, onClose }: { empresa: {id: number; nome: stri
   };
 
   const corDaAcao = (a: string) => {
-    if (a.includes('falha') || a.includes('cancelar') || a.includes('excluir')) return 'bg-red-50 text-red-700';
-    if (a.includes('emitir') || a.includes('login_sucesso')) return 'bg-green-50 text-green-700';
-    if (a.includes('alterar') || a.includes('editar')) return 'bg-amber-50 text-amber-700';
-    return 'bg-gray-100 text-gray-700';
+    if (a.includes('falha') || a.includes('cancelar') || a.includes('excluir')) return 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300';
+    if (a.includes('emitir') || a.includes('login_sucesso')) return 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300';
+    if (a.includes('alterar') || a.includes('editar')) return 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300';
+    return 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200';
   };
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[80] p-4">
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-        className="bg-white rounded-2xl w-full max-w-6xl shadow-2xl max-h-[90vh] flex flex-col">
-        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+        className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-6xl shadow-2xl max-h-[90vh] flex flex-col">
+        <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
               <FileSearch className="w-5 h-5 text-purple-600" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-gray-800">Auditoria de Ações</h3>
-              <p className="text-xs text-gray-500">{empresa.nome}</p>
+              <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">Auditoria de Ações</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{empresa.nome}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-            <X className="w-5 h-5 text-gray-500" />
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors">
+            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </button>
         </div>
-        <div className="p-4 bg-gray-50 border-b border-gray-100 flex flex-wrap items-end gap-3">
+        <div className="p-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-100 dark:border-gray-700 flex flex-wrap items-end gap-3">
           <div>
-            <label className="block text-[10px] font-bold text-gray-600 uppercase mb-1">De</label>
+            <label className="block text-[10px] font-bold text-gray-600 dark:text-gray-300 uppercase mb-1">De</label>
             <input type="date" value={dataInicio} onChange={e => setDataInicio(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-lg text-xs" />
+              className="px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-xs" />
           </div>
           <div>
-            <label className="block text-[10px] font-bold text-gray-600 uppercase mb-1">Até</label>
+            <label className="block text-[10px] font-bold text-gray-600 dark:text-gray-300 uppercase mb-1">Até</label>
             <input type="date" value={dataFim} onChange={e => setDataFim(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-lg text-xs" />
+              className="px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-xs" />
           </div>
           <div>
-            <label className="block text-[10px] font-bold text-gray-600 uppercase mb-1">Ação</label>
+            <label className="block text-[10px] font-bold text-gray-600 dark:text-gray-300 uppercase mb-1">Ação</label>
             <select value={filtroAcao} onChange={e => setFiltroAcao(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-lg text-xs min-w-[180px]">
+              className="px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-xs min-w-[180px]">
               <option value="">Todas</option>
               {acoes.map(a => <option key={a} value={a}>{formatarAcao(a)}</option>)}
             </select>
@@ -907,39 +907,39 @@ const AuditoriaModal = ({ empresa, onClose }: { empresa: {id: number; nome: stri
             {loading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Filter className="w-3.5 h-3.5" />}
             Filtrar
           </button>
-          <div className="ml-auto text-xs text-gray-500">
+          <div className="ml-auto text-xs text-gray-500 dark:text-gray-400">
             {logs.length} registro(s)
           </div>
         </div>
         <div className="overflow-auto flex-1">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 sticky top-0">
+            <thead className="bg-gray-50 dark:bg-gray-900 sticky top-0">
               <tr className="text-left">
-                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase whitespace-nowrap">Data/Hora</th>
-                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase whitespace-nowrap">Usuário</th>
-                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase whitespace-nowrap">Ação</th>
-                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase w-full">Descrição</th>
-                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 uppercase text-center whitespace-nowrap">Detalhes</th>
+                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase whitespace-nowrap">Data/Hora</th>
+                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase whitespace-nowrap">Usuário</th>
+                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase whitespace-nowrap">Ação</th>
+                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase w-full">Descrição</th>
+                <th className="px-4 py-3 text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase text-center whitespace-nowrap">Detalhes</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
               {logs.length === 0 && !loading && (
-                <tr><td colSpan={5} className="px-6 py-12 text-center text-xs text-gray-400 italic">Nenhum registro encontrado para o filtro selecionado.</td></tr>
+                <tr><td colSpan={5} className="px-6 py-12 text-center text-xs text-gray-400 dark:text-gray-500 italic">Nenhum registro encontrado para o filtro selecionado.</td></tr>
               )}
               {logs.map((l: any) => (
-                <tr key={l.id} className="hover:bg-gray-50/50">
-                  <td className="px-4 py-3 text-xs text-gray-600 whitespace-nowrap">{new Date(l.criado_em).toLocaleString('pt-BR')}</td>
-                  <td className="px-4 py-3 text-xs font-medium text-gray-800">{l.usuario_nome || '—'}</td>
+                <tr key={l.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                  <td className="px-4 py-3 text-xs text-gray-600 dark:text-gray-300 whitespace-nowrap">{new Date(l.criado_em).toLocaleString('pt-BR')}</td>
+                  <td className="px-4 py-3 text-xs font-medium text-gray-800 dark:text-gray-100">{l.usuario_nome || '—'}</td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${corDaAcao(l.acao)} whitespace-nowrap`}>
                       {formatarAcao(l.acao)}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-xs text-gray-700" title={l.descricao || ''}>
+                  <td className="px-4 py-3 text-xs text-gray-700 dark:text-gray-200" title={l.descricao || ''}>
                     {l.descricao || '—'}
                   </td>
                   <td className="px-4 py-3 text-center">
-                    <button onClick={() => setDetalhe(l)} className="p-1.5 text-gray-400 hover:text-purple-600" title="Ver detalhes">
+                    <button onClick={() => setDetalhe(l)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-purple-600" title="Ver detalhes">
                       <Eye className="w-3.5 h-3.5" />
                     </button>
                   </td>
@@ -948,44 +948,44 @@ const AuditoriaModal = ({ empresa, onClose }: { empresa: {id: number; nome: stri
             </tbody>
           </table>
         </div>
-        <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end">
-          <button onClick={onClose} className="px-5 py-2 text-xs font-semibold text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100">Fechar</button>
+        <div className="p-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex justify-end">
+          <button onClick={onClose} className="px-5 py-2 text-xs font-semibold text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Fechar</button>
         </div>
       </motion.div>
       {detalhe && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[90] p-4">
-          <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl max-h-[85vh] flex flex-col">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-2xl shadow-2xl max-h-[85vh] flex flex-col">
             <div className="p-5 border-b flex items-center justify-between">
-              <p className="font-bold text-gray-800 text-sm">Detalhes da Ação</p>
-              <button onClick={() => setDetalhe(null)} className="p-1 hover:bg-gray-100 rounded">
-                <X className="w-4 h-4 text-gray-500" />
+              <p className="font-bold text-gray-800 dark:text-gray-100 text-sm">Detalhes da Ação</p>
+              <button onClick={() => setDetalhe(null)} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
+                <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
               </button>
             </div>
             <div className="p-5 overflow-auto space-y-3 text-xs">
               <div className="grid grid-cols-2 gap-3">
-                <div><span className="text-gray-500 font-bold">Quando:</span><br />{new Date(detalhe.criado_em).toLocaleString('pt-BR')}</div>
-                <div><span className="text-gray-500 font-bold">Quem:</span><br />{detalhe.usuario_nome || '—'} (ID {detalhe.usuario_id || '—'})</div>
-                <div><span className="text-gray-500 font-bold">Ação:</span><br />{formatarAcao(detalhe.acao)}</div>
-                <div><span className="text-gray-500 font-bold">Entidade:</span><br />{detalhe.entidade || '—'} #{detalhe.entidade_id || '—'}</div>
-                <div className="col-span-2"><span className="text-gray-500 font-bold">Descrição:</span><br />{detalhe.descricao || '—'}</div>
-                <div><span className="text-gray-500 font-bold">IP:</span><br />{detalhe.ip || '—'}</div>
-                <div className="col-span-2"><span className="text-gray-500 font-bold">User Agent:</span><br /><span className="text-[10px] text-gray-500">{detalhe.user_agent || '—'}</span></div>
+                <div><span className="text-gray-500 dark:text-gray-400 font-bold">Quando:</span><br />{new Date(detalhe.criado_em).toLocaleString('pt-BR')}</div>
+                <div><span className="text-gray-500 dark:text-gray-400 font-bold">Quem:</span><br />{detalhe.usuario_nome || '—'} (ID {detalhe.usuario_id || '—'})</div>
+                <div><span className="text-gray-500 dark:text-gray-400 font-bold">Ação:</span><br />{formatarAcao(detalhe.acao)}</div>
+                <div><span className="text-gray-500 dark:text-gray-400 font-bold">Entidade:</span><br />{detalhe.entidade || '—'} #{detalhe.entidade_id || '—'}</div>
+                <div className="col-span-2"><span className="text-gray-500 dark:text-gray-400 font-bold">Descrição:</span><br />{detalhe.descricao || '—'}</div>
+                <div><span className="text-gray-500 dark:text-gray-400 font-bold">IP:</span><br />{detalhe.ip || '—'}</div>
+                <div className="col-span-2"><span className="text-gray-500 dark:text-gray-400 font-bold">User Agent:</span><br /><span className="text-[10px] text-gray-500 dark:text-gray-400">{detalhe.user_agent || '—'}</span></div>
               </div>
               {detalhe.dados_antes && (
                 <div>
-                  <p className="text-gray-500 font-bold mb-1">Antes:</p>
-                  <pre className="bg-red-50 text-red-800 p-3 rounded-lg overflow-auto text-[10px]">{JSON.stringify(JSON.parse(detalhe.dados_antes), null, 2)}</pre>
+                  <p className="text-gray-500 dark:text-gray-400 font-bold mb-1">Antes:</p>
+                  <pre className="bg-red-50 dark:bg-red-900/20 text-red-800 p-3 rounded-lg overflow-auto text-[10px]">{JSON.stringify(JSON.parse(detalhe.dados_antes), null, 2)}</pre>
                 </div>
               )}
               {detalhe.dados_depois && (
                 <div>
-                  <p className="text-gray-500 font-bold mb-1">Depois:</p>
-                  <pre className="bg-green-50 text-green-800 p-3 rounded-lg overflow-auto text-[10px]">{JSON.stringify(JSON.parse(detalhe.dados_depois), null, 2)}</pre>
+                  <p className="text-gray-500 dark:text-gray-400 font-bold mb-1">Depois:</p>
+                  <pre className="bg-green-50 dark:bg-green-900/20 text-green-800 p-3 rounded-lg overflow-auto text-[10px]">{JSON.stringify(JSON.parse(detalhe.dados_depois), null, 2)}</pre>
                 </div>
               )}
             </div>
             <div className="p-4 border-t flex justify-end">
-              <button onClick={() => setDetalhe(null)} className="px-4 py-2 text-xs font-semibold text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100">Fechar</button>
+              <button onClick={() => setDetalhe(null)} className="px-4 py-2 text-xs font-semibold text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Fechar</button>
             </div>
           </div>
         </div>
@@ -1041,53 +1041,53 @@ const BackupPanel = ({ onClose, adminToken }: { onClose: () => void; adminToken:
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-            <HardDrive className="w-5 h-5 text-blue-600" /> Gerenciamento de Backups
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+            <HardDrive className="w-5 h-5 text-blue-600 dark:text-blue-400" /> Gerenciamento de Backups
           </h3>
-          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-400" /></button>
+          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"><X className="w-5 h-5 text-gray-400 dark:text-gray-500" /></button>
         </div>
 
         <div className="overflow-y-auto flex-1 px-6 py-5">
           {loading ? (
-            <div className="text-center py-12 text-gray-400 text-sm">Carregando...</div>
+            <div className="text-center py-12 text-gray-400 dark:text-gray-500 text-sm">Carregando...</div>
           ) : (
             <>
               {/* Cards de Status */}
               {status?.success && (
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-5">
-                  <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
-                    <div className="flex items-center gap-2 text-xs text-blue-600 font-semibold mb-1"><Database className="w-4 h-4" /> Último Backup</div>
-                    <div className="text-base font-bold text-gray-800">{status.ultimo_backup?.data || '—'}</div>
-                    <div className="text-xs text-gray-500 mt-1">{status.ultimo_backup ? `${status.ultimo_backup.tamanho} • ${status.ultimo_backup.idade_horas}h atrás` : 'Nenhum'}</div>
+                  <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 rounded-xl p-4">
+                    <div className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400 font-semibold mb-1"><Database className="w-4 h-4" /> Último Backup</div>
+                    <div className="text-base font-bold text-gray-800 dark:text-gray-100">{status.ultimo_backup?.data || '—'}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{status.ultimo_backup ? `${status.ultimo_backup.tamanho} • ${status.ultimo_backup.idade_horas}h atrás` : 'Nenhum'}</div>
                   </div>
-                  <div className="bg-purple-50 border border-purple-100 rounded-xl p-4">
+                  <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-100 rounded-xl p-4">
                     <div className="flex items-center gap-2 text-xs text-purple-600 font-semibold mb-1"><HardDrive className="w-4 h-4" /> Local (VPS)</div>
-                    <div className="text-base font-bold text-gray-800">{status.backups_local.qtd} arquivos</div>
-                    <div className="text-xs text-gray-500 mt-1">{status.backups_local.tamanho} ocupados</div>
+                    <div className="text-base font-bold text-gray-800 dark:text-gray-100">{status.backups_local.qtd} arquivos</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{status.backups_local.tamanho} ocupados</div>
                   </div>
-                  <div className={`${status.nuvem.conectado ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100'} border rounded-xl p-4`}>
-                    <div className={`flex items-center gap-2 text-xs ${status.nuvem.conectado ? 'text-green-600' : 'text-red-600'} font-semibold mb-1`}><Cloud className="w-4 h-4" /> Google Drive</div>
-                    <div className="text-base font-bold text-gray-800">{status.nuvem.conectado ? `${status.nuvem.qtd} arquivos` : 'Desconectado'}</div>
-                    <div className="text-xs text-gray-500 mt-1">{status.nuvem.tamanho}</div>
+                  <div className={`${status.nuvem.conectado ? 'bg-green-50 dark:bg-green-900/20 border-green-100' : 'bg-red-50 dark:bg-red-900/20 border-red-100'} border rounded-xl p-4`}>
+                    <div className={`flex items-center gap-2 text-xs ${status.nuvem.conectado ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'} font-semibold mb-1`}><Cloud className="w-4 h-4" /> Google Drive</div>
+                    <div className="text-base font-bold text-gray-800 dark:text-gray-100">{status.nuvem.conectado ? `${status.nuvem.qtd} arquivos` : 'Desconectado'}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{status.nuvem.tamanho}</div>
                   </div>
-                  <div className="bg-gray-50 border border-gray-100 rounded-xl p-4">
-                    <div className="flex items-center gap-2 text-xs text-gray-600 font-semibold mb-1"><FileText className="w-4 h-4" /> Disco</div>
-                    <div className="text-base font-bold text-gray-800">{status.disco.uso_pct}% usado</div>
-                    <div className="text-xs text-gray-500 mt-1">{status.disco.livre} livres</div>
+                  <div className="bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-xl p-4">
+                    <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300 font-semibold mb-1"><FileText className="w-4 h-4" /> Disco</div>
+                    <div className="text-base font-bold text-gray-800 dark:text-gray-100">{status.disco.uso_pct}% usado</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{status.disco.livre} livres</div>
                   </div>
                 </div>
               )}
 
               {/* Botões de ação */}
               <div className="flex items-center justify-between mb-4">
-                <div className="flex rounded-lg overflow-hidden border border-gray-200">
-                  <button onClick={() => setTab('local')} className={`px-4 py-2 text-xs font-medium transition-colors ${tab === 'local' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>Local ({backups.local?.length || 0})</button>
-                  <button onClick={() => setTab('nuvem')} className={`px-4 py-2 text-xs font-medium transition-colors ${tab === 'nuvem' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>Nuvem ({backups.nuvem?.length || 0})</button>
+                <div className="flex rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                  <button onClick={() => setTab('local')} className={`px-4 py-2 text-xs font-medium transition-colors ${tab === 'local' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`}>Local ({backups.local?.length || 0})</button>
+                  <button onClick={() => setTab('nuvem')} className={`px-4 py-2 text-xs font-medium transition-colors ${tab === 'nuvem' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`}>Nuvem ({backups.nuvem?.length || 0})</button>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={carregar} className="flex items-center gap-1 px-3 py-2 text-xs border border-gray-200 rounded-lg hover:bg-gray-50"><RefreshCw className="w-3.5 h-3.5" /> Atualizar</button>
+                  <button onClick={carregar} className="flex items-center gap-1 px-3 py-2 text-xs border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"><RefreshCw className="w-3.5 h-3.5" /> Atualizar</button>
                   <button onClick={() => setConfirmGerar(true)} disabled={gerando} className="flex items-center gap-1 px-4 py-2 text-xs bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50">
                     {gerando ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
                     {gerando ? 'Gerando...' : 'Gerar Backup Agora'}
@@ -1096,9 +1096,9 @@ const BackupPanel = ({ onClose, adminToken }: { onClose: () => void; adminToken:
               </div>
 
               {/* Tabela */}
-              <div className="border border-gray-100 rounded-xl overflow-hidden">
+              <div className="border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden">
                 <table className="w-full text-sm">
-                  <thead className="bg-gray-50 text-xs text-gray-500 uppercase border-b border-gray-100">
+                  <thead className="bg-gray-50 dark:bg-gray-900 text-xs text-gray-500 dark:text-gray-400 uppercase border-b border-gray-100 dark:border-gray-700">
                     <tr>
                       <th className="px-3 py-2 text-left">Arquivo</th>
                       <th className="px-3 py-2 text-left">Tipo</th>
@@ -1107,30 +1107,30 @@ const BackupPanel = ({ onClose, adminToken }: { onClose: () => void; adminToken:
                       <th className="px-3 py-2 text-center">Ação</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                     {(tab === 'local' ? backups.local : backups.nuvem)?.map((b: any) => (
-                      <tr key={b.nome} className="hover:bg-gray-50">
-                        <td className="px-3 py-2 text-gray-800 font-mono text-xs">{b.nome}</td>
-                        <td className="px-3 py-2"><span className={`text-xs px-2 py-0.5 rounded-full font-medium ${b.tipo === 'Banco de Dados' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>{b.tipo}</span></td>
-                        <td className="px-3 py-2 text-gray-600">{b.data}</td>
-                        <td className="px-3 py-2 text-right font-medium text-gray-700">{b.tamanho}</td>
+                      <tr key={b.nome} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td className="px-3 py-2 text-gray-800 dark:text-gray-100 font-mono text-xs">{b.nome}</td>
+                        <td className="px-3 py-2"><span className={`text-xs px-2 py-0.5 rounded-full font-medium ${b.tipo === 'Banco de Dados' ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300' : 'bg-purple-100 text-purple-700'}`}>{b.tipo}</span></td>
+                        <td className="px-3 py-2 text-gray-600 dark:text-gray-300">{b.data}</td>
+                        <td className="px-3 py-2 text-right font-medium text-gray-700 dark:text-gray-200">{b.tamanho}</td>
                         <td className="px-3 py-2 text-center">
                           {tab === 'local' ? (
-                            <button onClick={() => baixar(b.nome)} className="p-1.5 hover:bg-blue-50 rounded text-blue-600" title="Baixar"><Download className="w-4 h-4 inline" /></button>
+                            <button onClick={() => baixar(b.nome)} className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded text-blue-600 dark:text-blue-400" title="Baixar"><Download className="w-4 h-4 inline" /></button>
                           ) : (
-                            <span className="text-xs text-gray-400">Apenas local</span>
+                            <span className="text-xs text-gray-400 dark:text-gray-500">Apenas local</span>
                           )}
                         </td>
                       </tr>
                     ))}
                     {(tab === 'local' ? backups.local : backups.nuvem)?.length === 0 && (
-                      <tr><td colSpan={5} className="text-center py-8 text-gray-400 text-sm">Nenhum backup encontrado.</td></tr>
+                      <tr><td colSpan={5} className="text-center py-8 text-gray-400 dark:text-gray-500 text-sm">Nenhum backup encontrado.</td></tr>
                     )}
                   </tbody>
                 </table>
               </div>
 
-              <p className="text-xs text-gray-400 mt-4 text-center">
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-4 text-center">
                 Backup automático diário às 03:00 • Retenção: 7 dias local / 30 dias nuvem
               </p>
             </>
@@ -1141,13 +1141,13 @@ const BackupPanel = ({ onClose, adminToken }: { onClose: () => void; adminToken:
       {/* Modal de confirmação de gerar backup */}
       {confirmGerar && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
-            <h3 className="text-base font-semibold text-gray-800 mb-2 flex items-center gap-2">
-              <Database className="w-5 h-5 text-blue-600" /> Gerar Backup
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100 mb-2 flex items-center gap-2">
+              <Database className="w-5 h-5 text-blue-600 dark:text-blue-400" /> Gerar Backup
             </h3>
-            <p className="text-sm text-gray-600 mb-5">Deseja gerar um backup agora? Pode levar alguns segundos.</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-5">Deseja gerar um backup agora? Pode levar alguns segundos.</p>
             <div className="flex gap-3">
-              <button onClick={() => setConfirmGerar(false)} className="flex-1 border border-gray-200 rounded-lg py-2 text-sm hover:bg-gray-50">Cancelar</button>
+              <button onClick={() => setConfirmGerar(false)} className="flex-1 border border-gray-200 dark:border-gray-700 rounded-lg py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700">Cancelar</button>
               <button onClick={gerarBackup} className="flex-1 bg-blue-600 text-white rounded-lg py-2 text-sm hover:bg-blue-700">Confirmar</button>
             </div>
           </div>
@@ -1157,12 +1157,12 @@ const BackupPanel = ({ onClose, adminToken }: { onClose: () => void; adminToken:
       {/* Modal de resultado */}
       {resultado && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
-            <h3 className={`text-base font-semibold mb-2 flex items-center gap-2 ${resultado.tipo === 'success' ? 'text-green-700' : 'text-red-700'}`}>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <h3 className={`text-base font-semibold mb-2 flex items-center gap-2 ${resultado.tipo === 'success' ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}>
               {resultado.tipo === 'success' ? <CheckCircle className="w-5 h-5" /> : <X className="w-5 h-5" />}
               {resultado.tipo === 'success' ? 'Sucesso' : 'Erro'}
             </h3>
-            <pre className="text-sm text-gray-700 mb-5 whitespace-pre-wrap font-sans max-h-64 overflow-y-auto">{resultado.msg}</pre>
+            <pre className="text-sm text-gray-700 dark:text-gray-200 mb-5 whitespace-pre-wrap font-sans max-h-64 overflow-y-auto">{resultado.msg}</pre>
             <div className="flex justify-end">
               <button onClick={() => setResultado(null)} className="px-5 bg-blue-600 text-white rounded-lg py-2 text-sm hover:bg-blue-700">OK</button>
             </div>

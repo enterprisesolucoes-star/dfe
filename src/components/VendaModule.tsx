@@ -42,22 +42,22 @@ export const GlobalMessageModal = ({ type, title, message, inputValue, onClose, 
       <motion.div 
         initial={{ scale: 0.9, opacity: 0 }} 
         animate={{ scale: 1, opacity: 1 }} 
-        className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl"
+        className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl"
       >
         <div className="p-6">
           <div className="flex items-center gap-3 mb-4">
             {type === 'alert' && <AlertCircle className="w-6 h-6 text-blue-500" />}
             {type === 'confirm' && <HelpCircle className="w-6 h-6 text-orange-500" />}
             {type === 'prompt' && <Edit className="w-6 h-6 text-blue-500" />}
-            <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{title}</h3>
           </div>
-          <p className="text-gray-600 mb-6 whitespace-pre-line">{message}</p>
+          <p className="text-gray-600 dark:text-gray-300 mb-6 whitespace-pre-line">{message}</p>
           
           {type === 'prompt' && (
             <input 
               type="text"
               autoFocus
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl mb-6 focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl mb-6 focus:ring-2 focus:ring-blue-500 outline-none"
               value={val}
               onChange={(e) => setVal(e.target.value)}
             />
@@ -67,7 +67,7 @@ export const GlobalMessageModal = ({ type, title, message, inputValue, onClose, 
             {(type === 'confirm' || type === 'prompt') && (
               <button 
                 onClick={onClose}
-                className="px-5 py-2.5 text-gray-500 font-semibold hover:bg-gray-50 rounded-xl transition-colors"
+                className="px-5 py-2.5 text-gray-500 dark:text-gray-400 font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors"
               >
                 Cancelar
               </button>
@@ -92,7 +92,7 @@ export const IdentificarModal = ({ onClose, onConfirm }: { onClose: () => void; 
   const [municipios, setMunicipios] = useState<{ id: number; nome: string }[]>([]);
   const [loadingMun, setLoadingMun] = useState(false);
   const [form, setForm]             = useState<any>({ nome: '', documento: '', uf: 'GO', municipio: '', codigoMunicipio: '', logradouro: '', numero: '', bairro: '', cep: '' });
-  const selClass = 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500';
+  const selClass = 'w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500';
 
   useEffect(() => {
     fetch('./api.php?action=clientes').then(r => r.json()).then(d => setClientes(Array.isArray(d) ? d : []));
@@ -129,30 +129,30 @@ export const IdentificarModal = ({ onClose, onConfirm }: { onClose: () => void; 
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[300] p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg flex flex-col max-h-[85vh]">
-        <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-          <h3 className="font-bold text-gray-800 flex items-center gap-2"><UserCheck className="w-5 h-5 text-indigo-600" /> Identificar Cliente</h3>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-500" /></button>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg flex flex-col max-h-[85vh]">
+        <div className="p-5 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+          <h3 className="font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2"><UserCheck className="w-5 h-5 text-indigo-600 dark:text-indigo-400" /> Identificar Cliente</h3>
+          <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"><X className="w-5 h-5 text-gray-500 dark:text-gray-400" /></button>
         </div>
-        <div className="flex border-b border-gray-100">
-          <button onClick={() => setAba('buscar')} className={`flex-1 py-2.5 text-sm font-medium transition-colors ${aba === 'buscar' ? 'border-b-2 border-indigo-600 text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}>Buscar Cadastrado</button>
-          <button onClick={() => setAba('manual')} className={`flex-1 py-2.5 text-sm font-medium transition-colors ${aba === 'manual' ? 'border-b-2 border-indigo-600 text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}>Digitar Manualmente</button>
+        <div className="flex border-b border-gray-100 dark:border-gray-700">
+          <button onClick={() => setAba('buscar')} className={`flex-1 py-2.5 text-sm font-medium transition-colors ${aba === 'buscar' ? 'border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Buscar Cadastrado</button>
+          <button onClick={() => setAba('manual')} className={`flex-1 py-2.5 text-sm font-medium transition-colors ${aba === 'manual' ? 'border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>Digitar Manualmente</button>
         </div>
 
         <div className="flex-1 overflow-auto p-5">
           {aba === 'buscar' ? (
             <div className="space-y-3">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar por nome ou CPF/CNPJ..." className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+                <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar por nome ou CPF/CNPJ..." className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
               </div>
               <div className="space-y-1 max-h-72 overflow-auto">
                 {filtrados.length === 0 ? (
-                  <p className="text-center text-gray-400 py-8 text-sm">Nenhum cliente encontrado.</p>
+                  <p className="text-center text-gray-400 dark:text-gray-500 py-8 text-sm">Nenhum cliente encontrado.</p>
                 ) : filtrados.map(c => (
                   <button key={c.id} onClick={() => selecionarCadastrado(c)} className="w-full text-left px-4 py-3 rounded-xl hover:bg-indigo-50 transition-colors border border-transparent hover:border-indigo-100">
-                    <p className="font-medium text-gray-800 text-sm">{c.nome}</p>
-                    <p className="text-xs text-gray-400">{c.documento} {c.endereco?.municipio ? ` - ${c.endereco.municipio}/${c.endereco.uf}` : ''}</p>
+                    <p className="font-medium text-gray-800 dark:text-gray-100 text-sm">{c.nome}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500">{c.documento} {c.endereco?.municipio ? ` - ${c.endereco.municipio}/${c.endereco.uf}` : ''}</p>
                   </button>
                 ))}
               </div>
@@ -163,7 +163,7 @@ export const IdentificarModal = ({ onClose, onConfirm }: { onClose: () => void; 
                 <div className="col-span-2"><Input label="Nome *" value={form.nome} onChange={(e: any) => setForm((f: any) => ({ ...f, nome: e.target.value }))} /></div>
                 <div className="col-span-2"><Input label="CPF / CNPJ" value={form.documento} onChange={(e: any) => setForm((f: any) => ({ ...f, documento: e.target.value }))} /></div>
               </div>
-              <p className="text-xs text-gray-500 font-medium pt-1">Endereço <span className="text-gray-400">(opcional - se preenchido, todos os campos são obrigatórios)</span></p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 font-medium pt-1">Endereço <span className="text-gray-400 dark:text-gray-500">(opcional - se preenchido, todos os campos são obrigatórios)</span></p>
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-2"><Input label="Logradouro" value={form.logradouro || ''} onChange={(e: any) => setForm((f: any) => ({ ...f, logradouro: e.target.value }))} /></div>
                 <Input label="Número" value={form.numero || ''} onChange={(e: any) => setForm((f: any) => ({ ...f, numero: e.target.value }))} />
@@ -174,29 +174,29 @@ export const IdentificarModal = ({ onClose, onConfirm }: { onClose: () => void; 
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Estado</label>
                   <select value={form.uf || ''} onChange={(e: any) => { setForm((f: any) => ({ ...f, uf: e.target.value, municipio: '', codigoMunicipio: '' })); fetchMunicipios(e.target.value); }} className={selClass}>
                     <option value="">UF</option>
                     {ESTADOS_BR.map(e => <option key={e.sigla} value={e.sigla}>{e.sigla}</option>)}
                   </select>
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Município</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Município</label>
                   <select value={form.codigoMunicipio || ''} onChange={(e: any) => { const m = municipios.find(m => String(m.id) === e.target.value); if (m) setForm((f: any) => ({ ...f, municipio: m.nome, codigoMunicipio: String(m.id) })); }} disabled={loadingMun || municipios.length === 0} className={selClass}>
                     <option value="">{loadingMun ? 'Carregando...' : 'Selecione...'}</option>
                     {municipios.map(m => <option key={m.id} value={String(m.id)}>{m.nome}</option>)}
                   </select>
                 </div>
               </div>
-              {!form.nome.trim() && <p className="text-xs text-red-500">* Nome é obrigatório</p>}
-              {form.logradouro && (!form.municipio || !form.uf || !form.cep) && <p className="text-xs text-red-500">* Preencha todos os campos de endereço</p>}
+              {!form.nome.trim() && <p className="text-xs text-red-500 dark:text-red-400">* Nome é obrigatório</p>}
+              {form.logradouro && (!form.municipio || !form.uf || !form.cep) && <p className="text-xs text-red-500 dark:text-red-400">* Preencha todos os campos de endereço</p>}
             </div>
           )}
         </div>
 
         {aba === 'manual' && (
-          <div className="p-5 border-t border-gray-100 flex gap-3">
-            <button onClick={onClose} className="flex-1 px-4 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50">Cancelar</button>
+          <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex gap-3">
+            <button onClick={onClose} className="flex-1 px-4 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">Cancelar</button>
             <button onClick={handleConfirmarManual} disabled={!form.nome.trim() || !!(form.logradouro && (!form.municipio || !form.uf || !form.cep))} className="flex-1 px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50">Confirmar</button>
           </div>
         )}
@@ -269,26 +269,26 @@ export const TefModal = ({ pagamentoId, vendaId, numero, uniqueid: initialUnique
     return () => clearInterval(interval);
   }, [status, uniqueId]);
 
-  const iconColor = status === 'aprovado' ? 'text-green-500' : status === 'rejeitado' || status === 'erro' ? 'text-red-500' : 'text-blue-500';
+  const iconColor = status === 'aprovado' ? 'text-green-500' : status === 'rejeitado' || status === 'erro' ? 'text-red-500 dark:text-red-400' : 'text-blue-500';
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[300] p-4">
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl">
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl">
         <div className="p-8 text-center">
           <div className="mb-6">
             {(status === 'solicitando' || status === 'aguardando') && (
-              <div className="w-16 h-16 mx-auto border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+              <div className="w-16 h-16 mx-auto border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 rounded-full animate-spin" />
             )}
             {status === 'aprovado' && <CheckCircle className={`w-16 h-16 mx-auto ${iconColor}`} />}
             {(status === 'rejeitado' || status === 'erro') && <AlertCircle className={`w-16 h-16 mx-auto ${iconColor}`} />}
           </div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-1">TEF - Venda #{numero}{totalPagamentos > 1 ? ` (${pagamentoAtual}/${totalPagamentos})` : ''}</h3>
-          <p className="text-gray-500 text-sm mb-6">{mensagem}</p>
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-1">TEF - Venda #{numero}{totalPagamentos > 1 ? ` (${pagamentoAtual}/${totalPagamentos})` : ''}</h3>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">{mensagem}</p>
           {(status === 'rejeitado' || status === 'erro') && (
-            <button onClick={onCancel} className="w-full py-3 bg-red-50 text-red-600 font-semibold rounded-xl hover:bg-red-100 transition-colors">Fechar (Venda Cancelada)</button>
+            <button onClick={onCancel} className="w-full py-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-semibold rounded-xl hover:bg-red-100 transition-colors">Fechar (Venda Cancelada)</button>
           )}
           {(status === 'solicitando' || status === 'aguardando') && (
-            <button onClick={onCancel} className="w-full py-3 text-gray-400 font-medium hover:text-gray-600 transition-colors text-sm">Cancelar</button>
+            <button onClick={onCancel} className="w-full py-3 text-gray-400 dark:text-gray-500 font-medium hover:text-gray-600 transition-colors text-sm">Cancelar</button>
           )}
         </div>
       </motion.div>
@@ -532,15 +532,15 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
       {showIdentificar && <IdentificarModal onClose={() => setShowIdentificar(false)} onConfirm={(d) => { setDestinatario(d); setShowIdentificar(false); }} />}
       {showPedidoModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000]">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center">
-            <div className="w-14 h-14 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center">
+            <div className="w-14 h-14 rounded-full bg-orange-100 dark:bg-orange-900/40 flex items-center justify-center mx-auto mb-4">
               <svg className="w-7 h-7 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
             </div>
-            <h3 className="text-lg font-bold text-gray-800 mb-1">Finalizar como Pedido</h3>
-            <p className="text-sm text-gray-500 mb-2">A venda será salva <strong>sem emitir NFC-e</strong>. Um comprovante sem valor fiscal será gerado.</p>
-            <p className="text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2 mb-5">Disponível apenas para pagamento em <strong>Dinheiro</strong> ou <strong>Crédito Loja</strong>.</p>
+            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-1">Finalizar como Pedido</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">A venda será salva <strong>sem emitir NFC-e</strong>. Um comprovante sem valor fiscal será gerado.</p>
+            <p className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded-lg px-3 py-2 mb-5">Disponível apenas para pagamento em <strong>Dinheiro</strong> ou <strong>Crédito Loja</strong>.</p>
             <div className="flex gap-3">
-              <button onClick={() => setShowPedidoModal(false)} className="flex-1 px-4 py-2 rounded-xl border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50">Cancelar</button>
+              <button onClick={() => setShowPedidoModal(false)} className="flex-1 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700">Cancelar</button>
               <button onClick={handleFinalizarPedido} className="flex-1 px-4 py-2 rounded-xl bg-orange-500 text-white text-sm font-bold hover:bg-orange-600 shadow">Confirmar</button>
             </div>
           </div>
@@ -548,18 +548,18 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
       )}
       {pedidoGerado && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000]">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xs">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-xs">
             <div className="p-4 border-b text-center">
-              <p className="font-bold text-gray-700 text-sm">{emitente?.razaoSocial}</p>
-              <p className="text-xs text-gray-400">{emitente?.cnpj}</p>
-              <p className="text-xs text-gray-400 mt-1">{pedidoGerado.data}</p>
-              <div className="mt-2 bg-orange-50 rounded px-2 py-1">
-                <p className="text-xs font-bold text-orange-600">*** SEM VALOR FISCAL ***</p>
+              <p className="font-bold text-gray-700 dark:text-gray-200 text-sm">{emitente?.razaoSocial}</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500">{emitente?.cnpj}</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{pedidoGerado.data}</p>
+              <div className="mt-2 bg-orange-50 dark:bg-orange-900/20 rounded px-2 py-1">
+                <p className="text-xs font-bold text-orange-600 dark:text-orange-400">*** SEM VALOR FISCAL ***</p>
                 <p className="text-xs text-orange-500">PEDIDO #{pedidoGerado.numero}</p>
               </div>
             </div>
             <div id="cupom-pedido" className="p-4 font-mono text-xs space-y-1">
-              <div className="flex justify-between border-b pb-1 mb-1 text-gray-500">
+              <div className="flex justify-between border-b pb-1 mb-1 text-gray-500 dark:text-gray-400">
                 <span>ITEM</span><span>QTD</span><span>TOTAL</span>
               </div>
               {pedidoGerado.itens.map((it, i) => {
@@ -575,13 +575,13 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
               <div className="border-t pt-2 mt-2 space-y-1">
                 <div className="flex justify-between font-bold"><span>TOTAL</span><span>R$ {pedidoGerado.total.toFixed(2)}</span></div>
                 {pedidoGerado.pagamentos.map((p, i) => (
-                  <div key={i} className="flex justify-between text-gray-500">
+                  <div key={i} className="flex justify-between text-gray-500 dark:text-gray-400">
                     <span>{p.formaPagamento === '01' ? 'Dinheiro' : 'Crédito Loja'}</span>
                     <span>R$ {p.valorPagamento.toFixed(2)}</span>
                   </div>
                 ))}
               </div>
-              <div className="text-center mt-3 text-gray-400 border-t pt-2">
+              <div className="text-center mt-3 text-gray-400 dark:text-gray-500 border-t pt-2">
                 <p>*** SEM VALOR FISCAL ***</p>
                 <p>Obrigado pela preferência!</p>
               </div>
@@ -629,7 +629,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
                 </body></html>`;
                 const w = window.open('', '_blank', 'width=320,height=700');
                 if (w) { w.document.write(html); w.document.close(); w.focus(); setTimeout(() => { w.print(); w.close(); }, 300); }
-              }} className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200">Imprimir</button>
+              }} className="flex-1 px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600">Imprimir</button>
               <button onClick={() => { setPedidoGerado(null); onSave({ id: 0, numero: 0, status: 'Pedido' } as any); }} className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-700">Fechar</button>
             </div>
           </div>
@@ -637,20 +637,20 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
       )}
       {showParcelamento && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000]">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 w-full max-w-md">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
                 <svg className="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
               </div>
               <div>
-                <h3 className="text-lg font-bold text-gray-800">Crédito Loja — Parcelamento</h3>
-                <p className="text-xs text-gray-400">Total: R$ {pendingCreditoValor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">Crédito Loja — Parcelamento</h3>
+                <p className="text-xs text-gray-400 dark:text-gray-500">Total: R$ {pendingCreditoValor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
               </div>
             </div>
             <div className="mb-4">
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Número de Parcelas</label>
+              <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Número de Parcelas</label>
               <select
-                className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-purple-500"
+                className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-purple-500"
                 value={parcelasCredito.length || 1}
                 onChange={e => {
                   const n = parseInt(e.target.value);
@@ -670,20 +670,20 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
             {parcelasCredito.length > 0 && (
               <div className="space-y-2 max-h-48 overflow-y-auto mb-4">
                 {parcelasCredito.map((p, i) => (
-                  <div key={i} className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
+                  <div key={i} className="flex items-center gap-2 bg-gray-50 dark:bg-gray-900 rounded-lg px-3 py-2">
                     <span className="text-xs font-bold text-purple-600 w-6">{p.numero}x</span>
                     <span className="text-sm font-bold flex-1">R$ {p.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                     <input type="date" value={p.vencimento} onChange={e => {
                       const novas = [...parcelasCredito];
                       novas[i] = { ...novas[i], vencimento: e.target.value };
                       setParcelasCredito(novas);
-                    }} className="border border-gray-200 rounded px-2 py-1 text-xs outline-none focus:border-purple-500" />
+                    }} className="border border-gray-200 dark:border-gray-700 rounded px-2 py-1 text-xs outline-none focus:border-purple-500" />
                   </div>
                 ))}
               </div>
             )}
             <div className="flex gap-3 mt-2">
-              <button onClick={() => { setShowParcelamento(false); setParcelasCredito([]); }} className="flex-1 px-4 py-2 rounded-xl border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50">Cancelar</button>
+              <button onClick={() => { setShowParcelamento(false); setParcelasCredito([]); }} className="flex-1 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700">Cancelar</button>
               <button
                 onClick={() => {
                   const parc = parcelasCredito.length > 0 ? parcelasCredito : [{ numero: 1, valor: pendingCreditoValor, vencimento: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0] }];
@@ -702,24 +702,24 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
       )}
       {modalAutManual && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000]">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 w-full max-w-sm">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+              <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
+                <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
               </div>
               <div>
-                <h3 className="text-lg font-bold text-gray-800">Pagamento com Cartão</h3>
-                <p className="text-xs text-gray-400">Informe os dados da transação</p>
+                <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">Pagamento com Cartão</h3>
+                <p className="text-xs text-gray-400 dark:text-gray-500">Informe os dados da transação</p>
               </div>
             </div>
-            <p className="text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2 mb-5 mt-2">
+            <p className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded-lg px-3 py-2 mb-5 mt-2">
               Integração TEF não ativa. Registre os dados manualmente conforme exigido pela legislação fiscal.
             </p>
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Operadora / Bandeira</label>
+                <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Operadora / Bandeira</label>
                 <select
-                  className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"
+                  className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"
                   value={modalAutManual.operadora}
                   onChange={e => setModalAutManual(prev => prev ? { ...prev, operadora: e.target.value } : null)}
                 >
@@ -728,10 +728,10 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
                 </select>
               </div>
               <div>
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Código de Autorização</label>
+                <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Código de Autorização</label>
                 <input
                   type="text"
-                  className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500 font-mono tracking-widest"
+                  className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500 font-mono tracking-widest"
                   placeholder="Ex: 123456"
                   value={modalAutManual.codigo}
                   onChange={e => setModalAutManual(prev => prev ? { ...prev, codigo: e.target.value } : null)}
@@ -742,7 +742,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => { modalAutManual.resolve(null); setModalAutManual(null); }}
-                className="flex-1 px-4 py-2 rounded-xl border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50"
+                className="flex-1 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
               >Cancelar</button>
               <button
                 onClick={() => {
@@ -758,20 +758,20 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
         </div>
       )}
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[200] p-4">
-        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden flex flex-col">
-          <div className="p-4 border-b border-gray-100 flex items-center gap-4">
-            <h3 className="text-xl font-semibold text-gray-800 flex-1">Nova NFC-e #{proximoNumero}</h3>
-            {destinatario && <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded-lg flex items-center gap-1">{destinatario.nome} <button onClick={() => setDestinatario(null)}>✕</button></span>}
+        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden flex flex-col">
+          <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-4">
+            <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 flex-1">Nova NFC-e #{proximoNumero}</h3>
+            {destinatario && <span className="text-xs bg-indigo-100 text-indigo-700 dark:text-indigo-300 px-2 py-1 rounded-lg flex items-center gap-1">{destinatario.nome} <button onClick={() => setDestinatario(null)}>✕</button></span>}
             <button onClick={() => setShowIdentificar(true)} className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium flex items-center gap-2 shadow-md hover:bg-indigo-700"><UserCheck className="w-4 h-4" /> Identificar</button>
-            <button onClick={handleFinalizar} disabled={isEmitting || itens.length === 0 || totalPago < totalDevido} className={`px-5 py-2 rounded-xl text-sm font-medium flex items-center gap-2 ${isEmitting || totalPago < totalDevido ? 'bg-gray-200 text-gray-400' : 'bg-green-600 text-white hover:bg-green-700 shadow-md'}`}>{isEmitting ? 'Transmitindo...' : <><Send className="w-4 h-4" /> Emitir NFC-e</>}</button>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">✕</button>
+            <button onClick={handleFinalizar} disabled={isEmitting || itens.length === 0 || totalPago < totalDevido} className={`px-5 py-2 rounded-xl text-sm font-medium flex items-center gap-2 ${isEmitting || totalPago < totalDevido ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500' : 'bg-green-600 text-white hover:bg-green-700 shadow-md'}`}>{isEmitting ? 'Transmitindo...' : <><Send className="w-4 h-4" /> Emitir NFC-e</>}</button>
+            <button onClick={onClose} className="text-gray-400 dark:text-gray-500 hover:text-gray-600">✕</button>
           </div>
           <div className="flex-1 overflow-auto p-6 grid grid-cols-1 md:grid-cols-5 gap-6">
             <div className="md:col-span-3 space-y-6">
               <div className="flex gap-4 items-end">
                 <div className="flex-1 relative">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Buscar Produto</label>
-                  <input ref={buscaProdutoInputRef} type="text" value={buscaProduto} placeholder="Código ou nome..." className="w-full px-4 py-2 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500" 
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Buscar Produto</label>
+                  <input ref={buscaProdutoInputRef} type="text" value={buscaProduto} placeholder="Código ou nome..." className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-blue-500" 
                     onChange={(e) => {
                       const t = e.target.value; setBuscaProduto(t); setSelectedProduto('');
                       if (t.length < 1) { setProdutosFiltrados([]); return; }
@@ -781,64 +781,64 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
                     }} 
                   />
                   {produtosFiltrados.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-[200] max-h-60 overflow-auto">
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-[200] max-h-60 overflow-auto">
                       {produtosFiltrados.map(p => (
-                        <button key={p.id} onClick={() => { setSelectedProduto(String(p.id)); setBuscaProduto(p.descricao); setValorAtual(p.valorUnitario); setProdutosFiltrados([]); setTimeout(() => inputQtdRef.current?.focus(), 10); }} className="w-full text-left px-4 py-2 flex justify-between hover:bg-blue-50">
-                          <div><p className="font-medium text-sm">{p.descricao}</p><p className="text-[10px] text-gray-400">{p.codigoInterno}</p></div>
-                          <span className="text-sm font-bold text-blue-600">R$ {brl(p.valorUnitario)}</span>
+                        <button key={p.id} onClick={() => { setSelectedProduto(String(p.id)); setBuscaProduto(p.descricao); setValorAtual(p.valorUnitario); setProdutosFiltrados([]); setTimeout(() => inputQtdRef.current?.focus(), 10); }} className="w-full text-left px-4 py-2 flex justify-between hover:bg-blue-50 dark:hover:bg-blue-900/30">
+                          <div><p className="font-medium text-sm">{p.descricao}</p><p className="text-[10px] text-gray-400 dark:text-gray-500">{p.codigoInterno}</p></div>
+                          <span className="text-sm font-bold text-blue-600 dark:text-blue-400">R$ {brl(p.valorUnitario)}</span>
                         </button>
                       ))}
                     </div>
                   )}
                 </div>
-                <div className="w-20"><label className="block text-sm font-medium text-gray-700 mb-1">Qtd</label><input ref={inputQtdRef} type="number" min="1" value={quantidade} onChange={e => setQuantidade(Number(e.target.value))} className="w-full px-4 py-2 border border-gray-200 rounded-lg" /></div>
-                <div className="w-28"><label className="block text-sm font-medium text-gray-700 mb-1">Valor</label><input ref={inputValorRef} type="text" value={valorAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} onChange={e => setValorAtual(Number(e.target.value.replace(/\D/g, '')) / 100)} className="w-full px-4 py-2 border border-gray-200 rounded-lg text-right font-bold" /></div>
+                <div className="w-20"><label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Qtd</label><input ref={inputQtdRef} type="number" min="1" value={quantidade} onChange={e => setQuantidade(Number(e.target.value))} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg" /></div>
+                <div className="w-28"><label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Valor</label><input ref={inputValorRef} type="text" value={valorAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} onChange={e => setValorAtual(Number(e.target.value.replace(/\D/g, '')) / 100)} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-right font-bold" /></div>
                 <button ref={btnAddRef} onClick={addItem} disabled={!selectedProduto} className="p-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-200"><Plus className="w-5 h-5" /></button>
               </div>
-              <div className="border border-gray-100 rounded-xl overflow-hidden">
+              <div className="border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-gray-50"><tr><th className="px-4 py-3">Produto</th><th className="px-4 py-3">Qtd</th><th className="px-4 py-3">Unit.</th><th className="px-4 py-3">Total</th><th></th></tr></thead>
+                  <thead className="bg-gray-50 dark:bg-gray-900"><tr><th className="px-4 py-3">Produto</th><th className="px-4 py-3">Qtd</th><th className="px-4 py-3">Unit.</th><th className="px-4 py-3">Total</th><th></th></tr></thead>
                   <tbody className="divide-y">
-                    {itens.length === 0 ? <tr><td colSpan={5} className="py-10 text-center text-gray-300 font-bold uppercase tracking-widest">Caixa Livre</td></tr> :
-                      itens.map((it, i) => { const p = produtos.find(x => x.id === it.produtoId); return <tr key={i}><td className="px-4 py-3 font-medium">{p?.descricao}</td><td className="px-4 py-3">{it.quantidade}</td><td className="px-4 py-3">R$ {brl(it.valorUnitario)}</td><td className="px-4 py-3 font-bold">R$ {brl(it.quantidade * it.valorUnitario)}</td><td className="px-4 py-3 text-right"><button onClick={() => removeItem(i)} className="text-red-400 hover:text-red-600"><Trash2 className="w-4 h-4" /></button></td></tr>; })}
+                    {itens.length === 0 ? <tr><td colSpan={5} className="py-10 text-center text-gray-300 dark:text-gray-600 font-bold uppercase tracking-widest">Caixa Livre</td></tr> :
+                      itens.map((it, i) => { const p = produtos.find(x => x.id === it.produtoId); return <tr key={i}><td className="px-4 py-3 font-medium">{p?.descricao}</td><td className="px-4 py-3">{it.quantidade}</td><td className="px-4 py-3">R$ {brl(it.valorUnitario)}</td><td className="px-4 py-3 font-bold">R$ {brl(it.quantidade * it.valorUnitario)}</td><td className="px-4 py-3 text-right"><button onClick={() => removeItem(i)} className="text-red-400 hover:text-red-600 dark:hover:text-red-400"><Trash2 className="w-4 h-4" /></button></td></tr>; })}
                   </tbody>
                 </table>
               </div>
             </div>
-            <div className="md:col-span-2 bg-gray-50 rounded-2xl p-5 flex flex-col">
-              <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">Resumo</h4>
+            <div className="md:col-span-2 bg-gray-50 dark:bg-gray-900 rounded-2xl p-5 flex flex-col">
+              <h4 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-6">Resumo</h4>
               <div className="space-y-4 flex-1">
-                <div className="flex justify-between text-gray-500"><span>Subtotal</span><span>R$ {brl(subtotal)}</span></div>
-                <div className="flex justify-between items-center text-gray-500"><span>Desconto</span><input type="text" value={valorDesconto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} onChange={e => setValorDesconto(Number(e.target.value.replace(/\D/g, '')) / 100)} className="w-24 text-right bg-transparent border-b border-gray-300 font-bold text-red-500 outline-none focus:border-blue-500" /></div>
-                <div className="pt-4 border-t border-gray-100 space-y-3">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase">Pagamentos</label>
-                  <select value={formaPagamentoInput} onChange={e => setFormaPagamentoInput(e.target.value)} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none">
+                <div className="flex justify-between text-gray-500 dark:text-gray-400"><span>Subtotal</span><span>R$ {brl(subtotal)}</span></div>
+                <div className="flex justify-between items-center text-gray-500 dark:text-gray-400"><span>Desconto</span><input type="text" value={valorDesconto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} onChange={e => setValorDesconto(Number(e.target.value.replace(/\D/g, '')) / 100)} className="w-24 text-right bg-transparent border-b border-gray-300 dark:border-gray-600 font-bold text-red-500 dark:text-red-400 outline-none focus:border-blue-500" /></div>
+                <div className="pt-4 border-t border-gray-100 dark:border-gray-700 space-y-3">
+                  <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase">Pagamentos</label>
+                  <select value={formaPagamentoInput} onChange={e => setFormaPagamentoInput(e.target.value)} className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm outline-none">
                     <option value="01">Dinheiro</option><option value="17">PIX</option><option value="03">Cartão Crédito</option><option value="04">Cartão Débito</option><option value="05" disabled={!destinatario?.isCadastrado}>Crédito Loja</option>
                   </select>
                   {!isTefRequired && ['03', '04'].includes(formaPagamentoInput) && (
                     <div className="flex gap-2">
-                       <select value={bandeiraSelecionada} onChange={e => setBandeiraSelecionada(e.target.value)} className="flex-1 bg-white border p-1 rounded text-xs">
+                       <select value={bandeiraSelecionada} onChange={e => setBandeiraSelecionada(e.target.value)} className="flex-1 bg-white dark:bg-gray-800 border p-1 rounded text-xs">
                          <option value="">Bandeira...</option>{bandeiras.map(b => <option key={b.id} value={b.id}>{b.tband_opc}</option>)}
                        </select>
                        <input value={autorizacaoInput} onChange={e => setAutorizacaoInput(e.target.value)} placeholder="Aut." className="w-16 border rounded p-1 text-xs" />
                     </div>
                   )}
                   <div className="flex gap-2">
-                    <input type="text" value={valorPagamentoInput.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} onChange={e => setValorPagamentoInput(Number(e.target.value.replace(/\D/g, '')) / 100)} className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm text-right font-bold" />
+                    <input type="text" value={valorPagamentoInput.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} onChange={e => setValorPagamentoInput(Number(e.target.value.replace(/\D/g, '')) / 100)} className="flex-1 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm text-right font-bold" />
                     <button onClick={addPagamento} className="w-10 h-10 bg-green-500 text-white rounded-lg hover:bg-green-600 font-bold">+</button>
                   </div>
                   <div className="space-y-1">
-                    {pagamentos.map((p, i) => <div key={i} className="flex justify-between bg-white p-2 rounded border text-sm"><span>{p.formaPagamento === '01' ? 'Dinheiro' : p.formaPagamento === '17' ? 'PIX' : 'Cartão'}</span><div className="flex gap-2"><b>R$ {brl(p.valorPagamento)}</b><button onClick={() => removePagamento(i)} className="text-red-500">✕</button></div></div>)}
+                    {pagamentos.map((p, i) => <div key={i} className="flex justify-between bg-white dark:bg-gray-800 p-2 rounded border text-sm"><span>{p.formaPagamento === '01' ? 'Dinheiro' : p.formaPagamento === '17' ? 'PIX' : 'Cartão'}</span><div className="flex gap-2"><b>R$ {brl(p.valorPagamento)}</b><button onClick={() => removePagamento(i)} className="text-red-500 dark:text-red-400">✕</button></div></div>)}
                   </div>
                 </div>
               </div>
-              <div className="mt-auto pt-6 border-t border-gray-200">
+              <div className="mt-auto pt-6 border-t border-gray-200 dark:border-gray-700">
                  <div className="flex justify-between items-center mb-2">
-                   <p className="text-sm font-medium text-gray-500">Total Devido</p>
-                   <p className="text-2xl font-bold text-gray-800">R$ {brl(totalDevido)}</p>
+                   <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Devido</p>
+                   <p className="text-2xl font-bold text-gray-800 dark:text-gray-100">R$ {brl(totalDevido)}</p>
                  </div>
                  {totalPago > totalDevido && (
-                   <div className="flex justify-between items-center text-green-600">
+                   <div className="flex justify-between items-center text-green-600 dark:text-green-400">
                      <p className="text-sm font-semibold">Troco</p>
                      <p className="text-xl font-bold">R$ {brl(troco)}</p>
                    </div>

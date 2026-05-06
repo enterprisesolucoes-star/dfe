@@ -518,10 +518,10 @@ const NfeDashboard: React.FC<Props> = ({
         onDismiss={() => setResultadoEmissao(null)}
       >
         {resultadoEmissao?.chave && (
-          <p className="text-gray-600 mt-1 font-mono text-xs break-all">Chave: {resultadoEmissao.chave}</p>
+          <p className="text-gray-600 dark:text-gray-300 mt-1 font-mono text-xs break-all">Chave: {resultadoEmissao.chave}</p>
         )}
         {resultadoEmissao?.protocolo && (
-          <p className="text-gray-600 text-xs">Protocolo: {resultadoEmissao.protocolo} | Nº {resultadoEmissao.numero}</p>
+          <p className="text-gray-600 dark:text-gray-300 text-xs">Protocolo: {resultadoEmissao.protocolo} | Nº {resultadoEmissao.numero}</p>
         )}
         {resultadoEmissao?.sucesso && boletoIdsEmissao.length > 0 && (
           <div className="mt-3 pt-3 border-t border-current/20 flex gap-3">
@@ -546,7 +546,7 @@ const NfeDashboard: React.FC<Props> = ({
               <FileText className="w-3.5 h-3.5" />
               {gerandoBoletosNfe ? 'Gerando...' : `Gerar e Imprimir ${boletoIdsEmissao.length} Boleto(s)`}
             </button>
-            <button onClick={() => setBoletoIdsEmissao([])} className="text-xs text-gray-500 hover:text-gray-700 font-bold uppercase">
+            <button onClick={() => setBoletoIdsEmissao([])} className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 font-bold uppercase">
               Depois
             </button>
           </div>
@@ -555,7 +555,7 @@ const NfeDashboard: React.FC<Props> = ({
           <div className="flex items-center gap-4 mt-3 pt-3 border-t border-current/20">
             <button
               onClick={() => handleDownloadXml(resultadoEmissao.xml!, `NFe_Analise_${resultadoEmissao.numero || 'Debug'}.xml`)}
-              className="flex items-center gap-1.5 text-blue-700 hover:text-blue-900 font-bold text-xs uppercase transition-all"
+              className="flex items-center gap-1.5 text-blue-700 dark:text-blue-300 hover:text-blue-900 font-bold text-xs uppercase transition-all"
             >
               <Download className="w-3.5 h-3.5" /> Baixar XML
             </button>
@@ -565,7 +565,7 @@ const NfeDashboard: React.FC<Props> = ({
                 navigator.clipboard.writeText(xmlText);
                 setXmlCopiado(true);
               }}
-              className="flex items-center gap-1.5 text-blue-700 hover:text-blue-900 font-bold text-xs uppercase transition-all"
+              className="flex items-center gap-1.5 text-blue-700 dark:text-blue-300 hover:text-blue-900 font-bold text-xs uppercase transition-all"
             >
               <RefreshCw className="w-3.5 h-3.5" /> Copiar Texto XML
             </button>
@@ -581,8 +581,8 @@ const NfeDashboard: React.FC<Props> = ({
       />
 
       {/* Tabs Navigation */}
-      <div className="sticky top-0 z-10 bg-white py-2">
-        <div className="flex flex-wrap items-center gap-2 p-1 bg-gray-100 rounded-xl border border-gray-200">
+      <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 py-2">
+        <div className="flex flex-wrap items-center gap-2 p-1 bg-gray-100 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-700">
           {[
             { id: 'identificacao', label: '1. Identificação', icon: User },
             { id: 'produtos',      label: '2. Produtos',      icon: Package },
@@ -596,7 +596,7 @@ const NfeDashboard: React.FC<Props> = ({
               className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
                 activeSubTab === tab.id 
                   ? 'bg-blue-600 text-white shadow-md' 
-                  : 'text-gray-500 hover:bg-white hover:text-blue-600'
+                  : 'text-gray-500 dark:text-gray-400 hover:bg-white hover:text-blue-600 dark:hover:text-blue-400'
               }`}
             >
               <tab.icon className="w-4 h-4" />
@@ -610,22 +610,22 @@ const NfeDashboard: React.FC<Props> = ({
         {/* ── Aba 1: Identificação ────────────────────────────────────── */}
         {activeSubTab === 'identificacao' && (
           <div className="space-y-4">
-            <section className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-              <h3 className="text-base font-semibold text-gray-800 mb-6 flex items-center gap-2 border-b border-gray-100 pb-3">
-                <User className="w-5 h-5 text-blue-600" /> Destinatário (Cliente)
+            <section className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+              <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100 mb-6 flex items-center gap-2 border-b border-gray-100 dark:border-gray-700 pb-3">
+                <User className="w-5 h-5 text-blue-600 dark:text-blue-400" /> Destinatário (Cliente)
               </h3>
               <div className="relative mb-6">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
                 <input
                   ref={refBuscaCliente}
                   value={buscaCliente}
                   onChange={e => { setBuscaCliente(e.target.value); setDropCliente(true); }}
                   onFocus={() => setDropCliente(true)}
                   placeholder="Buscar por nome ou CPF/CNPJ..."
-                  className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none shadow-sm"
+                  className="w-full pl-11 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none shadow-sm"
                 />
                 {dropCliente && clientesFiltrados.length > 0 && (
-                  <div className="absolute z-20 top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl max-h-60 overflow-y-auto">
+                  <div className="absolute z-20 top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl max-h-60 overflow-y-auto">
                     {clientesFiltrados.map(c => (
                       <button key={c.id} onClick={() => { 
                         setClienteSel(c); 
@@ -645,9 +645,9 @@ const NfeDashboard: React.FC<Props> = ({
                           setForm(f => ({ ...f, consumidorFinal: '1' }));
                         }
                       }}
-                        className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors border-b border-gray-50 last:border-0">
-                        <p className="font-semibold text-gray-700 text-sm">{c.nome}</p>
-                        <p className="text-gray-400 text-xs">{c.documento} · {c.endereco?.municipio}/{c.endereco?.uf}</p>
+                        className="w-full text-left px-4 py-3 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors border-b border-gray-50 dark:border-gray-700 last:border-0">
+                        <p className="font-semibold text-gray-700 dark:text-gray-200 text-sm">{c.nome}</p>
+                        <p className="text-gray-400 dark:text-gray-500 text-xs">{c.documento} · {c.endereco?.municipio}/{c.endereco?.uf}</p>
                       </button>
                     ))}
                   </div>
@@ -655,21 +655,21 @@ const NfeDashboard: React.FC<Props> = ({
               </div>
 
               {clienteSel ? (
-                <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 flex flex-wrap gap-6 items-start">
-                  <div className="bg-white p-3 rounded-xl shadow-sm border border-gray-200">
+                <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 flex flex-wrap gap-6 items-start">
+                  <div className="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
                     <User className="w-8 h-8 text-blue-500" />
                   </div>
                   <div className="flex-1 min-w-[200px]">
                     <div className="flex justify-between">
-                      <p className="text-lg font-semibold text-gray-800">{clienteSel.nome}</p>
-                      <button onClick={() => { setClienteSel(null); setBuscaCliente(''); }} className="p-1 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-lg">
+                      <p className="text-lg font-semibold text-gray-800 dark:text-gray-100">{clienteSel.nome}</p>
+                      <button onClick={() => { setClienteSel(null); setBuscaCliente(''); }} className="p-1 hover:bg-red-50 dark:hover:bg-red-900/30 text-gray-400 dark:text-gray-500 hover:text-red-500 rounded-lg">
                         <X className="w-5 h-5" />
                       </button>
                     </div>
-                    <p className="text-sm font-medium text-gray-500 mb-4">{clienteSel.documento}</p>
+                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4">{clienteSel.documento}</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-medium text-gray-500 mb-1">Tipo de Tributação</label>
+                        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Tipo de Tributação</label>
                         <select value={indIEDest} 
                           onChange={e => {
                             const val = e.target.value as any;
@@ -677,15 +677,15 @@ const NfeDashboard: React.FC<Props> = ({
                             // Regra SEFAZ: Se indIEDest=9 (Não contrib.), indFinal deve ser 1 (Cons. Final)
                             if (val === '9') setForm(f => ({ ...f, consumidorFinal: '1' }));
                           }}
-                          className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs bg-white outline-none focus:ring-1 focus:ring-blue-500">
+                          className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-1.5 text-xs bg-white dark:bg-gray-800 outline-none focus:ring-1 focus:ring-blue-500">
                           {IND_IE_DEST.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                         </select>
                       </div>
                       {indIEDest === '1' && (
                         <div>
-                          <label className="block text-xs font-medium text-gray-500 mb-1">Inscrição Estadual</label>
+                          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Inscrição Estadual</label>
                           <input value={ieDest} onChange={e => setIeDest(e.target.value)}
-                            className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs outline-none focus:ring-1 focus:ring-blue-500"
+                            className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-1.5 text-xs outline-none focus:ring-1 focus:ring-blue-500"
                             placeholder="Somente números" />
                         </div>
                       )}
@@ -693,44 +693,44 @@ const NfeDashboard: React.FC<Props> = ({
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-10 border-2 border-dashed border-gray-100 rounded-2xl">
+                <div className="text-center py-10 border-2 border-dashed border-gray-100 dark:border-gray-700 rounded-2xl">
                   <User className="w-12 h-12 text-gray-200 mx-auto mb-2" />
-                  <p className="text-sm text-gray-400">Nenhum cliente selecionado</p>
+                  <p className="text-sm text-gray-400 dark:text-gray-500">Nenhum cliente selecionado</p>
                 </div>
               )}
             </section>
 
-            <section className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-              <h3 className="text-base font-semibold text-gray-800 mb-6 flex items-center gap-2 border-b border-gray-100 pb-3">
-                <FileText className="w-5 h-5 text-blue-600" /> Operação e Finalidade
+            <section className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+              <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100 mb-6 flex items-center gap-2 border-b border-gray-100 dark:border-gray-700 pb-3">
+                <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" /> Operação e Finalidade
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-500 mb-2">Finalidade da Compra</label>
+                  <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Finalidade da Compra</label>
                   <select value={form.finalidadeCompra || '1'} onChange={e => setForm(f => ({ ...f, finalidadeCompra: e.target.value as any }))}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all shadow-sm bg-white">
+                    className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all shadow-sm bg-white dark:bg-gray-800">
                     <option value="1">Revenda / Industrialização</option>
                     <option value="2">Uso e Consumo</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-500 mb-2">Natureza da Operação</label>
+                  <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Natureza da Operação</label>
                   <input value={form.naturezaOperacao}
                     onChange={e => setForm(f => ({ ...f, naturezaOperacao: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all shadow-sm"
+                    className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all shadow-sm"
                     placeholder="Ex: VENDA" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-500 mb-2">Finalidade NF-e</label>
+                  <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Finalidade NF-e</label>
                   <select value={form.finalidade} onChange={e => setForm(f => ({ ...f, finalidade: e.target.value as any }))}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all shadow-sm bg-white">
+                    className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all shadow-sm bg-white dark:bg-gray-800">
                     {FINALIDADES.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-500 mb-2">Consumidor Final</label>
+                  <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Consumidor Final</label>
                   <select value={form.consumidorFinal} onChange={e => setForm(f => ({ ...f, consumidorFinal: e.target.value as any }))}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all shadow-sm bg-white">
+                    className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all shadow-sm bg-white dark:bg-gray-800">
                     <option value="0">0 – Normal (B2B)</option>
                     <option value="1">1 – Consumidor Final</option>
                   </select>
@@ -743,31 +743,31 @@ const NfeDashboard: React.FC<Props> = ({
         {/* ── Aba 2: Produtos ─────────────────────────────────────────── */}
         {activeSubTab === 'produtos' && (
           <div className="space-y-4">
-            <section className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+            <section className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
               <div className="flex items-center gap-4 mb-6">
-                <h3 className="text-base font-semibold text-gray-800 flex items-center gap-2 shrink-0">
-                  <Package className="w-5 h-5 text-blue-600" /> Itens da Nota
+                <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2 shrink-0">
+                  <Package className="w-5 h-5 text-blue-600 dark:text-blue-400" /> Itens da Nota
                 </h3>
                 <div className="relative flex-1 max-w-xl">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
                   <input
                     ref={refBuscaProduto}
                     value={buscaProduto}
                     onChange={e => { setBuscaProduto(e.target.value); setDropProduto(true); } }
                     onFocus={() => setDropProduto(true)}
                     placeholder="Buscar produto..."
-                    className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl text-base outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 shadow-sm transition-all"
+                    className="w-full pl-11 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl text-base outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 shadow-sm transition-all"
                   />
                   {dropProduto && produtosFiltrados.length > 0 && (
-                    <div className="absolute z-20 top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl max-h-60 overflow-y-auto">
+                    <div className="absolute z-20 top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl max-h-60 overflow-y-auto">
                       {produtosFiltrados.map(p => (
                         <button key={p.id} onClick={() => adicionarProduto(p)}
-                          className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors border-b border-gray-50 last:border-0 flex justify-between items-center">
+                          className="w-full text-left px-4 py-3 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors border-b border-gray-50 dark:border-gray-700 last:border-0 flex justify-between items-center">
                           <div>
-                            <p className="font-semibold text-gray-700 text-sm">{p.descricao}</p>
-                            <p className="text-gray-400 text-[11px] font-medium">{p.codigoInterno} · NCM {p.ncm} · <span className={p.estoque && p.estoque > 0 ? "text-green-600" : "text-red-500"}>Estoque: {p.estoque ?? 0}</span></p>
+                            <p className="font-semibold text-gray-700 dark:text-gray-200 text-sm">{p.descricao}</p>
+                            <p className="text-gray-400 dark:text-gray-500 text-[11px] font-medium">{p.codigoInterno} · NCM {p.ncm} · <span className={p.estoque && p.estoque > 0 ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"}>Estoque: {p.estoque ?? 0}</span></p>
                           </div>
-                          <span className="bg-blue-50 text-blue-700 text-xs font-bold px-2 py-1 rounded-lg">R$ {p.valorUnitario.toFixed(2)}</span>
+                          <span className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 text-xs font-bold px-2 py-1 rounded-lg">R$ {p.valorUnitario.toFixed(2)}</span>
                         </button>
                       ))}
                     </div>
@@ -779,7 +779,7 @@ const NfeDashboard: React.FC<Props> = ({
                 <div className="overflow-x-auto -mx-6">
                   <table className="w-full border-collapse">
                     <thead>
-                      <tr className="bg-gray-50 text-gray-500 text-xs font-semibold border-y border-gray-100">
+                      <tr className="bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 text-xs font-semibold border-y border-gray-100 dark:border-gray-700">
                         <th className="text-left px-6 py-3">Produto</th>
                         <th className="text-center px-4 py-3">Qtd</th>
                         <th className="text-center px-4 py-3">Vl. Unit</th>
@@ -788,36 +788,36 @@ const NfeDashboard: React.FC<Props> = ({
                         <th className="text-right px-6 py-3">Ações</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                       {itens.map((it, idx) => (
-                        <tr key={idx} className="hover:bg-gray-50 transition-colors group">
+                        <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group">
                           <td className="px-6 py-4">
-                            <p className="font-semibold text-gray-700 text-sm">{it.descricao}</p>
-                            <p className="text-xs text-gray-400 font-medium tracking-tight">NCM {it.ncm} · CFOP {it.cfop}</p>
+                            <p className="font-semibold text-gray-700 dark:text-gray-200 text-sm">{it.descricao}</p>
+                            <p className="text-xs text-gray-400 dark:text-gray-500 font-medium tracking-tight">NCM {it.ncm} · CFOP {it.cfop}</p>
                           </td>
                           <td className="px-4 py-4 w-24">
                             <BrDecimalInput value={it.quantidade} decimals={3} onChange={v => atualizarItem(idx, 'quantidade', v)}
-                              className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-center text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+                              className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 text-center text-sm outline-none focus:ring-1 focus:ring-blue-500" />
                           </td>
                           <td className="px-4 py-4 w-28">
                             <BrDecimalInput value={it.valorUnitario} onChange={v => atualizarItem(idx, 'valorUnitario', v)}
-                              className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-center text-sm outline-none focus:ring-1 focus:ring-blue-500 font-medium text-blue-600" />
+                              className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 text-center text-sm outline-none focus:ring-1 focus:ring-blue-500 font-medium text-blue-600 dark:text-blue-400" />
                           </td>
-                          <td className="px-4 py-4 text-center text-xs text-gray-500">
+                          <td className="px-4 py-4 text-center text-xs text-gray-500 dark:text-gray-400">
                             R$ {(it.quantidade * it.valorUnitario).toFixed(2)}
                           </td>
-                          <td className="px-4 py-4 text-center font-bold text-gray-800 text-sm">
+                          <td className="px-4 py-4 text-center font-bold text-gray-800 dark:text-gray-100 text-sm">
                             R$ {it.valorTotal.toFixed(2)}
                           </td>
                           <td className="px-6 py-4 text-right">
                             <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                               <button onClick={() => setEditingItemIdx(editingItemIdx === idx ? null : idx)}
-                                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                                className="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-all"
                                 title="Editar Impostos">
                                 <Edit3 className="w-4 h-4" />
                               </button>
                               <button onClick={() => removerItem(idx)}
-                                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                                className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all"
                                 title="Remover">
                                 <Trash2 className="w-4 h-4" />
                               </button>
@@ -830,10 +830,10 @@ const NfeDashboard: React.FC<Props> = ({
                 </div>
               ) : (
                 <div className="text-center py-16">
-                  <div className="bg-gray-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Package className="w-10 h-10 text-gray-300" />
+                  <div className="bg-gray-50 dark:bg-gray-900 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Package className="w-10 h-10 text-gray-300 dark:text-gray-600" />
                   </div>
-                  <p className="text-gray-400 font-medium">Nenhum produto na lista</p>
+                  <p className="text-gray-400 dark:text-gray-500 font-medium">Nenhum produto na lista</p>
                 </div>
               )}
             </section>
@@ -841,7 +841,7 @@ const NfeDashboard: React.FC<Props> = ({
             {/* Modal de Edição Fiscal do Item */}
             {editingItemIdx !== null && (
               <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-                <div className="bg-white rounded-3xl w-full max-w-3xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col">
+                <div className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-3xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col">
                   <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-8 py-5 text-white flex justify-between items-center shrink-0">
                     <div>
                       <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -856,13 +856,13 @@ const NfeDashboard: React.FC<Props> = ({
 
                   <div className="p-6 overflow-y-auto flex-1">
                     {/* Tabs: Produto | ICMS | IPI | PIS | COFINS | Reforma */}
-                    <div className="flex gap-1 p-1 bg-gray-100 rounded-xl mb-6">
+                    <div className="flex gap-1 p-1 bg-gray-100 dark:bg-gray-700 rounded-xl mb-6">
                       {['PRODUTO', 'ICMS', 'IPI', 'PIS', 'COFINS', 'REFORMA'].map((tab) => (
                         <button
                           key={tab}
                           onClick={() => setLocalTaxTab(tab as any)}
                           className={`flex-1 py-2.5 text-xs font-semibold rounded-lg transition-all ${
-                            localTaxTab === tab ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                            localTaxTab === tab ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                           }`}
                         >
                           {tab === 'PRODUTO' ? 'Produto' : tab === 'REFORMA' ? 'Reforma' : tab}
@@ -874,38 +874,38 @@ const NfeDashboard: React.FC<Props> = ({
                     {localTaxTab === 'PRODUTO' && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">NCM</label>
+                          <label className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider block">NCM</label>
                           <input
                             type="text" value={itens[editingItemIdx].ncm ?? ''}
                             onChange={e => atualizarItem(editingItemIdx, 'ncm', e.target.value)}
-                            className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none transition-all"
+                            className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 outline-none transition-all"
                             placeholder="00000000" maxLength={8}
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">CFOP</label>
+                          <label className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider block">CFOP</label>
                           <input
                             type="text" value={itens[editingItemIdx].cfop ?? ''}
                             onChange={e => atualizarItem(editingItemIdx, 'cfop', e.target.value)}
-                            className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none transition-all"
+                            className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 outline-none transition-all"
                             placeholder="5102" maxLength={4}
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">CST/CSOSN (ICMS)</label>
+                          <label className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider block">CST/CSOSN (ICMS)</label>
                           <input
                             type="text" value={itens[editingItemIdx].icmsCstCsosn ?? ''}
                             onChange={e => atualizarItem(editingItemIdx, 'icmsCstCsosn', e.target.value)}
-                            className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none transition-all"
+                            className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 outline-none transition-all"
                             placeholder="102" maxLength={3}
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">Origem da Mercadoria</label>
+                          <label className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider block">Origem da Mercadoria</label>
                           <select
                             value={itens[editingItemIdx].origemMercadoria ?? '0'}
                             onChange={e => atualizarItem(editingItemIdx, 'origemMercadoria', e.target.value)}
-                            className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none transition-all"
+                            className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 outline-none transition-all"
                           >
                             <option value="0">0 – Nacional</option>
                             <option value="1">1 – Estrangeira (imp. direta)</option>
@@ -916,38 +916,38 @@ const NfeDashboard: React.FC<Props> = ({
                           </select>
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">CST PIS</label>
+                          <label className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider block">CST PIS</label>
                           <input
                             type="text" value={itens[editingItemIdx].pisCst ?? ''}
                             onChange={e => atualizarItem(editingItemIdx, 'pisCst', e.target.value)}
-                            className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none transition-all"
+                            className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 outline-none transition-all"
                             placeholder="07" maxLength={2}
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">CST COFINS</label>
+                          <label className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider block">CST COFINS</label>
                           <input
                             type="text" value={itens[editingItemIdx].cofinsCst ?? ''}
                             onChange={e => atualizarItem(editingItemIdx, 'cofinsCst', e.target.value)}
-                            className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none transition-all"
+                            className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 outline-none transition-all"
                             placeholder="07" maxLength={2}
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">CST IPI</label>
+                          <label className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider block">CST IPI</label>
                           <input
                             type="text" value={itens[editingItemIdx].ipiCst ?? ''}
                             onChange={e => atualizarItem(editingItemIdx, 'ipiCst', e.target.value)}
-                            className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none transition-all"
+                            className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 outline-none transition-all"
                             placeholder="99" maxLength={2}
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">Unidade Comercial</label>
+                          <label className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider block">Unidade Comercial</label>
                           <input
                             type="text" value={itens[editingItemIdx].unidadeComercial ?? ''}
                             onChange={e => atualizarItem(editingItemIdx, 'unidadeComercial', e.target.value.toUpperCase())}
-                            className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none transition-all"
+                            className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 outline-none transition-all"
                             placeholder="UN" maxLength={6}
                           />
                         </div>
@@ -958,26 +958,26 @@ const NfeDashboard: React.FC<Props> = ({
                     {localTaxTab === 'REFORMA' && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">CST CBS/IBS</label>
+                          <label className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider block">CST CBS/IBS</label>
                           <input
                             type="text" value={itens[editingItemIdx].cbsCst ?? ''}
                             onChange={e => atualizarItem(editingItemIdx, 'cbsCst', e.target.value)}
-                            className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none transition-all"
+                            className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 outline-none transition-all"
                             placeholder="00" maxLength={2}
                           />
-                          <p className="text-[10px] text-gray-400">Deixe vazio para não enviar IBS/CBS</p>
+                          <p className="text-[10px] text-gray-400 dark:text-gray-500">Deixe vazio para não enviar IBS/CBS</p>
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">cClassTrib (Classificação Tributária)</label>
+                          <label className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider block">cClassTrib (Classificação Tributária)</label>
                           <input
                             type="text" value={itens[editingItemIdx].cbsClasstrib ?? ''}
                             onChange={e => atualizarItem(editingItemIdx, 'cbsClasstrib', e.target.value)}
-                            className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none transition-all"
+                            className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 outline-none transition-all"
                             placeholder="Ex: 0000000"
                           />
                         </div>
-                        <div className="md:col-span-2 bg-blue-50 rounded-xl p-4 border border-blue-100">
-                          <p className="text-xs text-blue-700 font-medium">As alíquotas CBS/IBS são configuradas na tela de Parâmetros RTC (Reforma Tributária). Aqui você ajusta apenas o CST e cClassTrib por item.</p>
+                        <div className="md:col-span-2 bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-100">
+                          <p className="text-xs text-blue-700 dark:text-blue-300 font-medium">As alíquotas CBS/IBS são configuradas na tela de Parâmetros RTC (Reforma Tributária). Aqui você ajusta apenas o CST e cClassTrib por item.</p>
                         </div>
                       </div>
                     )}
@@ -987,7 +987,7 @@ const NfeDashboard: React.FC<Props> = ({
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {/* Base de Cálculo */}
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">Base de Cálculo</label>
+                          <label className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider block">Base de Cálculo</label>
                           <BrDecimalInput 
                             value={
                               localTaxTab === 'ICMS' ? (itens[editingItemIdx].vbc_icms ?? 0) :
@@ -1003,13 +1003,13 @@ const NfeDashboard: React.FC<Props> = ({
                               const aliq = (itens[editingItemIdx][fAliq as keyof NfeItem] as number) ?? 0;
                               atualizarItem(editingItemIdx, fVal as any, round2(val * (aliq / 100)));
                             }}
-                            className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3.5 text-gray-700 font-semibold outline-none transition-all"
+                            className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3.5 text-gray-700 dark:text-gray-200 font-semibold outline-none transition-all"
                           />
                         </div>
 
                         {/* Alíquota */}
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">Alíquota (%)</label>
+                          <label className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider block">Alíquota (%)</label>
                           <BrDecimalInput 
                             value={
                               localTaxTab === 'ICMS' ? (itens[editingItemIdx].icmsAliquota ?? 0) :
@@ -1025,15 +1025,15 @@ const NfeDashboard: React.FC<Props> = ({
                               const base = (itens[editingItemIdx][fBase as keyof NfeItem] as number) ?? 0;
                               atualizarItem(editingItemIdx, fVal as any, round2(base * (val / 100)));
                             }}
-                            className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3.5 text-blue-600 font-semibold outline-none transition-all text-center"
+                            className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3.5 text-blue-600 dark:text-blue-400 font-semibold outline-none transition-all text-center"
                           />
                         </div>
 
                         {/* Valor do Imposto */}
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">Valor do Imposto</label>
+                          <label className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider block">Valor do Imposto</label>
                           <div className="relative">
-                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-sm">R$</span>
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 font-medium text-sm">R$</span>
                             <input
                               type="text" inputMode="decimal"
                               value={taxEditingField === 'val' ? taxEditingRaw : (
@@ -1054,7 +1054,7 @@ const NfeDashboard: React.FC<Props> = ({
                                 atualizarItem(editingItemIdx, fVal as any, val);
                                 setTaxEditingField(null);
                               }}
-                              className="w-full bg-blue-50 border-2 border-blue-100 focus:border-blue-500 focus:bg-white rounded-xl pl-11 pr-4 py-3.5 text-blue-700 font-semibold outline-none transition-all"
+                              className="w-full bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-100 focus:border-blue-500 focus:bg-white rounded-xl pl-11 pr-4 py-3.5 text-blue-700 dark:text-blue-300 font-semibold outline-none transition-all"
                             />
                           </div>
                         </div>
@@ -1062,7 +1062,7 @@ const NfeDashboard: React.FC<Props> = ({
                     )}
 
                     <div className="mt-8 flex gap-4">
-                      <button onClick={() => setEditingItemIdx(null)} className="flex-1 py-3.5 bg-gray-100 text-gray-600 font-semibold rounded-xl hover:bg-gray-200 transition-colors">
+                      <button onClick={() => setEditingItemIdx(null)} className="flex-1 py-3.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 font-semibold rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                         Cancelar
                       </button>
                       <button onClick={() => setEditingItemIdx(null)} className="flex-[2] py-3.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200 flex items-center justify-center gap-2">
@@ -1074,9 +1074,9 @@ const NfeDashboard: React.FC<Props> = ({
               </div>
             )}
 
-            <section className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-              <h3 className="text-base font-semibold text-gray-800 mb-6 flex items-center gap-2">
-                <Calculator className="w-5 h-5 text-blue-600" /> Totais e Bases
+            <section className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+              <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100 mb-6 flex items-center gap-2">
+                <Calculator className="w-5 h-5 text-blue-600 dark:text-blue-400" /> Totais e Bases
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 {[
@@ -1089,9 +1089,9 @@ const NfeDashboard: React.FC<Props> = ({
                   { label: 'COFINS',         val: totaisBase.valorCOFINS, primary: false },
                   { label: 'Outras Desp.',   val: (form.valorFrete ?? 0) + (form.valorSeguro ?? 0) + (form.valorOutras ?? 0), primary: false },
                 ].map((item) => (
-                  <div key={item.label} className={`rounded-xl p-3 border text-right ${item.primary ? 'bg-blue-50 border-blue-100 shadow-inner' : 'bg-white border-gray-100'}`}>
-                    <p className="text-xs font-medium text-gray-400 mb-1">{item.label}</p>
-                    <p className={`text-sm font-semibold ${item.primary ? 'text-blue-700' : 'text-gray-700'}`}>
+                  <div key={item.label} className={`rounded-xl p-3 border text-right ${item.primary ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-100 shadow-inner' : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700'}`}>
+                    <p className="text-xs font-medium text-gray-400 dark:text-gray-500 mb-1">{item.label}</p>
+                    <p className={`text-sm font-semibold ${item.primary ? 'text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-200'}`}>
                       R$ {item.val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
                   </div>
@@ -1105,13 +1105,13 @@ const NfeDashboard: React.FC<Props> = ({
               </div>
 
               <div className="mt-8">
-                <label className="block text-sm font-medium text-gray-500 mb-2">Informações Complementares (infCpl)</label>
+                <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Informações Complementares (infCpl)</label>
                 <textarea rows={4} value={form.informacoesAdicionais}
                   onChange={e => setForm(f => ({ ...f, informacoesAdicionais: e.target.value }))}
                   placeholder="Mensagens que sairão no corpo da nota..."
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm resize-none" />
+                  className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm resize-none" />
                 {(emitente.crt === '1' || emitente.crt === '2') && emitente.gerarCreditoSimples && (emitente.aliquotaCreditoSimples ?? 0) > 0 && (
-                  <div className="mt-2 flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-700">
+                  <div className="mt-2 flex items-start gap-2 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20 px-3 py-2 text-xs text-blue-700 dark:text-blue-300">
                     <span className="font-semibold shrink-0 mt-0.5">Auto →</span>
                     <span>
                       PERMITE O APROVEITAMENTO DO CRÉDITO DE ICMS NO VALOR DE R$ {round2(totalNF * emitente.aliquotaCreditoSimples! / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} CORRESPONDENTE À ALÍQUOTA DE {(emitente.aliquotaCreditoSimples!).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}%, NOS TERMOS DO ART. 23 DA LC 123.
@@ -1126,25 +1126,25 @@ const NfeDashboard: React.FC<Props> = ({
         {/* ── Aba 3: Transporte ───────────────────────────────────────── */}
         {activeSubTab === 'transporte' && (
           <div className="space-y-4">
-            <section className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-              <h3 className="text-base font-semibold text-gray-800 mb-6 flex items-center gap-2 border-b border-gray-100 pb-3">
-                <Truck className="w-5 h-5 text-blue-600" /> Detalhes do Transporte
+            <section className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+              <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100 mb-6 flex items-center gap-2 border-b border-gray-100 dark:border-gray-700 pb-3">
+                <Truck className="w-5 h-5 text-blue-600 dark:text-blue-400" /> Detalhes do Transporte
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-500 mb-2">Modalidade do Frete</label>
+                  <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Modalidade do Frete</label>
                   <select value={transporte.modFrete}
                     onChange={e => setTransporte(t => ({ ...t, modFrete: e.target.value as any }))}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm bg-white">
+                    className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm bg-white dark:bg-gray-800">
                     {MOD_FRETE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                   </select>
                 </div>
                 {transporte.modFrete !== '9' && (
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-500 mb-2">Transportadora</label>
+                    <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Transportadora</label>
                     <select value={transporte.transportadorId ?? ''}
                       onChange={e => setTransporte(t => ({ ...t, transportadorId: e.target.value ? Number(e.target.value) : null }))}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm bg-white">
+                      className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm bg-white dark:bg-gray-800">
                       <option value="">-- Nenhuma selecionada --</option>
                       {transportadores.map(t => (
                         <option key={t.id} value={t.id}>{t.nome} — {t.documento}</option>
@@ -1156,69 +1156,69 @@ const NfeDashboard: React.FC<Props> = ({
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-500 mb-2">Frete (R$)</label>
+                  <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Frete (R$)</label>
                   <BrDecimalInput value={form.valorFrete ?? 0} onChange={v => setForm(f => ({ ...f, valorFrete: v }))}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 shadow-sm text-right" />
+                    className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 shadow-sm text-right" />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-2 text-right">Seguro (R$)</label>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 text-right">Seguro (R$)</label>
                   <BrDecimalInput value={form.valorSeguro ?? 0} onChange={v => setForm(f => ({ ...f, valorSeguro: v }))}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 shadow-sm text-right" />
+                    className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 shadow-sm text-right" />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-2 text-right">Outras Despesas (R$)</label>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 text-right">Outras Despesas (R$)</label>
                   <BrDecimalInput value={form.valorOutras ?? 0} onChange={v => setForm(f => ({ ...f, valorOutras: v }))}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 shadow-sm text-right" />
+                    className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 shadow-sm text-right" />
                 </div>
               </div>
             </section>
 
-            <section className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+            <section className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-base font-semibold text-gray-800 flex items-center gap-2">
-                  <Package className="w-5 h-5 text-blue-600" /> Volumes e Carga
+                <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                  <Package className="w-5 h-5 text-blue-600 dark:text-blue-400" /> Volumes e Carga
                 </h3>
                 <button onClick={adicionarVolume}
-                  className="bg-blue-50 text-blue-700 px-4 py-2 rounded-xl text-xs font-semibold hover:bg-blue-100 transition-colors flex items-center gap-2">
+                  className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-xl text-xs font-semibold hover:bg-blue-100 transition-colors flex items-center gap-2">
                   <Plus className="w-4 h-4" /> Adicionar Volume
                 </button>
               </div>
 
               <div className="space-y-4">
                 {volumes.map((vol, idx) => (
-                  <div key={idx} className="relative bg-gray-50 rounded-2xl p-6 border border-gray-100 grid grid-cols-2 md:grid-cols-6 gap-4">
+                  <div key={idx} className="relative bg-gray-50 dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-700 grid grid-cols-2 md:grid-cols-6 gap-4">
                     <button onClick={() => setVolumes(prev => prev.filter((_, i) => i !== idx))}
-                      className="absolute -top-3 -right-3 w-8 h-8 bg-white border border-gray-100 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 shadow-sm transition-all">
+                      className="absolute -top-3 -right-3 w-8 h-8 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-full flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-red-500 shadow-sm transition-all">
                       <Trash2 className="w-4 h-4" />
                     </button>
                     <div className="text-right">
-                      <label className="block text-xs font-medium text-gray-500 mb-1">Qtd</label>
+                      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Qtd</label>
                       <input type="number" value={vol.qVol ?? ''} onChange={e => atualizarVolume(idx, 'qVol', e.target.value)}
-                        className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm outline-none focus:ring-1 focus:ring-blue-500 text-right" />
+                        className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 text-sm outline-none focus:ring-1 focus:ring-blue-500 text-right" />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-[10px] font-medium text-gray-400 uppercase mb-1">Espécie</label>
+                      <label className="block text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase mb-1">Espécie</label>
                       <input value={vol.esp ?? ''} onChange={e => atualizarVolume(idx, 'esp', e.target.value)}
-                        className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+                        className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-medium text-gray-400 uppercase mb-1">Marca</label>
+                      <label className="block text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase mb-1">Marca</label>
                       <input value={vol.marca ?? ''} onChange={e => atualizarVolume(idx, 'marca', e.target.value)}
-                        className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+                        className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
                     </div>
                     <div className="text-right">
-                      <label className="block text-[10px] font-medium text-gray-400 uppercase mb-1">Peso Líq (kg)</label>
+                      <label className="block text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase mb-1">Peso Líq (kg)</label>
                       <BrDecimalInput value={vol.pesoL ?? 0} decimals={3} onChange={v => atualizarVolume(idx, 'pesoL', v)}
-                        className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm outline-none focus:ring-1 focus:ring-blue-500 text-right" />
+                        className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 text-sm outline-none focus:ring-1 focus:ring-blue-500 text-right" />
                     </div>
                     <div className="text-right">
-                      <label className="block text-[10px] font-medium text-gray-400 uppercase mb-1">Peso Bruto (kg)</label>
+                      <label className="block text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase mb-1">Peso Bruto (kg)</label>
                       <BrDecimalInput value={vol.pesoB ?? 0} decimals={3} onChange={v => atualizarVolume(idx, 'pesoB', v)}
-                        className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm outline-none focus:ring-1 focus:ring-blue-500 text-right" />
+                        className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 text-sm outline-none focus:ring-1 focus:ring-blue-500 text-right" />
                     </div>
                   </div>
                 ))}
-                {volumes.length === 0 && <p className="text-center py-6 text-gray-400 text-sm italic">Nenhum volume informado</p>}
+                {volumes.length === 0 && <p className="text-center py-6 text-gray-400 dark:text-gray-500 text-sm italic">Nenhum volume informado</p>}
               </div>
             </section>
           </div>
@@ -1227,13 +1227,13 @@ const NfeDashboard: React.FC<Props> = ({
         {/* ── Aba 4: Pagamento ───────────────────────────────────────── */}
         {activeSubTab === 'pagamento' && (
           <div className="space-y-4">
-            <section className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+            <section className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-base font-semibold text-gray-800 flex items-center gap-2">
-                  <CreditCard className="w-5 h-5 text-blue-600" /> Detalhamento Financeiro
+                <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                  <CreditCard className="w-5 h-5 text-blue-600 dark:text-blue-400" /> Detalhamento Financeiro
                 </h3>
                 <button onClick={adicionarPagamento}
-                  className="bg-blue-50 text-blue-700 px-4 py-2 rounded-xl text-xs font-semibold hover:bg-blue-100 transition-colors flex items-center gap-2">
+                  className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-xl text-xs font-semibold hover:bg-blue-100 transition-colors flex items-center gap-2">
                   <Plus className="w-4 h-4" /> Adicionar Pagamento
                 </button>
               </div>
@@ -1241,36 +1241,36 @@ const NfeDashboard: React.FC<Props> = ({
               <div className="space-y-4 mb-8">
                 {pagamentos.map((pag, idx) => (
                   <div key={idx} className="space-y-2">
-                    <div className="flex gap-4 items-center bg-gray-50 p-4 rounded-xl border border-gray-100">
+                    <div className="flex gap-4 items-center bg-gray-50 dark:bg-gray-900 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
                       <div className="flex-1">
-                        <label className="block text-xs font-medium text-gray-500 mb-1">Forma de Pagamento</label>
+                        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Forma de Pagamento</label>
                         <select value={pag.formaPagamento} onChange={e => atualizarPagamento(idx, 'formaPagamento', e.target.value)}
-                          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white outline-none focus:ring-2 focus:ring-blue-500/20">
+                          className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 outline-none focus:ring-2 focus:ring-blue-500/20">
                           {FORMAS_PAGAMENTO.map(f => <option key={f.codigo} value={f.codigo}>{f.codigo} – {f.descricao}</option>)}
                         </select>
                       </div>
                       <div className="w-48 text-right">
-                        <label className="block text-xs font-medium text-gray-500 mb-1">Valor (R$)</label>
+                        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Valor (R$)</label>
                         <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">R$</span>
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 text-xs">R$</span>
                           <BrDecimalInput value={pag.valorPagamento} onChange={v => atualizarPagamento(idx, 'valorPagamento', v)}
-                            className="w-full border border-gray-200 rounded-lg pl-9 pr-3 py-2 text-sm font-semibold text-gray-700 outline-none focus:ring-2 focus:ring-blue-500/20 shadow-inner text-right" />
+                            className="w-full border border-gray-200 dark:border-gray-700 rounded-lg pl-9 pr-3 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 outline-none focus:ring-2 focus:ring-blue-500/20 shadow-inner text-right" />
                         </div>
                       </div>
                       {['05', '15'].includes(pag.formaPagamento) && (
                         <button onClick={() => setParcelamentoIdx(idx)} title="Gerar Parcelas"
-                          className={`mt-5 p-2 rounded-xl transition-all active:scale-95 ${pag.vencimentos?.length ? 'bg-blue-600 text-white shadow-md shadow-blue-100' : 'text-gray-400 hover:text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100'}`}>
+                          className={`mt-5 p-2 rounded-xl transition-all active:scale-95 ${pag.vencimentos?.length ? 'bg-blue-600 text-white shadow-md shadow-blue-100' : 'text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 border border-transparent hover:border-blue-100'}`}>
                           <CalendarDays className="w-4 h-4" />
                         </button>
                       )}
-                      <button onClick={() => removerPagamento(idx)} className="mt-5 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg">
+                      <button onClick={() => removerPagamento(idx)} className="mt-5 p-2 text-gray-400 dark:text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                     {pag.vencimentos && pag.vencimentos.length > 0 && (
                       <div className="ml-4 flex flex-wrap gap-2">
                         {pag.vencimentos.map((v, i) => (
-                          <span key={i} className="text-[10px] bg-blue-50 text-blue-700 border border-blue-100 rounded-full px-2 py-0.5 font-medium">
+                          <span key={i} className="text-[10px] bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-100 rounded-full px-2 py-0.5 font-medium">
                             {i + 1}/{pag.vencimentos!.length} · {v.vencimento.split('-').reverse().join('/')} · R$ {Number(v.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </span>
                         ))}
@@ -1278,17 +1278,17 @@ const NfeDashboard: React.FC<Props> = ({
                     )}
                   </div>
                 ))}
-                {pagamentos.length === 0 && <p className="text-center py-6 text-gray-400 text-sm italic">Nenhuma forma de pagamento vinculada</p>}
+                {pagamentos.length === 0 && <p className="text-center py-6 text-gray-400 dark:text-gray-500 text-sm italic">Nenhuma forma de pagamento vinculada</p>}
               </div>
 
-              <div className="bg-blue-50 rounded-2xl p-6 border border-blue-100 flex justify-between items-center">
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-6 border border-blue-100 flex justify-between items-center">
                 <div className="text-left">
-                  <p className="text-sm font-semibold text-blue-700 mb-1">Cálculo de Fechamento</p>
+                  <p className="text-sm font-semibold text-blue-700 dark:text-blue-300 mb-1">Cálculo de Fechamento</p>
                   <p className="text-sm font-medium text-blue-800">
                     Total NF: <span className="font-semibold">R$ {totalNF.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span> | Total Informado: <span className="font-semibold">R$ {totalPago.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </p>
                 </div>
-                <div className={`px-4 py-2 rounded-xl text-sm font-medium ${Math.abs(totalPago - totalNF) < 0.02 ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
+                <div className={`px-4 py-2 rounded-xl text-sm font-medium ${Math.abs(totalPago - totalNF) < 0.02 ? 'bg-green-100 text-green-700 dark:text-green-300' : 'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300'}`}>
                   {Math.abs(totalPago - totalNF) < 0.02 ? '✓ Valores informados corretamente' : `Pendente R$ ${Math.abs(totalNF - totalPago).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
                 </div>
               </div>
@@ -1303,10 +1303,10 @@ const NfeDashboard: React.FC<Props> = ({
               <div className="text-center">
                 <div className="relative mb-8">
                   <div className="w-24 h-24 border-4 border-green-100 border-t-green-600 rounded-full animate-spin mx-auto"></div>
-                  <Send className="w-8 h-8 text-green-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                  <Send className="w-8 h-8 text-green-600 dark:text-green-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-2">Emitindo Nota Fiscal...</h3>
-                <p className="text-gray-500">Aguarde a resposta da SEFAZ</p>
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">Emitindo Nota Fiscal...</h3>
+                <p className="text-gray-500 dark:text-gray-400">Aguarde a resposta da SEFAZ</p>
               </div>
             ) : (
               <div className="w-full">
@@ -1316,7 +1316,7 @@ const NfeDashboard: React.FC<Props> = ({
                     <button onClick={emitirNfe} className="px-12 py-5 bg-green-600 text-white rounded-2xl font-bold text-xl hover:bg-green-700 transition-all">
                       TENTAR EMITIR NOVAMENTE
                     </button>
-                    <button onClick={() => setActiveSubTab('pagamento')} className="block mx-auto mt-4 text-gray-400 hover:text-gray-600 font-medium">
+                    <button onClick={() => setActiveSubTab('pagamento')} className="block mx-auto mt-4 text-gray-400 dark:text-gray-500 hover:text-gray-600 font-medium">
                       Voltar e revisar dados
                     </button>
                   </div>
@@ -1344,24 +1344,24 @@ const NfeDashboard: React.FC<Props> = ({
     {/* ── TEF Modal (SMARTPOS) ───────────────────────────────────────────── */}
     {modalAutManual && (
       <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000]">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 w-full max-w-sm">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-              <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+            <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
+              <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
             </div>
             <div>
-              <h3 className="text-lg font-bold text-gray-800">Pagamento com Cartão</h3>
-              <p className="text-xs text-gray-400">Informe os dados da transação</p>
+              <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">Pagamento com Cartão</h3>
+              <p className="text-xs text-gray-400 dark:text-gray-500">Informe os dados da transação</p>
             </div>
           </div>
-          <p className="text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2 mb-5 mt-2">
+          <p className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded-lg px-3 py-2 mb-5 mt-2">
             Integração TEF não ativa. Registre os dados manualmente conforme exigido pela legislação fiscal.
           </p>
           <div className="space-y-4">
             <div>
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Operadora / Bandeira</label>
+              <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Operadora / Bandeira</label>
               <select
-                className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"
+                className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"
                 value={modalAutManual.operadora}
                 onChange={e => setModalAutManual(prev => prev ? { ...prev, operadora: e.target.value } : null)}
               >
@@ -1370,10 +1370,10 @@ const NfeDashboard: React.FC<Props> = ({
               </select>
             </div>
             <div>
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Código de Autorização</label>
+              <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Código de Autorização</label>
               <input
                 type="text"
-                className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500 font-mono tracking-widest"
+                className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500 font-mono tracking-widest"
                 placeholder="Ex: 123456"
                 value={modalAutManual.codigo}
                 onChange={e => setModalAutManual(prev => prev ? { ...prev, codigo: e.target.value } : null)}
@@ -1382,7 +1382,7 @@ const NfeDashboard: React.FC<Props> = ({
             </div>
           </div>
           <div className="flex gap-3 mt-6">
-            <button onClick={() => { modalAutManual.resolve(null); setModalAutManual(null); }} className="flex-1 px-4 py-2 rounded-xl border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50">Cancelar</button>
+            <button onClick={() => { modalAutManual.resolve(null); setModalAutManual(null); }} className="flex-1 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700">Cancelar</button>
             <button
               onClick={() => {
                 if (!modalAutManual.codigo.trim()) { alert('Informe o código de autorização.'); return; }
@@ -1485,34 +1485,34 @@ const NfeTefModal = ({ pagamentoId, vendaId, numero, pagamentoAtual = 1, totalPa
     return () => clearInterval(interval);
   }, [status, uniqueId]);
 
-  const iconColor = status === 'aprovado' ? 'text-green-500' : (status === 'rejeitado' || status === 'erro') ? 'text-red-500' : 'text-blue-500';
+  const iconColor = status === 'aprovado' ? 'text-green-500' : (status === 'rejeitado' || status === 'erro') ? 'text-red-500 dark:text-red-400' : 'text-blue-500';
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[300] p-4">
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl"
+        className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl"
       >
         <div className="p-8 text-center">
           <div className="mb-6">
             {(status === 'solicitando' || status === 'aguardando') && (
-              <div className="w-16 h-16 mx-auto border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+              <div className="w-16 h-16 mx-auto border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 rounded-full animate-spin" />
             )}
             {status === 'aprovado' && <CheckCircle className={`w-16 h-16 mx-auto ${iconColor}`} />}
             {(status === 'rejeitado' || status === 'erro') && <AlertCircle className={`w-16 h-16 mx-auto ${iconColor}`} />}
           </div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-1">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-1">
             TEF — NF-e #{numero}{totalPagamentos > 1 ? ` (${pagamentoAtual}/${totalPagamentos})` : ''}
           </h3>
-          <p className="text-gray-500 text-sm mb-6">{mensagem}</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">{mensagem}</p>
           {(status === 'rejeitado' || status === 'erro') && (
-            <button onClick={onCancel} className="w-full py-3 bg-red-50 text-red-600 font-semibold rounded-xl hover:bg-red-100 transition-colors">
+            <button onClick={onCancel} className="w-full py-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-semibold rounded-xl hover:bg-red-100 transition-colors">
               Fechar (Emissão Cancelada)
             </button>
           )}
           {(status === 'solicitando' || status === 'aguardando') && (
-            <button onClick={onCancel} className="w-full py-3 text-gray-400 font-medium hover:text-gray-600 transition-colors text-sm">
+            <button onClick={onCancel} className="w-full py-3 text-gray-400 dark:text-gray-500 font-medium hover:text-gray-600 transition-colors text-sm">
               Cancelar
             </button>
           )}
@@ -1565,44 +1565,44 @@ const NfeParcelamentoModal = ({ total, inicial, onConfirm, onCancel }: {
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[300] p-4 backdrop-blur-sm">
       <style>{`b, strong, h1, h2, h3 { font-weight: 600 !important; color: #334155; }`}</style>
       <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-        className="bg-white rounded-3xl w-full max-w-xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
-        <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-          <h3 className="text-lg font-bold text-gray-800 uppercase tracking-tight">Configurar Parcelamento</h3>
+        className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+        <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between bg-gray-50 dark:bg-gray-900/50">
+          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 uppercase tracking-tight">Configurar Parcelamento</h3>
           <span className="bg-blue-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm">
             TOTAL: R$ {total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
           </span>
         </div>
         <div className="p-6 space-y-6 flex-1 overflow-auto">
-          <div className="bg-blue-50 p-4 rounded-2xl flex items-center gap-4">
+          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-2xl flex items-center gap-4">
             <div className="flex-1">
-              <label className="block text-[10px] font-bold text-blue-600 uppercase mb-1">Quantidade de Parcelas</label>
+              <label className="block text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase mb-1">Quantidade de Parcelas</label>
               <input type="number" min={1} value={numParcelas}
                 onChange={e => setNumParcelas(Math.max(1, Number(e.target.value)))}
-                className="w-full bg-white border-0 rounded-xl px-4 py-2 font-bold text-blue-800 outline-none focus:ring-2 focus:ring-blue-400" />
+                className="w-full bg-white dark:bg-gray-800 border-0 rounded-xl px-4 py-2 font-bold text-blue-800 outline-none focus:ring-2 focus:ring-blue-400" />
             </div>
             <p className="text-xs text-blue-500 font-medium">Intervalo padrão de 30 dias.</p>
           </div>
-          <div className="border border-gray-100 rounded-2xl overflow-hidden">
+          <div className="border border-gray-100 dark:border-gray-700 rounded-2xl overflow-hidden">
             <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50 dark:bg-gray-900">
                 <tr>
-                  <th className="px-4 py-2 text-[10px] font-bold text-gray-400">#</th>
-                  <th className="px-4 py-2 text-[10px] font-bold text-gray-400">Vencimento</th>
-                  <th className="px-4 py-2 text-[10px] font-bold text-gray-400 text-right">Valor</th>
+                  <th className="px-4 py-2 text-[10px] font-bold text-gray-400 dark:text-gray-500">#</th>
+                  <th className="px-4 py-2 text-[10px] font-bold text-gray-400 dark:text-gray-500">Vencimento</th>
+                  <th className="px-4 py-2 text-[10px] font-bold text-gray-400 dark:text-gray-500 text-right">Valor</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
                 {parcelas.map((p, idx) => (
                   <tr key={p.numero}>
-                    <td className="px-4 py-3 font-bold text-gray-400">{p.numero}</td>
+                    <td className="px-4 py-3 font-bold text-gray-400 dark:text-gray-500">{p.numero}</td>
                     <td className="px-4 py-3">
                       <input type="date" value={p.vencimento}
                         onChange={e => { const n = [...parcelas]; n[idx].vencimento = e.target.value; setParcelas(n); }}
-                        className="bg-transparent font-medium text-gray-700 outline-none focus:text-blue-600 transition-colors" />
+                        className="bg-transparent font-medium text-gray-700 dark:text-gray-200 outline-none focus:text-blue-600 transition-colors" />
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-2 group">
-                        <span className="text-[10px] font-bold text-gray-400">R$</span>
+                        <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500">R$</span>
                         <input 
                           type="text" 
                           inputMode="decimal"
@@ -1614,7 +1614,7 @@ const NfeParcelamentoModal = ({ total, inicial, onConfirm, onCancel }: {
                             newP[idx].valor = valNum;
                             setParcelas(newP);
                           }} 
-                          className="w-28 text-right bg-white border border-gray-100 rounded-lg px-2 py-1.5 font-bold text-gray-700 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all" 
+                          className="w-28 text-right bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-lg px-2 py-1.5 font-bold text-gray-700 dark:text-gray-200 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all" 
                         />
                       </div>
                     </td>
@@ -1624,20 +1624,20 @@ const NfeParcelamentoModal = ({ total, inicial, onConfirm, onCancel }: {
             </table>
           </div>
           {invalido && (
-            <div className="bg-red-50 p-3 rounded-xl flex items-center gap-2 text-red-600 text-xs font-bold">
+            <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-xl flex items-center gap-2 text-red-600 dark:text-red-400 text-xs font-bold">
               <AlertCircle className="w-4 h-4" />
               A soma das parcelas (R$ {totalParcelas.toFixed(2)}) não confere com o total. Ajuste os valores.
             </div>
           )}
         </div>
-        <div className="p-6 bg-gray-50 border-t border-gray-100 flex gap-4 items-center">
-          <button onClick={onCancel} className="flex-1 py-3 bg-white border border-gray-200 text-gray-500 font-semibold rounded-xl hover:bg-gray-100 hover:text-gray-700 transition-all uppercase text-[11px] tracking-wider active:scale-95">
+        <div className="p-6 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex gap-4 items-center">
+          <button onClick={onCancel} className="flex-1 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200 transition-all uppercase text-[11px] tracking-wider active:scale-95">
             Cancelar
           </button>
           <button 
             disabled={invalido} 
             onClick={() => onConfirm(parcelas)}
-            className={`flex-1 py-3 rounded-xl font-bold transition-all uppercase text-[11px] tracking-wider active:scale-95 shadow-md ${invalido ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none' : 'bg-blue-600 text-white shadow-blue-200 hover:bg-blue-700 hover:shadow-lg'}`}
+            className={`flex-1 py-3 rounded-xl font-bold transition-all uppercase text-[11px] tracking-wider active:scale-95 shadow-md ${invalido ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed shadow-none' : 'bg-blue-600 text-white shadow-blue-200 hover:bg-blue-700 hover:shadow-lg'}`}
           >
             Salvar
           </button>

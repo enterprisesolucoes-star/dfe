@@ -14,13 +14,13 @@ export const StatCard = ({ label, value, icon: Icon, color, trend }: any) => {
   
   return (
     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-      className="bg-white dark:bg-gray-800 border border-[#F1F5F9] rounded-[12px] shadow-sm p-6 flex flex-col justify-between h-full hover:shadow-md transition-shadow duration-300">
+      className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-[12px] shadow-sm p-6 flex flex-col justify-between h-full hover:shadow-md transition-shadow duration-300">
       <div>
-        <div className="flex items-center gap-2 text-[#64748B] mb-4">
+        <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 mb-4">
           <Icon className="w-4 h-4 stroke-[1.5px]" />
-          <span className="text-[10px] font-semibold text-[#64748B] uppercase tracking-wider">{label}</span>
+          <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{label}</span>
         </div>
-        <h3 className="text-[#1E293B] text-2xl font-bold font-mono tracking-tighter">
+        <h3 className="text-slate-800 dark:text-slate-100 text-2xl font-bold font-mono tracking-tighter">
           {value}
         </h3>
       </div>

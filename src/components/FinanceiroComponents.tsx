@@ -63,52 +63,52 @@ const BaixaModal = ({ titulo, emitente, onClose, onSuccess, showAlert }: any) =>
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[300] p-4 backdrop-blur-sm">
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
-        <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
-          <h3 className="font-bold text-gray-800">BAIXAR {titulo.tipo === 'R' ? 'RECEBIMENTO' : 'PAGAMENTO'}</h3>
-          <span className="text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded font-bold">TITULO #{titulo.id}</span>
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
+        <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 flex items-center justify-between">
+          <h3 className="font-bold text-gray-800 dark:text-gray-100">BAIXAR {titulo.tipo === 'R' ? 'RECEBIMENTO' : 'PAGAMENTO'}</h3>
+          <span className="text-[10px] bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded font-bold">TITULO #{titulo.id}</span>
         </div>
 
         <div className="p-6 space-y-4">
            <div className="grid grid-cols-2 gap-4">
              <div>
-               <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Valor Original</label>
-               <p className="text-xl font-bold text-gray-800">R$ {Number(titulo.valor_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+               <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Valor Original</label>
+               <p className="text-xl font-bold text-gray-800 dark:text-gray-100">R$ {Number(titulo.valor_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
              </div>
              <div>
-               <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Vencimento</label>
-               <p className="text-sm font-bold text-gray-600">{new Date(titulo.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
+               <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Vencimento</label>
+               <p className="text-sm font-bold text-gray-600 dark:text-gray-300">{new Date(titulo.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
              </div>
            </div>
 
-           <div className="p-4 bg-gray-50 rounded-2xl space-y-3">
+           <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl space-y-3">
               <div className="flex justify-between items-center">
-                 <span className="text-xs text-gray-500">Multa / Juros (+)</span>
+                 <span className="text-xs text-gray-500 dark:text-gray-400">Multa / Juros (+)</span>
                  <div className="flex gap-2">
-                   <input type="number" step="0.01" value={valorMulta} onChange={e => setValorMulta(Number(e.target.value))} className="w-20 text-right bg-white border border-gray-200 rounded-lg px-2 py-1 text-xs font-bold text-red-500" />
-                   <input type="number" step="0.01" value={valorJuros} onChange={e => setValorJuros(Number(e.target.value))} className="w-20 text-right bg-white border border-gray-200 rounded-lg px-2 py-1 text-xs font-bold text-red-500" />
+                   <input type="number" step="0.01" value={valorMulta} onChange={e => setValorMulta(Number(e.target.value))} className="w-20 text-right bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1 text-xs font-bold text-red-500 dark:text-red-400" />
+                   <input type="number" step="0.01" value={valorJuros} onChange={e => setValorJuros(Number(e.target.value))} className="w-20 text-right bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1 text-xs font-bold text-red-500 dark:text-red-400" />
                  </div>
               </div>
-              <div className="flex justify-between items-center text-emerald-600">
+              <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-400">
                  <span className="text-xs font-medium">Desconto (-)</span>
-                 <input type="number" step="0.01" value={valorDesconto} onChange={e => setValorDesconto(Number(e.target.value))} className="w-20 text-right bg-white border border-gray-200 rounded-lg px-2 py-1 text-xs font-bold text-emerald-600" />
+                 <input type="number" step="0.01" value={valorDesconto} onChange={e => setValorDesconto(Number(e.target.value))} className="w-20 text-right bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400" />
               </div>
-              <div className="pt-2 border-t border-gray-200 flex justify-between items-center">
-                 <span className="text-sm font-bold text-gray-800">TOTAL A RECEBER</span>
-                 <span className="text-xl font-bold text-blue-600">R$ {valorFinal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+              <div className="pt-2 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                 <span className="text-sm font-bold text-gray-800 dark:text-gray-100">TOTAL A RECEBER</span>
+                 <span className="text-xl font-bold text-blue-600 dark:text-blue-400">R$ {valorFinal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
               </div>
            </div>
 
            <div>
-              <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Conta de Destino</label>
-              <select value={contaId} onChange={e => setContaId(e.target.value)} className="w-full bg-gray-50 border-0 rounded-xl px-4 py-2.5 font-bold text-gray-700 outline-none focus:ring-2 focus:ring-blue-400">
+              <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Conta de Destino</label>
+              <select value={contaId} onChange={e => setContaId(e.target.value)} className="w-full bg-gray-50 dark:bg-gray-900 border-0 rounded-xl px-4 py-2.5 font-bold text-gray-700 dark:text-gray-200 outline-none focus:ring-2 focus:ring-blue-400">
                 {contas.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
               </select>
            </div>
         </div>
 
-        <div className="p-6 bg-gray-50 border-t border-gray-100 flex gap-3">
-          <button onClick={onClose} className="flex-1 py-3 text-gray-400 font-bold hover:bg-gray-100 rounded-2xl transition-all">CANCELAR</button>
+        <div className="p-6 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex gap-3">
+          <button onClick={onClose} className="flex-1 py-3 text-gray-400 dark:text-gray-500 font-bold hover:bg-gray-100 dark:hover:bg-gray-700 rounded-2xl transition-all">CANCELAR</button>
           <button onClick={handleConfirmar} disabled={loading} className="flex-1 py-3 bg-emerald-600 text-white font-bold rounded-2xl shadow-lg shadow-emerald-100 hover:bg-emerald-700 transition-all">
             {loading ? 'PROCESSANDO...' : 'CONFIRMAR BAIXA'}
           </button>
