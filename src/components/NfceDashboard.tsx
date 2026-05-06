@@ -4360,7 +4360,7 @@ const DashboardTab = ({ isFiscal }: { isFiscal: boolean }) => {
         />
         {isFiscal && (
           <StatCard 
-            label="Contas Autorizadas" 
+            label="AUTORIZADAS NO MÊS" 
             value={summary.count.toString()} 
             icon={CheckCircle} 
             trend={summary.trendCount}

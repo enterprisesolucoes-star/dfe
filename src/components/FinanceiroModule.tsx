@@ -193,7 +193,7 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobranc
         <div className="flex items-center gap-2">
           <div className="relative">
             <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input type="text" placeholder="Buscar cliente..." value={busca} onChange={e => setBusca(e.target.value)} onKeyDown={e => e.key === 'Enter' && fetchTitulos()} className="border border-gray-200 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none w-48" />
+            <input type="text" placeholder={`Buscar ${tipo === 'P' ? 'fornecedor' : 'cliente'}...`} value={busca} onChange={e => setBusca(e.target.value)} onKeyDown={e => e.key === 'Enter' && fetchTitulos()} className="border border-gray-200 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none w-48" />
           </div>
         </div>
       </div>
@@ -448,6 +448,7 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
     if (erro === 0) {
       // Abre impressão de todos os boletos gerados
       savedIds.forEach(id => window.open(`./api.php?action=boleto_imprimir&id=${id}`, '_blank'));
+      onSuccess();
     } else {
       showAlert('Atenção', `${ok} gerado(s), ${erro} com erro. Verifique configurações de cobrança.`);
       onSuccess();

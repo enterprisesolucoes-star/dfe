@@ -75,7 +75,7 @@ export const Sidebar = ({
                 { id: 'fin_caixa', label: 'Caixa', icon: History },
                 ...(cobrancaAtiva ? [
                   { id: 'cobranca_boletos', label: 'Boletos', icon: FileText },
-                  { id: 'cobranca_historico', label: 'Hist. Remessas', icon: Archive },
+                  { id: 'cobranca_historico', label: 'Arquivos', icon: Archive },
                 ] : []),
               ].map(sub => (
                 <button

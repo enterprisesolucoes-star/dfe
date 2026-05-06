@@ -118,11 +118,14 @@ const AdminPortal = () => {
 
   const salvar = async () => {
     // Garantir valores padrão antes de enviar
+    const ieValue = form.inscricao_estadual ?? form.ie ?? '';
     const payload: any = {
       ...form,
       usuario_dfe: Number(form.usuario_dfe ?? 2),
       status: form.status || 'Ativo',
       tem_tef: Number(form.tem_tef) || 0,
+      inscricao_estadual: ieValue,
+      ie: ieValue,
     };
     // Valores padrão apenas para novos cadastros
     if (!empresaId) {
@@ -421,7 +424,7 @@ const AdminPortal = () => {
                     </div>
                     <div>
                       <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Inscrição Estadual</label>
-                      <input value={form.ie || form.inscricao_estadual || ''} onChange={e => set('inscricao_estadual', e.target.value)}
+                      <input value={form.inscricao_estadual ?? form.ie ?? ''} onChange={e => { set('inscricao_estadual', e.target.value); set('ie', e.target.value); }}
                         className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" />
                     </div>
                     <div>
@@ -642,6 +645,34 @@ const AdminPortal = () => {
             <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-3">
               <button onClick={() => setModal(false)} className="px-6 py-2.5 text-gray-500 font-bold text-xs uppercase hover:bg-gray-100 rounded-xl transition-colors">Cancelar</button>
               <button onClick={salvar} className="px-8 py-2.5 bg-blue-600 text-white font-bold text-xs uppercase rounded-xl hover:bg-blue-700 transition-colors">Salvar</button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+      {/* Modal Confirmação Excluir SmartPOS */}
+      {confirmSmartPos.open && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[80] p-4">
+          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+            className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
+                <Trash2 className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <p className="font-bold text-gray-800 text-sm">Excluir Máquina</p>
+                <p className="text-xs text-gray-500">Esta ação não pode ser desfeita</p>
+              </div>
+            </div>
+            <p className="text-xs text-gray-600 mb-5">Tem certeza que deseja excluir esta máquina SmartPOS?</p>
+            <div className="flex gap-2 justify-end">
+              <button onClick={() => setConfirmSmartPos({open: false, id: null})}
+                className="px-4 py-2 text-gray-500 font-bold text-xs uppercase hover:bg-gray-100 rounded-xl transition-colors">
+                Cancelar
+              </button>
+              <button onClick={confirmarDelSmartPos}
+                className="px-6 py-2 bg-red-600 text-white font-bold text-xs uppercase rounded-xl hover:bg-red-700 transition-colors">
+                Excluir
+              </button>
             </div>
           </motion.div>
         </div>
