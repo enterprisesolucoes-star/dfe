@@ -728,7 +728,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
 
   const renderTab = () => {
     switch (activeTab) {
-      case 'dashboard': return <DashboardTab isFiscal={isFiscal} />;
+      case 'dashboard': return <DashboardTab isFiscal={isFiscal} onNavigate={(t: any) => handleSetActiveTab(t)} />;
       case 'fin_receber': return <FinanceiroView tipo="R" emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} cobrancaAtiva={cobrancaAtiva} />;
       case 'fin_pagar': return <FinanceiroView tipo="P" emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} />;
       case 'fin_caixa': return <CaixaView emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} />;

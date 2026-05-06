@@ -145,48 +145,80 @@ switch ($action) {
 
     case 'dashboard_kpis':
         try {
-            $hojeIni     = date('Y-m-01');
-            $hojeFim     = date('Y-m-t');
-            $em7dias     = date('Y-m-d', strtotime('+7 days'));
-            $hoje        = date('Y-m-d');
-            $empFilter   = $empresaId ? " AND empresa_id = " . (int)$empresaId : "";
-            $empFilterC  = $empresaId ? " AND c.empresa_id = " . (int)$empresaId : "";
+            // Aceita dt_inicio/dt_fim como parâmetros; default = mês atual
+            $dtIni  = $_GET['dt_inicio'] ?? date('Y-m-01');
+            $dtFim  = $_GET['dt_fim']    ?? date('Y-m-t');
 
-            // 1) Orçamentos pendentes (status = Enviado/Rascunho/Aprovado em aberto)
+            // Período anterior — mesma duração imediatamente anterior
+            $diff   = (strtotime($dtFim) - strtotime($dtIni)) / 86400 + 1;
+            $dtIniAnt = date('Y-m-d', strtotime($dtIni . ' -' . $diff . ' days'));
+            $dtFimAnt = date('Y-m-d', strtotime($dtIni . ' -1 day'));
+
+            $hoje    = date('Y-m-d');
+            $em7dias = date('Y-m-d', strtotime('+7 days'));
+
+            $empFilter = $empresaId ? " AND empresa_id = " . (int)$empresaId : "";
+            $empFilterCustom = function($alias) use ($empresaId) {
+                return $empresaId ? " AND {$alias}.empresa_id = " . (int)$empresaId : "";
+            };
+
+            // Helper p/ trend
+            $trend = function($atual, $ant) {
+                if ($ant <= 0) return $atual > 0 ? 100 : 0;
+                return round((($atual - $ant) / $ant) * 100, 1);
+            };
+
+            // 1) Orçamentos pendentes (snapshot atual, não usa filtro)
             $orcPend = $pdo->query("SELECT COUNT(*) qtd, COALESCE(SUM(valor_total),0) val
                 FROM orcamentos
                 WHERE status IN ('Rascunho','Enviado') {$empFilter}")->fetch(PDO::FETCH_ASSOC);
 
-            // 2) Orçamentos do mês para taxa de conversão
-            $orcMes = $pdo->query("SELECT
+            // 2) Orçamentos do período + período anterior (taxa de conversão + ticket)
+            $stmt = $pdo->prepare("SELECT
                 COUNT(*) total,
                 SUM(CASE WHEN status='Aprovado' THEN 1 ELSE 0 END) aprovados,
                 COALESCE(AVG(CASE WHEN status='Aprovado' THEN valor_total END),0) ticket
                 FROM orcamentos
-                WHERE data_criacao >= '{$hojeIni}' AND data_criacao <= '{$hojeFim} 23:59:59' {$empFilter}")->fetch(PDO::FETCH_ASSOC);
+                WHERE data_criacao >= ? AND data_criacao <= ? {$empFilter}");
+            $stmt->execute([$dtIni, $dtFim . ' 23:59:59']);
+            $orcAtual = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            $taxaConv = (int)$orcMes['total'] > 0
-                ? round(((int)$orcMes['aprovados'] / (int)$orcMes['total']) * 100, 1)
-                : 0;
+            $stmt->execute([$dtIniAnt, $dtFimAnt . ' 23:59:59']);
+            $orcAnt = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // 3) OS em andamento
+            $taxaConv = (int)$orcAtual['total'] > 0
+                ? round(((int)$orcAtual['aprovados'] / (int)$orcAtual['total']) * 100, 1) : 0;
+            $taxaConvAnt = (int)$orcAnt['total'] > 0
+                ? round(((int)$orcAnt['aprovados'] / (int)$orcAnt['total']) * 100, 1) : 0;
+
+            // 3) OS em andamento (snapshot)
             $osAnd = $pdo->query("SELECT COUNT(*) qtd
                 FROM ordens_servico
                 WHERE status IN ('Aberta','Em Andamento') {$empFilter}")->fetch(PDO::FETCH_ASSOC);
 
-            // 4) OS concluídas no mês — ticket médio
-            $osMes = $pdo->query("SELECT COALESCE(AVG(valor_total),0) ticket
+            // 4) OS concluídas no período (ticket + trend)
+            $stmt = $pdo->prepare("SELECT COUNT(*) qtd, COALESCE(AVG(valor_total),0) ticket
                 FROM ordens_servico
-                WHERE status='Concluída' AND data_criacao >= '{$hojeIni}' AND data_criacao <= '{$hojeFim} 23:59:59' {$empFilter}")->fetch(PDO::FETCH_ASSOC);
+                WHERE status='Concluída' AND data_criacao >= ? AND data_criacao <= ? {$empFilter}");
+            $stmt->execute([$dtIni, $dtFim . ' 23:59:59']);
+            $osAtual = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->execute([$dtIniAnt, $dtFimAnt . ' 23:59:59']);
+            $osAnt2 = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // 5) Top 5 clientes do mês (somando vendas autorizadas + orçamentos aprovados + OS concluídas)
-            $topClientes = $pdo->query("
+            // Ticket médio combinado (orcamento + OS)
+            $ticketAtual = ((float)$orcAtual['ticket'] + (float)$osAtual['ticket']) / 2;
+            $ticketAnt   = ((float)$orcAnt['ticket']  + (float)$osAnt2['ticket'])  / 2;
+            if ($ticketAtual == 0) $ticketAtual = (float)($orcAtual['ticket'] ?: $osAtual['ticket']);
+            if ($ticketAnt == 0)   $ticketAnt   = (float)($orcAnt['ticket']   ?: $osAnt2['ticket']);
+
+            // 5) Top 5 clientes do período
+            $stmt = $pdo->prepare("
                 SELECT cliente_id, cliente_nome, SUM(valor) total
                 FROM (
                     SELECT v.cliente_id, COALESCE(c.nome, c.razao_social, 'Consumidor') AS cliente_nome, v.valor_total AS valor
                     FROM vendas v
                     LEFT JOIN clientes c ON c.id = v.cliente_id
-                    WHERE v.status='Autorizada' AND v.data_emissao >= '{$hojeIni}' AND v.data_emissao <= '{$hojeFim} 23:59:59'
+                    WHERE v.status='Autorizada' AND v.data_emissao >= ? AND v.data_emissao <= ?
                       " . ($empresaId ? "AND v.empresa_id = " . (int)$empresaId : "") . "
                       AND v.cliente_id IS NOT NULL
 
@@ -195,7 +227,7 @@ switch ($action) {
                     SELECT o.cliente_id, COALESCE(c.nome, c.razao_social, o.cliente_nome) AS cliente_nome, o.valor_total AS valor
                     FROM orcamentos o
                     LEFT JOIN clientes c ON c.id = o.cliente_id
-                    WHERE o.status='Aprovado' AND o.data_criacao >= '{$hojeIni}' AND o.data_criacao <= '{$hojeFim} 23:59:59'
+                    WHERE o.status='Aprovado' AND o.data_criacao >= ? AND o.data_criacao <= ?
                       " . ($empresaId ? "AND o.empresa_id = " . (int)$empresaId : "") . "
 
                     UNION ALL
@@ -203,71 +235,68 @@ switch ($action) {
                     SELECT os.cliente_id, COALESCE(c.nome, c.razao_social, os.cliente_nome) AS cliente_nome, os.valor_total AS valor
                     FROM ordens_servico os
                     LEFT JOIN clientes c ON c.id = os.cliente_id
-                    WHERE os.status='Concluída' AND os.data_criacao >= '{$hojeIni}' AND os.data_criacao <= '{$hojeFim} 23:59:59'
+                    WHERE os.status='Concluída' AND os.data_criacao >= ? AND os.data_criacao <= ?
                       " . ($empresaId ? "AND os.empresa_id = " . (int)$empresaId : "") . "
                 ) t
                 WHERE cliente_nome IS NOT NULL AND cliente_nome <> ''
                 GROUP BY cliente_id, cliente_nome
                 ORDER BY total DESC
                 LIMIT 5
-            ")->fetchAll(PDO::FETCH_ASSOC);
+            ");
+            $f = $dtFim . ' 23:59:59';
+            $stmt->execute([$dtIni, $f, $dtIni, $f, $dtIni, $f]);
+            $topClientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // 6) Top 5 produtos mais vendidos no mês (vendas autorizadas)
-            $topProdutos = $pdo->query("
+            // 6) Top 5 produtos
+            $stmt = $pdo->prepare("
                 SELECT vi.produto_id, COALESCE(p.descricao, 'Produto removido') AS descricao,
                        SUM(vi.quantidade) qtd, SUM(vi.valor_total) total
                 FROM vendas_itens vi
                 INNER JOIN vendas v ON v.id = vi.venda_id
                 LEFT JOIN produtos p ON p.id = vi.produto_id
-                WHERE v.status='Autorizada'
-                  AND v.data_emissao >= '{$hojeIni}' AND v.data_emissao <= '{$hojeFim} 23:59:59'
+                WHERE v.status='Autorizada' AND v.data_emissao >= ? AND v.data_emissao <= ?
                   " . ($empresaId ? "AND v.empresa_id = " . (int)$empresaId : "") . "
                 GROUP BY vi.produto_id, p.descricao
                 ORDER BY total DESC
                 LIMIT 5
-            ")->fetchAll(PDO::FETCH_ASSOC);
+            ");
+            $stmt->execute([$dtIni, $f]);
+            $topProdutos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // 7) Contas a receber vencendo em 7 dias
+            // 7-10) Vencimentos (snapshot atual; não muda com filtro de período)
             $recVenc = $pdo->query("SELECT COUNT(*) qtd, COALESCE(SUM(valor_total - valor_pago),0) val
-                FROM financeiro
-                WHERE tipo='R' AND status IN ('Pendente','Parcial')
-                  AND vencimento >= '{$hoje}' AND vencimento <= '{$em7dias}' {$empFilter}")->fetch(PDO::FETCH_ASSOC);
-
-            // 8) Contas a receber VENCIDAS (passou da data e não pagou)
+                FROM financeiro WHERE tipo='R' AND status IN ('Pendente','Parcial')
+                AND vencimento >= '{$hoje}' AND vencimento <= '{$em7dias}' {$empFilter}")->fetch(PDO::FETCH_ASSOC);
             $recVencidas = $pdo->query("SELECT COUNT(*) qtd, COALESCE(SUM(valor_total - valor_pago),0) val
-                FROM financeiro
-                WHERE tipo='R' AND status IN ('Pendente','Parcial')
-                  AND vencimento < '{$hoje}' {$empFilter}")->fetch(PDO::FETCH_ASSOC);
-
-            // 9) Contas a pagar vencendo em 7 dias
+                FROM financeiro WHERE tipo='R' AND status IN ('Pendente','Parcial')
+                AND vencimento < '{$hoje}' {$empFilter}")->fetch(PDO::FETCH_ASSOC);
             $pagVenc = $pdo->query("SELECT COUNT(*) qtd, COALESCE(SUM(valor_total - valor_pago),0) val
-                FROM financeiro
-                WHERE tipo='P' AND status IN ('Pendente','Parcial')
-                  AND vencimento >= '{$hoje}' AND vencimento <= '{$em7dias}' {$empFilter}")->fetch(PDO::FETCH_ASSOC);
-
-            // 10) Contas a pagar VENCIDAS
+                FROM financeiro WHERE tipo='P' AND status IN ('Pendente','Parcial')
+                AND vencimento >= '{$hoje}' AND vencimento <= '{$em7dias}' {$empFilter}")->fetch(PDO::FETCH_ASSOC);
             $pagVencidas = $pdo->query("SELECT COUNT(*) qtd, COALESCE(SUM(valor_total - valor_pago),0) val
-                FROM financeiro
-                WHERE tipo='P' AND status IN ('Pendente','Parcial')
-                  AND vencimento < '{$hoje}' {$empFilter}")->fetch(PDO::FETCH_ASSOC);
+                FROM financeiro WHERE tipo='P' AND status IN ('Pendente','Parcial')
+                AND vencimento < '{$hoje}' {$empFilter}")->fetch(PDO::FETCH_ASSOC);
 
             echo json_encode([
                 'success' => true,
+                'periodo' => ['dt_inicio' => $dtIni, 'dt_fim' => $dtFim, 'dt_ini_ant' => $dtIniAnt, 'dt_fim_ant' => $dtFimAnt],
                 'orcamentos_pendentes' => [
-                    'qtd' => (int)$orcPend['qtd'],
-                    'valor' => (float)$orcPend['val'],
+                    'qtd' => (int)$orcPend['qtd'], 'valor' => (float)$orcPend['val'],
                 ],
                 'taxa_conversao' => [
-                    'percentual' => $taxaConv,
-                    'aprovados'  => (int)$orcMes['aprovados'],
-                    'total'      => (int)$orcMes['total'],
+                    'percentual' => $taxaConv, 'aprovados' => (int)$orcAtual['aprovados'], 'total' => (int)$orcAtual['total'],
+                    'trend' => round($taxaConv - $taxaConvAnt, 1),
                 ],
-                'os_andamento' => [
-                    'qtd' => (int)$osAnd['qtd'],
+                'os_andamento' => ['qtd' => (int)$osAnd['qtd']],
+                'os_concluidas_periodo' => [
+                    'qtd' => (int)$osAtual['qtd'],
+                    'trend' => $trend((int)$osAtual['qtd'], (int)$osAnt2['qtd']),
                 ],
                 'ticket_medio' => [
-                    'orcamento' => (float)$orcMes['ticket'],
-                    'os'        => (float)$osMes['ticket'],
+                    'orcamento' => (float)$orcAtual['ticket'],
+                    'os' => (float)$osAtual['ticket'],
+                    'medio' => $ticketAtual,
+                    'trend' => $trend($ticketAtual, $ticketAnt),
                 ],
                 'top_clientes' => $topClientes,
                 'top_produtos' => $topProdutos,
@@ -282,12 +311,12 @@ switch ($action) {
             ]);
         } catch (\Exception $e) {
             echo json_encode([
-                'success' => false,
-                'message' => $e->getMessage(),
+                'success' => false, 'message' => $e->getMessage(),
                 'orcamentos_pendentes' => ['qtd' => 0, 'valor' => 0],
-                'taxa_conversao' => ['percentual' => 0, 'aprovados' => 0, 'total' => 0],
+                'taxa_conversao' => ['percentual' => 0, 'aprovados' => 0, 'total' => 0, 'trend' => 0],
                 'os_andamento' => ['qtd' => 0],
-                'ticket_medio' => ['orcamento' => 0, 'os' => 0],
+                'os_concluidas_periodo' => ['qtd' => 0, 'trend' => 0],
+                'ticket_medio' => ['orcamento' => 0, 'os' => 0, 'medio' => 0, 'trend' => 0],
                 'top_clientes' => [], 'top_produtos' => [],
                 'contas_receber' => ['vencendo_7d' => ['qtd'=>0,'valor'=>0], 'vencidas' => ['qtd'=>0,'valor'=>0]],
                 'contas_pagar'   => ['vencendo_7d' => ['qtd'=>0,'valor'=>0], 'vencidas' => ['qtd'=>0,'valor'=>0]],

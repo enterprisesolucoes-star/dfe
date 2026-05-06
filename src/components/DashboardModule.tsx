@@ -1,17 +1,95 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { DollarSign, CheckCircle, XCircle, TrendingDown, RefreshCw, FileText, Wrench, TrendingUp, Users, Package, AlertTriangle, Clock } from 'lucide-react';
+import { DollarSign, CheckCircle, XCircle, TrendingDown, TrendingUp, RefreshCw, FileText, Wrench, Users, Package, AlertTriangle, Clock, Calendar } from 'lucide-react';
 import { StatCard } from './UIComponents';
 
 // ─────────────────────────────────────────
-// DASHBOARD MODULE — KPIs e gráficos principais
+// DASHBOARD MODULE — KPIs com filtro de período + cards clicáveis + trends
 // ─────────────────────────────────────────
 
-export const DashboardTab = ({ isFiscal }: { isFiscal: boolean }) => {
+type Periodo = 'hoje' | 'semana' | 'mes' | 'mes_passado' | 'custom';
+
+const PERIODO_LABELS: Record<Periodo, string> = {
+  hoje: 'Hoje',
+  semana: 'Esta semana',
+  mes: 'Este mês',
+  mes_passado: 'Mês passado',
+  custom: 'Personalizado',
+};
+
+function calcularPeriodo(p: Periodo, customIni?: string, customFim?: string): { dtIni: string; dtFim: string } {
+  const hoje = new Date();
+  const fmt = (d: Date) => d.toISOString().slice(0, 10);
+  const ini = new Date(hoje); ini.setHours(0,0,0,0);
+  const fim = new Date(hoje); fim.setHours(23,59,59,999);
+
+  if (p === 'hoje') {
+    return { dtIni: fmt(ini), dtFim: fmt(fim) };
+  }
+  if (p === 'semana') {
+    const diff = ini.getDay(); // 0 = domingo
+    ini.setDate(ini.getDate() - diff);
+    return { dtIni: fmt(ini), dtFim: fmt(fim) };
+  }
+  if (p === 'mes') {
+    ini.setDate(1);
+    const ultimoDia = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+    return { dtIni: fmt(ini), dtFim: fmt(ultimoDia) };
+  }
+  if (p === 'mes_passado') {
+    const ini2 = new Date(hoje.getFullYear(), hoje.getMonth() - 1, 1);
+    const fim2 = new Date(hoje.getFullYear(), hoje.getMonth(), 0);
+    return { dtIni: fmt(ini2), dtFim: fmt(fim2) };
+  }
+  return { dtIni: customIni || fmt(ini), dtFim: customFim || fmt(fim) };
+}
+
+// Componente de StatCard com Trend explícito (extensão do StatCard padrão)
+const KPICard = ({ label, value, icon: Icon, color, trend, sub, onClick }: any) => {
+  const colorMap: Record<string, string> = {
+    blue: 'text-blue-600 bg-blue-50',
+    green: 'text-emerald-600 bg-emerald-50',
+    red: 'text-red-600 bg-red-50',
+    orange: 'text-orange-600 bg-orange-50',
+    purple: 'text-purple-600 bg-purple-50',
+  };
+  const trendColor = trend > 0 ? 'text-emerald-600' : trend < 0 ? 'text-red-500' : 'text-gray-400';
+  const TrendIcon = trend > 0 ? TrendingUp : trend < 0 ? TrendingDown : null;
+
+  return (
+    <div
+      onClick={onClick}
+      className={`bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 ${onClick ? 'cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all' : ''}`}
+    >
+      <div className="flex items-start justify-between mb-3">
+        <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">{label}</p>
+        {Icon && <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${colorMap[color] || colorMap.blue}`}>
+          <Icon className="w-4 h-4" />
+        </div>}
+      </div>
+      <p className="text-2xl font-bold text-gray-800 dark:text-white">{value}</p>
+      {sub && <p className="text-xs text-gray-400 mt-1">{sub}</p>}
+      {trend !== undefined && trend !== null && (
+        <div className={`flex items-center gap-1 mt-2 ${trendColor}`}>
+          {TrendIcon && <TrendIcon className="w-3 h-3" />}
+          <span className="text-xs font-bold">{trend > 0 ? '+' : ''}{trend}% vs período anterior</span>
+        </div>
+      )}
+    </div>
+  );
+};
+
+interface DashboardTabProps {
+  isFiscal: boolean;
+  onNavigate?: (tab: string) => void;
+}
+
+export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
   const [data, setData] = useState<any[]>([]);
   const [finChart, setFinChart] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [summary, setSummary] = useState({
     total: 0, count: 0, avg: 0, nfeCount: 0, nfceCount: 0, canceladoCount: 0,
     trendTotal: 0, trendCount: 0
@@ -19,83 +97,92 @@ export const DashboardTab = ({ isFiscal }: { isFiscal: boolean }) => {
   const [finSummary, setFinSummary] = useState({ total_receber: 0, total_pagar: 0, trendReceber: 0, trendPagar: 0 });
   const [kpis, setKpis] = useState<any>({
     orcamentos_pendentes: { qtd: 0, valor: 0 },
-    taxa_conversao: { percentual: 0, aprovados: 0, total: 0 },
+    taxa_conversao: { percentual: 0, aprovados: 0, total: 0, trend: 0 },
     os_andamento: { qtd: 0 },
-    ticket_medio: { orcamento: 0, os: 0 },
+    os_concluidas_periodo: { qtd: 0, trend: 0 },
+    ticket_medio: { orcamento: 0, os: 0, medio: 0, trend: 0 },
     top_clientes: [], top_produtos: [],
     contas_receber: { vencendo_7d: { qtd: 0, valor: 0 }, vencidas: { qtd: 0, valor: 0 } },
     contas_pagar:   { vencendo_7d: { qtd: 0, valor: 0 }, vencidas: { qtd: 0, valor: 0 } },
   });
 
-  useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        const res = await fetch('./api.php?action=dashboard_vendas');
-        const json = await res.json();
-        if (Array.isArray(json)) {
-          const formatted = json.map(item => ({
+  // Filtro de período
+  const [periodo, setPeriodo] = useState<Periodo>('mes');
+  const [customIni, setCustomIni] = useState('');
+  const [customFim, setCustomFim] = useState('');
+
+  const { dtIni, dtFim } = calcularPeriodo(periodo, customIni, customFim);
+
+  const fmtBRL = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const goTo = (tab: string) => onNavigate && onNavigate(tab);
+
+  const fetchAll = async () => {
+    try {
+      // KPIs (com filtro de período)
+      const kpiRes = await fetch(`./api.php?action=dashboard_kpis&dt_inicio=${dtIni}&dt_fim=${dtFim}`);
+      const kpiJson = await kpiRes.json();
+      if (kpiJson && kpiJson.success !== false) setKpis(kpiJson);
+
+      // Dashboard vendas (sempre últimos 12 meses)
+      const res = await fetch('./api.php?action=dashboard_vendas');
+      const json = await res.json();
+      if (Array.isArray(json)) {
+        const formatted = json.map(item => ({
+          ...item,
+          periodoStr: String(item.periodo).substring(5, 7) + '/' + String(item.periodo).substring(0, 4),
+        }));
+        setData(formatted);
+        if (formatted.length > 0) {
+          const last = formatted[formatted.length - 1];
+          const prev = formatted[formatted.length - 2];
+          const calcTrend = (cur: number, old: number) => !old ? 0 : ((cur - old) / old) * 100;
+          setSummary({
+            total: last.total || 0, count: last.count || 0,
+            avg: (last.total / (last.count || 1)),
+            nfeCount: last.nfe_count || 0, nfceCount: last.nfce_count || 0,
+            canceladoCount: last.cancelado_count || 0,
+            trendTotal: prev ? calcTrend(last.total, prev.total) : 0,
+            trendCount: prev ? calcTrend(last.count, prev.count) : 0,
+          });
+        }
+      }
+
+      // Financeiro (sempre snapshot)
+      const finRes = await fetch('./api.php?action=dashboard_financeiro');
+      const finJson = await finRes.json();
+      if (finJson) {
+        const tRec = finJson.total_receber || 0;
+        const tPag = finJson.total_pagar || 0;
+        const aRec = finJson.receber_ant || 0;
+        const aPag = finJson.pagar_ant || 0;
+        setFinSummary({
+          total_receber: tRec, total_pagar: tPag,
+          trendReceber: aRec > 0 ? ((tRec - aRec) / aRec) * 100 : (tRec > 0 ? 100 : 0),
+          trendPagar:   aPag > 0 ? ((tPag - aPag) / aPag) * 100 : (tPag > 0 ? 100 : 0),
+        });
+        if (Array.isArray(finJson.chart)) {
+          setFinChart(finJson.chart.map((item: any) => ({
             ...item,
             periodoStr: String(item.periodo).substring(5, 7) + '/' + String(item.periodo).substring(0, 4),
-          }));
-          setData(formatted);
-
-          if (formatted.length > 0) {
-            const last = formatted[formatted.length - 1];
-            const prev = formatted[formatted.length - 2];
-            const calcTrend = (cur: number, old: number) => {
-              if (!old) return 0;
-              return ((cur - old) / old) * 100;
-            };
-
-            setSummary({
-              total: last.total || 0,
-              count: last.count || 0,
-              avg: (last.total / (last.count || 1)),
-              nfeCount: last.nfe_count || 0,
-              nfceCount: last.nfce_count || 0,
-              canceladoCount: last.cancelado_count || 0,
-              trendTotal: prev ? calcTrend(last.total, prev.total) : 0,
-              trendCount: prev ? calcTrend(last.count, prev.count) : 0
-            });
-          }
+          })));
         }
-
-        const kpiRes = await fetch('./api.php?action=dashboard_kpis');
-        const kpiJson = await kpiRes.json();
-        if (kpiJson && kpiJson.success !== false) setKpis(kpiJson);
-
-        const finRes = await fetch('./api.php?action=dashboard_financeiro');
-        const finJson = await finRes.json();
-        if (finJson) {
-           const tRec = finJson.total_receber || 0;
-           const tPag = finJson.total_pagar || 0;
-           const aRec = finJson.receber_ant || 0;
-           const aPag = finJson.pagar_ant || 0;
-           const trendRec = aRec > 0 ? ((tRec - aRec) / aRec) * 100 : (tRec > 0 ? 100 : 0);
-           const trendPag = aPag > 0 ? ((tPag - aPag) / aPag) * 100 : (tPag > 0 ? 100 : 0);
-
-           setFinSummary({
-             total_receber: tRec,
-             total_pagar: tPag,
-             trendReceber: trendRec,
-             trendPagar: trendPag
-           });
-           if (Array.isArray(finJson.chart)) {
-             const fFormatted = finJson.chart.map((item: any) => ({
-                ...item,
-                periodoStr: String(item.periodo).substring(5, 7) + '/' + String(item.periodo).substring(0, 4)
-             }));
-             setFinChart(fFormatted);
-           }
-        }
-      } catch (err) {
-        console.error("Erro dashboard:", err);
-      } finally {
-        setLoading(false);
       }
-    };
-    fetchDashboard();
-  }, []);
+    } catch (err) {
+      console.error("Erro dashboard:", err);
+    }
+  };
+
+  useEffect(() => {
+    setLoading(true);
+    fetchAll().finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [periodo, customIni, customFim]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchAll();
+    setRefreshing(false);
+  };
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -125,108 +212,125 @@ export const DashboardTab = ({ isFiscal }: { isFiscal: boolean }) => {
 
   return (
     <div className="space-y-8 pb-10">
+      {/* ─── Filtro de Período + Refresh ─── */}
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 flex flex-wrap items-center gap-3">
+        <Calendar className="w-4 h-4 text-gray-400" />
+        <span className="text-xs font-bold text-gray-500 uppercase">Período:</span>
+        {(['hoje','semana','mes','mes_passado','custom'] as Periodo[]).map(p => (
+          <button key={p} onClick={() => setPeriodo(p)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              periodo === p ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}>
+            {PERIODO_LABELS[p]}
+          </button>
+        ))}
+        {periodo === 'custom' && (
+          <>
+            <input type="date" value={customIni} onChange={e => setCustomIni(e.target.value)}
+              className="border border-gray-200 rounded-lg px-2 py-1 text-xs outline-none focus:ring-2 focus:ring-blue-400" />
+            <span className="text-xs text-gray-400">até</span>
+            <input type="date" value={customFim} onChange={e => setCustomFim(e.target.value)}
+              className="border border-gray-200 rounded-lg px-2 py-1 text-xs outline-none focus:ring-2 focus:ring-blue-400" />
+          </>
+        )}
+        <span className="text-xs text-gray-400 ml-2">
+          {dtIni.split('-').reverse().join('/')} a {dtFim.split('-').reverse().join('/')}
+        </span>
+        <button onClick={handleRefresh} disabled={refreshing}
+          className="ml-auto px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-medium flex items-center gap-2">
+          <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+          Atualizar
+        </button>
+      </div>
+
+      {/* ─── Cards principais (Vendas / Autorizadas / Cancelados) ─── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard
           label="Vendas do Mês"
           value={summary.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-          icon={DollarSign}
-          trend={summary.trendTotal}
-          color="blue"
+          icon={DollarSign} trend={summary.trendTotal} color="blue"
         />
         {isFiscal && (
-          <StatCard
-            label="AUTORIZADAS NO MÊS"
-            value={summary.count.toString()}
-            icon={CheckCircle}
-            trend={summary.trendCount}
-            color="green"
-          />
+          <StatCard label="AUTORIZADAS NO MÊS" value={summary.count.toString()}
+            icon={CheckCircle} trend={summary.trendCount} color="green" />
         )}
         {isFiscal && (
-          <StatCard
-            label="Cancelados no Mês"
-            value={summary.canceladoCount.toString()}
-            icon={XCircle}
-            color="red"
-          />
+          <StatCard label="Cancelados no Mês" value={summary.canceladoCount.toString()}
+            icon={XCircle} color="red" />
         )}
       </div>
 
-      {/* ─── KPIs Operacionais ──────────────────────── */}
+      {/* ─── KPIs Operacionais (clicáveis) ─── */}
       <div>
         <h4 className="text-xs uppercase font-bold text-gray-400 mb-3 tracking-wider">Operacional</h4>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <StatCard
-            label="Orçamentos Pendentes"
-            value={`${kpis.orcamentos_pendentes.qtd} (${kpis.orcamentos_pendentes.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })})`}
-            icon={FileText}
-            color="orange"
-          />
-          <StatCard
-            label="OS em Andamento"
-            value={kpis.os_andamento.qtd.toString()}
-            icon={Wrench}
-            color="blue"
-          />
-          <StatCard
-            label="Taxa de Conversão"
+          <KPICard label="Orçamentos Pendentes"
+            value={kpis.orcamentos_pendentes.qtd}
+            sub={fmtBRL(kpis.orcamentos_pendentes.valor)}
+            icon={FileText} color="orange"
+            onClick={() => goTo('orcamentos')} />
+          <KPICard label="OS em Andamento"
+            value={kpis.os_andamento.qtd}
+            icon={Wrench} color="blue"
+            onClick={() => goTo('ordens_servico')} />
+          <KPICard label="Taxa de Conversão"
             value={`${kpis.taxa_conversao.percentual}%`}
+            sub={`${kpis.taxa_conversao.aprovados} de ${kpis.taxa_conversao.total} orçamentos`}
             icon={TrendingUp}
             color={kpis.taxa_conversao.percentual >= 50 ? 'green' : 'orange'}
-          />
-          <StatCard
-            label="Ticket Médio"
-            value={(kpis.ticket_medio.orcamento || kpis.ticket_medio.os || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-            icon={DollarSign}
-            color="blue"
-          />
+            trend={kpis.taxa_conversao.trend}
+            onClick={() => goTo('orcamentos')} />
+          <KPICard label="Ticket Médio"
+            value={fmtBRL(kpis.ticket_medio.medio || kpis.ticket_medio.orcamento || kpis.ticket_medio.os || 0)}
+            icon={DollarSign} color="purple"
+            trend={kpis.ticket_medio.trend} />
         </div>
       </div>
 
-      {/* ─── Alertas de Vencimento ──────────────────── */}
+      {/* ─── Alertas Financeiros (clicáveis) ─── */}
       {(kpis.contas_receber.vencidas.qtd > 0 || kpis.contas_pagar.vencidas.qtd > 0 ||
         kpis.contas_receber.vencendo_7d.qtd > 0 || kpis.contas_pagar.vencendo_7d.qtd > 0) && (
         <div>
           <h4 className="text-xs uppercase font-bold text-gray-400 mb-3 tracking-wider">Alertas Financeiros</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {kpis.contas_receber.vencidas.qtd > 0 && (
-              <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-5">
+              <div onClick={() => goTo('fin_receber')} className="bg-red-50 border-2 border-red-200 rounded-2xl p-5 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all">
                 <div className="flex items-center gap-2 mb-2"><AlertTriangle className="w-4 h-4 text-red-600" /><p className="text-[10px] uppercase font-bold text-red-600">A Receber — Vencidas</p></div>
-                <p className="text-2xl font-bold text-red-700">{kpis.contas_receber.vencidas.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                <p className="text-xs text-red-500 mt-1">{kpis.contas_receber.vencidas.qtd} título(s)</p>
+                <p className="text-2xl font-bold text-red-700">{fmtBRL(kpis.contas_receber.vencidas.valor)}</p>
+                <p className="text-xs text-red-500 mt-1">{kpis.contas_receber.vencidas.qtd} título(s) — clique para abrir</p>
               </div>
             )}
             {kpis.contas_receber.vencendo_7d.qtd > 0 && (
-              <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5">
+              <div onClick={() => goTo('fin_receber')} className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all">
                 <div className="flex items-center gap-2 mb-2"><Clock className="w-4 h-4 text-amber-600" /><p className="text-[10px] uppercase font-bold text-amber-600">A Receber — Próx. 7 dias</p></div>
-                <p className="text-2xl font-bold text-amber-700">{kpis.contas_receber.vencendo_7d.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                <p className="text-xs text-amber-500 mt-1">{kpis.contas_receber.vencendo_7d.qtd} título(s)</p>
+                <p className="text-2xl font-bold text-amber-700">{fmtBRL(kpis.contas_receber.vencendo_7d.valor)}</p>
+                <p className="text-xs text-amber-500 mt-1">{kpis.contas_receber.vencendo_7d.qtd} título(s) — clique para abrir</p>
               </div>
             )}
             {kpis.contas_pagar.vencidas.qtd > 0 && (
-              <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-5">
+              <div onClick={() => goTo('fin_pagar')} className="bg-red-50 border-2 border-red-200 rounded-2xl p-5 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all">
                 <div className="flex items-center gap-2 mb-2"><AlertTriangle className="w-4 h-4 text-red-600" /><p className="text-[10px] uppercase font-bold text-red-600">A Pagar — Vencidas</p></div>
-                <p className="text-2xl font-bold text-red-700">{kpis.contas_pagar.vencidas.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                <p className="text-xs text-red-500 mt-1">{kpis.contas_pagar.vencidas.qtd} título(s)</p>
+                <p className="text-2xl font-bold text-red-700">{fmtBRL(kpis.contas_pagar.vencidas.valor)}</p>
+                <p className="text-xs text-red-500 mt-1">{kpis.contas_pagar.vencidas.qtd} título(s) — clique para abrir</p>
               </div>
             )}
             {kpis.contas_pagar.vencendo_7d.qtd > 0 && (
-              <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5">
+              <div onClick={() => goTo('fin_pagar')} className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all">
                 <div className="flex items-center gap-2 mb-2"><Clock className="w-4 h-4 text-amber-600" /><p className="text-[10px] uppercase font-bold text-amber-600">A Pagar — Próx. 7 dias</p></div>
-                <p className="text-2xl font-bold text-amber-700">{kpis.contas_pagar.vencendo_7d.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                <p className="text-xs text-amber-500 mt-1">{kpis.contas_pagar.vencendo_7d.qtd} título(s)</p>
+                <p className="text-2xl font-bold text-amber-700">{fmtBRL(kpis.contas_pagar.vencendo_7d.valor)}</p>
+                <p className="text-xs text-amber-500 mt-1">{kpis.contas_pagar.vencendo_7d.qtd} título(s) — clique para abrir</p>
               </div>
             )}
           </div>
         </div>
       )}
 
-      {/* ─── Top 5 Clientes e Produtos ──────────────── */}
+      {/* ─── Top 5 Clientes / Produtos ─── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700">
           <div className="flex items-center gap-2 mb-4">
             <Users className="w-5 h-5 text-blue-600" />
-            <h4 className="text-base font-bold text-gray-800 dark:text-white">Top 5 Clientes do Mês</h4>
+            <h4 className="text-base font-bold text-gray-800 dark:text-white">Top 5 Clientes</h4>
           </div>
           {kpis.top_clientes.length === 0 ? (
             <p className="text-xs text-gray-400 text-center py-8">Nenhum cliente no período</p>
@@ -234,21 +338,21 @@ export const DashboardTab = ({ isFiscal }: { isFiscal: boolean }) => {
             <div className="space-y-2">
               {kpis.top_clientes.map((c: any, i: number) => (
                 <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">{i + 1}</div>
-                    <p className="text-sm font-medium text-gray-700 truncate max-w-[200px]">{c.cliente_nome}</p>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold flex-shrink-0">{i + 1}</div>
+                    <p className="text-sm font-medium text-gray-700 truncate">{c.cliente_nome}</p>
                   </div>
-                  <p className="text-sm font-bold text-blue-700">{Number(c.total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                  <p className="text-sm font-bold text-blue-700 flex-shrink-0">{fmtBRL(Number(c.total))}</p>
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700">
           <div className="flex items-center gap-2 mb-4">
             <Package className="w-5 h-5 text-emerald-600" />
-            <h4 className="text-base font-bold text-gray-800 dark:text-white">Top 5 Produtos do Mês</h4>
+            <h4 className="text-base font-bold text-gray-800 dark:text-white">Top 5 Produtos</h4>
           </div>
           {kpis.top_produtos.length === 0 ? (
             <p className="text-xs text-gray-400 text-center py-8">Nenhum produto vendido no período</p>
@@ -257,13 +361,13 @@ export const DashboardTab = ({ isFiscal }: { isFiscal: boolean }) => {
               {kpis.top_produtos.map((p: any, i: number) => (
                 <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs font-bold">{i + 1}</div>
+                    <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs font-bold flex-shrink-0">{i + 1}</div>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-gray-700 truncate max-w-[180px]">{p.descricao}</p>
+                      <p className="text-sm font-medium text-gray-700 truncate">{p.descricao}</p>
                       <p className="text-xs text-gray-400">{Number(p.qtd).toLocaleString('pt-BR')} un.</p>
                     </div>
                   </div>
-                  <p className="text-sm font-bold text-emerald-700">{Number(p.total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                  <p className="text-sm font-bold text-emerald-700 flex-shrink-0">{fmtBRL(Number(p.total))}</p>
                 </div>
               ))}
             </div>
@@ -271,8 +375,7 @@ export const DashboardTab = ({ isFiscal }: { isFiscal: boolean }) => {
         </div>
       </div>
 
-
-
+      {/* ─── Gráfico de Evolução ─── */}
       <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.4 }} className="bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-xl border border-gray-100 dark:border-gray-700">
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -284,7 +387,6 @@ export const DashboardTab = ({ isFiscal }: { isFiscal: boolean }) => {
             {isFiscal && <div className="flex items-center gap-2"><div className="w-3 h-3 bg-emerald-500 rounded-full"></div><span className="text-[10px] text-gray-500 uppercase">NF-E</span></div>}
           </div>
         </div>
-
         <div className="h-[400px] w-full" style={{ minHeight: '400px', minWidth: 0 }}>
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
@@ -299,19 +401,11 @@ export const DashboardTab = ({ isFiscal }: { isFiscal: boolean }) => {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-              <XAxis
-                dataKey="periodoStr"
-                axisLine={false}
-                tickLine={false}
+              <XAxis dataKey="periodoStr" axisLine={false} tickLine={false}
+                tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }} dy={10} />
+              <YAxis axisLine={false} tickLine={false}
                 tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }}
-                dy={10}
-              />
-              <YAxis
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }}
-                tickFormatter={(val) => `R$ ${val >= 1000 ? (val/1000).toFixed(1) + 'k' : val}`}
-              />
+                tickFormatter={(val) => `R$ ${val >= 1000 ? (val/1000).toFixed(1) + 'k' : val}`} />
               <Tooltip content={<CustomTooltip />} />
               {isFiscal && <Area type="monotone" name="NFC-e" dataKey="nfce" stroke="#3b82f6" strokeWidth={4} fillOpacity={1} fill="url(#colorNfce)" />}
               {isFiscal && <Area type="monotone" name="NF-e" dataKey="nfe" stroke="#10b981" strokeWidth={4} fillOpacity={1} fill="url(#colorNfe)" />}
@@ -320,25 +414,16 @@ export const DashboardTab = ({ isFiscal }: { isFiscal: boolean }) => {
         </div>
       </motion.div>
 
+      {/* ─── A Receber / A Pagar + Previsão ─── */}
       <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.5 }} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
         <div className="flex flex-col gap-6">
-          <StatCard
-            label="Total a Receber"
+          <StatCard label="Total a Receber"
             value={finSummary.total_receber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-            icon={DollarSign}
-            trend={finSummary.trendReceber}
-            color="green"
-          />
-          <StatCard
-            label="Total a Pagar"
+            icon={DollarSign} trend={finSummary.trendReceber} color="green" />
+          <StatCard label="Total a Pagar"
             value={finSummary.total_pagar.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-            icon={TrendingDown}
-            trend={finSummary.trendPagar}
-            color="red"
-          />
+            icon={TrendingDown} trend={finSummary.trendPagar} color="red" />
         </div>
-
         <div className="lg:col-span-2 bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-xl border border-gray-100 dark:border-gray-700">
           <div className="flex items-center justify-between mb-8">
             <div>
@@ -350,7 +435,6 @@ export const DashboardTab = ({ isFiscal }: { isFiscal: boolean }) => {
               <div className="flex items-center gap-2"><div className="w-3 h-3 bg-red-400 rounded-full"></div><span className="text-[10px] text-gray-500 uppercase">A PAGAR</span></div>
             </div>
           </div>
-
           <div className="h-[400px] w-full" style={{ minHeight: '400px', minWidth: 0 }}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={finChart} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
@@ -365,22 +449,14 @@ export const DashboardTab = ({ isFiscal }: { isFiscal: boolean }) => {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                <XAxis
-                  dataKey="periodoStr"
-                  axisLine={false}
-                  tickLine={false}
+                <XAxis dataKey="periodoStr" axisLine={false} tickLine={false}
+                  tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }} dy={10} />
+                <YAxis axisLine={false} tickLine={false}
                   tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }}
-                  dy={10}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }}
-                  tickFormatter={(val) => `R$ ${val >= 1000 ? (val/1000).toFixed(1) + 'k' : val}`}
-                />
+                  tickFormatter={(val) => `R$ ${val >= 1000 ? (val/1000).toFixed(1) + 'k' : val}`} />
                 <Tooltip content={<CustomTooltip />} />
                 <Area type="monotone" name="A Receber" dataKey="receber" stroke="#10b981" strokeWidth={4} fillOpacity={1} fill="url(#colorReceber)" />
-                <Area type="monotone" name="A Pagar" dataKey="pagar" stroke="#f87171" strokeWidth={4} fillOpacity={1} fill="url(#colorPagar)" />
+                <Area type="monotone" name="A Pagar"   dataKey="pagar"   stroke="#f87171" strokeWidth={4} fillOpacity={1} fill="url(#colorPagar)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
