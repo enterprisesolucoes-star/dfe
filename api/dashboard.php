@@ -324,4 +324,59 @@ switch ($action) {
         }
         break;
 
+
+    case 'dashboard_status_donut':
+        try {
+            $hojeIni = date('Y-m-01');
+            $hojeFim = date('Y-m-t') . ' 23:59:59';
+            $empFilter = $empresaId ? " AND empresa_id = " . (int)$empresaId : "";
+
+            $rows = $pdo->query("
+                SELECT status, COUNT(*) qtd, COALESCE(SUM(valor_total),0) val
+                FROM vendas
+                WHERE data_emissao >= '{$hojeIni}' AND data_emissao <= '{$hojeFim}' {$empFilter}
+                GROUP BY status
+            ")->fetchAll(PDO::FETCH_ASSOC);
+
+            $mapa = [
+                'Autorizada'  => ['nome' => 'Autorizadas',  'cor' => '#10b981', 'qtd' => 0, 'val' => 0],
+                'Contingencia'=> ['nome' => 'Contingência', 'cor' => '#06b6d4', 'qtd' => 0, 'val' => 0],
+                'Pendente'    => ['nome' => 'Pendentes',    'cor' => '#f59e0b', 'qtd' => 0, 'val' => 0],
+                'Cancelada'   => ['nome' => 'Canceladas',   'cor' => '#ef4444', 'qtd' => 0, 'val' => 0],
+                'Rejeitada'   => ['nome' => 'Rejeitadas',   'cor' => '#a855f7', 'qtd' => 0, 'val' => 0],
+                'Inutilizada' => ['nome' => 'Inutilizadas', 'cor' => '#6b7280', 'qtd' => 0, 'val' => 0],
+            ];
+
+            foreach ($rows as $r) {
+                $st = $r['status'];
+                if (isset($mapa[$st])) {
+                    $mapa[$st]['qtd'] = (int)$r['qtd'];
+                    $mapa[$st]['val'] = (float)$r['val'];
+                }
+            }
+
+            $segmentos = [];
+            $total_qtd = 0;
+            foreach ($mapa as $st => $info) {
+                if ($info['qtd'] > 0) {
+                    $segmentos[] = $info;
+                    $total_qtd += $info['qtd'];
+                }
+            }
+
+            echo json_encode([
+                'success' => true,
+                'segmentos' => $segmentos,
+                'total_qtd' => $total_qtd,
+            ]);
+        } catch (\Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'segmentos' => [],
+                'total_qtd' => 0,
+            ]);
+        }
+        break;
+
 }

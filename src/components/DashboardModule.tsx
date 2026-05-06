@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, BarChart, Bar } from 'recharts';
 import { DollarSign, CheckCircle, XCircle, TrendingDown, TrendingUp, RefreshCw, FileText, Wrench, Users, Package, AlertTriangle, Clock, Calendar } from 'lucide-react';
 import { StatCard } from './UIComponents';
 
@@ -95,6 +95,7 @@ export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
     trendTotal: 0, trendCount: 0
   });
   const [finSummary, setFinSummary] = useState({ total_receber: 0, total_pagar: 0, trendReceber: 0, trendPagar: 0 });
+  const [donutData, setDonutData] = useState<{segmentos: any[]; total_qtd: number}>({ segmentos: [], total_qtd: 0 });
   const [kpis, setKpis] = useState<any>({
     orcamentos_pendentes: { qtd: 0, valor: 0 },
     taxa_conversao: { percentual: 0, aprovados: 0, total: 0, trend: 0 },
@@ -118,6 +119,13 @@ export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
 
   const fetchAll = async () => {
     try {
+      // Donut chart de status (sempre mês atual)
+      try {
+        const donutRes = await fetch('./api.php?action=dashboard_status_donut');
+        const donutJson = await donutRes.json();
+        if (donutJson && donutJson.success !== false) setDonutData(donutJson);
+      } catch (e) { console.error('donut:', e); }
+
       // KPIs (com filtro de período)
       const kpiRes = await fetch(`./api.php?action=dashboard_kpis&dt_inicio=${dtIni}&dt_fim=${dtFim}`);
       const kpiJson = await kpiRes.json();
@@ -243,21 +251,90 @@ export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
         </button>
       </div>
 
-      {/* ─── Cards principais (Vendas / Autorizadas / Cancelados) ─── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard
-          label="Vendas do Mês"
-          value={summary.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-          icon={DollarSign} trend={summary.trendTotal} color="blue"
-        />
-        {isFiscal && (
-          <StatCard label="AUTORIZADAS NO MÊS" value={summary.count.toString()}
-            icon={CheckCircle} trend={summary.trendCount} color="green" />
-        )}
-        {isFiscal && (
-          <StatCard label="Cancelados no Mês" value={summary.canceladoCount.toString()}
-            icon={XCircle} color="red" />
-        )}
+      {/* ─── Cards Vendas + Donut Chart Status ─── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Card Vendas + Total a Receber + Total a Pagar (coluna esquerda) */}
+        <div className="space-y-6">
+          <StatCard
+            label="Vendas do Mês"
+            value={summary.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            icon={DollarSign} trend={summary.trendTotal} color="blue"
+          />
+          <StatCard
+            label="Total a Receber"
+            value={finSummary.total_receber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            icon={DollarSign} trend={finSummary.trendReceber} color="green"
+          />
+          <StatCard
+            label="Total a Pagar"
+            value={finSummary.total_pagar.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            icon={TrendingDown} trend={finSummary.trendPagar} color="red"
+          />
+        </div>
+
+        {/* Donut Chart Status (2 colunas) */}
+        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h4 className="text-base font-bold text-gray-800 dark:text-gray-100">Status de Documentos Fiscais</h4>
+              <p className="text-xs text-gray-400 dark:text-gray-500 uppercase">Mês atual</p>
+            </div>
+          </div>
+
+          {donutData.segmentos.length === 0 ? (
+            <p className="text-xs text-gray-400 text-center py-12">Nenhum documento emitido neste mês</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+              {/* Donut */}
+              <div className="relative h-[240px] flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={donutData.segmentos}
+                      dataKey="qtd"
+                      nameKey="nome"
+                      innerRadius={70}
+                      outerRadius={100}
+                      paddingAngle={3}
+                      strokeWidth={0}
+                    >
+                      {donutData.segmentos.map((entry: any, idx: number) => (
+                        <Cell key={idx} fill={entry.cor} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(v: any, _n: any, item: any) => [`${v} documento(s) — R$ ${Number(item.payload.val).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, item.payload.nome]}
+                      contentStyle={{ backgroundColor: 'rgba(15, 20, 32, 0.95)', border: '1px solid #1a1f2e', borderRadius: 12, color: '#fff' }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <p className="text-3xl font-bold text-gray-800 dark:text-gray-100">{donutData.total_qtd}</p>
+                  <p className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider">Total</p>
+                </div>
+              </div>
+
+              {/* Lista de status */}
+              <div className="space-y-3">
+                {donutData.segmentos.map((s: any, i: number) => {
+                  const pct = donutData.total_qtd > 0 ? Math.round((s.qtd / donutData.total_qtd) * 100) : 0;
+                  return (
+                    <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-700 last:border-0">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: s.cor }}></div>
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{s.nome}</span>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-bold text-gray-800 dark:text-gray-100">{s.qtd}</p>
+                        <p className="text-[10px] text-gray-400 dark:text-gray-500">{pct}%</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* ─── KPIs Operacionais (clicáveis) ─── */}
@@ -389,27 +466,32 @@ export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
         </div>
         <div className="h-[400px] w-full" style={{ minHeight: '400px', minWidth: 0 }}>
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-              <defs>
-                <linearGradient id="colorNfce" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                </linearGradient>
-                <linearGradient id="colorNfe" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+            <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }} barCategoryGap="20%">
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" strokeOpacity={0.3} />
               <XAxis dataKey="periodoStr" axisLine={false} tickLine={false}
                 tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }} dy={10} />
               <YAxis axisLine={false} tickLine={false}
                 tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }}
                 tickFormatter={(val) => `R$ ${val >= 1000 ? (val/1000).toFixed(1) + 'k' : val}`} />
-              <Tooltip content={<CustomTooltip />} />
-              {isFiscal && <Area type="monotone" name="NFC-e" dataKey="nfce" stroke="#3b82f6" strokeWidth={4} fillOpacity={1} fill="url(#colorNfce)" />}
-              {isFiscal && <Area type="monotone" name="NF-e" dataKey="nfe" stroke="#10b981" strokeWidth={4} fillOpacity={1} fill="url(#colorNfe)" />}
-            </AreaChart>
+              <Tooltip
+                content={<CustomTooltip />}
+                cursor={{ fill: 'rgba(6, 182, 212, 0.05)' }}
+              />
+              {isFiscal && (
+                <Bar name="NFC-e" dataKey="nfce" radius={[6, 6, 0, 0]}>
+                  {data.map((_, idx) => (
+                    <Cell key={`nfce-${idx}`} fill={idx === data.length - 1 ? '#06b6d4' : '#3b82f6'} />
+                  ))}
+                </Bar>
+              )}
+              {isFiscal && (
+                <Bar name="NF-e" dataKey="nfe" radius={[6, 6, 0, 0]}>
+                  {data.map((_, idx) => (
+                    <Cell key={`nfe-${idx}`} fill={idx === data.length - 1 ? '#10b981' : '#34d399'} fillOpacity={idx === data.length - 1 ? 1 : 0.5} />
+                  ))}
+                </Bar>
+              )}
+            </BarChart>
           </ResponsiveContainer>
         </div>
       </motion.div>
