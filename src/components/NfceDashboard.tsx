@@ -1002,7 +1002,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] flex flex-col">
+    <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#0a0e1a] flex flex-col">
       <div className="flex-1 flex">
         <Sidebar
           activeTab={activeTab}
