@@ -84,6 +84,7 @@ import type { Session } from '../App';
 import FormAlert from './FormAlert';
 import { motion, AnimatePresence } from 'motion/react';
 import { Produto, Cliente, Fornecedor, Transportador, Venda as Nfce, Emitente, Medida, Bandeira } from '../types/nfce';
+import { useTheme } from '../contexts/ThemeContext';
 
 const lazyRetry = (componentImport: any) => {
   return lazy(async () => {
@@ -101,20 +102,9 @@ const NfeDashboard = lazyRetry(() => import('./NfeDashboard'));
 
 const NfceDashboard: React.FC<{ session: Session; onLogout: () => void; onUpdateSession: (s: Session) => void }> = ({ session, onLogout, onUpdateSession }) => {
 
-  const [darkMode, setDarkMode] = useState<boolean>(() => {
-    return localStorage.getItem('dfe_dark_mode') === 'true';
-  });
-
-  useEffect(() => {
-    const html = document.documentElement;
-    if (darkMode) {
-      html.classList.add('dark');
-      localStorage.setItem('dfe_dark_mode', 'true');
-    } else {
-      html.classList.remove('dark');
-      localStorage.setItem('dfe_dark_mode', 'false');
-    }
-  }, [darkMode]);
+  // Dark mode gerenciado pelo ThemeContext
+  const { theme: themeMode, toggleTheme } = useTheme();
+  const darkMode = themeMode === 'dark';
 
   const [usuarioDfeAtual, setUsuarioDfeAtual] = useState<number>(Number(session.usuarioDfe) ?? 2);
   const isFiscal = usuarioDfeAtual !== 0 && usuarioDfeAtual !== 4;
@@ -1133,7 +1123,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
 
             {/* Toggle dark/light mode */}
             <button
-              onClick={() => setDarkMode(d => !d)}
+              onClick={toggleTheme}
               title={darkMode ? 'Modo claro' : 'Modo escuro'}
               className="p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
             >
