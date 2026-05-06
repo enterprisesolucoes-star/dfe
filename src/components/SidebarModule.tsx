@@ -1,10 +1,10 @@
 import React from 'react';
+import { useTheme } from '../contexts/ThemeContext';
 import { 
   Monitor, DollarSign, ChevronDown, ChevronRight, ArrowUpCircle, 
   ArrowDownCircle, History, FileText, Send, QrCode, Package, 
   Users, Store, ShoppingCart, ClipboardList, Wrench, FolderOpen, BarChart2, 
-  Hash, Ruler, CreditCard, Truck, ShieldCheck, Building, Settings, LogOut, Zap, UserCircle, TrendingUp, Landmark, FileText, Archive
-} from 'lucide-react';
+  Hash, Ruler, CreditCard, Truck, ShieldCheck, Building, Settings, LogOut, Zap, UserCircle, TrendingUp, Landmark, FileText, Archive, Sun, Moon} from 'lucide-react';
 
 export const SidebarItem = ({ icon: Icon, label, active, onClick }: any) => (
   <button
@@ -12,7 +12,7 @@ export const SidebarItem = ({ icon: Icon, label, active, onClick }: any) => (
     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
       active 
         ? 'bg-blue-600 text-white shadow-lg shadow-blue-200 font-semibold' 
-        : 'text-gray-500 hover:bg-gray-50 hover:text-blue-600'
+        : 'text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900 hover:text-blue-600 dark:hover:text-blue-400'
     }`}
   >
     <Icon className={`w-5 h-5 ${active ? 'text-white' : ''}`} />
@@ -36,17 +36,22 @@ export const Sidebar = ({
   setCadastrosOpen,
   usuarioDfe
 }: any) => {
+  const { theme, toggleTheme } = useTheme();
   const isFiscal = Number(usuarioDfe ?? session?.usuarioDfe ?? 0) > 0 && Number(usuarioDfe ?? session?.usuarioDfe ?? 0) !== 4;
 
   return (
-    <aside className="w-64 bg-white flex flex-col shadow-sm border-r border-gray-100 h-screen sticky top-0 z-50">
-      <div className="p-6 border-b border-gray-50 flex items-center justify-between">
+    <aside className="w-64 bg-white dark:bg-gray-800 flex flex-col shadow-sm border-r border-gray-100 dark:border-gray-700 h-screen sticky top-0 z-50">
+      <div className="p-6 border-b border-gray-50 dark:border-gray-700 flex items-center justify-between">
         <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent flex items-center gap-2">
           <FileText className="w-6 h-6 text-blue-600" />
           DFe IA
         </h1>
         <div className="flex items-center gap-2">
-          <button onClick={onLogout} title="Sair" className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+          <button onClick={toggleTheme} title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
+            className="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-xl transition-all">
+            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
+          <button onClick={onLogout} title="Sair" className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all">
             <LogOut className="w-4 h-4" />
           </button>
         </div>
@@ -60,7 +65,7 @@ export const Sidebar = ({
           <button
             onClick={() => setFinanceiroOpen(!financeiroOpen)}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-              financeiroOpen || ['fin_receber', 'fin_pagar', 'fin_caixa', 'cobranca_boletos', 'cobranca_historico'].includes(activeTab) ? 'text-blue-600 font-bold bg-blue-50/50' : 'text-gray-500 hover:bg-gray-50'
+              financeiroOpen || ['fin_receber', 'fin_pagar', 'fin_caixa', 'cobranca_boletos', 'cobranca_historico'].includes(activeTab) ? 'text-blue-600 font-bold bg-blue-50/50' : 'text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900'
             }`}
           >
             <DollarSign className="w-5 h-5" />
@@ -82,7 +87,7 @@ export const Sidebar = ({
                   key={sub.id}
                   onClick={() => handleSetActiveTab(sub.id)}
                   className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all ${
-                    activeTab === sub.id ? 'bg-blue-600 text-white font-bold shadow-md' : 'text-gray-500 hover:bg-blue-50 hover:text-blue-600'
+                    activeTab === sub.id ? 'bg-blue-600 text-white font-bold shadow-md' : 'text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:bg-blue-50 hover:text-blue-600 dark:hover:text-blue-400'
                   }`}
                 >
                   <sub.icon className="w-3.5 h-3.5" /> {sub.label}
@@ -97,7 +102,7 @@ export const Sidebar = ({
           <button
             onClick={() => setDfeNfeOpen(!dfeNfeOpen)}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-              dfeNfeOpen || ['dfe_nfe', 'dfe_nfe_geral'].includes(activeTab) ? 'text-blue-600 font-bold bg-blue-50/50' : 'text-gray-500 hover:bg-gray-50'
+              dfeNfeOpen || ['dfe_nfe', 'dfe_nfe_geral'].includes(activeTab) ? 'text-blue-600 font-bold bg-blue-50/50' : 'text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900'
             }`}
           >
             <FileText className="w-5 h-5" />
@@ -106,10 +111,10 @@ export const Sidebar = ({
           </button>
           {dfeNfeOpen && (
             <div className="mt-1 ml-4 border-l-2 border-blue-100 pl-2 space-y-1">
-              <button onClick={() => handleSetActiveTab('dfe_nfe')} className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all ${activeTab === 'dfe_nfe' ? 'bg-blue-600 text-white font-bold' : 'text-gray-500 hover:bg-blue-50'}`}>
+              <button onClick={() => handleSetActiveTab('dfe_nfe')} className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all ${activeTab === 'dfe_nfe' ? 'bg-blue-600 text-white font-bold' : 'text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:bg-blue-50'}`}>
                 <Send className="w-3.5 h-3.5" /> Emissão
               </button>
-              <button onClick={() => handleSetActiveTab('dfe_nfe_geral')} className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all ${activeTab === 'dfe_nfe_geral' ? 'bg-blue-600 text-white font-bold' : 'text-gray-500 hover:bg-blue-50'}`}>
+              <button onClick={() => handleSetActiveTab('dfe_nfe_geral')} className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all ${activeTab === 'dfe_nfe_geral' ? 'bg-blue-600 text-white font-bold' : 'text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:bg-blue-50'}`}>
                 <FileText className="w-3.5 h-3.5" /> Geral
               </button>
             </div>
@@ -120,7 +125,7 @@ export const Sidebar = ({
           <button
             onClick={() => setDfeNfceOpen(!dfeNfceOpen)}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-              dfeNfceOpen || ['vendas', 'vendas_geral'].includes(activeTab) ? 'text-blue-600 font-bold bg-blue-50/50' : 'text-gray-500 hover:bg-gray-50'
+              dfeNfceOpen || ['vendas', 'vendas_geral'].includes(activeTab) ? 'text-blue-600 font-bold bg-blue-50/50' : 'text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900'
             }`}
           >
             <QrCode className="w-5 h-5" />
@@ -129,10 +134,10 @@ export const Sidebar = ({
           </button>
           {dfeNfceOpen && (
             <div className="mt-1 ml-4 border-l-2 border-blue-100 pl-2 space-y-1">
-              <button onClick={() => handleSetActiveTab('vendas')} className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all ${activeTab === 'vendas' ? 'bg-blue-600 text-white font-bold' : 'text-gray-500 hover:bg-blue-50'}`}>
+              <button onClick={() => handleSetActiveTab('vendas')} className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all ${activeTab === 'vendas' ? 'bg-blue-600 text-white font-bold' : 'text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:bg-blue-50'}`}>
                 <Send className="w-3.5 h-3.5" /> Emissão
               </button>
-              <button onClick={() => handleSetActiveTab('vendas_geral')} className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all ${activeTab === 'vendas_geral' ? 'bg-blue-600 text-white font-bold' : 'text-gray-500 hover:bg-blue-50'}`}>
+              <button onClick={() => handleSetActiveTab('vendas_geral')} className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all ${activeTab === 'vendas_geral' ? 'bg-blue-600 text-white font-bold' : 'text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:bg-blue-50'}`}>
                 <FileText className="w-3.5 h-3.5" /> Geral
               </button>
             </div>
@@ -152,7 +157,7 @@ export const Sidebar = ({
           <button
             onClick={() => setCadastrosOpen(!cadastrosOpen)}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-              cadastrosOpen || ['ncm', 'usuarios', 'medidas', 'bandeiras', 'transportadores', 'vendedores', 'comissoes', 'cobranca_config', 'config_integracao', 'dfe_config', 'dfe_nfe_dados', 'dfe_nfce_dados', 'dfe_provedor'].includes(activeTab) ? 'text-blue-600 font-bold bg-blue-50/50' : 'text-gray-500 hover:bg-gray-50'
+              cadastrosOpen || ['ncm', 'usuarios', 'medidas', 'bandeiras', 'transportadores', 'vendedores', 'comissoes', 'cobranca_config', 'config_integracao', 'dfe_config', 'dfe_nfe_dados', 'dfe_nfce_dados', 'dfe_provedor'].includes(activeTab) ? 'text-blue-600 font-bold bg-blue-50/50' : 'text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900'
             }`}
           >
             <FolderOpen className="w-5 h-5" />
@@ -178,7 +183,7 @@ export const Sidebar = ({
                   key={sub.id}
                   onClick={() => handleSetActiveTab(sub.id)}
                   className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all ${
-                    activeTab === sub.id ? 'bg-blue-600 text-white font-bold' : 'text-gray-500 hover:bg-blue-50'
+                    activeTab === sub.id ? 'bg-blue-600 text-white font-bold' : 'text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:bg-blue-50'
                   }`}
                 >
                   <sub.icon className="w-3.5 h-3.5" /> {sub.label}
@@ -195,8 +200,8 @@ export const Sidebar = ({
 
       </nav>
 
-      <div className="p-4 border-t border-gray-50">
-        <div className="bg-gray-50 rounded-2xl p-4">
+      <div className="p-4 border-t border-gray-50 dark:border-gray-700">
+        <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-4">
           
           <p className="text-[11px] text-gray-600 font-medium truncate">{session?.nome || ""}</p>
         </div>

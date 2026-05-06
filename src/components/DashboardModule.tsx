@@ -48,28 +48,28 @@ function calcularPeriodo(p: Periodo, customIni?: string, customFim?: string): { 
 // Componente de StatCard com Trend explícito (extensão do StatCard padrão)
 const KPICard = ({ label, value, icon: Icon, color, trend, sub, onClick }: any) => {
   const colorMap: Record<string, string> = {
-    blue: 'text-blue-600 bg-blue-50',
-    green: 'text-emerald-600 bg-emerald-50',
-    red: 'text-red-600 bg-red-50',
-    orange: 'text-orange-600 bg-orange-50',
-    purple: 'text-purple-600 bg-purple-50',
+    blue: 'text-blue-600 bg-blue-50 dark:bg-blue-900/20',
+    green: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20',
+    red: 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20',
+    orange: 'text-orange-600 bg-orange-50 dark:bg-orange-900/20',
+    purple: 'text-purple-600 bg-purple-50 dark:bg-purple-900/20',
   };
-  const trendColor = trend > 0 ? 'text-emerald-600' : trend < 0 ? 'text-red-500' : 'text-gray-400';
+  const trendColor = trend > 0 ? 'text-emerald-600' : trend < 0 ? 'text-red-500 dark:text-red-400' : 'text-gray-400 dark:text-gray-500';
   const TrendIcon = trend > 0 ? TrendingUp : trend < 0 ? TrendingDown : null;
 
   return (
     <div
       onClick={onClick}
-      className={`bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 ${onClick ? 'cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all' : ''}`}
+      className={`bg-white dark:bg-gray-800 dark:bg-gray-800 p-5 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 dark:border-gray-700 ${onClick ? 'cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all' : ''}`}
     >
       <div className="flex items-start justify-between mb-3">
-        <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">{label}</p>
+        <p className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider">{label}</p>
         {Icon && <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${colorMap[color] || colorMap.blue}`}>
           <Icon className="w-4 h-4" />
         </div>}
       </div>
-      <p className="text-2xl font-bold text-gray-800 dark:text-white">{value}</p>
-      {sub && <p className="text-xs text-gray-400 mt-1">{sub}</p>}
+      <p className="text-2xl font-bold text-gray-800 dark:text-gray-100 dark:text-white">{value}</p>
+      {sub && <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{sub}</p>}
       {trend !== undefined && trend !== null && (
         <div className={`flex items-center gap-1 mt-2 ${trendColor}`}>
           {TrendIcon && <TrendIcon className="w-3 h-3" />}
@@ -187,12 +187,12 @@ export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white dark:bg-gray-800 p-4 border border-gray-100 dark:border-gray-700 rounded-xl shadow-2xl backdrop-blur-md">
-          <p className="text-xs font-bold text-gray-500 mb-2">{label}</p>
+        <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 p-4 border border-gray-100 dark:border-gray-700 dark:border-gray-700 rounded-xl shadow-2xl backdrop-blur-md">
+          <p className="text-xs font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-2">{label}</p>
           {payload.map((entry: any, index: number) => (
             <div key={index} className="flex items-center gap-3 mb-1">
               <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }}></div>
-              <p className="text-xs font-bold text-gray-700 dark:text-gray-200">
+              <p className="text-xs font-bold text-gray-700 dark:text-gray-200 dark:text-gray-200">
                 {entry.name}: <span className="text-blue-600">R$ {entry.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
               </p>
             </div>
@@ -206,20 +206,20 @@ export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
   if (loading) return (
     <div className="flex flex-col items-center justify-center py-20 gap-4">
       <RefreshCw className="w-10 h-10 text-blue-600 animate-spin" />
-      <p className="text-gray-400 animate-pulse">Carregando indicadores...</p>
+      <p className="text-gray-400 dark:text-gray-500 animate-pulse">Carregando indicadores...</p>
     </div>
   );
 
   return (
     <div className="space-y-8 pb-10">
       {/* ─── Filtro de Período + Refresh ─── */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 flex flex-wrap items-center gap-3">
-        <Calendar className="w-4 h-4 text-gray-400" />
-        <span className="text-xs font-bold text-gray-500 uppercase">Período:</span>
+      <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 dark:border-gray-700 p-4 flex flex-wrap items-center gap-3">
+        <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+        <span className="text-xs font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 uppercase">Período:</span>
         {(['hoje','semana','mes','mes_passado','custom'] as Periodo[]).map(p => (
           <button key={p} onClick={() => setPeriodo(p)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-              periodo === p ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              periodo === p ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}>
             {PERIODO_LABELS[p]}
           </button>
@@ -227,17 +227,17 @@ export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
         {periodo === 'custom' && (
           <>
             <input type="date" value={customIni} onChange={e => setCustomIni(e.target.value)}
-              className="border border-gray-200 rounded-lg px-2 py-1 text-xs outline-none focus:ring-2 focus:ring-blue-400" />
-            <span className="text-xs text-gray-400">até</span>
+              className="border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1 text-xs outline-none focus:ring-2 focus:ring-blue-400" />
+            <span className="text-xs text-gray-400 dark:text-gray-500">até</span>
             <input type="date" value={customFim} onChange={e => setCustomFim(e.target.value)}
-              className="border border-gray-200 rounded-lg px-2 py-1 text-xs outline-none focus:ring-2 focus:ring-blue-400" />
+              className="border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1 text-xs outline-none focus:ring-2 focus:ring-blue-400" />
           </>
         )}
-        <span className="text-xs text-gray-400 ml-2">
+        <span className="text-xs text-gray-400 dark:text-gray-500 ml-2">
           {dtIni.split('-').reverse().join('/')} a {dtFim.split('-').reverse().join('/')}
         </span>
         <button onClick={handleRefresh} disabled={refreshing}
-          className="ml-auto px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-medium flex items-center gap-2">
+          className="ml-auto px-3 py-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg text-xs font-medium flex items-center gap-2">
           <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
           Atualizar
         </button>
@@ -262,7 +262,7 @@ export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
 
       {/* ─── KPIs Operacionais (clicáveis) ─── */}
       <div>
-        <h4 className="text-xs uppercase font-bold text-gray-400 mb-3 tracking-wider">Operacional</h4>
+        <h4 className="text-xs uppercase font-bold text-gray-400 dark:text-gray-500 mb-3 tracking-wider">Operacional</h4>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <KPICard label="Orçamentos Pendentes"
             value={kpis.orcamentos_pendentes.qtd}
@@ -291,34 +291,34 @@ export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
       {(kpis.contas_receber.vencidas.qtd > 0 || kpis.contas_pagar.vencidas.qtd > 0 ||
         kpis.contas_receber.vencendo_7d.qtd > 0 || kpis.contas_pagar.vencendo_7d.qtd > 0) && (
         <div>
-          <h4 className="text-xs uppercase font-bold text-gray-400 mb-3 tracking-wider">Alertas Financeiros</h4>
+          <h4 className="text-xs uppercase font-bold text-gray-400 dark:text-gray-500 mb-3 tracking-wider">Alertas Financeiros</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {kpis.contas_receber.vencidas.qtd > 0 && (
-              <div onClick={() => goTo('fin_receber')} className="bg-red-50 border-2 border-red-200 rounded-2xl p-5 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all">
-                <div className="flex items-center gap-2 mb-2"><AlertTriangle className="w-4 h-4 text-red-600" /><p className="text-[10px] uppercase font-bold text-red-600">A Receber — Vencidas</p></div>
-                <p className="text-2xl font-bold text-red-700">{fmtBRL(kpis.contas_receber.vencidas.valor)}</p>
-                <p className="text-xs text-red-500 mt-1">{kpis.contas_receber.vencidas.qtd} título(s) — clique para abrir</p>
+              <div onClick={() => goTo('fin_receber')} className="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-2xl p-5 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                <div className="flex items-center gap-2 mb-2"><AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" /><p className="text-[10px] uppercase font-bold text-red-600 dark:text-red-400">A Receber — Vencidas</p></div>
+                <p className="text-2xl font-bold text-red-700 dark:text-red-300">{fmtBRL(kpis.contas_receber.vencidas.valor)}</p>
+                <p className="text-xs text-red-500 dark:text-red-400 mt-1">{kpis.contas_receber.vencidas.qtd} título(s) — clique para abrir</p>
               </div>
             )}
             {kpis.contas_receber.vencendo_7d.qtd > 0 && (
-              <div onClick={() => goTo('fin_receber')} className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all">
-                <div className="flex items-center gap-2 mb-2"><Clock className="w-4 h-4 text-amber-600" /><p className="text-[10px] uppercase font-bold text-amber-600">A Receber — Próx. 7 dias</p></div>
-                <p className="text-2xl font-bold text-amber-700">{fmtBRL(kpis.contas_receber.vencendo_7d.valor)}</p>
-                <p className="text-xs text-amber-500 mt-1">{kpis.contas_receber.vencendo_7d.qtd} título(s) — clique para abrir</p>
+              <div onClick={() => goTo('fin_receber')} className="bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800 rounded-2xl p-5 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                <div className="flex items-center gap-2 mb-2"><Clock className="w-4 h-4 text-amber-600 dark:text-amber-400" /><p className="text-[10px] uppercase font-bold text-amber-600 dark:text-amber-400">A Receber — Próx. 7 dias</p></div>
+                <p className="text-2xl font-bold text-amber-700 dark:text-amber-300">{fmtBRL(kpis.contas_receber.vencendo_7d.valor)}</p>
+                <p className="text-xs text-amber-500 dark:text-amber-400 mt-1">{kpis.contas_receber.vencendo_7d.qtd} título(s) — clique para abrir</p>
               </div>
             )}
             {kpis.contas_pagar.vencidas.qtd > 0 && (
-              <div onClick={() => goTo('fin_pagar')} className="bg-red-50 border-2 border-red-200 rounded-2xl p-5 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all">
-                <div className="flex items-center gap-2 mb-2"><AlertTriangle className="w-4 h-4 text-red-600" /><p className="text-[10px] uppercase font-bold text-red-600">A Pagar — Vencidas</p></div>
-                <p className="text-2xl font-bold text-red-700">{fmtBRL(kpis.contas_pagar.vencidas.valor)}</p>
-                <p className="text-xs text-red-500 mt-1">{kpis.contas_pagar.vencidas.qtd} título(s) — clique para abrir</p>
+              <div onClick={() => goTo('fin_pagar')} className="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-2xl p-5 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                <div className="flex items-center gap-2 mb-2"><AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" /><p className="text-[10px] uppercase font-bold text-red-600 dark:text-red-400">A Pagar — Vencidas</p></div>
+                <p className="text-2xl font-bold text-red-700 dark:text-red-300">{fmtBRL(kpis.contas_pagar.vencidas.valor)}</p>
+                <p className="text-xs text-red-500 dark:text-red-400 mt-1">{kpis.contas_pagar.vencidas.qtd} título(s) — clique para abrir</p>
               </div>
             )}
             {kpis.contas_pagar.vencendo_7d.qtd > 0 && (
-              <div onClick={() => goTo('fin_pagar')} className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all">
-                <div className="flex items-center gap-2 mb-2"><Clock className="w-4 h-4 text-amber-600" /><p className="text-[10px] uppercase font-bold text-amber-600">A Pagar — Próx. 7 dias</p></div>
-                <p className="text-2xl font-bold text-amber-700">{fmtBRL(kpis.contas_pagar.vencendo_7d.valor)}</p>
-                <p className="text-xs text-amber-500 mt-1">{kpis.contas_pagar.vencendo_7d.qtd} título(s) — clique para abrir</p>
+              <div onClick={() => goTo('fin_pagar')} className="bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800 rounded-2xl p-5 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                <div className="flex items-center gap-2 mb-2"><Clock className="w-4 h-4 text-amber-600 dark:text-amber-400" /><p className="text-[10px] uppercase font-bold text-amber-600 dark:text-amber-400">A Pagar — Próx. 7 dias</p></div>
+                <p className="text-2xl font-bold text-amber-700 dark:text-amber-300">{fmtBRL(kpis.contas_pagar.vencendo_7d.valor)}</p>
+                <p className="text-xs text-amber-500 dark:text-amber-400 mt-1">{kpis.contas_pagar.vencendo_7d.qtd} título(s) — clique para abrir</p>
               </div>
             )}
           </div>
@@ -327,47 +327,47 @@ export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
 
       {/* ─── Top 5 Clientes / Produtos ─── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 p-6 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 dark:border-gray-700">
           <div className="flex items-center gap-2 mb-4">
             <Users className="w-5 h-5 text-blue-600" />
-            <h4 className="text-base font-bold text-gray-800 dark:text-white">Top 5 Clientes</h4>
+            <h4 className="text-base font-bold text-gray-800 dark:text-gray-100 dark:text-white">Top 5 Clientes</h4>
           </div>
           {kpis.top_clientes.length === 0 ? (
-            <p className="text-xs text-gray-400 text-center py-8">Nenhum cliente no período</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 text-center py-8">Nenhum cliente no período</p>
           ) : (
             <div className="space-y-2">
               {kpis.top_clientes.map((c: any, i: number) => (
-                <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-700 last:border-0">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold flex-shrink-0">{i + 1}</div>
-                    <p className="text-sm font-medium text-gray-700 truncate">{c.cliente_nome}</p>
+                    <div className="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 flex items-center justify-center text-xs font-bold flex-shrink-0">{i + 1}</div>
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-200 truncate">{c.cliente_nome}</p>
                   </div>
-                  <p className="text-sm font-bold text-blue-700 flex-shrink-0">{fmtBRL(Number(c.total))}</p>
+                  <p className="text-sm font-bold text-blue-700 dark:text-blue-300 flex-shrink-0">{fmtBRL(Number(c.total))}</p>
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-800 dark:bg-gray-800 p-6 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 dark:border-gray-700">
           <div className="flex items-center gap-2 mb-4">
             <Package className="w-5 h-5 text-emerald-600" />
-            <h4 className="text-base font-bold text-gray-800 dark:text-white">Top 5 Produtos</h4>
+            <h4 className="text-base font-bold text-gray-800 dark:text-gray-100 dark:text-white">Top 5 Produtos</h4>
           </div>
           {kpis.top_produtos.length === 0 ? (
-            <p className="text-xs text-gray-400 text-center py-8">Nenhum produto vendido no período</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 text-center py-8">Nenhum produto vendido no período</p>
           ) : (
             <div className="space-y-2">
               {kpis.top_produtos.map((p: any, i: number) => (
-                <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-700 last:border-0">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs font-bold flex-shrink-0">{i + 1}</div>
+                    <div className="w-7 h-7 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 flex items-center justify-center text-xs font-bold flex-shrink-0">{i + 1}</div>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-gray-700 truncate">{p.descricao}</p>
-                      <p className="text-xs text-gray-400">{Number(p.qtd).toLocaleString('pt-BR')} un.</p>
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-200 truncate">{p.descricao}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">{Number(p.qtd).toLocaleString('pt-BR')} un.</p>
                     </div>
                   </div>
-                  <p className="text-sm font-bold text-emerald-700 flex-shrink-0">{fmtBRL(Number(p.total))}</p>
+                  <p className="text-sm font-bold text-emerald-700 dark:text-emerald-300 flex-shrink-0">{fmtBRL(Number(p.total))}</p>
                 </div>
               ))}
             </div>
@@ -376,15 +376,15 @@ export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
       </div>
 
       {/* ─── Gráfico de Evolução ─── */}
-      <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.4 }} className="bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-xl border border-gray-100 dark:border-gray-700">
+      <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.4 }} className="bg-white dark:bg-gray-800 dark:bg-gray-800 p-8 rounded-[2rem] shadow-xl border border-gray-100 dark:border-gray-700 dark:border-gray-700">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h4 className="text-xl font-bold text-gray-800 dark:text-white">Evolução de Vendas</h4>
-            <p className="text-xs text-gray-400 uppercase">ÚLTIMOS 12 MESES</p>
+            <h4 className="text-xl font-bold text-gray-800 dark:text-gray-100 dark:text-white">Evolução de Vendas</h4>
+            <p className="text-xs text-gray-400 dark:text-gray-500 uppercase">ÚLTIMOS 12 MESES</p>
           </div>
           <div className="flex items-center gap-4">
-            {isFiscal && <div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-500 rounded-full"></div><span className="text-[10px] text-gray-500 uppercase">NFC-E</span></div>}
-            {isFiscal && <div className="flex items-center gap-2"><div className="w-3 h-3 bg-emerald-500 rounded-full"></div><span className="text-[10px] text-gray-500 uppercase">NF-E</span></div>}
+            {isFiscal && <div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-500 rounded-full"></div><span className="text-[10px] text-gray-500 dark:text-gray-400 dark:text-gray-500 uppercase">NFC-E</span></div>}
+            {isFiscal && <div className="flex items-center gap-2"><div className="w-3 h-3 bg-emerald-500 rounded-full"></div><span className="text-[10px] text-gray-500 dark:text-gray-400 dark:text-gray-500 uppercase">NF-E</span></div>}
           </div>
         </div>
         <div className="h-[400px] w-full" style={{ minHeight: '400px', minWidth: 0 }}>
@@ -424,15 +424,15 @@ export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
             value={finSummary.total_pagar.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
             icon={TrendingDown} trend={finSummary.trendPagar} color="red" />
         </div>
-        <div className="lg:col-span-2 bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-xl border border-gray-100 dark:border-gray-700">
+        <div className="lg:col-span-2 bg-white dark:bg-gray-800 dark:bg-gray-800 p-8 rounded-[2rem] shadow-xl border border-gray-100 dark:border-gray-700 dark:border-gray-700">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h4 className="text-xl font-bold text-gray-800 dark:text-white">Previsão Financeira</h4>
-              <p className="text-xs text-gray-400 uppercase">PRÓXIMOS 6 MESES</p>
+              <h4 className="text-xl font-bold text-gray-800 dark:text-gray-100 dark:text-white">Previsão Financeira</h4>
+              <p className="text-xs text-gray-400 dark:text-gray-500 uppercase">PRÓXIMOS 6 MESES</p>
             </div>
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2"><div className="w-3 h-3 bg-emerald-500 rounded-full"></div><span className="text-[10px] text-gray-500 uppercase">A RECEBER</span></div>
-              <div className="flex items-center gap-2"><div className="w-3 h-3 bg-red-400 rounded-full"></div><span className="text-[10px] text-gray-500 uppercase">A PAGAR</span></div>
+              <div className="flex items-center gap-2"><div className="w-3 h-3 bg-emerald-500 rounded-full"></div><span className="text-[10px] text-gray-500 dark:text-gray-400 dark:text-gray-500 uppercase">A RECEBER</span></div>
+              <div className="flex items-center gap-2"><div className="w-3 h-3 bg-red-400 rounded-full"></div><span className="text-[10px] text-gray-500 dark:text-gray-400 dark:text-gray-500 uppercase">A PAGAR</span></div>
             </div>
           </div>
           <div className="h-[400px] w-full" style={{ minHeight: '400px', minWidth: 0 }}>

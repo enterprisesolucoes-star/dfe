@@ -14,7 +14,7 @@ export const StatCard = ({ label, value, icon: Icon, color, trend }: any) => {
   
   return (
     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-      className="bg-white border border-[#F1F5F9] rounded-[12px] shadow-sm p-6 flex flex-col justify-between h-full hover:shadow-md transition-shadow duration-300">
+      className="bg-white dark:bg-gray-800 border border-[#F1F5F9] rounded-[12px] shadow-sm p-6 flex flex-col justify-between h-full hover:shadow-md transition-shadow duration-300">
       <div>
         <div className="flex items-center gap-2 text-[#64748B] mb-4">
           <Icon className="w-4 h-4 stroke-[1.5px]" />
@@ -38,11 +38,11 @@ export const StatCard = ({ label, value, icon: Icon, color, trend }: any) => {
 
 export const Input = React.forwardRef<HTMLInputElement, any>(({ label, ...props }, ref) => (
   <div>
-    <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{label}</label>
     <input
       ref={ref}
       {...props}
-      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+      className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
     />
   </div>
 ));
