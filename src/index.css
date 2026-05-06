@@ -23,11 +23,118 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
-/* Dark mode base */
-html.dark body {
-  background-color: #0f172a;
-  color: #e5e7eb;
-}
+/* ═══════════════════════════════════════════════════════
+   Dark Mode — Paleta Quantico (refinada)
+   ─ fundo principal: #0a0e1a (quase preto azulado)
+   ─ cards/elementos: #0f1420 com bordas em #1a1f2e
+   ─ texto principal: #f5f7fa
+   ─ texto secundário: #8892a6
+   ═══════════════════════════════════════════════════════ */
 html.dark {
   color-scheme: dark;
+}
+
+html.dark body {
+  background-color: #0a0e1a;
+  color: #f5f7fa;
+}
+
+/* Substituir os tons padrão do Tailwind no modo dark */
+/* gray-800 (cards) → #0f1420 mais profundo */
+html.dark .dark\:bg-gray-800 {
+  background-color: #0f1420 !important;
+}
+
+/* gray-900 (fundos secundários) → mais escuro ainda */
+html.dark .dark\:bg-gray-900 {
+  background-color: #060912 !important;
+}
+
+/* gray-700 (botões secundários, hovers) */
+html.dark .dark\:bg-gray-700 {
+  background-color: #1a1f2e !important;
+}
+
+html.dark .dark\:hover\:bg-gray-700:hover {
+  background-color: #1a1f2e !important;
+}
+
+/* Bordas mais sutis */
+html.dark .dark\:border-gray-700 {
+  border-color: #1a1f2e !important;
+}
+
+html.dark .dark\:border-gray-600 {
+  border-color: #2a3142 !important;
+}
+
+/* Texto principal — mais limpo que cinza padrão */
+html.dark .dark\:text-gray-100 {
+  color: #f5f7fa !important;
+}
+
+html.dark .dark\:text-gray-200 {
+  color: #e5e9f0 !important;
+}
+
+html.dark .dark\:text-gray-300 {
+  color: #c4cad9 !important;
+}
+
+/* Texto secundário — tom azulado para hierarquia */
+html.dark .dark\:text-gray-400 {
+  color: #8892a6 !important;
+}
+
+html.dark .dark\:text-gray-500 {
+  color: #5a6378 !important;
+}
+
+/* Inputs no dark mode — mais legíveis */
+html.dark input,
+html.dark select,
+html.dark textarea {
+  background-color: #0f1420;
+  color: #f5f7fa;
+  border-color: #1a1f2e;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #5a6378;
+}
+
+/* Scrollbar custom no dark */
+html.dark ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+html.dark ::-webkit-scrollbar-track {
+  background: #0a0e1a;
+}
+html.dark ::-webkit-scrollbar-thumb {
+  background: #1a1f2e;
+  border-radius: 5px;
+}
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #2a3142;
+}
+
+/* Sombras mais discretas no dark */
+html.dark .shadow-sm,
+html.dark .shadow-md {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+}
+html.dark .shadow-lg {
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.5);
+}
+html.dark .shadow-xl,
+html.dark .shadow-2xl {
+  box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.6);
+}
+
+/* Excecao: tela de login mantem visual claro mesmo no dark */
+html.dark .login-keep-light input {
+  background-color: white !important;
+  color: #1f2937 !important;
 }
