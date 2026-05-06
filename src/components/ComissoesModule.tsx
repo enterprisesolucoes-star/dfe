@@ -162,6 +162,27 @@ export const ComissoesTab = ({ showAlert, showConfirm }: ComissoesTabProps) => {
               </select>
             </div>
           </>}
+          <button onClick={() => {
+              const params = new URLSearchParams();
+              if (filtroCompetencia) params.append('competencia', filtroCompetencia);
+              if (filtroStatus)      params.append('status', filtroStatus);
+              if (filtroVendedor)    params.append('vendedor_id', filtroVendedor);
+              window.location.href = `./api.php?action=relatorio_comissoes_geral&${params}`;
+            }}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-medium"
+            title="Baixar relatório geral em PDF">
+            📄 Relatório Geral
+          </button>
+          <button onClick={() => {
+              const params = new URLSearchParams();
+              if (filtroCompetencia) params.append('competencia', filtroCompetencia);
+              if (filtroVendedor)    params.append('vendedor_id', filtroVendedor);
+              window.location.href = `./api.php?action=relatorio_comissoes_recibo&${params}`;
+            }}
+            className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm font-medium"
+            title="Baixar recibo por vendedor (somente comissões aprovadas)">
+            🧾 Recibo Vendedor
+          </button>
           <button onClick={() => aba === 'lista' ? carregarLista() : carregarResumo()}
             className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm">
             Atualizar

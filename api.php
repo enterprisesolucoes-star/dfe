@@ -343,7 +343,9 @@ $modules = [
     'aprovar_comissao'    => 'comissoes',
     'pagar_comissao'      => 'comissoes',
     'listar_comissoes'    => 'comissoes',
-    'resumo_vendedores'   => 'comissoes'
+    'resumo_vendedores'   => 'comissoes',
+    'relatorio_comissoes_geral'  => 'comissoes',
+    'relatorio_comissoes_recibo' => 'comissoes'
 ];
 
 if (isset($modules[$action])) {
