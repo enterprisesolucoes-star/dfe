@@ -262,7 +262,7 @@ switch ($action) {
             $stmt->execute([$empresaId]);
         } else {
             // Fallback: primeiro admin sem empresa_id definida
-            $stmt = $pdo->query("SELECT * FROM empresas LIMIT 1");
+            echo json_encode(null); exit; // empresa_id obrigatório
         }
         $empresa = $stmt->fetch();
         if ($empresa) {

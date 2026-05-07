@@ -32,7 +32,7 @@ switch ($action) {
             $stmt = $pdo->prepare("SELECT * FROM fornecedores WHERE ativo=1 AND empresa_id=? ORDER BY nome ASC");
             $stmt->execute([$empresaId]);
         } else {
-            $stmt = $pdo->query("SELECT * FROM fornecedores WHERE ativo=1 ORDER BY nome ASC");
+            echo json_encode([]); exit; // empresa_id obrigatório
         }
         echo json_encode($stmt->fetchAll());
         break;

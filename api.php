@@ -126,7 +126,7 @@ use App\Services\NfeService;
 use App\Services\PrinterService;
 
 // empresa_id e perfil da sessão PHP — disponíveis em todos os módulos incluídos
-$empresaId = (int)($_SESSION['empresa_id'] ?? $_GET['empresa_id'] ?? $_POST['empresa_id'] ?? $_SERVER['HTTP_X_EMPRESA_ID'] ?? 0);
+$empresaId = (int)($_SESSION['empresa_id'] ?? $_SERVER['HTTP_X_EMPRESA_ID'] ?? 0);
 $usuarioPerfil = $_SESSION['usuario_perfil'] ?? 'operador';
 // Headers vindos do proxy Node têm prioridade (sessão PHP não persiste por causa do proxy)
 $usuarioId    = (int)($_SERVER['HTTP_X_USUARIO_ID'] ?? $_SESSION['usuario_id'] ?? 0);
@@ -349,6 +349,21 @@ $modules = [
     'relatorio_comissoes_geral'  => 'comissoes',
     'relatorio_comissoes_recibo' => 'comissoes'
 ];
+
+
+// Gate: ações que exigem empresa_id identificada — bloqueia IDOR via URL manipulation
+$publicActions = ['login', 'login_admin', 'logout', 'check_vendor', 'ncm_listar', 'ncm_ufs',
+                  'ncm_importar', 'rtc_importar', 'rtc_atualizar_online', 'listar_pre_cadastros',
+                  'aprovar_pre_cadastro', 'reprovar_pre_cadastro', 'status_sefaz',
+                  'system_admin', 'manutencao_global', 'listar_usuarios_admin', 'salvar_usuario_admin',
+                  'excluir_usuario_admin', 'alterar_status_empresa', 'listar_smartpos_admin',
+                  'salvar_smartpos_admin', 'excluir_smartpos_admin', 'listar_empresas_admin',
+                  'salvar_empresa_admin', 'excluir_empresa_admin'];
+if (!in_array($action, $publicActions) && $empresaId === 0) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'message' => 'Não autenticado.']);
+    exit;
+}
 
 if (isset($modules[$action])) {
     $mod = $modules[$action];

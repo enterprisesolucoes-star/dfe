@@ -20,7 +20,7 @@ switch ($action) {
             $stmt = $pdo->prepare("SELECT * FROM produtos WHERE empresa_id=? ORDER BY descricao ASC");
             $stmt->execute([$empresaId]);
         } else {
-            $stmt = $pdo->query("SELECT * FROM produtos ORDER BY descricao ASC");
+            echo json_encode([]); exit; // empresa_id obrigatório
         }
         echo json_encode($stmt->fetchAll());
         break;

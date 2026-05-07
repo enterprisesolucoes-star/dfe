@@ -153,7 +153,7 @@ switch ($action) {
             $stmt = $pdo->prepare("SELECT id, nome, login, perfil, ativo, created_at FROM usuarios WHERE empresa_id=? ORDER BY nome");
             $stmt->execute([$empresaId]);
         } else {
-            $stmt = $pdo->query("SELECT id, nome, login, perfil, ativo, created_at FROM usuarios ORDER BY nome");
+            echo json_encode([]); exit; // empresa_id obrigatório
         }
         echo json_encode($stmt->fetchAll());
         break;
