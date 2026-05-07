@@ -10,6 +10,7 @@ import { CobrancaConfigTab, CobrancaBoletosTab, CobrancaHistoricoTab } from './C
 import { ComissoesTab } from './ComissoesModule';
 import { DashboardTab } from './DashboardModule';
 import { Sidebar } from './SidebarModule';
+import CommandPalette from './CommandPalette';
 import { 
   ProdutoModal, ClienteModal, FornecedorModal, TransportadorModal, MedidaModal, BandeiraModal,
   ProdutosTab, ClientesTab, FornecedoresTab, TransportadoresTab, BandeirasTab, MedidasTab, NcmTab
@@ -107,6 +108,13 @@ const NfceDashboard: React.FC<{ session: Session; onLogout: () => void; onUpdate
   // Dark mode gerenciado pelo ThemeContext
   const { theme: themeMode, toggleTheme } = useTheme();
   const darkMode = themeMode === 'dark';
+  const { toast } = useToast();
+  const [cmdOpen, setCmdOpen] = useState(false);
+  useEffect(() => {
+    const _kh = (e: KeyboardEvent) => { if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); setCmdOpen(o => !o); } };
+    window.addEventListener('keydown', _kh);
+    return () => window.removeEventListener('keydown', _kh);
+  }, []);
 
   const [usuarioDfeAtual, setUsuarioDfeAtual] = useState<number>(Number(session.usuarioDfe) ?? 2);
   const isFiscal = usuarioDfeAtual !== 0 && usuarioDfeAtual !== 4;
@@ -1307,9 +1315,11 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
         />
       )}
 
+      <CommandPalette open={cmdOpen} onClose={() => setCmdOpen(false)} onNavigate={handleSetActiveTab} isFiscal={isFiscal} />
+
       {/* Global Alert/Confirm Modal */}
       {globalModal.isOpen && (
-        <GlobalMessageModal
+      <GlobalMessageModal
           {...globalModal}
           onClose={closeGlobalModal}
           onConfirm={(val) => {
