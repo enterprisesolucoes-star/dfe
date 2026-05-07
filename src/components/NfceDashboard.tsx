@@ -85,6 +85,7 @@ import FormAlert from './FormAlert';
 import { motion, AnimatePresence } from 'motion/react';
 import { Produto, Cliente, Fornecedor, Transportador, Venda as Nfce, Emitente, Medida, Bandeira } from '../types/nfce';
 import { useTheme } from '../contexts/ThemeContext';
+import { useToast } from '../contexts/ToastContext';
 
 const lazyRetry = (componentImport: any) => {
   return lazy(async () => {
@@ -185,7 +186,12 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
   type GlobalModalState = { isOpen: boolean; type: 'alert' | 'confirm' | 'prompt'; title: string; message: string; inputValue?: string; onConfirm?: (val?: string) => void };
   const [globalModal, setGlobalModal] = useState<GlobalModalState>({ isOpen: false, type: 'alert', title: '', message: '' });
 
-  const showAlert = (title: string, message: string) => setGlobalModal({ isOpen: true, type: 'alert', title, message });
+  const showAlert = (title: string, message: string) => {
+    const low = title.toLowerCase();
+    if (low.includes('sucesso') || low.includes('ok')) { toast(message, 'success'); }
+    else if (low.includes('atenção') || low.includes('aviso')) { toast(message, 'warning'); }
+    else { setGlobalModal({ isOpen: true, type: 'alert', title, message }); }
+  };
   const showConfirm = (title: string, message: string, onConfirm: () => void) => setGlobalModal({ isOpen: true, type: 'confirm', title, message, onConfirm });
   const showPrompt = (title: string, message: string, onConfirm: (val: string) => void, initialValue = '') => setGlobalModal({ isOpen: true, type: 'prompt', title, message, inputValue: initialValue, onConfirm });
   const closeGlobalModal = () => setGlobalModal(prev => ({ ...prev, isOpen: false }));
