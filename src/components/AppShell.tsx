@@ -112,7 +112,7 @@ const lazyRetry = (componentImport: any) => {
 
 const NfeDashboard = lazyRetry(() => import('./NfeDashboard'));
 
-const NfceDashboard: React.FC<{ session: Session; onLogout: () => void; onUpdateSession: (s: Session) => void }> = ({ session, onLogout, onUpdateSession }) => {
+const AppShell: React.FC<{ session: Session; onLogout: () => void; onUpdateSession: (s: Session) => void }> = ({ session, onLogout, onUpdateSession }) => {
 
   // Dark mode gerenciado pelo ThemeContext
   const { theme: themeMode, toggleTheme } = useTheme();
@@ -1287,12 +1287,12 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
 };
 
 // â€ â‚¬â€ â‚¬â€ â‚¬ Modal de Devolução â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬
-const NfceDashboardWithProvider: React.FC<{ session: Session; onLogout: () => void; onUpdateSession: (s: Session) => void }> = (props) => (
+const AppShellWithProvider: React.FC<{ session: Session; onLogout: () => void; onUpdateSession: (s: Session) => void }> = (props) => (
   <AppDataProvider>
-    <NfceDashboard {...props} />
+    <AppShell {...props} />
   </AppDataProvider>
 );
-export default NfceDashboardWithProvider;
+export default AppShellWithProvider;
 
 
 

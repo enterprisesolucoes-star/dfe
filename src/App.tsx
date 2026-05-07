@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import LoginScreen from './components/LoginScreen';
-import NfceDashboard from './components/NfceDashboard';
+import AppShell from './components/AppShell';
 import AdminPortal from './components/AdminPortal';
 
 export type Session = {
@@ -64,7 +64,7 @@ export default function App() {
 
   return (
     <div className="antialiased font-sans">
-      <NfceDashboard
+      <AppShell
         session={session}
         onLogout={handleLogout}
         onUpdateSession={handleUpdateSession}

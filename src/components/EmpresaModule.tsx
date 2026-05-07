@@ -656,10 +656,5 @@ const DfeConfigPage = ({
   );
 };
 
-const NfceDashboardWithProvider: React.FC<{ session: Session; onLogout: () => void; onUpdateSession: (s: Session) => void }> = (props) => (
-  <AppDataProvider>
-    <NfceDashboard {...props} />
-  </AppDataProvider>
-);
 
 export { EmpresaPage, IntegracaoPage, DfeConfigPage };
