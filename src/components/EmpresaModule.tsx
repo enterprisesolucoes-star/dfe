@@ -102,6 +102,7 @@ const SmartPosSection = ({ emitente, onUpdate, showAlert }: { emitente: Emitente
 const ConfigTab = ({ emitente, onUpdate, onSave, showAlert, usuarioDfe }: { emitente: Emitente, onUpdate: (e: Emitente) => void, onSave: () => void, showAlert: (title: string, message: string) => void, usuarioDfe?: string | number }) => {
   const [municipios, setMunicipios] = useState<{ id: number, nome: string }[]>([]);
   const [loadingMun, setLoadingMun] = useState(false);
+  const [tabAtivo, setTabAtivo] = useState<'empresa'|'email'|'parametros'>('empresa');
 
   const handleChange = (field: string, value: any) => {
     onUpdate({ ...emitente, [field]: value });
@@ -126,7 +127,6 @@ const ConfigTab = ({ emitente, onUpdate, onSave, showAlert, usuarioDfe }: { emit
     }
   };
 
-  // Carrega municípios quando já há UF salva
   useEffect(() => {
     if (emitente.uf && municipios.length === 0) {
       setLoadingMun(true);
@@ -156,11 +156,23 @@ const ConfigTab = ({ emitente, onUpdate, onSave, showAlert, usuarioDfe }: { emit
   };
 
   const selClass = "w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100";
+  const tabClass = (t: string) =>
+    `px-4 py-2 text-sm font-medium rounded-lg transition-colors ${tabAtivo === t ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`;
 
   return (
-    <div className="max-w-3xl bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-8">
-      <div className="space-y-6">
-        <div className="animate-fadeIn grid grid-cols-2 gap-4">
+    <div className="max-w-3xl">
+      <div className="flex gap-2 mb-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-2">
+        <button onClick={() => setTabAtivo('empresa')} className={tabClass('empresa')}>Dados da Empresa</button>
+        <button onClick={() => setTabAtivo('email')} className={tabClass('email')}>E-mail</button>
+        <button onClick={() => setTabAtivo('parametros')} className={tabClass('parametros')}>Parâmetros</button>
+      </div>
+
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-8">
+        <div className="space-y-6">
+
+        {/* ABA 1: Dados da Empresa */}
+        {tabAtivo === 'empresa' && (
+          <div className="animate-fadeIn grid grid-cols-2 gap-4">
             <Input label="CNPJ *" value={emitente.cnpj} onChange={(e: any) => handleChange('cnpj', e.target.value)} />
             <Input label="Inscrição Estadual *" value={emitente.inscricaoEstadual} onChange={(e: any) => handleChange('inscricaoEstadual', e.target.value)} />
             <div className="col-span-2">
@@ -181,7 +193,6 @@ const ConfigTab = ({ emitente, onUpdate, onSave, showAlert, usuarioDfe }: { emit
             <Input label="Bairro *" value={emitente.bairro || ''} onChange={(e: any) => handleChange('bairro', e.target.value)} />
             <Input label="CEP *" value={emitente.cep || ''} onChange={(e: any) => handleChange('cep', e.target.value)} />
 
-            {/* UF + Telefone na mesma linha (UF subiu) */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">UF (Estado) *</label>
               <select value={emitente.uf || ''} onChange={e => handleUfChange(e.target.value)} className={selClass}>
@@ -191,7 +202,6 @@ const ConfigTab = ({ emitente, onUpdate, onSave, showAlert, usuarioDfe }: { emit
             </div>
             <Input label="Telefone *" value={emitente.telefone || ''} onChange={(e: any) => handleChange('telefone', e.target.value)} />
 
-            {/* Município + Cód. IBGE desceram para cá */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Município *</label>
               <select
@@ -225,12 +235,12 @@ const ConfigTab = ({ emitente, onUpdate, onSave, showAlert, usuarioDfe }: { emit
             {emitente.crt === '1' && (Number(usuarioDfe) === 1 || Number(usuarioDfe) === 2) && (
               <div className="col-span-2 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100/50 space-y-4 animate-fadeIn">
                 <div className="flex items-center gap-3">
-                  <input 
-                    type="checkbox" 
-                    id="gerarCreditoSimples" 
-                    checked={emitente.gerarCreditoSimples || false} 
-                    onChange={(e) => handleChange('gerarCreditoSimples', e.target.checked)} 
-                    className="w-5 h-5 text-blue-600 dark:text-blue-400 rounded focus:ring-blue-500 cursor-pointer" 
+                  <input
+                    type="checkbox"
+                    id="gerarCreditoSimples"
+                    checked={emitente.gerarCreditoSimples || false}
+                    onChange={(e) => handleChange('gerarCreditoSimples', e.target.checked)}
+                    className="w-5 h-5 text-blue-600 dark:text-blue-400 rounded focus:ring-blue-500 cursor-pointer"
                   />
                   <label htmlFor="gerarCreditoSimples" className="text-sm font-semibold text-gray-700 dark:text-gray-200 cursor-pointer">
                     Permitir aos clientes gerar crédito de ICMS do Simples Nacional
@@ -238,12 +248,12 @@ const ConfigTab = ({ emitente, onUpdate, onSave, showAlert, usuarioDfe }: { emit
                 </div>
                 {emitente.gerarCreditoSimples && (
                   <div className="pl-8">
-                    <Input 
-                      label="Alíquota de Crédito do Simples Nacional (%)" 
-                      type="number" 
+                    <Input
+                      label="Alíquota de Crédito do Simples Nacional (%)"
+                      type="number"
                       step="0.01"
-                      value={emitente.aliquotaCreditoSimples || 0} 
-                      onChange={(e: any) => handleChange('aliquotaCreditoSimples', parseFloat(e.target.value) || 0)} 
+                      value={emitente.aliquotaCreditoSimples || 0}
+                      onChange={(e: any) => handleChange('aliquotaCreditoSimples', parseFloat(e.target.value) || 0)}
                       placeholder="Ex: 2.50"
                     />
                     <p className="text-[10px] text-blue-600 dark:text-blue-400 mt-1 uppercase font-bold">
@@ -251,16 +261,14 @@ const ConfigTab = ({ emitente, onUpdate, onSave, showAlert, usuarioDfe }: { emit
                     </p>
                   </div>
                 )}
-                
-                {/* Reforma Tributária — Opção IBS/CBS Por Fora */}
                 {(Number(usuarioDfe) === 1 || Number(usuarioDfe) === 2) && (
-                   <div className="pt-3 mt-3 border-t border-blue-100/50 flex items-center gap-3">
-                    <input 
-                      type="checkbox" 
-                      id="recolhe_ibscbs_fora" 
-                      checked={emitente.recolhe_ibscbs_fora || false} 
-                      onChange={(e) => handleChange('recolhe_ibscbs_fora', e.target.checked)} 
-                      className="w-5 h-5 text-emerald-600 dark:text-emerald-400 rounded focus:ring-emerald-500 cursor-pointer" 
+                  <div className="pt-3 mt-3 border-t border-blue-100/50 flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="recolhe_ibscbs_fora"
+                      checked={emitente.recolhe_ibscbs_fora || false}
+                      onChange={(e) => handleChange('recolhe_ibscbs_fora', e.target.checked)}
+                      className="w-5 h-5 text-emerald-600 dark:text-emerald-400 rounded focus:ring-emerald-500 cursor-pointer"
                     />
                     <label htmlFor="recolhe_ibscbs_fora" className="text-sm font-semibold text-blue-800 dark:text-blue-300 cursor-pointer">
                       Recolher IBS e CBS "Por Fora" do Simples Nacional? (Opção LC 214)
@@ -270,24 +278,22 @@ const ConfigTab = ({ emitente, onUpdate, onSave, showAlert, usuarioDfe }: { emit
               </div>
             )}
 
-            <div className="col-span-2 pt-2">
-              <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Gerar comissão de vendedor</label>
-              <select
-                value={emitente.momento_comissao || 'emissao'}
-                onChange={(e) => handleChange('momento_comissao', e.target.value)}
-                className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              >
-                <option value="emissao">Na emissão do documento (Orçamento Aprovado / OS Concluída / Venda)</option>
-                <option value="pagamento">No pagamento do cliente (baixa em Contas a Receber)</option>
-              </select>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Define quando a comissão do vendedor é contabilizada.</p>
+            <div className="col-span-2 pt-4 border-t border-gray-100 dark:border-gray-700">
+              <button onClick={handleSalvar} className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm">
+                Salvar Dados da Empresa
+              </button>
             </div>
-            <div className="col-span-2 pt-4 border-t border-gray-100 dark:border-gray-700 mt-4">
+          </div>
+        )}
+
+        {/* ABA 2: E-mail */}
+        {tabAtivo === 'email' && (
+          <div className="animate-fadeIn grid grid-cols-2 gap-4">
+            <div className="col-span-2">
               <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
                 <Send className="w-4 h-4 text-blue-600 dark:text-blue-400" /> Envio de Arquivos (Contador / SMTP)
               </h4>
             </div>
-            
             <div className="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input label="E-mail do Contador" type="email" value={emitente.emailContador || ''} onChange={(e: any) => handleChange('emailContador', e.target.value)} />
               <Input label="Servidor SMTP (Host)" placeholder="ex: smtp.hostinger.com" value={emitente.smtpHost || ''} onChange={(e: any) => handleChange('smtpHost', e.target.value)} />
@@ -305,43 +311,74 @@ const ConfigTab = ({ emitente, onUpdate, onSave, showAlert, usuarioDfe }: { emit
                 </select>
               </div>
             </div>
-
+            <div className="col-span-2 pt-4">
+              <button onClick={handleSalvar} className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm">
+                Salvar E-mail
+              </button>
+            </div>
           </div>
-        {/* Financeiro — Juros e Multa */}
-        <div className="pt-6 border-t border-gray-100 dark:border-gray-700 mt-2">
-          <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
-            <DollarSign className="w-4 h-4 text-blue-600 dark:text-blue-400" /> Financeiro — Juros e Multa
-          </h4>
-          <div className="grid grid-cols-3 gap-4">
-            <Input label="Multa (%)" type="number" step="0.01"
-              value={emitente.multa_receber ?? ''}
-              onChange={(e: any) => handleChange('multa_receber', parseFloat(e.target.value) || 0)}
-              placeholder="Ex: 2.00" />
-            <Input label="Juros ao dia (%)" type="number" step="0.01"
-              value={emitente.juros_dia_receber ?? ''}
-              onChange={(e: any) => handleChange('juros_dia_receber', parseFloat(e.target.value) || 0)}
-              placeholder="Ex: 0.033" />
-            <Input label="Carência (dias)" type="number"
-              value={emitente.carencia_dias_receber ?? ''}
-              onChange={(e: any) => handleChange('carencia_dias_receber', parseInt(e.target.value) || 0)}
-              placeholder="Ex: 0" />
+        )}
+
+        {/* ABA 3: Parâmetros */}
+        {tabAtivo === 'parametros' && (
+          <div className="animate-fadeIn space-y-6">
+
+            <div>
+              <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-3 flex items-center gap-2">
+                <DollarSign className="w-4 h-4 text-blue-600 dark:text-blue-400" /> Comissão de Vendedor
+              </h4>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Gerar comissão de vendedor</label>
+                <select
+                  value={emitente.momento_comissao || 'emissao'}
+                  onChange={(e) => handleChange('momento_comissao', e.target.value)}
+                  className={selClass}
+                >
+                  <option value="emissao">Na emissão do documento (Orçamento Aprovado / OS Concluída / Venda)</option>
+                  <option value="pagamento">No pagamento do cliente (baixa em Contas a Receber)</option>
+                </select>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Define quando a comissão do vendedor é contabilizada.</p>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
+              <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
+                <DollarSign className="w-4 h-4 text-blue-600 dark:text-blue-400" /> Financeiro — Juros e Multa
+              </h4>
+              <div className="grid grid-cols-3 gap-4">
+                <Input label="Multa (%)" type="number" step="0.01"
+                  value={emitente.multa_receber ?? ''}
+                  onChange={(e: any) => handleChange('multa_receber', parseFloat(e.target.value) || 0)}
+                  placeholder="Ex: 2.00" />
+                <Input label="Juros ao dia (%)" type="number" step="0.01"
+                  value={emitente.juros_dia_receber ?? ''}
+                  onChange={(e: any) => handleChange('juros_dia_receber', parseFloat(e.target.value) || 0)}
+                  placeholder="Ex: 0.033" />
+                <Input label="Carência (dias)" type="number"
+                  value={emitente.carencia_dias_receber ?? ''}
+                  onChange={(e: any) => handleChange('carencia_dias_receber', parseInt(e.target.value) || 0)}
+                  placeholder="Ex: 0" />
+              </div>
+            </div>
+
+            <div className="border-t border-gray-100 dark:border-gray-700 pt-4">
+              <LogoUploadSection emitente={emitente} onUpdate={onUpdate} showAlert={showAlert} />
+            </div>
+
+            <div className="pt-4">
+              <button onClick={handleSalvar} className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm">
+                Salvar Parâmetros
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Logo da empresa */}
-        <LogoUploadSection emitente={emitente} onUpdate={onUpdate} showAlert={showAlert} />
-
-        <div className="pt-4">
-          <button onClick={handleSalvar} className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm">
-            Salvar Configurações
-          </button>
         </div>
       </div>
     </div>
   );
 };
 
-// â€ â‚¬â€ â‚¬â€ â‚¬ Logo Upload Section â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬
 const LogoUploadSection = ({ emitente, onUpdate, showAlert }: { emitente: Emitente; onUpdate: (e: Emitente) => void; showAlert: (t: string, m: string) => void }) => {
   const [uploading, setUploading] = useState(false);
 
