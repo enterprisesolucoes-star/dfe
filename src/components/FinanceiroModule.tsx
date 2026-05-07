@@ -121,7 +121,50 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobranc
   const [di, setDi] = useState(() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`; });
   const [df, setDf] = useState(() => new Date().toISOString().split('T')[0]);
   const [busca, setBusca] = useState('');
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [baixaTitulo, setBaixaTitulo] = useState<any | null>(null);
+
+  const toggleSelect = (id: number) => setSelectedIds(prev => {
+    const next = new Set(prev);
+    next.has(id) ? next.delete(id) : next.add(id);
+    return next;
+  });
+
+  const toggleSelectAll = () => {
+    const pendentesIds = titulos.filter(t => t.status !== 'Pago').map(t => t.id);
+    const allSel = pendentesIds.length > 0 && pendentesIds.every(id => selectedIds.has(id));
+    setSelectedIds(allSel ? new Set() : new Set(pendentesIds));
+  };
+
+  const baixarLote = () => {
+    if (selectedIds.size === 0) return;
+    const selecionados = titulos.filter(t => selectedIds.has(t.id));
+    const total = selecionados.reduce((a, t) => a + Number(t.valor_total || 0), 0);
+    const hoje = new Date().toISOString().split('T')[0];
+    showConfirm(
+      `Baixar ${selectedIds.size} título(s)`,
+      `Confirmar recebimento de ${total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} com data de hoje (${new Date().toLocaleDateString('pt-BR')})?`,
+      async () => {
+        let ok = 0, fail = 0;
+        for (const id of Array.from(selectedIds)) {
+          const titulo = titulos.find(t => t.id === id);
+          if (!titulo) continue;
+          try {
+            const r = await fetch('./api.php?action=fin_baixar_titulo', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id, data_pagamento: hoje, valor_pago: Number(titulo.valor_total), valor_multa: 0, valor_juros: 0, valor_desconto: 0, conta_id: null })
+            });
+            const d = await r.json();
+            d.success ? ok++ : fail++;
+          } catch { fail++; }
+        }
+        setSelectedIds(new Set());
+        fetchTitulos();
+        showAlert(ok > 0 ? 'Sucesso' : 'Erro', `${ok} título(s) baixado(s).${fail > 0 ? ` ${fail} com falha.` : ''}`);
+      }
+    );
+  };
   const [showLancamento, setShowLancamento] = useState(false);
   const [editTitulo, setEditTitulo] = useState<any | null>(null);
   const [boletoTitulo, setBoletoTitulo] = useState<any | null>(null);
@@ -199,10 +242,24 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobranc
         </div>
       </div>
 
+      {selectedIds.size > 0 && (
+        <div className="flex items-center gap-3 px-4 py-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl">
+          <span className="text-sm font-bold text-blue-700 dark:text-blue-300">{selectedIds.size} título(s) selecionado(s)</span>
+          <button onClick={baixarLote} className="ml-auto px-4 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition-all flex items-center gap-1.5">
+            <CheckCircle className="w-3.5 h-3.5" /> Baixar selecionados
+          </button>
+          <button onClick={() => setSelectedIds(new Set())} className="text-xs text-blue-500 hover:underline">Limpar</button>
+        </div>
+      )}
       <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead className="bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400">
             <tr>
+              <th className="px-4 py-4 w-10">
+                <input type="checkbox" className="w-3.5 h-3.5 rounded accent-blue-600 cursor-pointer"
+                  checked={titulos.filter(t => t.status !== 'Pago').length > 0 && titulos.filter(t => t.status !== 'Pago').every(t => selectedIds.has(t.id))}
+                  onChange={toggleSelectAll} />
+              </th>
               <th className="px-6 py-4 font-bold uppercase text-[10px]">Descrição / Cliente</th>
               <th className="px-6 py-4 font-bold uppercase text-[10px]">Vencimento</th>
               <th className="px-6 py-4 font-bold uppercase text-[10px]">Status</th>
@@ -218,7 +275,14 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobranc
               <EmptyState icon={FileText} title="Nenhum registro encontrado" subtitle="Ajuste os filtros ou cadastre um novo lançamento" />
             )}
             {!loading && titulos.map((t) => (
-              <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
+              <tr key={t.id} onClick={() => t.status !== 'Pago' && toggleSelect(t.id)}
+                className={`hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all cursor-pointer ${selectedIds.has(t.id) ? 'bg-blue-50 dark:bg-blue-900/10' : ''}`}>
+                <td className="px-4 py-4 w-10" onClick={e => e.stopPropagation()}>
+                  {t.status !== 'Pago' && (
+                    <input type="checkbox" className="w-3.5 h-3.5 rounded accent-blue-600 cursor-pointer"
+                      checked={selectedIds.has(t.id)} onChange={() => toggleSelect(t.id)} />
+                  )}
+                </td>
                 <td className="px-6 py-4">
                   <p className="text-xs font-bold text-gray-700 dark:text-gray-200">{t.categoria}</p>
                   <p className="text-[10px] text-blue-600 dark:text-blue-400 font-bold">{t.nome_entidade}</p>

@@ -118,12 +118,59 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
     const [df, setDf] = useState(() => new Date().toISOString().split('T')[0]);
     const [busca, setBusca] = useState('');
   const debouncedBusca = useDebounce(busca);
+    const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+
+    const toggleSelect = (id: number) => setSelectedIds(prev => {
+        const next = new Set(prev);
+        next.has(id) ? next.delete(id) : next.add(id);
+        return next;
+    });
+
+    const toggleSelectAll = () => {
+        const autorizadasIds = lista.filter(n => n.status === 'Autorizada').map(n => n.id);
+        const allSelected = autorizadasIds.every(id => selectedIds.has(id));
+        if (allSelected) setSelectedIds(new Set());
+        else setSelectedIds(new Set(autorizadasIds));
+    };
+
+    const cancelarLote = () => {
+        if (selectedIds.size === 0) return;
+        showPrompt && showPrompt(
+            `Cancelar ${selectedIds.size} NF-e(s)`,
+            'Informe a justificativa (mínimo 15 caracteres — aplica a todas selecionadas):',
+            async (justificativa: string) => {
+                if (!justificativa || justificativa.length < 15) {
+                    showAlert && showAlert('Ação Inválida', 'A justificativa deve ter no mínimo 15 caracteres.');
+                    return;
+                }
+                let ok = 0, fail = 0;
+                for (const id of Array.from(selectedIds)) {
+                    try {
+                        const r = await fetch(`./api.php?action=nfe_cancelar&id=${id}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ justificativa })
+                        });
+                        const d = await r.json();
+                        d.success ? ok++ : fail++;
+                    } catch { fail++; }
+                }
+                setSelectedIds(new Set());
+                fetchNfeList();
+                showAlert && showAlert(
+                    ok > 0 ? 'Sucesso' : 'Erro',
+                    `${ok} cancelada(s) com sucesso.${fail > 0 ? ` ${fail} com falha.` : ''}`
+                );
+            }
+        );
+    };
+
     const fetchNfeList = async () => {
         setLoading(true);
         try {
             const resp = await fetch(`./api.php?action=nfe_listar&data_inicio=${di}&data_fim=${df}`);
             const data = await resp.json();
-            if (Array.isArray(data)) setNfeList(data);
+            if (Array.isArray(data)) { setNfeList(data); setSelectedIds(new Set()); }
         } catch {} finally { setLoading(false); }
     };
     useEffect(() => { fetchNfeList(); }, [di, df]);
@@ -153,10 +200,26 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
                     <input type="text" placeholder="Buscar Nº Nota, Cliente ou Natureza..." value={busca} onChange={e => setBusca(e.target.value)} className="w-full border border-gray-200 dark:border-gray-700 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none" />
                 </div>
             </div>
+            {selectedIds.size > 0 && (
+                <div className="flex items-center gap-3 px-4 py-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl">
+                    <span className="text-sm font-bold text-blue-700 dark:text-blue-300">{selectedIds.size} NF-e(s) selecionada(s)</span>
+                    <button onClick={cancelarLote} className="ml-auto px-4 py-1.5 bg-red-600 text-white text-xs font-bold rounded-xl hover:bg-red-700 transition-all flex items-center gap-1.5">
+                        <X className="w-3.5 h-3.5" /> Cancelar selecionadas
+                    </button>
+                    <button onClick={() => setSelectedIds(new Set())} className="text-xs text-blue-500 hover:underline">Limpar seleção</button>
+                </div>
+            )}
             <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden overflow-x-auto">
                 <table className="w-full text-left text-sm">
                     <thead className="bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400">
                         <tr>
+                            <th className="px-4 py-4 w-10">
+                                <input type="checkbox"
+                                    className="w-3.5 h-3.5 rounded accent-blue-600 cursor-pointer"
+                                    checked={lista.filter(n => n.status === 'Autorizada').length > 0 && lista.filter(n => n.status === 'Autorizada').every(n => selectedIds.has(n.id))}
+                                    onChange={toggleSelectAll}
+                                />
+                            </th>
                             <th className="px-6 py-4 font-bold uppercase text-[10px]">Nº/Série</th>
                             <th className="px-6 py-4 font-bold uppercase text-[10px]">Data</th>
                             <th className="px-6 py-4 font-bold uppercase text-[10px]">Natureza</th>
@@ -169,7 +232,14 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
                         {loading && <SkeletonTable cols={6} />}
                         {!loading && lista.length === 0 && <tr><td colSpan={6} className="px-6 py-8 text-center text-xs text-gray-400 dark:text-gray-500">Nenhuma NF-e encontrada.</td></tr>}
                         {!loading && lista.map((n: any) => (
-                            <tr key={n.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
+                            <tr key={n.id} onClick={() => n.status === 'Autorizada' && toggleSelect(n.id)}
+                                className={`hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all cursor-pointer ${selectedIds.has(n.id) ? 'bg-blue-50 dark:bg-blue-900/10' : ''}`}>
+                                <td className="px-4 py-4 w-10" onClick={e => e.stopPropagation()}>
+                                    {n.status === 'Autorizada' && (
+                                        <input type="checkbox" className="w-3.5 h-3.5 rounded accent-blue-600 cursor-pointer"
+                                            checked={selectedIds.has(n.id)} onChange={() => toggleSelect(n.id)} />
+                                    )}
+                                </td>
                                 <td className="px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-200">{n.numero}/{n.serie || 1}</td>
                                 <td className="px-6 py-4 text-xs text-gray-600 dark:text-gray-300">{n.data_emissao ? new Date(n.data_emissao).toLocaleDateString('pt-BR') : '-'}</td>
                                 <td className="px-6 py-4 text-xs text-gray-600 dark:text-gray-300"><div>{n.natureza_operacao || '-'}</div><div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{n.cliente_nome || ''}{n.cliente_documento ? ` · ${n.cliente_documento}` : ''}</div></td>
