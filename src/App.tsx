@@ -33,6 +33,17 @@ export default function App() {
     setSession(null);
   };
 
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey && e.key === '5') || (e.ctrlKey && e.shiftKey && e.key === 'R')) {
+        e.preventDefault();
+        handleLogout();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
   const handleUpdateSession = (s: Session) => {
     setSession(s);
     if (localStorage.getItem('dfe_session')) {

@@ -87,6 +87,17 @@ const AdminPortal = () => {
     setAdminToken(''); setLoggedIn(false); setEmpresas([]);
   };
 
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey && e.key === '5') || (e.ctrlKey && e.shiftKey && e.key === 'R')) {
+        e.preventDefault();
+        handleLogout();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [loggedIn]);
+
   const abrirModal = async (emp?: any) => {
     setTab('dados');
     setSpForm({ codigo: '', numero_serie: '', integradora: '', apelido: '' });
