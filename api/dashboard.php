@@ -346,32 +346,38 @@ echo json_encode([
             $empFilter = $empresaId ? " AND empresa_id = " . (int)$empresaId : "";
 
             $rows = $pdo->query("
-                SELECT status, COUNT(*) qtd, COALESCE(SUM(valor_total),0) val
+                SELECT modelo, status, COUNT(*) qtd, COALESCE(SUM(valor_total),0) val
                 FROM vendas
                 WHERE data_emissao >= '{$hojeIni}' AND data_emissao <= '{$hojeFim}' {$empFilter}
-                GROUP BY status
+                GROUP BY modelo, status
             ")->fetchAll(PDO::FETCH_ASSOC);
 
             $mapa = [
-                'Autorizada'  => ['nome' => 'Autorizadas',  'cor' => '#22c55e', 'qtd' => 0, 'val' => 0],
-                'Contingencia'=> ['nome' => 'Contingência', 'cor' => '#0ea5e9', 'qtd' => 0, 'val' => 0],
-                'Pendente'    => ['nome' => 'Pendentes',    'cor' => '#f59e0b', 'qtd' => 0, 'val' => 0],
-                'Cancelada'   => ['nome' => 'Canceladas',   'cor' => '#ef4444', 'qtd' => 0, 'val' => 0],
-                'Rejeitada'   => ['nome' => 'Rejeitadas',   'cor' => '#a855f7', 'qtd' => 0, 'val' => 0],
-                'Inutilizada' => ['nome' => 'Inutilizadas', 'cor' => '#6b7280', 'qtd' => 0, 'val' => 0],
+                '65_Autorizada'   => ['nome' => 'NFCe Autorizadas',   'cor' => '#06b6d4', 'qtd' => 0, 'val' => 0],
+                '55_Autorizada'   => ['nome' => 'NFe Autorizadas',    'cor' => '#22c55e', 'qtd' => 0, 'val' => 0],
+                '65_Cancelada'    => ['nome' => 'NFCe Canceladas',    'cor' => '#f97316', 'qtd' => 0, 'val' => 0],
+                '55_Cancelada'    => ['nome' => 'NFe Canceladas',     'cor' => '#ef4444', 'qtd' => 0, 'val' => 0],
+                '65_Contingencia' => ['nome' => 'NFCe Contingencia',  'cor' => '#38bdf8', 'qtd' => 0, 'val' => 0],
+                '55_Contingencia' => ['nome' => 'NFe Contingencia',   'cor' => '#3b82f6', 'qtd' => 0, 'val' => 0],
+                '65_Pendente'     => ['nome' => 'NFCe Pendentes',     'cor' => '#fbbf24', 'qtd' => 0, 'val' => 0],
+                '55_Pendente'     => ['nome' => 'NFe Pendentes',      'cor' => '#f59e0b', 'qtd' => 0, 'val' => 0],
+                '65_Rejeitada'    => ['nome' => 'NFCe Rejeitadas',    'cor' => '#c084fc', 'qtd' => 0, 'val' => 0],
+                '55_Rejeitada'    => ['nome' => 'NFe Rejeitadas',     'cor' => '#a855f7', 'qtd' => 0, 'val' => 0],
+                '65_Inutilizada'  => ['nome' => 'NFCe Inutilizadas',  'cor' => '#9ca3af', 'qtd' => 0, 'val' => 0],
+                '55_Inutilizada'  => ['nome' => 'NFe Inutilizadas',   'cor' => '#6b7280', 'qtd' => 0, 'val' => 0],
             ];
 
             foreach ($rows as $r) {
-                $st = $r['status'];
-                if (isset($mapa[$st])) {
-                    $mapa[$st]['qtd'] = (int)$r['qtd'];
-                    $mapa[$st]['val'] = (float)$r['val'];
+                $key = $r['modelo'] . '_' . $r['status'];
+                if (isset($mapa[$key])) {
+                    $mapa[$key]['qtd'] = (int)$r['qtd'];
+                    $mapa[$key]['val'] = (float)$r['val'];
                 }
             }
 
             $segmentos = [];
             $total_qtd = 0;
-            foreach ($mapa as $st => $info) {
+            foreach ($mapa as $key => $info) {
                 if ($info['qtd'] > 0) {
                     $segmentos[] = $info;
                     $total_qtd += $info['qtd'];
