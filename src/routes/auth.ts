@@ -50,7 +50,7 @@ export async function login(req: Request, res: Response) {
         idClienteSecurity: usuario.empresa_id,
         perfil: usuario.perfil,
       },
-      process.env.JWT_SECRET || "123456",
+      process.env.JWT_SECRET!,
       { expiresIn: "24h" }
     );
 

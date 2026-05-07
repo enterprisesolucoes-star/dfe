@@ -1,3 +1,12 @@
+import "dotenv/config";
+
+// Validação de variáveis críticas no startup
+const _jwtSecret = process.env.JWT_SECRET;
+if (!_jwtSecret || _jwtSecret.length < 32) {
+  console.error("[CRÍTICO] JWT_SECRET ausente ou fraco. Encerrando o servidor.");
+  process.exit(1);
+}
+
 import express from "express";
 import path from "path";
 import cors from "cors";
