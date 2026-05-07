@@ -341,8 +341,8 @@ echo json_encode([
 
     case 'dashboard_status_donut':
         try {
-            $hojeIni = date('Y-m-01');
-            $hojeFim = date('Y-m-t') . ' 23:59:59';
+            $hojeIni = $_GET['dt_inicio'] ?? date('Y-m-01');
+            $hojeFim = ($_GET['dt_fim'] ?? date('Y-m-t')) . ' 23:59:59';
             $empFilter = $empresaId ? " AND empresa_id = " . (int)$empresaId : "";
 
             $rows = $pdo->query("

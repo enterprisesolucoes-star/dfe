@@ -124,7 +124,7 @@ export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
     try {
       // Donut chart de status (sempre mês atual)
       try {
-        const donutRes = await fetch('./api.php?action=dashboard_status_donut');
+        const donutRes = await fetch(`./api.php?action=dashboard_status_donut&dt_inicio=${dtIni}&dt_fim=${dtFim}`);
         const donutJson = await donutRes.json();
         if (donutJson && donutJson.success !== false) setDonutData(donutJson);
       } catch (e) { console.error('donut:', e); }
@@ -280,12 +280,12 @@ export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h4 className="text-base font-bold text-gray-800 dark:text-gray-100">Status de Documentos Fiscais</h4>
-              <p className="text-xs text-gray-400 dark:text-gray-500 uppercase">Mês atual</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 uppercase">{PERIODO_LABELS[periodo]}</p>
             </div>
           </div>
 
           {donutData.segmentos.length === 0 ? (
-            <p className="text-xs text-gray-400 text-center py-12">Nenhum documento emitido neste mês</p>
+            <p className="text-xs text-gray-400 text-center py-12">Nenhum documento no período selecionado</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
               {/* Donut */}
