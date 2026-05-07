@@ -59,7 +59,7 @@ switch ($action) {
         $cStmt->execute($params);
         $total = (int)$cStmt->fetchColumn();
 
-        $stmt = $pdo->prepare("SELECT v.*, c.nome as cliente_nome, c.documento as cliente_documento, c.email as cliente_email FROM vendas v LEFT JOIN clientes c ON c.id = v.cliente_id WHERE $sqlW ORDER BY v.data_emissao DESC LIMIT $limit OFFSET $offset");
+        $stmt = $pdo->prepare("SELECT v.*, c.nome as cliente_nome, c.documento as cliente_documento, c.email as cliente_email, c.telefone as cliente_telefone FROM vendas v LEFT JOIN clientes c ON c.id = v.cliente_id WHERE $sqlW ORDER BY v.data_emissao DESC LIMIT $limit OFFSET $offset");
         $stmt->execute($params);
         echo json_encode(['data' => $stmt->fetchAll(), 'total' => $total, 'page' => $page, 'pages' => (int)ceil($total / $limit), 'limit' => $limit]);
         break;

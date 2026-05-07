@@ -225,12 +225,13 @@ export const OrdemServicoTab = ({
     try {
       const r = await fetch('/api/whatsapp/send-document', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, ...waTarget })
+        body: JSON.stringify({ ...waTarget, phone })
       });
       const d = await r.json();
       if (d.success) { setWaTarget(null); showAlert('WhatsApp', 'OS enviada com sucesso!'); setWaSending(false); return; }
     } catch {}
     setWaSending(false);
+    showAlert('WhatsApp', 'Não foi possível enviar pelo Evolution API. Abrindo WhatsApp Web...');
     window.open(phone ? `https://wa.me/55${phone}?text=${encodeURIComponent(waTarget.caption)}` : `https://wa.me/?text=${encodeURIComponent(waTarget.caption)}`, '_blank');
     setWaTarget(null);
   };

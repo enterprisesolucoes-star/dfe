@@ -78,7 +78,7 @@ export const VendasTab = ({ vendas, onCancelar, onSincronizar, onRetryTef, onExc
     try {
       const r = await fetch('/api/whatsapp/send-document', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, ...waTarget })
+        body: JSON.stringify({ ...waTarget, phone })
       });
       const d = await r.json();
       if (d.success) { setWaTarget(null); }
@@ -177,7 +177,7 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
         try {
             const r = await fetch('/api/whatsapp/send-document', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone, ...waTarget })
+                body: JSON.stringify({ ...waTarget, phone })
             });
             const d = await r.json();
             if (d.success) setWaTarget(null);
@@ -387,7 +387,7 @@ export const NfeDashboardTab = ({ nfeList, showAlert, showPrompt, onNovaNfe, onC
         try {
             const r = await fetch('/api/whatsapp/send-document', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone, ...waTarget })
+                body: JSON.stringify({ ...waTarget, phone })
             });
             const d = await r.json();
             if (d.success) setWaTarget(null);
@@ -479,7 +479,7 @@ export const GeralNfceTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, o
         try {
             const r = await fetch('/api/whatsapp/send-document', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone, ...waTarget })
+                body: JSON.stringify({ ...waTarget, phone })
             });
             const d = await r.json();
             if (d.success) setWaTarget(null);
