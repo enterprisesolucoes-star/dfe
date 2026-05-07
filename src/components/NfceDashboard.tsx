@@ -85,6 +85,7 @@ import FormAlert from './FormAlert';
 import { motion, AnimatePresence } from 'motion/react';
 import { Produto, Cliente, Fornecedor, Transportador, Venda as Nfce, Emitente, Medida, Bandeira } from '../types/nfce';
 import { useTheme } from '../contexts/ThemeContext';
+import { maskCPFCNPJ, maskCEP } from './UIComponents';
 import { useToast } from '../contexts/ToastContext';
 
 const lazyRetry = (componentImport: any) => {
@@ -1746,13 +1747,13 @@ const DevolucaoModal = ({ loading, data, vendaId, modeloOrigem, onClose, onSucce
                 </div>
                 <div>
                   <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">CPF / CNPJ</label>
-                  <input value={clienteManual.documento} onChange={e => setClienteManual(p => ({ ...p, documento: e.target.value }))}
+                  <input value={clienteManual.documento} onChange={e => setClienteManual(p => ({ ...p, documento: maskCPFCNPJ(e.target.value) }))}
                     className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white dark:bg-gray-800"
                     placeholder="000.000.000-00" />
                 </div>
                 <div>
                   <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">CEP</label>
-                  <input value={clienteManual.cep} onChange={e => setClienteManual(p => ({ ...p, cep: e.target.value }))}
+                  <input value={clienteManual.cep} onChange={e => setClienteManual(p => ({ ...p, cep: maskCEP(e.target.value) }))}
                     className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white dark:bg-gray-800"
                     placeholder="00000-000" />
                 </div>

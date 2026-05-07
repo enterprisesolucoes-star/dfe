@@ -87,3 +87,62 @@ export function SkeletonCards({ count = 3 }: { count?: number }) {
     </div>
   );
 }
+
+/* ─── Máscaras de input ─────────────────────────────────────── */
+
+export function maskCPFCNPJ(v: string): string {
+  const d = v.replace(/\D/g, '').slice(0, 14);
+  if (d.length <= 11)
+    return d.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  return d.replace(/(\d{2})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1/$2').replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+}
+
+export function maskCEP(v: string): string {
+  return v.replace(/\D/g, '').slice(0, 8).replace(/(\d{5})(\d)/, '$1-$2');
+}
+
+export function maskPhone(v: string): string {
+  const d = v.replace(/\D/g, '').slice(0, 11);
+  if (d.length <= 10)
+    return d.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{4})(\d)/, '$1-$2');
+  return d.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2');
+}
+
+export function maskCurrency(v: string): string {
+  const num = v.replace(/\D/g, '');
+  if (!num) return '';
+  return (Number(num) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+type MaskType = 'cpfcnpj' | 'cep' | 'phone' | 'currency';
+const MASK_FN: Record<MaskType, (v: string) => string> = {
+  cpfcnpj: maskCPFCNPJ,
+  cep: maskCEP,
+  phone: maskPhone,
+  currency: maskCurrency,
+};
+
+export const MaskedInput = React.forwardRef<HTMLInputElement, any>(
+  ({ label, mask, onChange, ...props }, ref) => {
+    const apply = mask ? MASK_FN[mask as MaskType] : null;
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (apply) {
+        const masked = apply(e.target.value);
+        e.target.value = masked;
+      }
+      onChange?.(e);
+    };
+    return (
+      <div>
+        {label && <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{label}</label>}
+        <input
+          ref={ref}
+          {...props}
+          onChange={handleChange}
+          className={props.className || 'w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm'}
+        />
+      </div>
+    );
+  }
+);
+MaskedInput.displayName = 'MaskedInput';

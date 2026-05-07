@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import {
   Plus, Search, Edit, Trash2, X, Upload, RefreshCw
 } from 'lucide-react';
-import { Input } from './UIComponents';
+import { Input, MaskedInput } from './UIComponents';
 import { Produto, Cliente, Fornecedor, Transportador, Bandeira, Medida } from '../types/nfce';
 
 const ESTADOS_BR = [
@@ -489,7 +489,7 @@ export const ClienteModal = ({ cliente, onClose, onSave, showAlert }: any) => {
         <div className="p-5 space-y-4 overflow-y-auto flex-1">
           <div className="grid grid-cols-2 gap-4">
             <Input label="Nome *" value={form.nome} onChange={(e: any) => setForm({ ...form, nome: e.target.value })} />
-            <Input label="CPF / CNPJ *" value={form.documento} onChange={(e: any) => setForm({ ...form, documento: e.target.value })} />
+            <MaskedInput label="CPF / CNPJ *" mask="cpfcnpj" value={form.documento} onChange={(e: any) => setForm({ ...form, documento: e.target.value })} />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <Input label="Email" type="email" value={form.email || ''} onChange={(e: any) => setForm({ ...form, email: e.target.value })} />
@@ -536,7 +536,7 @@ export const ClienteModal = ({ cliente, onClose, onSave, showAlert }: any) => {
             <div className="grid grid-cols-3 gap-4 mt-3">
               <Input label="Complemento" value={form.endereco?.complemento || ''} onChange={(e: any) => setEnd('complemento', e.target.value)} />
               <Input label="Bairro" value={form.endereco?.bairro || ''} onChange={(e: any) => setEnd('bairro', e.target.value)} />
-              <Input label="CEP" value={form.endereco?.cep || ''} onChange={(e: any) => setEnd('cep', e.target.value)} />
+              <MaskedInput label="CEP" mask="cep" value={form.endereco?.cep || ''} onChange={(e: any) => setEnd('cep', e.target.value)} />
             </div>
             <div className="grid grid-cols-3 gap-4 mt-3">
               <div>
@@ -1109,7 +1109,7 @@ export const FornecedorModal = ({ fornecedor, onClose, onSave, showAlert }: any)
         <div className="p-5 space-y-4 overflow-y-auto flex-1">
           <div className="grid grid-cols-2 gap-4">
             <Input label="Nome / Razão Social *" value={form.nome} onChange={(e: any) => set('nome', e.target.value)} />
-            <Input label="CNPJ / CPF *" value={form.documento} onChange={(e: any) => set('documento', e.target.value)} />
+            <MaskedInput label="CNPJ / CPF *" mask="cpfcnpj" value={form.documento} onChange={(e: any) => set('documento', e.target.value)} />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <Input label="Email" type="email" value={form.email || ''} onChange={(e: any) => set('email', e.target.value)} />
@@ -1126,7 +1126,7 @@ export const FornecedorModal = ({ fornecedor, onClose, onSave, showAlert }: any)
             <div className="grid grid-cols-3 gap-4 mt-3">
               <Input label="Complemento" value={form.endereco?.complemento || ''} onChange={(e: any) => setEnd('complemento', e.target.value)} />
               <Input label="Bairro" value={form.endereco?.bairro || ''} onChange={(e: any) => setEnd('bairro', e.target.value)} />
-              <Input label="CEP" value={form.endereco?.cep || ''} onChange={(e: any) => setEnd('cep', e.target.value)} />
+              <MaskedInput label="CEP" mask="cep" value={form.endereco?.cep || ''} onChange={(e: any) => setEnd('cep', e.target.value)} />
             </div>
             <div className="grid grid-cols-3 gap-4 mt-3">
               <div>
@@ -1184,7 +1184,7 @@ export const TransportadorModal = ({ transportador, onClose, onSave }: any) => {
         <div className="p-5 space-y-4 overflow-y-auto flex-1">
           <div className="grid grid-cols-2 gap-4">
             <Input label="Nome / Razão Social *" value={form.nome} onChange={(e: any) => set('nome', e.target.value)} />
-            <Input label="CNPJ / CPF *" value={form.documento} onChange={(e: any) => set('documento', e.target.value)} />
+            <MaskedInput label="CNPJ / CPF *" mask="cpfcnpj" value={form.documento} onChange={(e: any) => set('documento', e.target.value)} />
           </div>
           <div className="grid grid-cols-3 gap-4">
             <Input label="Inscrição Estadual" value={form.ie || ''} onChange={(e: any) => set('ie', e.target.value)} />
@@ -1201,7 +1201,7 @@ export const TransportadorModal = ({ transportador, onClose, onSave }: any) => {
             </div>
             <div className="grid grid-cols-3 gap-4 mt-3">
               <Input label="Bairro" value={form.endereco?.bairro || ''} onChange={(e: any) => setEnd('bairro', e.target.value)} />
-              <Input label="CEP" value={form.endereco?.cep || ''} onChange={(e: any) => setEnd('cep', e.target.value)} />
+              <MaskedInput label="CEP" mask="cep" value={form.endereco?.cep || ''} onChange={(e: any) => setEnd('cep', e.target.value)} />
               <Input label="Complemento" value={form.endereco?.complemento || ''} onChange={(e: any) => setEnd('complemento', e.target.value)} />
             </div>
             <div className="grid grid-cols-3 gap-4 mt-3">
@@ -1291,7 +1291,7 @@ export const BandeiraModal = ({ bandeira, onClose, onSave }: any) => {
             </select>
           </div>
           <Input label="Bandeira / Credenciadora" value={form.tband_opc || ''} onChange={(e: any) => set('tband_opc', e.target.value)} placeholder="Ex: Visa, Mastercard, Cielo..." />
-          <Input label="CNPJ da Credenciadora" value={form.cnpj_opc || ''} onChange={(e: any) => set('cnpj_opc', e.target.value)} placeholder="Ex: 00000000000000" />
+          <MaskedInput label="CNPJ da Credenciadora" mask="cpfcnpj" value={form.cnpj_opc || ''} onChange={(e: any) => set('cnpj_opc', e.target.value)} placeholder="Ex: 00.000.000/0001-00" />
         </div>
         <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/30">
           <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl">Cancelar</button>

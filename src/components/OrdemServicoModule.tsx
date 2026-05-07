@@ -1,3 +1,4 @@
+import { maskCPFCNPJ } from './UIComponents';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Plus, Search, Edit, Trash2, RefreshCw, X, CheckCircle, Printer, Mail,
@@ -293,7 +294,7 @@ export const OrdemServicoTab = ({
                 ) : (
                   <div className="grid grid-cols-2 gap-3">
                     <input placeholder="Nome / Razão Social" value={form.cliente_nome || ''} onChange={e => setField('cliente_nome', e.target.value)} className={ic} />
-                    <input placeholder="CPF / CNPJ" value={form.cliente_documento || ''} onChange={e => setField('cliente_documento', e.target.value)} className={ic} />
+                    <input placeholder="CPF / CNPJ" value={form.cliente_documento || ''} onChange={e => setField('cliente_documento', maskCPFCNPJ(e.target.value))} className={ic} />
                     <input placeholder="Telefone / WhatsApp" value={form.cliente_telefone || ''} onChange={e => setField('cliente_telefone', e.target.value)} className={ic} />
                     <input placeholder="E-mail" type="email" value={form.cliente_email || ''} onChange={e => setField('cliente_email', e.target.value)} className={ic} />
                   </div>
