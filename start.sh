@@ -1,5 +1,9 @@
 #!/bin/sh
-# Lê Docker Secrets se disponíveis (substitui env vars expostas via docker inspect)
-[ -f /run/secrets/dfe_database_url ] && export DATABASE_URL=
-[ -f /run/secrets/dfe_jwt_secret ]   && export JWT_SECRET=
+# Lê Docker Secrets se disponíveis — substitui env vars expostas em docker inspect
+if [ -f /run/secrets/dfe_database_url ]; then
+  export DATABASE_URL=$(cat /run/secrets/dfe_database_url)
+fi
+if [ -f /run/secrets/dfe_jwt_secret ]; then
+  export JWT_SECRET=$(cat /run/secrets/dfe_jwt_secret)
+fi
 npm install && npx prisma generate && exec npx tsx server.ts
