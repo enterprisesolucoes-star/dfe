@@ -16,6 +16,32 @@ const STATUS_ORC_COLORS: Record<string, string> = {
   Expirado: 'bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400',
 };
 
+
+const WaModal = ({ onClose, onSend, sending, defaultPhone = '' }: { onClose: () => void; onSend: (phone: string) => void; sending: boolean; defaultPhone?: string }) => {
+  const [phone, setPhone] = React.useState(defaultPhone);
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-80 space-y-4" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center gap-2">
+          <MessageCircle className="w-5 h-5 text-green-500" />
+          <h3 className="font-semibold text-gray-800 dark:text-gray-100 text-sm">Enviar por WhatsApp</h3>
+        </div>
+        <input
+          type="tel" placeholder="Telefone com DDD (ex: 11999999999)"
+          value={phone} onChange={e => setPhone(e.target.value.replace(/\D/g, ''))}
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-green-500"
+        />
+        <div className="flex gap-2">
+          <button onClick={onClose} className="flex-1 py-2 text-sm text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">Cancelar</button>
+          <button onClick={() => onSend(phone)} disabled={sending || phone.length < 10} className="flex-1 py-2 text-sm font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center justify-center gap-1.5">
+            {sending ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <MessageCircle className="w-3.5 h-3.5" />}
+            {sending ? 'Enviando...' : 'Enviar'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 const OrcamentosTab = ({
   clientes, produtos, vendedores, emitente, showAlert, showConfirm, isFiscal, onExportarNFCe
 }: {
@@ -44,6 +70,8 @@ const OrcamentosTab = ({
   const [emailOrc, setEmailOrc] = useState<Orcamento | null>(null);
   const [emailDest, setEmailDest] = useState('');
   const [emailSending, setEmailSending] = useState(false);
+  const [waTarget, setWaTarget] = useState<{id: number; action: string; filename: string; caption: string; phone?: string} | null>(null);
+  const [waSending, setWaSending] = useState(false);
 
   // ── Form data ────────────────────────────────────────────────────────────
   const emptyOrc = (): Orcamento => ({ status: 'Rascunho', valor_total: 0, itens: [] });
@@ -172,36 +200,20 @@ const OrcamentosTab = ({
     setSaving(false);
   };
 
-  const handleWhatsApp = async (orc: Orcamento) => {
-    const num = String(orc.numero ?? '').padStart(4, '0');
-    const val = 'R$ ' + Number(orc.valor_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-    const tel = (orc.cliente_telefone || '').replace(/\D/g, '');
-    const caption = `📄 *Orçamento Nº ${num}*\nCliente: ${orc.cliente_nome || '-'}\nTotal: ${val}`;
-
-    // Tenta Evolution API primeiro (envia PDF direto)
+  const sendWhatsApp = async (phone: string) => {
+    if (!waTarget) return;
+    setWaSending(true);
     try {
-      const sr = await fetch('/api/whatsapp/status');
-      if (sr.ok) {
-        const sd = await sr.json();
-        if (sd.state === 'open' && tel) {
-          const dr = await fetch('/api/whatsapp/send-document', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ phone: tel, action: 'orcamento_pdf', id: orc.id, filename: `orcamento_${num}.pdf`, caption })
-          });
-          const dd = await dr.json();
-          if (dd.success) { showAlert('WhatsApp', 'Orçamento enviado com sucesso!'); return; }
-        }
-      }
+      const r = await fetch('/api/whatsapp/send-document', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, ...waTarget })
+      });
+      const d = await r.json();
+      if (d.success) { setWaTarget(null); showAlert('WhatsApp', 'Enviado com sucesso!'); setWaSending(false); return; }
     } catch {}
-
-    // Fallback: abre wa.me com link
-    const val2 = orc.validade ? new Date(orc.validade + 'T12:00:00').toLocaleDateString('pt-BR') : 'Sem prazo';
-    const base = window.location.origin + window.location.pathname.replace(/\/$/, '');
-    const linkPdf = `${base}/./api.php?action=orcamento_pdf&id=${orc.id}`;
-    let msg = `*Orçamento Nº ${num}*\nCliente: ${orc.cliente_nome || '-'}\nTotal: ${val}\nValidade: ${val2}\n`;
-    if (orc.observacao) msg += `Obs: ${orc.observacao}\n`;
-    msg += `\n📄 *Visualize seu Orçamento em PDF clicando abaixo:*\n${linkPdf}`;
-    window.open(tel ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    setWaSending(false);
+    window.open(phone ? `https://wa.me/55${phone}?text=${encodeURIComponent(waTarget.caption)}` : `https://wa.me/?text=${encodeURIComponent(waTarget.caption)}`, '_blank');
+    setWaTarget(null);
   };
 
   const handleEnviarEmail = async () => {
@@ -478,6 +490,7 @@ const OrcamentosTab = ({
   // ── List view ──────────────────────────────────────────────────────────────
   return (
     <div className="space-y-4">
+      {waTarget && <WaModal onClose={() => setWaTarget(null)} onSend={sendWhatsApp} sending={waSending} defaultPhone={waTarget.phone || ''} />}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 flex flex-wrap gap-3 items-center">
         <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
           <span>De:</span>
@@ -527,7 +540,7 @@ const OrcamentosTab = ({
                       <button title="Editar" onClick={() => openForm(orc)} className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400 transition-colors"><Edit className="w-4 h-4" /></button>
                       <button title="Imprimir PDF" onClick={() => handlePrint(orc.id!)} className="p-1.5 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300 transition-colors"><Printer className="w-4 h-4" /></button>
                       <button title="Enviar por e-mail" onClick={() => { setEmailOrc(orc); setEmailDest(orc.cliente_email || ''); setShowEmail(true); }} className="p-1.5 hover:bg-purple-50 rounded-lg text-purple-600 transition-colors"><Mail className="w-4 h-4" /></button>
-                      <button title="Enviar WhatsApp" onClick={() => handleWhatsApp(orc)} className="p-1.5 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-lg text-green-600 dark:text-green-400 transition-colors"><MessageCircle className="w-4 h-4" /></button>
+                      <button title="Enviar WhatsApp" onClick={() => { const num = String(orc.numero ?? '').padStart(4,'0'); const val = 'R$ ' + Number(orc.valor_total).toLocaleString('pt-BR',{minimumFractionDigits:2}); setWaTarget({ id: orc.id!, action: 'orcamento_pdf', filename: `orcamento_${num}.pdf`, caption: `Orcamento No ${num} - ${orc.cliente_nome || 'Cliente'} - ${val}`, phone: (orc.cliente_telefone || '').replace(/\D/g,'') }); }} className="p-1.5 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-lg text-green-600 dark:text-green-400 transition-colors"><MessageCircle className="w-4 h-4" /></button>
                       {isFiscal && <button title="Exportar para NFC-e" onClick={() => handleExportarNFCe(orc)} className="p-1.5 hover:bg-orange-50 rounded-lg text-orange-600 dark:text-orange-400 transition-colors"><ArrowRight className="w-4 h-4" /></button>}
                       <button title="Excluir" onClick={() => handleExcluir(orc.id!)} className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg text-red-500 dark:text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
                     </div>

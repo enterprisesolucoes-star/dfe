@@ -11,6 +11,32 @@ const getLocalToday = () => {
   return new Date(Date.now() - tzOffset).toISOString().split('T')[0];
 };
 
+
+const WaModal = ({ onClose, onSend, sending, defaultPhone = '' }: { onClose: () => void; onSend: (phone: string) => void; sending: boolean; defaultPhone?: string }) => {
+  const [phone, setPhone] = React.useState(defaultPhone);
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-80 space-y-4" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center gap-2">
+          <MessageCircle className="w-5 h-5 text-green-500" />
+          <h3 className="font-semibold text-gray-800 dark:text-gray-100 text-sm">Enviar por WhatsApp</h3>
+        </div>
+        <input
+          type="tel" placeholder="Telefone com DDD (ex: 11999999999)"
+          value={phone} onChange={e => setPhone(e.target.value.replace(/\D/g, ''))}
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-green-500"
+        />
+        <div className="flex gap-2">
+          <button onClick={onClose} className="flex-1 py-2 text-sm text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">Cancelar</button>
+          <button onClick={() => onSend(phone)} disabled={sending || phone.length < 10} className="flex-1 py-2 text-sm font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center justify-center gap-1.5">
+            {sending ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <MessageCircle className="w-3.5 h-3.5" />}
+            {sending ? 'Enviando...' : 'Enviar'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 type OsItem = { id?: number; tipo: 'produto' | 'servico'; produto_id?: number | null; descricao: string; unidade: string; quantidade: number; valor_unitario: number; valor_total: number };
 type OrdemServico = {
   id?: number; numero?: number; status: string; cliente_id?: number | null;
@@ -51,6 +77,8 @@ export const OrdemServicoTab = ({
   const [emailOs, setEmailOs] = useState<OrdemServico | null>(null);
   const [emailDest, setEmailDest] = useState('');
   const [emailSending, setEmailSending] = useState(false);
+  const [waTarget, setWaTarget] = useState<{id: number; action: string; filename: string; caption: string; phone?: string} | null>(null);
+  const [waSending, setWaSending] = useState(false);
 
   // ── View / wizard state ─────────────────────────────────────────────────
   const [viewMode, setViewMode] = useState<'list' | 'form'>('list');
@@ -191,30 +219,20 @@ export const OrdemServicoTab = ({
     setSaving(false);
   };
 
-  const handleWhatsApp = async (os: OrdemServico) => {
-    const num = String(os.numero ?? '').padStart(4, '0');
-    const tel = (os.cliente_telefone || '').replace(/\D/g, '');
-    const caption = `OS Nº ${num} - ${os.cliente_nome || 'Cliente'}`;
-    const filename = `os_${num}.pdf`;
+  const sendWhatsApp = async (phone: string) => {
+    if (!waTarget) return;
+    setWaSending(true);
     try {
-      const sr = await fetch('/api/whatsapp/status');
-      if (sr.ok) {
-        const sd = await sr.json();
-        if (sd.state === 'open' && tel) {
-          const dr = await fetch('/api/whatsapp/send-document', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ phone: tel, action: 'os_pdf', id: os.id, filename, caption })
-          });
-          const dd = await dr.json();
-          if (dd.success) { showAlert('WhatsApp', 'OS enviada com sucesso!'); return; }
-        }
-      }
+      const r = await fetch('/api/whatsapp/send-document', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, ...waTarget })
+      });
+      const d = await r.json();
+      if (d.success) { setWaTarget(null); showAlert('WhatsApp', 'OS enviada com sucesso!'); setWaSending(false); return; }
     } catch {}
-    const val = 'R$ ' + Number(os.valor_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-    const prev = os.previsao ? new Date(os.previsao + 'T12:00:00').toLocaleDateString('pt-BR') : 'Sem prazo';
-    let msg = `*Ordem de Serviço Nº ${num}*\nCliente: ${os.cliente_nome || '-'}\nTotal: ${val}\nPrevisão: ${prev}\n`;
-    if (os.observacao) msg += `Obs: ${os.observacao}\n`;
-    window.open(tel ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    setWaSending(false);
+    window.open(phone ? `https://wa.me/55${phone}?text=${encodeURIComponent(waTarget.caption)}` : `https://wa.me/?text=${encodeURIComponent(waTarget.caption)}`, '_blank');
+    setWaTarget(null);
   };
 
   const handleEnviarEmail = async () => {
@@ -474,6 +492,7 @@ export const OrdemServicoTab = ({
   // ── List view ──────────────────────────────────────────────────────────────
   return (
     <div className="space-y-4">
+      {waTarget && <WaModal onClose={() => setWaTarget(null)} onSend={sendWhatsApp} sending={waSending} defaultPhone={waTarget.phone || ''} />}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 flex flex-wrap gap-3 items-center">
         <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
           <span>De:</span>
@@ -524,7 +543,7 @@ export const OrdemServicoTab = ({
                       <button title="Editar" onClick={() => openForm(os)} className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400"><Edit className="w-4 h-4" /></button>
                       <button title="PDF" onClick={() => handlePrint(os.id!)} className="p-1.5 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300"><Printer className="w-4 h-4" /></button>
                       <button title="E-mail" onClick={() => { setEmailOs(os); setEmailDest(os.cliente_email || ''); setShowEmail(true); }} className="p-1.5 hover:bg-purple-50 rounded-lg text-purple-600"><Mail className="w-4 h-4" /></button>
-                      <button title="WhatsApp" onClick={() => handleWhatsApp(os)} className="p-1.5 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-lg text-green-600 dark:text-green-400"><MessageCircle className="w-4 h-4" /></button>
+                      <button title="WhatsApp" onClick={() => { const num = String(os.numero ?? '').padStart(4,'0'); const val = 'R$ ' + Number(os.valor_total).toLocaleString('pt-BR',{minimumFractionDigits:2}); setWaTarget({ id: os.id!, action: 'os_pdf', filename: `os_${num}.pdf`, caption: `OS No ${num} - ${os.cliente_nome || 'Cliente'} - ${val}`, phone: (os.cliente_telefone || '').replace(/\D/g,'') }); }} className="p-1.5 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-lg text-green-600 dark:text-green-400"><MessageCircle className="w-4 h-4" /></button>
                       <button title="Excluir" onClick={() => handleExcluir(os.id!)} className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg text-red-500 dark:text-red-400"><Trash2 className="w-4 h-4" /></button>
                     </div>
                   </td>

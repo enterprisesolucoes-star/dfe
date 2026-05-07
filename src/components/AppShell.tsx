@@ -310,6 +310,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       const response = await fetch(`./api.php?action=nfe_listar&data_inicio=${primeiroDia}&data_fim=${hoje}`);
       const data = await response.json();
       if (Array.isArray(data)) setNfeList(data);
+      else if (data && Array.isArray(data.data)) setNfeList(data.data);
     } catch (error) {
       console.error("Erro ao buscar NF-e:", error);
     }
