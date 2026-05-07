@@ -146,3 +146,55 @@ export const MaskedInput = React.forwardRef<HTMLInputElement, any>(
   }
 );
 MaskedInput.displayName = 'MaskedInput';
+
+/* ─── Top Progress Bar ───────────────────────────────────────── */
+import { useRef as _useRef, useEffect as _useEffect } from 'react';
+
+export function TopProgressBar({ active }: { active: boolean }) {
+  return (
+    <div className={`fixed top-0 left-0 right-0 z-[10000] h-[2px] transition-opacity duration-300 ${active ? 'opacity-100' : 'opacity-0'}`}>
+      <div
+        className="h-full bg-blue-500"
+        style={{
+          animation: active ? 'topbar-progress 0.8s ease-in-out infinite alternate' : 'none',
+          width: active ? '90%' : '100%',
+          transition: active ? 'none' : 'width 0.3s ease',
+        }}
+      />
+      <style>{`@keyframes topbar-progress { from { width: 20%; } to { width: 85%; } }`}</style>
+    </div>
+  );
+}
+
+/* ─── useCountUp hook ────────────────────────────────────────── */
+export function useCountUp(target: number, duration = 900): number {
+  const [value, setValue] = React.useState(0);
+  const raf = _useRef<number>(0);
+  _useEffect(() => {
+    if (!target) { setValue(0); return; }
+    const start = performance.now();
+    const tick = (now: number) => {
+      const p = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      setValue(Math.round(target * ease));
+      if (p < 1) raf.current = requestAnimationFrame(tick);
+    };
+    raf.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf.current);
+  }, [target, duration]);
+  return value;
+}
+
+/* ─── Empty State ────────────────────────────────────────────── */
+export function EmptyState({ icon: Icon, title, subtitle }: { icon?: React.ElementType; title: string; subtitle?: string }) {
+  const Ic = Icon;
+  return (
+    <tr>
+      <td colSpan={99} className="px-6 py-16 text-center">
+        {Ic && <Ic className="w-10 h-10 mx-auto mb-3 text-gray-200 dark:text-gray-700" />}
+        <p className="text-sm font-medium text-gray-400 dark:text-gray-500">{title}</p>
+        {subtitle && <p className="text-xs text-gray-300 dark:text-gray-600 mt-1">{subtitle}</p>}
+      </td>
+    </tr>
+  );
+}

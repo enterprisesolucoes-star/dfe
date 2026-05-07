@@ -118,7 +118,7 @@ export const ComprasTab = ({
             {loading ? (
               <SkeletonTable cols={6} />
             ) : filtradas.length === 0 ? (
-              <tr><td colSpan={6} className="px-4 py-12 text-center text-gray-400 dark:text-gray-500">Nenhuma compra localizada no período.</td></tr>
+              <EmptyState icon={ShoppingCart} title="Nenhuma compra no período" subtitle="Importe um XML ou registre uma compra manual" />
             ) : filtradas.map(c => (
               <tr key={c.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-all">
                 <td className="px-4 py-3 font-medium text-gray-800 dark:text-gray-100">#{c.numero_nf}</td>

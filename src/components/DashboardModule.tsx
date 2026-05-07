@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, BarChart, Bar } from 'recharts';
 import { DollarSign, CheckCircle, XCircle, TrendingDown, TrendingUp, RefreshCw, FileText, Wrench, Users, Package, AlertTriangle, Clock, Calendar } from 'lucide-react';
-import { StatCard } from './UIComponents';
+import { StatCard, useCountUp, EmptyState } from './UIComponents';
 
 // ─────────────────────────────────────────
 // DASHBOARD MODULE — KPIs com filtro de período + cards clicáveis + trends
@@ -56,6 +56,8 @@ const KPICard = ({ label, value, icon: Icon, color, trend, sub, onClick }: any) 
   };
   const trendColor = trend > 0 ? 'text-emerald-600' : trend < 0 ? 'text-red-500 dark:text-red-400' : 'text-gray-400 dark:text-gray-500';
   const TrendIcon = trend > 0 ? TrendingUp : trend < 0 ? TrendingDown : null;
+  const isNumeric = typeof value === 'number';
+  const animated = useCountUp(isNumeric ? value : 0);
 
   return (
     <div
@@ -68,7 +70,7 @@ const KPICard = ({ label, value, icon: Icon, color, trend, sub, onClick }: any) 
           <Icon className="w-4 h-4" />
         </div>}
       </div>
-      <p className="text-2xl font-bold text-gray-800 dark:text-gray-100 dark:text-white">{value}</p>
+      <p className="text-2xl font-bold text-gray-800 dark:text-gray-100 dark:text-white">{isNumeric ? animated : value}</p>
       {sub && <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{sub}</p>}
       {trend !== undefined && trend !== null && (
         <div className={`flex items-center gap-1 mt-2 ${trendColor}`}>

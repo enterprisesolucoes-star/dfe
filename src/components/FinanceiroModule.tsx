@@ -1,4 +1,4 @@
-import { SkeletonTable } from './UIComponents';
+import { SkeletonTable, EmptyState } from './UIComponents';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { DollarSign, CheckCircle, Trash2, Search, TrendingUp, TrendingDown, Plus, RotateCcw, Edit2, FileText, Loader2, Copy, ExternalLink } from 'lucide-react';
@@ -215,7 +215,7 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobranc
               <SkeletonTable cols={5} />
             )}
             {!loading && titulos.length === 0 && (
-              <tr><td colSpan={5} className="px-6 py-8 text-center text-xs text-gray-400 dark:text-gray-500">Nenhum registro encontrado.</td></tr>
+              <EmptyState icon={FileText} title="Nenhum registro encontrado" subtitle="Ajuste os filtros ou cadastre um novo lançamento" />
             )}
             {!loading && titulos.map((t) => (
               <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
@@ -857,7 +857,7 @@ export const CaixaView = ({ emitente, showAlert, showConfirm }: { emitente: any,
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
             {loading && <SkeletonTable cols={6} />}
-            {!loading && movimentos.length === 0 && <tr><td colSpan={6} className="px-6 py-8 text-center text-xs text-gray-400 dark:text-gray-500">Nenhum movimento encontrado.</td></tr>}
+            {!loading && movimentos.length === 0 && <EmptyState icon={History} title="Nenhum movimento encontrado" subtitle="Selecione outro período ou registre um novo lançamento" />}
             {!loading && movimentos.map((m) => (
               <tr key={m.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
                 <td className="px-6 py-4 text-xs text-gray-600 dark:text-gray-300">{m.data_movimento ? new Date(m.data_movimento).toLocaleDateString('pt-BR') : '-'}</td>

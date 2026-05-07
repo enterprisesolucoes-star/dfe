@@ -3,7 +3,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { ComprasTab, ImportXmlModal, CompraModal } from './ComprasModule';
 import { OrdemServicoTab } from './OrdemServicoModule';
 import { RelatoriosHub } from './RelatorioTefModule';
-import { StatCard, Input } from './UIComponents';
+import { StatCard, Input, TopProgressBar } from './UIComponents';
 import { FinanceiroView, CaixaView, BaixaModal, ParcelamentoModal } from './FinanceiroModule';
 import { PedidoTab } from './PedidoModule';
 import { CobrancaConfigTab, CobrancaBoletosTab, CobrancaHistoricoTab } from './CobrancaModule';
@@ -110,6 +110,7 @@ const NfceDashboard: React.FC<{ session: Session; onLogout: () => void; onUpdate
   const darkMode = themeMode === 'dark';
   const { toast } = useToast();
   const [cmdOpen, setCmdOpen] = useState(false);
+  const [navLoading, setNavLoading] = useState(false);
   useEffect(() => {
     const _kh = (e: KeyboardEvent) => { if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); setCmdOpen(o => !o); } };
     window.addEventListener('keydown', _kh);
@@ -129,6 +130,8 @@ const [prevTab, setPrevTab] = useState<typeof activeTab>(session.empresaConfigur
 
 const handleSetActiveTab = (tab: typeof activeTab) => {
   if (empresaBloqueada && !CONFIG_TABS.includes(tab)) return;
+  setNavLoading(true);
+  setTimeout(() => setNavLoading(false), 350);
   setPrevTab(activeTab);
   setActiveTab(tab);
 };
@@ -1017,6 +1020,8 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
   };
 
   return (
+    <>
+      <TopProgressBar active={navLoading} />
     <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#0a0e1a] flex flex-col">
       <div className="flex-1 flex">
         <Sidebar
@@ -1413,6 +1418,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       />
       </div>
     </div>
+    </>
   );
 };
 
