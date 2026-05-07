@@ -111,7 +111,23 @@ switch ($action) {
                 $params[] = "%$busca%";
             }
 
-            $sqlW  = implode(" AND ", $where);
+            $page   = max(1, (int)($_GET['page']  ?? 1));
+            $limit  = min(200, max(10, (int)($_GET['limit'] ?? 50)));
+            $offset = ($page - 1) * $limit;
+            $sqlW   = implode(" AND ", $where);
+
+            $aggStmt = $pdo->prepare("SELECT COUNT(*) as cnt,
+                SUM(CASE WHEN f.status IN ('Pendente','Parcial') THEN f.valor_total - f.valor_pago ELSE 0 END) as pendente,
+                SUM(CASE WHEN f.status IN ('Pago','Parcial') THEN f.valor_pago ELSE 0 END) as pago
+                FROM financeiro f
+                LEFT JOIN clientes c      ON f.entidade_id = c.id
+                LEFT JOIN fornecedores fo ON f.entidade_id = fo.id
+                LEFT JOIN vendas v        ON f.venda_id = v.id
+                LEFT JOIN clientes c2     ON v.cliente_id = c2.id
+                WHERE $sqlW");
+            $aggStmt->execute($params);
+            $agg = $aggStmt->fetch(PDO::FETCH_ASSOC);
+
             $query = "SELECT f.*,
                         COALESCE(c.nome, fo.nome, c2.nome, '') as nome_entidade
                       FROM financeiro f
@@ -119,20 +135,21 @@ switch ($action) {
                       LEFT JOIN fornecedores fo ON f.entidade_id = fo.id
                       LEFT JOIN vendas v        ON f.venda_id = v.id
                       LEFT JOIN clientes c2     ON v.cliente_id = c2.id
-                      WHERE $sqlW ORDER BY f.vencimento ASC";
+                      WHERE $sqlW ORDER BY f.vencimento ASC
+                      LIMIT $limit OFFSET $offset";
 
             $stmt = $pdo->prepare($query);
             $stmt->execute($params);
-            $titulos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            $totalPendente = 0;
-            $totalPago     = 0;
-            foreach ($titulos as $t) {
-                if (in_array($t['status'], ['Pendente','Parcial'])) $totalPendente += ($t['valor_total'] - $t['valor_pago']);
-                if (in_array($t['status'], ['Pago','Parcial']))     $totalPago     += $t['valor_pago'];
-            }
-
-            echo json_encode(['titulos' => $titulos, 'total_pendente' => $totalPendente, 'total_pago' => $totalPago]);
+            echo json_encode([
+                'titulos'        => $stmt->fetchAll(PDO::FETCH_ASSOC),
+                'total_pendente' => (float)($agg['pendente'] ?? 0),
+                'total_pago'     => (float)($agg['pago']     ?? 0),
+                'total'          => (int)($agg['cnt']        ?? 0),
+                'page'           => $page,
+                'pages'          => (int)ceil((int)($agg['cnt'] ?? 0) / $limit),
+                'limit'          => $limit,
+            ]);
         } catch (\Exception $e) {
             echo json_encode(['error' => true, 'message' => $e->getMessage(), 'titulos' => [], 'total_pendente' => 0, 'total_pago' => 0]);
         }
@@ -411,12 +428,17 @@ switch ($action) {
         
     case 'fin_resumo_dashboard':
         migrarTabelasFinanceiras($pdo);
-        $hoje = date('Y-m-d');
+        $hoje     = date('Y-m-d');
+        $cacheKey = "fin_resumo_{$empresaId}_{$hoje}";
+        if (function_exists('apcu_fetch') && ($cached = apcu_fetch($cacheKey)) !== false) {
+            echo json_encode($cached); break;
+        }
         $resumo = [
             'pagar_hoje'    => $pdo->query("SELECT SUM(valor_total - valor_pago) FROM financeiro WHERE empresa_id=$empresaId AND tipo='P' AND status IN ('Pendente','Parcial') AND vencimento='$hoje'")->fetchColumn() ?: 0,
             'receber_hoje'  => $pdo->query("SELECT SUM(valor_total - valor_pago) FROM financeiro WHERE empresa_id=$empresaId AND tipo='R' AND status IN ('Pendente','Parcial') AND vencimento='$hoje'")->fetchColumn() ?: 0,
             'saldo_contas'  => $pdo->query("SELECT SUM(valor * IF(tipo='C', 1, -1)) FROM caixa_movimentos WHERE empresa_id=$empresaId")->fetchColumn() ?: 0,
         ];
+        if (function_exists('apcu_store')) apcu_store($cacheKey, $resumo, 60);
         echo json_encode($resumo);
         break;
 

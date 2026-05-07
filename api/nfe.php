@@ -45,10 +45,23 @@ switch ($action) {
         if ($di) { $where[] = "DATE(v.data_emissao) >= ?"; $params[] = $di; }
         if ($df) { $where[] = "DATE(v.data_emissao) <= ?"; $params[] = $df; }
 
-        $sqlW = implode(' AND ', $where);
-        $stmt = $pdo->prepare("SELECT v.*, c.nome as cliente_nome, c.documento as cliente_documento, c.email as cliente_email FROM vendas v LEFT JOIN clientes c ON c.id = v.cliente_id WHERE $sqlW ORDER BY v.data_emissao DESC LIMIT 500");
+        $busca = trim($_GET['busca'] ?? '');
+        if ($busca !== '') {
+            $where[] = "(c.nome LIKE ? OR CAST(v.numero AS CHAR) LIKE ? OR v.natureza_operacao LIKE ?)";
+            $params[] = "%$busca%"; $params[] = "%$busca%"; $params[] = "%$busca%";
+        }
+        $page   = max(1, (int)($_GET['page']  ?? 1));
+        $limit  = min(100, max(10, (int)($_GET['limit'] ?? 50)));
+        $offset = ($page - 1) * $limit;
+        $sqlW   = implode(' AND ', $where);
+
+        $cStmt = $pdo->prepare("SELECT COUNT(*) FROM vendas v LEFT JOIN clientes c ON c.id = v.cliente_id WHERE $sqlW");
+        $cStmt->execute($params);
+        $total = (int)$cStmt->fetchColumn();
+
+        $stmt = $pdo->prepare("SELECT v.*, c.nome as cliente_nome, c.documento as cliente_documento, c.email as cliente_email FROM vendas v LEFT JOIN clientes c ON c.id = v.cliente_id WHERE $sqlW ORDER BY v.data_emissao DESC LIMIT $limit OFFSET $offset");
         $stmt->execute($params);
-        echo json_encode($stmt->fetchAll());
+        echo json_encode(['data' => $stmt->fetchAll(), 'total' => $total, 'page' => $page, 'pages' => (int)ceil($total / $limit), 'limit' => $limit]);
         break;
 
     case 'nfe_emitir':

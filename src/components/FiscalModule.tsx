@@ -1,4 +1,4 @@
-import { SkeletonTable, useDebounce} from './UIComponents';
+import { SkeletonTable, useDebounce, Pagination } from './UIComponents';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { FileText, Search, RefreshCw, X, Printer, 
@@ -119,6 +119,8 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
     const [busca, setBusca] = useState('');
   const debouncedBusca = useDebounce(busca);
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+    const [nfePage, setNfePage] = useState(1);
+    const [nfePagination, setNfePagination] = useState({ total: 0, pages: 0 });
 
     const toggleSelect = (id: number) => setSelectedIds(prev => {
         const next = new Set(prev);
@@ -165,16 +167,23 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
         );
     };
 
-    const fetchNfeList = async () => {
+    const fetchNfeList = async (page = nfePage) => {
         setLoading(true);
         try {
-            const resp = await fetch(`./api.php?action=nfe_listar&data_inicio=${di}&data_fim=${df}`);
+            const p = new URLSearchParams({ action: 'nfe_listar', data_inicio: di, data_fim: df, page: String(page), limit: '50' });
+            if (debouncedBusca) p.set('busca', debouncedBusca);
+            const resp = await fetch(`./api.php?${p}`);
             const data = await resp.json();
-            if (Array.isArray(data)) { setNfeList(data); setSelectedIds(new Set()); }
+            if (data && Array.isArray(data.data)) {
+                setNfeList(data.data);
+                setNfePagination({ total: data.total, pages: data.pages });
+                setSelectedIds(new Set());
+            }
         } catch {} finally { setLoading(false); }
     };
-    useEffect(() => { fetchNfeList(); }, [di, df]);
-    const lista = nfeList.filter(n => !debouncedBusca || String(n.numero || '').includes(debouncedBusca) || (n.natureza_operacao || '').toLowerCase().includes(debouncedBusca.toLowerCase()));
+    useEffect(() => { setNfePage(1); }, [di, df, debouncedBusca]);
+    useEffect(() => { fetchNfeList(nfePage); }, [nfePage, di, df, debouncedBusca]);
+    const lista = nfeList;
     const totAutorizado = lista.filter(n => n.status === 'Autorizada' && n.finalidade !== '4' && n.finalidade !== 4 && !(n.natureza_operacao || '').toUpperCase().includes('DEVOL')).reduce((a, n) => a + Number(n.valor_total || 0), 0);
     const qtdAutorizadas = lista.filter(n => n.status === 'Autorizada').length;
     const qtdCanceladas = lista.filter(n => n.status === 'Cancelada').length;
@@ -261,6 +270,7 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
                         ))}
                     </tbody>
                 </table>
+                {nfePagination.pages > 1 && <Pagination page={nfePage} pages={nfePagination.pages} total={nfePagination.total} limit={50} onChange={p => setNfePage(p)} />}
             </div>
             {cceModal.open && <CceModal nfe={cceModal.nfe} showAlert={showAlert} onClose={() => setCceModal({open: false, nfe: null})} />}
         </div>

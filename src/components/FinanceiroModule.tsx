@@ -1,4 +1,4 @@
-import { SkeletonTable, EmptyState } from './UIComponents';
+import { SkeletonTable, EmptyState, Pagination } from './UIComponents';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { DollarSign, CheckCircle, Trash2, Search, TrendingUp, TrendingDown, Plus, RotateCcw, Edit2, FileText, Loader2, Copy, ExternalLink } from 'lucide-react';
@@ -122,6 +122,8 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobranc
   const [df, setDf] = useState(() => new Date().toISOString().split('T')[0]);
   const [busca, setBusca] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({ total: 0, pages: 0 });
   const [baixaTitulo, setBaixaTitulo] = useState<any | null>(null);
 
   const toggleSelect = (id: number) => setSelectedIds(prev => {
@@ -169,22 +171,25 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobranc
   const [editTitulo, setEditTitulo] = useState<any | null>(null);
   const [boletoTitulo, setBoletoTitulo] = useState<any | null>(null);
 
-  const fetchTitulos = async () => {
+  const fetchTitulos = async (p = page) => {
     setLoading(true);
     try {
-      const resp = await fetch(`./api.php?action=fin_listar_titulos&tipo=${tipo}&status=${filtroStatus}&di=${di}&df=${df}&busca=${encodeURIComponent(busca.trim())}`);
+      const params = new URLSearchParams({ action: 'fin_listar_titulos', tipo, status: filtroStatus, di, df, busca: busca.trim(), page: String(p), limit: '50' });
+      const resp = await fetch(`./api.php?${params}`);
       const data = await resp.json();
       if (Array.isArray(data)) {
         setTitulos(data); setTotPendente(0); setTotPago(0);
       } else {
         setTitulos(data.titulos || []);
+        setPagination({ total: data.total ?? 0, pages: data.pages ?? 0 });
         setTotPendente(data.total_pendente || 0);
         setTotPago(data.total_pago || 0);
       }
     } catch {} finally { setLoading(false); }
   };
 
-  useEffect(() => { fetchTitulos(); }, [tipo, filtroStatus, di, df]);
+  useEffect(() => { setPage(1); }, [tipo, filtroStatus, di, df, busca]);
+  useEffect(() => { fetchTitulos(page); }, [page, tipo, filtroStatus, di, df]);
 
   const handleExcluir = (id: number) => {
     showConfirm("Confirmação", "Excluir este título?", async () => {
@@ -320,6 +325,7 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobranc
             ))}
           </tbody>
         </table>
+        {pagination.pages > 1 && <Pagination page={page} pages={pagination.pages} total={pagination.total} limit={50} onChange={p => setPage(p)} />}
       </div>
     </div>
   );

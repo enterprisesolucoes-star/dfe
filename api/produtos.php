@@ -17,12 +17,32 @@ switch ($action) {
             $pdo->exec("ALTER TABLE produtos ADD COLUMN codigo_fornecedor VARCHAR(60) DEFAULT NULL, ADD INDEX idx_cod_forn (codigo_fornecedor)");
         }
         if ($empresaId) {
-            $stmt = $pdo->prepare("SELECT * FROM produtos WHERE empresa_id=? ORDER BY descricao ASC");
-            $stmt->execute([$empresaId]);
+            $busca  = trim($_GET['busca'] ?? '');
+            $pWhere = ["empresa_id = ?"];
+            $pParams = [$empresaId];
+            if ($busca !== '') {
+                $pWhere[] = "(descricao LIKE ? OR codigo_interno LIKE ? OR codigo_barras LIKE ?)";
+                $pParams[] = "%$busca%"; $pParams[] = "%$busca%"; $pParams[] = "%$busca%";
+            }
+            $pSql = implode(' AND ', $pWhere);
+            if (isset($_GET['page'])) {
+                $page   = max(1, (int)$_GET['page']);
+                $limit  = min(200, max(20, (int)($_GET['limit'] ?? 50)));
+                $offset = ($page - 1) * $limit;
+                $cStmt  = $pdo->prepare("SELECT COUNT(*) FROM produtos WHERE $pSql");
+                $cStmt->execute($pParams);
+                $total  = (int)$cStmt->fetchColumn();
+                $stmt   = $pdo->prepare("SELECT * FROM produtos WHERE $pSql ORDER BY descricao ASC LIMIT $limit OFFSET $offset");
+                $stmt->execute($pParams);
+                echo json_encode(['data' => $stmt->fetchAll(), 'total' => $total, 'page' => $page, 'pages' => (int)ceil($total / $limit), 'limit' => $limit]);
+            } else {
+                $stmt = $pdo->prepare("SELECT * FROM produtos WHERE $pSql ORDER BY descricao ASC LIMIT 500");
+                $stmt->execute($pParams);
+                echo json_encode($stmt->fetchAll());
+            }
         } else {
             echo json_encode([]); exit; // empresa_id obrigatório
         }
-        echo json_encode($stmt->fetchAll());
         break;
 
     case 'salvar_produto':

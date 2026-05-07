@@ -1,4 +1,4 @@
-import { maskCPFCNPJ, useDebounce} from './UIComponents';
+import { maskCPFCNPJ, useDebounce, Pagination } from './UIComponents';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Plus, Search, Edit, Trash2, RefreshCw, X, CheckCircle, Printer, Mail,
@@ -38,6 +38,8 @@ export const OrdemServicoTab = ({
 }) => {
   // ── List state ──────────────────────────────────────────────────────────
   const [ordens, setOrdens] = useState<OrdemServico[]>([]);
+  const [osPage, setOsPage] = useState(1);
+  const [osPagination, setOsPagination] = useState({ total: 0, pages: 0 });
   const [busca, setBusca] = useState('');
   const debouncedBusca = useDebounce(busca);
   const [loading, setLoading] = useState(false);
@@ -80,17 +82,25 @@ export const OrdemServicoTab = ({
   const setField = (f: keyof OrdemServico, v: any) => setForm(p => ({ ...p, [f]: v }));
   const calcTotal = (itens: { valor_total: number }[]) => parseFloat(itens.reduce((s, i) => s + i.valor_total, 0).toFixed(2));
 
-  const fetchOrdens = async () => {
+  const fetchOrdens = async (p = osPage) => {
     setLoading(true);
     try {
-      const res = await fetch(`./api.php?action=listar_os&data_inicio=${di}&data_fim=${df}`);
+      const params = new URLSearchParams({ action: 'listar_os', data_inicio: di, data_fim: df, page: String(p), limit: '50' });
+      if (debouncedBusca) params.set('busca', debouncedBusca);
+      const res = await fetch(`./api.php?${params}`);
       const data = await res.json();
-      if (Array.isArray(data)) setOrdens(data);
+      if (data && Array.isArray(data.data)) {
+        setOrdens(data.data);
+        setOsPagination({ total: data.total, pages: data.pages });
+      } else if (Array.isArray(data)) {
+        setOrdens(data);
+      }
     } catch { /* silent */ }
     setLoading(false);
   };
 
-  useEffect(() => { fetchOrdens(); }, [di, df]);
+  useEffect(() => { setOsPage(1); }, [di, df, debouncedBusca]);
+  useEffect(() => { fetchOrdens(osPage); }, [osPage, di, df, debouncedBusca]);
 
   const openForm = (os: OrdemServico | null) => {
     setForm(os ? { ...os } : { status: 'Rascunho', valor_total: 0, itens: [] });
@@ -211,11 +221,7 @@ export const OrdemServicoTab = ({
   const totalProdutos = form.itens.filter(i => i.tipo === 'produto').reduce((s, i) => s + i.valor_total, 0);
   const totalServicos = form.itens.filter(i => i.tipo === 'servico').reduce((s, i) => s + i.valor_total, 0);
 
-  const ordensFiltradas = ordens.filter(o => {
-    const q = debouncedBusca.toLowerCase().trim();
-    if (!q) return true;
-    return String(o.numero ?? '').includes(q) || (o.cliente_nome || '').toLowerCase().includes(q);
-  });
+  const ordensFiltradas = ordens;
 
   // ── Wizard form view ──────────────────────────────────────────────────────
   if (viewMode === 'form') {
@@ -513,6 +519,7 @@ export const OrdemServicoTab = ({
               ))}
             </tbody>
           </table>
+          {osPagination.pages > 1 && <Pagination page={osPage} pages={osPagination.pages} total={osPagination.total} limit={50} onChange={p => setOsPage(p)} />}
         </div>
       </div>
 

@@ -208,6 +208,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
   const showPrompt = (title: string, message: string, onConfirm: (val: string) => void, initialValue = '') => setGlobalModal({ isOpen: true, type: 'prompt', title, message, inputValue: initialValue, onConfirm });
   const closeGlobalModal = () => setGlobalModal(prev => ({ ...prev, isOpen: false }));
   
+  const [produtosRefreshKey, setProdutosRefreshKey] = useState(0);
   const fetchProdutos = async () => {
     try {
       const response = await fetch('./api.php?action=produtos');
@@ -743,11 +744,10 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       case 'vendas_geral': return <GeralNfceTab showAlert={showAlert} showConfirm={showConfirm} showPrompt={showPrompt} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} onCancelar={handleCancelar} onRetryTef={handleRetryTef} onExcluir={handleExcluirVenda} emitente={emitente} />;
       case 'vendas': return <VendasTab vendas={vendas} onCancelar={handleCancelar} onSincronizar={handleSincronizarContingencia} onRetryTef={handleRetryTef} onExcluir={handleExcluirVenda} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} />;
       case 'produtos': return (
-        <ProdutosTab 
-          produtos={produtos} 
-          onEdit={(p) => { setEditingProduto(p); setIsProdutoModalOpen(true); }} 
+        <ProdutosTab
+          onEdit={(p) => { setEditingProduto(p); setIsProdutoModalOpen(true); }}
           onDelete={handleExcluirProduto}
-          onRefresh={fetchProdutos}
+          refreshTrigger={produtosRefreshKey}
         />
       );
       case 'clientes': return (
@@ -865,6 +865,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
         body: JSON.stringify(p)
       });
       fetchProdutos();
+      setProdutosRefreshKey(k => k + 1);
       setIsProdutoModalOpen(false);
       setEditingProduto(null);
     } catch (error) {
@@ -877,6 +878,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       try {
         await fetch(`./api.php?action=excluir_produto&id=${id}`);
         fetchProdutos();
+        setProdutosRefreshKey(k => k + 1);
         showAlert("Sucesso", "Produto removido com sucesso.");
       } catch (error) {
         console.error("Erro ao excluir produto:", error);

@@ -207,7 +207,20 @@ switch ($action) {
         if ($di) { $where[] = "DATE(o.data_criacao) >= ?"; $params[] = $di; }
         if ($df) { $where[] = "DATE(o.data_criacao) <= ?"; $params[] = $df; }
 
+        $busca = trim($_GET['busca'] ?? '');
+        if ($busca !== '') {
+            $where[] = "(o.numero LIKE ? OR o.cliente_nome LIKE ? OR o.equipamento LIKE ?)";
+            $params[] = "%$busca%"; $params[] = "%$busca%"; $params[] = "%$busca%";
+        }
+        $page     = max(1, (int)($_GET['page']  ?? 1));
+        $limit    = min(100, max(10, (int)($_GET['limit'] ?? 50)));
+        $offset   = ($page - 1) * $limit;
         $whereStr = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
+
+        $cStmt = $pdo->prepare("SELECT COUNT(*) FROM ordens_servico o {$whereStr}");
+        $cStmt->execute($params);
+        $total = (int)$cStmt->fetchColumn();
+
         $stmt = $pdo->prepare("
             SELECT o.*,
                    (SELECT JSON_ARRAYAGG(JSON_OBJECT(
@@ -219,14 +232,14 @@ switch ($action) {
             FROM ordens_servico o
             {$whereStr}
             ORDER BY o.data_criacao DESC
-            LIMIT 500
+            LIMIT $limit OFFSET $offset
         ");
         $stmt->execute($params);
         $rows = $stmt->fetchAll();
         foreach ($rows as &$r) {
             $r['itens'] = $r['itens'] ? json_decode($r['itens'], true) : [];
         }
-        echo json_encode($rows);
+        echo json_encode(['data' => $rows, 'total' => $total, 'page' => $page, 'pages' => (int)ceil($total / $limit), 'limit' => $limit]);
         break;
 
     // ── Salvar (criar ou atualizar) ───────────────────────────────────────────

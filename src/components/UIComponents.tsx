@@ -208,3 +208,37 @@ export function useDebounce<T>(value: T, delay = 250): T {
   }, [value, delay]);
   return debounced;
 }
+
+// ── Pagination ─────────────────────────────────────────────────────────────
+export function Pagination({ page, pages, total, limit, onChange }: {
+  page: number; pages: number; total: number; limit: number; onChange: (p: number) => void;
+}) {
+  if (pages <= 1) return null;
+  const start = (page - 1) * limit + 1;
+  const end   = Math.min(page * limit, total);
+  const range: (number | '…')[] = [];
+  if (pages <= 7) {
+    for (let i = 1; i <= pages; i++) range.push(i);
+  } else if (page <= 4) {
+    [1,2,3,4,5,'…',pages].forEach(x => range.push(x as any));
+  } else if (page >= pages - 3) {
+    [1,'…',pages-4,pages-3,pages-2,pages-1,pages].forEach(x => range.push(x as any));
+  } else {
+    [1,'…',page-1,page,page+1,'…',pages].forEach(x => range.push(x as any));
+  }
+  const btn = 'px-2.5 py-1 rounded-lg text-xs font-medium transition-colors disabled:opacity-30 disabled:cursor-not-allowed';
+  return (
+    <div className="flex items-center justify-between px-4 py-2.5 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400 select-none">
+      <span>{start.toLocaleString('pt-BR')}–{end.toLocaleString('pt-BR')} de {total.toLocaleString('pt-BR')}</span>
+      <div className="flex items-center gap-0.5">
+        <button className={`${btn} hover:bg-gray-100 dark:hover:bg-gray-700`} disabled={page === 1} onClick={() => onChange(page - 1)}>‹</button>
+        {range.map((p, i) => p === '…'
+          ? <span key={`e${i}`} className="px-1.5">…</span>
+          : <button key={p} onClick={() => onChange(p as number)}
+              className={`${btn} min-w-[28px] ${page === p ? 'bg-blue-600 text-white' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'}`}>{p}</button>
+        )}
+        <button className={`${btn} hover:bg-gray-100 dark:hover:bg-gray-700`} disabled={page === pages} onClick={() => onChange(page + 1)}>›</button>
+      </div>
+    </div>
+  );
+}
