@@ -191,16 +191,29 @@ export const OrdemServicoTab = ({
     setSaving(false);
   };
 
-  const handleWhatsApp = (os: OrdemServico) => {
+  const handleWhatsApp = async (os: OrdemServico) => {
     const num = String(os.numero ?? '').padStart(4, '0');
+    const tel = (os.cliente_telefone || '').replace(/\D/g, '');
+    const caption = `OS Nº ${num} - ${os.cliente_nome || 'Cliente'}`;
+    const filename = `os_${num}.pdf`;
+    try {
+      const sr = await fetch('/api/whatsapp/status');
+      if (sr.ok) {
+        const sd = await sr.json();
+        if (sd.state === 'open' && tel) {
+          const dr = await fetch('/api/whatsapp/send-document', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone: tel, action: 'os_pdf', id: os.id, filename, caption })
+          });
+          const dd = await dr.json();
+          if (dd.success) { showAlert('WhatsApp', 'OS enviada com sucesso!'); return; }
+        }
+      }
+    } catch {}
     const val = 'R$ ' + Number(os.valor_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
     const prev = os.previsao ? new Date(os.previsao + 'T12:00:00').toLocaleDateString('pt-BR') : 'Sem prazo';
-    const base = window.location.origin + window.location.pathname.replace(/\/$/, '');
-    const linkPdf = `${base}/./api.php?action=os_pdf&id=${os.id}`;
     let msg = `*Ordem de Serviço Nº ${num}*\nCliente: ${os.cliente_nome || '-'}\nTotal: ${val}\nPrevisão: ${prev}\n`;
     if (os.observacao) msg += `Obs: ${os.observacao}\n`;
-    msg += `\n📄 *Visualize sua OS em PDF clicando abaixo:*\n${linkPdf}`;
-    const tel = (os.cliente_telefone || '').replace(/\D/g, '');
     window.open(tel ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
   };
 

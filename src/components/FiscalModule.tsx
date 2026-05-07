@@ -10,8 +10,8 @@ import { StatCard, Input } from './UIComponents';
 import { Nfce, Nfe, Produto, Cliente, Medida } from '../types/nfce';
 
 // ── WaModal ───────────────────────────────────────────────────────────────────
-const WaModal = ({ onClose, onSend, sending }: { onClose: () => void; onSend: (phone: string) => void; sending: boolean }) => {
-  const [phone, setPhone] = React.useState('');
+const WaModal = ({ onClose, onSend, sending, defaultPhone = '' }: { onClose: () => void; onSend: (phone: string) => void; sending: boolean; defaultPhone?: string }) => {
+  const [phone, setPhone] = React.useState(defaultPhone);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-80 space-y-4" onClick={e => e.stopPropagation()}>
@@ -69,7 +69,7 @@ export const VendasTab = ({ vendas, onCancelar, onSincronizar, onRetryTef, onExc
     const vendasHoje = vendas.filter(v => v.dataEmissao && v.dataEmissao.startsWith(dataHoje));
     const [busca, setBusca] = useState('');
   const debouncedBusca = useDebounce(busca);
-  const [waTarget, setWaTarget] = useState<{id: number; action: string; filename: string; caption: string} | null>(null);
+  const [waTarget, setWaTarget] = useState<{id: number; action: string; filename: string; caption: string; phone?: string} | null>(null);
   const [waSending, setWaSending] = useState(false);
 
   const sendWhatsApp = async (phone: string) => {
@@ -95,7 +95,7 @@ export const VendasTab = ({ vendas, onCancelar, onSincronizar, onRetryTef, onExc
     const emitidasCard = vendasHoje.filter(v => v.status === 'Autorizada').length;
     return (
         <div className="space-y-6">
-          {waTarget && <WaModal onClose={() => setWaTarget(null)} onSend={sendWhatsApp} sending={waSending} />}
+          {waTarget && <WaModal onClose={() => setWaTarget(null)} onSend={sendWhatsApp} sending={waSending} defaultPhone={waTarget.phone || ''} />}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard label="Total Hoje" value={totalHoje.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} icon={DollarSign} color="blue" />
                 <StatCard label="Autorizadas" value={emitidasCard.toString()} icon={CheckCircle} color="green" />
@@ -138,7 +138,7 @@ export const VendasTab = ({ vendas, onCancelar, onSincronizar, onRetryTef, onExc
                                     <td className="px-4 py-3 text-right">
                                         <div className="flex items-center justify-end gap-1">
                                             {v.status === 'Autorizada' && <button onClick={() => window.open(`./api.php?action=danfe&id=${v.id}`, '_blank')} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400" title="DANFE"><FileText className="w-3.5 h-3.5" /></button>}
-                                            {v.status === 'Autorizada' && <button onClick={() => setWaTarget({ id: v.id, action: 'danfe', filename: `nfce_${v.numero}.pdf`, caption: `NFCe N\xba ${String(v.numero).padStart(6,'0')}` })} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-green-600 dark:hover:text-green-400" title="Enviar WhatsApp"><MessageCircle className="w-3.5 h-3.5" /></button>}
+                                            {v.status === 'Autorizada' && <button onClick={() => setWaTarget({ id: v.id, action: 'danfe', filename: `nfce_${v.numero}.pdf`, caption: `NFCe N\xba ${String(v.numero).padStart(6,'0')}`, phone: ((v as any).cliente_telefone || '').replace(/\D/g,'') })} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-green-600 dark:hover:text-green-400" title="Enviar WhatsApp"><MessageCircle className="w-3.5 h-3.5" /></button>}
                                             {v.status === 'Autorizada' && onEmailDoc && <button onClick={() => onEmailDoc(v.id, 65)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-blue-500" title="Email"><Send className="w-3.5 h-3.5" /></button>}
                                             {v.status === 'Autorizada' && <button onClick={() => downloadXml(`./api.php?action=nfce_download_xml&id=${v.id}`, `nfce_${v.numero}.xml`)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-green-600" title="XML"><Download className="w-3.5 h-3.5" /></button>}
                                             {v.status === 'Autorizada' && onDevolucao && <button onClick={() => onDevolucao(v.id, 65)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-orange-500" title="Devolução"><RefreshCw className="w-3.5 h-3.5" /></button>}
@@ -165,54 +165,25 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
     const [di, setDi] = useState(() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`; });
     const [df, setDf] = useState(() => new Date().toISOString().split('T')[0]);
     const [busca, setBusca] = useState('');
-  const debouncedBusca = useDebounce(busca);
-    const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+    const debouncedBusca = useDebounce(busca);
     const [nfePage, setNfePage] = useState(1);
     const [nfePagination, setNfePagination] = useState({ total: 0, pages: 0 });
+    const [waTarget, setWaTarget] = useState<{id: number; action: string; filename: string; caption: string; phone?: string} | null>(null);
+    const [waSending, setWaSending] = useState(false);
 
-    const toggleSelect = (id: number) => setSelectedIds(prev => {
-        const next = new Set(prev);
-        next.has(id) ? next.delete(id) : next.add(id);
-        return next;
-    });
-
-    const toggleSelectAll = () => {
-        const autorizadasIds = lista.filter(n => n.status === 'Autorizada').map(n => n.id);
-        const allSelected = autorizadasIds.every(id => selectedIds.has(id));
-        if (allSelected) setSelectedIds(new Set());
-        else setSelectedIds(new Set(autorizadasIds));
-    };
-
-    const cancelarLote = () => {
-        if (selectedIds.size === 0) return;
-        showPrompt && showPrompt(
-            `Cancelar ${selectedIds.size} NF-e(s)`,
-            'Informe a justificativa (mínimo 15 caracteres — aplica a todas selecionadas):',
-            async (justificativa: string) => {
-                if (!justificativa || justificativa.length < 15) {
-                    showAlert && showAlert('Ação Inválida', 'A justificativa deve ter no mínimo 15 caracteres.');
-                    return;
-                }
-                let ok = 0, fail = 0;
-                for (const id of Array.from(selectedIds)) {
-                    try {
-                        const r = await fetch(`./api.php?action=nfe_cancelar&id=${id}`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ justificativa })
-                        });
-                        const d = await r.json();
-                        d.success ? ok++ : fail++;
-                    } catch { fail++; }
-                }
-                setSelectedIds(new Set());
-                fetchNfeList();
-                showAlert && showAlert(
-                    ok > 0 ? 'Sucesso' : 'Erro',
-                    `${ok} cancelada(s) com sucesso.${fail > 0 ? ` ${fail} com falha.` : ''}`
-                );
-            }
-        );
+    const sendWhatsApp = async (phone: string) => {
+        if (!waTarget) return;
+        setWaSending(true);
+        try {
+            const r = await fetch('/api/whatsapp/send-document', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone, ...waTarget })
+            });
+            const d = await r.json();
+            if (d.success) setWaTarget(null);
+            else alert('Falha: ' + (d.message || 'Erro desconhecido'));
+        } catch { alert('Erro ao conectar com o servidor.'); }
+        setWaSending(false);
     };
 
     const fetchNfeList = async (page = nfePage) => {
@@ -225,7 +196,6 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
             if (data && Array.isArray(data.data)) {
                 setNfeList(data.data);
                 setNfePagination({ total: data.total, pages: data.pages });
-                setSelectedIds(new Set());
             }
         } catch {} finally { setLoading(false); }
     };
@@ -238,6 +208,7 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
     const qtdPendentes = lista.filter(n => !['Autorizada','Cancelada'].includes(n.status)).length;
     return (
         <div className="space-y-4">
+            {waTarget && <WaModal onClose={() => setWaTarget(null)} onSend={sendWhatsApp} sending={waSending} defaultPhone={waTarget.phone || ''} />}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard label="Total Autorizado" value={totAutorizado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} icon={DollarSign} color="blue" />
                 <StatCard label="Autorizadas" value={qtdAutorizadas.toString()} icon={CheckCircle} color="green" />
@@ -249,7 +220,7 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
                 <input type="date" value={di} onChange={e => setDi(e.target.value)} className="border border-gray-200 dark:border-gray-700 rounded-xl px-2 py-1.5 text-xs outline-none" />
                 <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase">Data Fim</span>
                 <input type="date" value={df} onChange={e => setDf(e.target.value)} className="border border-gray-200 dark:border-gray-700 rounded-xl px-2 py-1.5 text-xs outline-none" />
-                <button onClick={fetchNfeList} className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all flex items-center gap-1"><RefreshCw className="w-3 h-3" /> Atualizar</button>
+                <button onClick={() => fetchNfeList()} className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all flex items-center gap-1"><RefreshCw className="w-3 h-3" /> Atualizar</button>
                 <button onClick={() => downloadXml(`./api.php?action=nfe_baixar_xml_lote&data_inicio=${di}&data_fim=${df}`, `NFe_XMLs_${di}_${df}.zip`)} className="px-3 py-1.5 bg-green-600 text-white text-xs font-bold rounded-xl hover:bg-green-700 transition-all flex items-center gap-1"><Download className="w-3 h-3" /> XML Lote</button>
                 <button onClick={() => showPrompt && showPrompt('Enviar XML ao Contador', 'Informe o e-mail do contador:', async (email: string) => { if (!email) return; const r = await fetch(`./api.php?action=nfe_enviar_xml_contador&data_inicio=${di}&data_fim=${df}&email=${encodeURIComponent(email)}`, {method:'GET'}); const d = await r.json(); showAlert && showAlert(d.success ? 'Enviado' : 'Erro', d.message || ''); }, emitente?.emailContador || '')} className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all flex items-center gap-1"><Send className="w-3 h-3" /> Enviar Contador</button>
                 <div className="relative ml-auto flex-1 max-w-xs">
@@ -257,29 +228,13 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
                     <input type="text" placeholder="Buscar Nº Nota, Cliente ou Natureza..." value={busca} onChange={e => setBusca(e.target.value)} className="w-full border border-gray-200 dark:border-gray-700 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none" />
                 </div>
             </div>
-            {selectedIds.size > 0 && (
-                <div className="flex items-center gap-3 px-4 py-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl">
-                    <span className="text-sm font-bold text-blue-700 dark:text-blue-300">{selectedIds.size} NF-e(s) selecionada(s)</span>
-                    <button onClick={cancelarLote} className="ml-auto px-4 py-1.5 bg-red-600 text-white text-xs font-bold rounded-xl hover:bg-red-700 transition-all flex items-center gap-1.5">
-                        <X className="w-3.5 h-3.5" /> Cancelar selecionadas
-                    </button>
-                    <button onClick={() => setSelectedIds(new Set())} className="text-xs text-blue-500 hover:underline">Limpar seleção</button>
-                </div>
-            )}
             <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden overflow-x-auto">
                 <table className="w-full text-left text-sm">
                     <thead className="bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400">
                         <tr>
-                            <th className="px-4 py-4 w-10">
-                                <input type="checkbox"
-                                    className="w-3.5 h-3.5 rounded accent-blue-600 cursor-pointer"
-                                    checked={lista.filter(n => n.status === 'Autorizada').length > 0 && lista.filter(n => n.status === 'Autorizada').every(n => selectedIds.has(n.id))}
-                                    onChange={toggleSelectAll}
-                                />
-                            </th>
                             <th className="px-6 py-4 font-bold uppercase text-[10px]">Nº/Série</th>
                             <th className="px-6 py-4 font-bold uppercase text-[10px]">Data</th>
-                            <th className="px-6 py-4 font-bold uppercase text-[10px]">Natureza</th>
+                            <th className="px-6 py-4 font-bold uppercase text-[10px]">Natureza / Cliente</th>
                             <th className="px-6 py-4 font-bold uppercase text-[10px] text-right">Valor</th>
                             <th className="px-6 py-4 font-bold uppercase text-[10px]">Status</th>
                             <th className="px-6 py-4 font-bold uppercase text-[10px] text-right">Ações</th>
@@ -289,25 +244,16 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
                         {loading && <SkeletonTable cols={6} />}
                         {!loading && lista.length === 0 && <tr><td colSpan={6} className="px-6 py-8 text-center text-xs text-gray-400 dark:text-gray-500">Nenhuma NF-e encontrada.</td></tr>}
                         {!loading && lista.map((n: any) => (
-                            <tr key={n.id} onClick={() => n.status === 'Autorizada' && toggleSelect(n.id)}
-                                className={`hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all cursor-pointer ${selectedIds.has(n.id) ? 'bg-blue-50 dark:bg-blue-900/10' : ''}`}>
-                                <td className="px-4 py-4 w-10" onClick={e => e.stopPropagation()}>
-                                    {n.status === 'Autorizada' && (
-                                        <input type="checkbox" className="w-3.5 h-3.5 rounded accent-blue-600 cursor-pointer"
-                                            checked={selectedIds.has(n.id)} onChange={() => toggleSelect(n.id)} />
-                                    )}
-                                </td>
+                            <tr key={n.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
                                 <td className="px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-200">{n.numero}/{n.serie || 1}</td>
                                 <td className="px-6 py-4 text-xs text-gray-600 dark:text-gray-300">{n.data_emissao ? new Date(n.data_emissao).toLocaleDateString('pt-BR') : '-'}</td>
                                 <td className="px-6 py-4 text-xs text-gray-600 dark:text-gray-300"><div>{n.natureza_operacao || '-'}</div><div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{n.cliente_nome || ''}{n.cliente_documento ? ` · ${n.cliente_documento}` : ''}</div></td>
                                 <td className="px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-200 text-right">{Number(n.valor_total || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-                                <td className="px-6 py-4">
-                                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${n.status === 'Autorizada' ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' : n.status === 'Cancelada' ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400' : 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300'}`}>{n.status}</span>
-                                </td>
+                                <td className="px-6 py-4"><span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${n.status === 'Autorizada' ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' : n.status === 'Cancelada' ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400' : 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300'}`}>{n.status}</span></td>
                                 <td className="px-6 py-4 text-right">
                                     <div className="flex items-center justify-end gap-1">
                                         {n.status === 'Autorizada' && <button onClick={() => window.open(`./api.php?action=nfe_danfe&id=${n.id}`, '_blank')} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400" title="DANFE"><FileText className="w-3.5 h-3.5" /></button>}
-                                        {n.status === 'Autorizada' && <button onClick={() => setWaTarget({ id: n.id, action: 'nfe_danfe', filename: `nfe_${n.numero}.pdf`, caption: `NFe N\xba ${String(n.numero).padStart(6,'0')}` })} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-green-600 dark:hover:text-green-400" title="Enviar WhatsApp"><MessageCircle className="w-3.5 h-3.5" /></button>}
+                                        {n.status === 'Autorizada' && <button onClick={() => setWaTarget({ id: n.id, action: 'nfe_danfe', filename: `nfe_${n.numero}.pdf`, caption: `NFe N\xba ${String(n.numero).padStart(6,'0')}`, phone: (n.cliente_telefone || '').replace(/\D/g,'') })} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-green-600 dark:hover:text-green-400" title="WhatsApp"><MessageCircle className="w-3.5 h-3.5" /></button>}
                                         {n.status === 'Autorizada' && onEmailDoc && <button onClick={() => onEmailDoc(n.id, 'nfe')} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-blue-500" title="Email"><Send className="w-3.5 h-3.5" /></button>}
                                         {n.status === 'Autorizada' && <button onClick={() => downloadXml(`./api.php?action=nfe_download_xml&id=${n.id}`, `nfe_${n.numero}.xml`)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-green-600" title="XML"><Download className="w-3.5 h-3.5" /></button>}
                                         {n.status === 'Autorizada' && onDevolucao && <button onClick={() => onDevolucao(n.id)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-orange-500" title="Devolução"><RefreshCw className="w-3.5 h-3.5" /></button>}
@@ -325,7 +271,6 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
         </div>
     );
 };
-
 const CceModal = ({ nfe, showAlert, onClose }: any) => {
     const [cceList, setCceList] = React.useState<any[]>([]);
     const [correcao, setCorrecao] = React.useState('');
@@ -430,8 +375,28 @@ const CceModal = ({ nfe, showAlert, onClose }: any) => {
 export const NfeDashboardTab = ({ nfeList, showAlert, showPrompt, onNovaNfe, onCancelarNfe, onExcluirNfe, onRefresh, onEmailDoc, onDevolucao, onRetryTef }: any) => {
     const [cceModalNfe, setCceModalNfe] = React.useState<{open: boolean, nfe: any}>({open: false, nfe: null});
     const [busca, setBusca] = useState('');
-  const debouncedBusca = useDebounce(busca);
-    const hoje = new Date().toISOString().split('T')[0];
+    const debouncedBusca = useDebounce(busca);
+    const [waTarget, setWaTarget] = useState<{id: number; action: string; filename: string; caption: string; phone?: string} | null>(null);
+    const [waSending, setWaSending] = useState(false);
+
+    useEffect(() => { onRefresh?.(); }, []);
+
+    const sendWhatsApp = async (phone: string) => {
+        if (!waTarget) return;
+        setWaSending(true);
+        try {
+            const r = await fetch('/api/whatsapp/send-document', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone, ...waTarget })
+            });
+            const d = await r.json();
+            if (d.success) setWaTarget(null);
+            else alert('Falha: ' + (d.message || 'Erro desconhecido'));
+        } catch { alert('Erro ao conectar com o servidor.'); }
+        setWaSending(false);
+    };
+
+    const hoje = getLocalToday();
     const listaHoje = (nfeList || []).filter((n: any) => n.data_emissao && n.data_emissao.startsWith(hoje));
     const lista = listaHoje.filter((n: any) =>
         !debouncedBusca || String(n.numero || '').includes(debouncedBusca) || (n.natureza_operacao || '').toLowerCase().includes(debouncedBusca.toLowerCase()) || (n.cliente_nome || '').toLowerCase().includes(debouncedBusca.toLowerCase())
@@ -442,6 +407,7 @@ export const NfeDashboardTab = ({ nfeList, showAlert, showPrompt, onNovaNfe, onC
     const qtdPendentes = lista.filter((n: any) => !['Autorizada','Cancelada'].includes(n.status)).length;
     return (
         <div className="space-y-4">
+            {waTarget && <WaModal onClose={() => setWaTarget(null)} onSend={sendWhatsApp} sending={waSending} defaultPhone={waTarget.phone || ''} />}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard label="Total Autorizado" value={totAutorizado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} icon={DollarSign} color="blue" />
                 <StatCard label="Autorizadas" value={qtdAutorizadas.toString()} icon={CheckCircle} color="green" />
@@ -453,6 +419,7 @@ export const NfeDashboardTab = ({ nfeList, showAlert, showPrompt, onNovaNfe, onC
                     <Search className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input type="text" placeholder="Buscar Nº Nota, Cliente ou Natureza..." value={busca} onChange={e => setBusca(e.target.value)} className="w-full border border-gray-200 dark:border-gray-700 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none" />
                 </div>
+                <button onClick={() => onRefresh?.()} className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all flex items-center gap-1"><RefreshCw className="w-3 h-3" /> Atualizar</button>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden overflow-x-auto">
                 <table className="w-full text-left text-sm">
@@ -460,29 +427,27 @@ export const NfeDashboardTab = ({ nfeList, showAlert, showPrompt, onNovaNfe, onC
                         <tr>
                             <th className="px-6 py-4 font-bold uppercase text-[10px]">Nº/Série</th>
                             <th className="px-6 py-4 font-bold uppercase text-[10px]">Data</th>
-                            <th className="px-6 py-4 font-bold uppercase text-[10px]">Natureza</th>
+                            <th className="px-6 py-4 font-bold uppercase text-[10px]">Natureza / Cliente</th>
                             <th className="px-6 py-4 font-bold uppercase text-[10px] text-right">Valor</th>
                             <th className="px-6 py-4 font-bold uppercase text-[10px]">Status</th>
                             <th className="px-6 py-4 font-bold uppercase text-[10px] text-right">Ações</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                        {lista.length === 0 && <tr><td colSpan={6} className="px-6 py-8 text-center text-xs text-gray-400 dark:text-gray-500">Nenhuma NF-e encontrada.</td></tr>}
+                        {lista.length === 0 && <tr><td colSpan={6} className="px-6 py-8 text-center text-xs text-gray-400 dark:text-gray-500">Nenhuma NF-e hoje.</td></tr>}
                         {lista.map((n: any) => (
                             <tr key={n.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
                                 <td className="px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-200">{n.numero}/{n.serie || 1}</td>
                                 <td className="px-6 py-4 text-xs text-gray-600 dark:text-gray-300">{n.data_emissao ? new Date(n.data_emissao).toLocaleDateString('pt-BR') : '-'}</td>
                                 <td className="px-6 py-4 text-xs text-gray-600 dark:text-gray-300"><div>{n.natureza_operacao || '-'}</div><div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{n.cliente_nome || ''}{n.cliente_documento ? ` · ${n.cliente_documento}` : ''}</div></td>
                                 <td className="px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-200 text-right">{Number(n.valor_total || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-                                <td className="px-6 py-4">
-                                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${n.status === 'Autorizada' ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' : n.status === 'Cancelada' ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400' : 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300'}`}>{n.status}</span>
-                                </td>
+                                <td className="px-6 py-4"><span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${n.status === 'Autorizada' ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' : n.status === 'Cancelada' ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400' : 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300'}`}>{n.status}</span></td>
                                 <td className="px-6 py-4 text-right">
                                     <div className="flex items-center justify-end gap-1">
                                         {n.status === 'Autorizada' && <button onClick={() => window.open(`./api.php?action=nfe_danfe&id=${n.id}`, '_blank')} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400" title="DANFE"><FileText className="w-3.5 h-3.5" /></button>}
-                                        {n.status === 'Autorizada' && <button onClick={() => setWaTarget({ id: n.id, action: 'nfe_danfe', filename: `nfe_${n.numero}.pdf`, caption: `NFe N\xba ${String(n.numero).padStart(6,'0')}` })} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-green-600 dark:hover:text-green-400" title="Enviar WhatsApp"><MessageCircle className="w-3.5 h-3.5" /></button>}
+                                        {n.status === 'Autorizada' && <button onClick={() => setWaTarget({ id: n.id, action: 'nfe_danfe', filename: `nfe_${n.numero}.pdf`, caption: `NFe N\xba ${String(n.numero).padStart(6,'0')}`, phone: (n.cliente_telefone || '').replace(/\D/g,'') })} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-green-600 dark:hover:text-green-400" title="WhatsApp"><MessageCircle className="w-3.5 h-3.5" /></button>}
                                         {n.status === 'Autorizada' && onEmailDoc && <button onClick={() => onEmailDoc(n.id, 'nfe')} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-blue-500" title="Email"><Send className="w-3.5 h-3.5" /></button>}
-                                        {n.status === 'Autorizada' && <button onClick={() => downloadXml(`./api.php?action=nfe_download_xml&id=${n.id}`, `nfe_${n.numero}.xml`)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-green-600" title="Baixar XML"><Download className="w-3.5 h-3.5" /></button>}
+                                        {n.status === 'Autorizada' && <button onClick={() => downloadXml(`./api.php?action=nfe_download_xml&id=${n.id}`, `nfe_${n.numero}.xml`)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-green-600" title="XML"><Download className="w-3.5 h-3.5" /></button>}
                                         {n.status === 'Autorizada' && onDevolucao && <button onClick={() => onDevolucao(n.id)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-orange-500" title="Devolução"><RefreshCw className="w-3.5 h-3.5" /></button>}
                                         {n.status === 'Autorizada' && <button onClick={() => setCceModalNfe({open: true, nfe: n})} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400" title="Carta de Correção"><Edit3 className="w-3.5 h-3.5" /></button>}
                                         {n.status === 'Autorizada' && onCancelarNfe && <button onClick={() => onCancelarNfe(n.id)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-500" title="Cancelar"><X className="w-3.5 h-3.5" /></button>}
@@ -498,8 +463,6 @@ export const NfeDashboardTab = ({ nfeList, showAlert, showPrompt, onNovaNfe, onC
         </div>
     );
 };
-
-// ─── GeralNfceTab ─────────────────────────────────────────────────────────────
 export const GeralNfceTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, onDevolucao, onCancelar, onRetryTef, onExcluir, emitente }: any) => {
     const [nfceList, setNfceList] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -507,6 +470,23 @@ export const GeralNfceTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, o
     const [df, setDf] = useState(() => new Date().toISOString().split('T')[0]);
     const [busca, setBusca] = useState('');
   const debouncedBusca = useDebounce(busca);
+    const [waTarget, setWaTarget] = useState<{id: number; action: string; filename: string; caption: string; phone?: string} | null>(null);
+    const [waSending, setWaSending] = useState(false);
+
+    const sendWhatsApp = async (phone: string) => {
+        if (!waTarget) return;
+        setWaSending(true);
+        try {
+            const r = await fetch('/api/whatsapp/send-document', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone, ...waTarget })
+            });
+            const d = await r.json();
+            if (d.success) setWaTarget(null);
+            else alert('Falha: ' + (d.message || 'Erro desconhecido'));
+        } catch { alert('Erro ao conectar com o servidor.'); }
+        setWaSending(false);
+    };
 
     const fetchList = async () => {
         setLoading(true);
@@ -527,6 +507,7 @@ export const GeralNfceTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, o
 
     return (
         <div className="space-y-4">
+            {waTarget && <WaModal onClose={() => setWaTarget(null)} onSend={sendWhatsApp} sending={waSending} defaultPhone={waTarget.phone || ''} />}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard label="Total Autorizado" value={totAutorizado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} icon={DollarSign} color="blue" />
                 <StatCard label="Autorizadas" value={qtdAutorizadas.toString()} icon={CheckCircle} color="green" />
@@ -573,6 +554,7 @@ export const GeralNfceTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, o
                                 <td className="px-6 py-4 text-right">
                                     <div className="flex items-center justify-end gap-1">
                                         {n.status === 'Autorizada' && <button onClick={() => window.open(`./api.php?action=danfe&id=${n.id}`, '_blank')} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400" title="DANFE"><FileText className="w-3.5 h-3.5" /></button>}
+                                        {n.status === 'Autorizada' && <button onClick={() => setWaTarget({ id: n.id, action: 'danfe', filename: `nfce_${n.numero}.pdf`, caption: `NFCe N\xba ${String(n.numero).padStart(6,'0')}`, phone: (n.cliente_telefone || n.clienteTelefone || '').replace(/\D/g,'') })} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-green-600 dark:hover:text-green-400" title="WhatsApp"><MessageCircle className="w-3.5 h-3.5" /></button>}
                                         {n.status === 'Autorizada' && onEmailDoc && <button onClick={() => onEmailDoc(n.id, 65)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-blue-500" title="Email"><Send className="w-3.5 h-3.5" /></button>}
                                         {n.status === 'Autorizada' && <button onClick={() => downloadXml(`./api.php?action=nfce_download_xml&id=${n.id}`, `nfce_${n.numero}.xml`)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-green-600" title="XML"><Download className="w-3.5 h-3.5" /></button>}
                                         {n.status === 'Autorizada' && onDevolucao && <button onClick={() => onDevolucao(n.id, 65)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-orange-500" title="Devolução"><RefreshCw className="w-3.5 h-3.5" /></button>}
