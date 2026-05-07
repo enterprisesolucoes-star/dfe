@@ -1,4 +1,4 @@
-import { maskCPFCNPJ } from './UIComponents';
+import { maskCPFCNPJ, useDebounce} from './UIComponents';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Plus, Search, Edit, Trash2, RefreshCw, X, CheckCircle, Printer, Mail,
@@ -39,6 +39,7 @@ export const OrdemServicoTab = ({
   // ── List state ──────────────────────────────────────────────────────────
   const [ordens, setOrdens] = useState<OrdemServico[]>([]);
   const [busca, setBusca] = useState('');
+  const debouncedBusca = useDebounce(busca);
   const [loading, setLoading] = useState(false);
   const [di, setDi] = useState(() => { const d = new Date(); d.setDate(1); return d.toISOString().split('T')[0]; });
   const [df, setDf] = useState(() => getLocalToday());
@@ -211,7 +212,7 @@ export const OrdemServicoTab = ({
   const totalServicos = form.itens.filter(i => i.tipo === 'servico').reduce((s, i) => s + i.valor_total, 0);
 
   const ordensFiltradas = ordens.filter(o => {
-    const q = busca.toLowerCase().trim();
+    const q = debouncedBusca.toLowerCase().trim();
     if (!q) return true;
     return String(o.numero ?? '').includes(q) || (o.cliente_nome || '').toLowerCase().includes(q);
   });
@@ -489,7 +490,7 @@ export const OrdemServicoTab = ({
             <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
               {loading && <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-400 dark:text-gray-500">Carregando...</td></tr>}
               {!loading && ordensFiltradas.length === 0 && (
-                <tr><td colSpan={7} className="px-4 py-12 text-center text-gray-400 dark:text-gray-500">{busca ? 'Nenhuma OS encontrada.' : 'Nenhuma OS no período. Clique em "Nova OS" para começar.'}</td></tr>
+                <tr><td colSpan={7} className="px-4 py-12 text-center text-gray-400 dark:text-gray-500">{debouncedBusca ? 'Nenhuma OS encontrada.' : 'Nenhuma OS no período. Clique em "Nova OS" para começar.'}</td></tr>
               )}
               {ordensFiltradas.map(os => (
                 <tr key={os.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">

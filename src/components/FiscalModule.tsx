@@ -1,4 +1,4 @@
-import { SkeletonTable } from './UIComponents';
+import { SkeletonTable, useDebounce} from './UIComponents';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { FileText, Search, RefreshCw, X, Printer, 
@@ -39,8 +39,9 @@ export const VendasTab = ({ vendas, onCancelar, onSincronizar, onRetryTef, onExc
     const dataHoje = getLocalToday();
     const vendasHoje = vendas.filter(v => v.dataEmissao && v.dataEmissao.startsWith(dataHoje));
     const [busca, setBusca] = useState('');
+  const debouncedBusca = useDebounce(busca);
     const vendasFiltradas = vendasHoje.filter(v => {
-        const q = busca.toLowerCase().trim();
+        const q = debouncedBusca.toLowerCase().trim();
         if (!q) return true;
         return String(v.numero).includes(q) || String(v.clienteId || '').toLowerCase().includes(q);
     });
@@ -76,7 +77,7 @@ export const VendasTab = ({ vendas, onCancelar, onSincronizar, onRetryTef, onExc
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                             {vendasFiltradas.length === 0 ? (
                                 <tr><td colSpan={5} className="px-6 py-12 text-center text-gray-400 dark:text-gray-500 italic">
-                                    {busca ? 'Nenhum resultado.' : 'Nenhuma venda hoje.'}
+                                    {debouncedBusca ? 'Nenhum resultado.' : 'Nenhuma venda hoje.'}
                                 </td></tr>
                             ) : vendasFiltradas.map((v, i) => (
                                 <tr key={v.id ?? i} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
@@ -116,6 +117,7 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
     const [di, setDi] = useState(() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`; });
     const [df, setDf] = useState(() => new Date().toISOString().split('T')[0]);
     const [busca, setBusca] = useState('');
+  const debouncedBusca = useDebounce(busca);
     const fetchNfeList = async () => {
         setLoading(true);
         try {
@@ -125,7 +127,7 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
         } catch {} finally { setLoading(false); }
     };
     useEffect(() => { fetchNfeList(); }, [di, df]);
-    const lista = nfeList.filter(n => !busca || String(n.numero || '').includes(busca) || (n.natureza_operacao || '').toLowerCase().includes(busca.toLowerCase()));
+    const lista = nfeList.filter(n => !debouncedBusca || String(n.numero || '').includes(debouncedBusca) || (n.natureza_operacao || '').toLowerCase().includes(debouncedBusca.toLowerCase()));
     const totAutorizado = lista.filter(n => n.status === 'Autorizada' && n.finalidade !== '4' && n.finalidade !== 4 && !(n.natureza_operacao || '').toUpperCase().includes('DEVOL')).reduce((a, n) => a + Number(n.valor_total || 0), 0);
     const qtdAutorizadas = lista.filter(n => n.status === 'Autorizada').length;
     const qtdCanceladas = lista.filter(n => n.status === 'Cancelada').length;
@@ -299,10 +301,11 @@ const CceModal = ({ nfe, showAlert, onClose }: any) => {
 export const NfeDashboardTab = ({ nfeList, showAlert, showPrompt, onNovaNfe, onCancelarNfe, onExcluirNfe, onRefresh, onEmailDoc, onDevolucao, onRetryTef }: any) => {
     const [cceModalNfe, setCceModalNfe] = React.useState<{open: boolean, nfe: any}>({open: false, nfe: null});
     const [busca, setBusca] = useState('');
+  const debouncedBusca = useDebounce(busca);
     const hoje = new Date().toISOString().split('T')[0];
     const listaHoje = (nfeList || []).filter((n: any) => n.data_emissao && n.data_emissao.startsWith(hoje));
     const lista = listaHoje.filter((n: any) =>
-        !busca || String(n.numero || '').includes(busca) || (n.natureza_operacao || '').toLowerCase().includes(busca.toLowerCase()) || (n.cliente_nome || '').toLowerCase().includes(busca.toLowerCase())
+        !debouncedBusca || String(n.numero || '').includes(debouncedBusca) || (n.natureza_operacao || '').toLowerCase().includes(debouncedBusca.toLowerCase()) || (n.cliente_nome || '').toLowerCase().includes(debouncedBusca.toLowerCase())
     );
     const totAutorizado = lista.filter((n: any) => n.status === 'Autorizada' && n.finalidade !== '4' && n.finalidade !== 4 && !(n.natureza_operacao || '').toUpperCase().includes('DEVOL')).reduce((a: number, n: any) => a + Number(n.valor_total || 0), 0);
     const qtdAutorizadas = lista.filter((n: any) => n.status === 'Autorizada').length;
@@ -373,6 +376,7 @@ export const GeralNfceTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, o
     const [di, setDi] = useState(() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`; });
     const [df, setDf] = useState(() => new Date().toISOString().split('T')[0]);
     const [busca, setBusca] = useState('');
+  const debouncedBusca = useDebounce(busca);
 
     const fetchList = async () => {
         setLoading(true);
@@ -385,7 +389,7 @@ export const GeralNfceTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, o
 
     useEffect(() => { fetchList(); }, [di, df]);
 
-    const lista = nfceList.filter(n => !busca || String(n.numero || '').includes(busca) || (n.cliente_nome || n.clienteNome || '').toLowerCase().includes(busca.toLowerCase()));
+    const lista = nfceList.filter(n => !debouncedBusca || String(n.numero || '').includes(debouncedBusca) || (n.cliente_nome || n.clienteNome || '').toLowerCase().includes(debouncedBusca.toLowerCase()));
     const totAutorizado = lista.filter(n => n.status === 'Autorizada').reduce((a, n) => a + Number(n.valor_total || n.valorTotal || 0), 0);
     const qtdAutorizadas = lista.filter(n => n.status === 'Autorizada').length;
     const qtdCanceladas = lista.filter(n => n.status === 'Cancelada').length;

@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import {
   Plus, Search, Edit, Trash2, X, Upload, RefreshCw
 } from 'lucide-react';
-import { Input, MaskedInput } from './UIComponents';
+import { Input, MaskedInput, useDebounce} from './UIComponents';
 import { Produto, Cliente, Fornecedor, Transportador, Bandeira, Medida } from '../types/nfce';
 
 const ESTADOS_BR = [
@@ -41,11 +41,12 @@ const useMunicipios = (ufInicial?: string) => {
 // ── Listagem: Produtos ───────────────────────────────────────────────────────
 export const ProdutosTab = ({ produtos, onEdit, onDelete, onRefresh }: { produtos: Produto[]; onEdit: (p: Produto) => void; onDelete: (id: number) => void; onRefresh?: () => void }) => {
   const [busca, setBusca] = useState('');
+  const debouncedBusca = useDebounce(busca);
   const filtrados = produtos.filter(p =>
-    p.descricao.toLowerCase().includes(busca.toLowerCase()) ||
-    p.codigoInterno.toLowerCase().includes(busca.toLowerCase()) ||
-    (p.codigoBarras || '').includes(busca) ||
-    p.ncm.includes(busca)
+    p.descricao.toLowerCase().includes(debouncedBusca.toLowerCase()) ||
+    p.codigoInterno.toLowerCase().includes(debouncedBusca.toLowerCase()) ||
+    (p.codigoBarras || '').includes(debouncedBusca) ||
+    p.ncm.includes(debouncedBusca)
   );
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
@@ -100,9 +101,10 @@ export const ProdutosTab = ({ produtos, onEdit, onDelete, onRefresh }: { produto
 // ── Listagem: Clientes ────────────────────────────────────────────────────────
 export const ClientesTab = ({ clientes, onEdit, onDelete }: { clientes: Cliente[]; onEdit: (c: Cliente) => void; onDelete: (id: number) => void }) => {
   const [busca, setBusca] = useState('');
+  const debouncedBusca = useDebounce(busca);
   const filtrados = clientes.filter(c =>
-    (c.nome || '').toLowerCase().includes(busca.toLowerCase()) ||
-    (c.documento || '').includes(busca)
+    (c.nome || '').toLowerCase().includes(debouncedBusca.toLowerCase()) ||
+    (c.documento || '').includes(debouncedBusca)
   );
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
@@ -151,7 +153,8 @@ export const ClientesTab = ({ clientes, onEdit, onDelete }: { clientes: Cliente[
 // ── Listagem: Fornecedores ────────────────────────────────────────────────────
 export const FornecedoresTab = ({ fornecedores, onEdit, onDelete }: { fornecedores: Fornecedor[]; onEdit: (f: Fornecedor) => void; onDelete: (id: number) => void }) => {
   const [busca, setBusca] = useState('');
-  const filtrados = fornecedores.filter(f => (f.nome || '').toLowerCase().includes(busca.toLowerCase()) || (f.documento || '').includes(busca));
+  const debouncedBusca = useDebounce(busca);
+  const filtrados = fornecedores.filter(f => (f.nome || '').toLowerCase().includes(debouncedBusca.toLowerCase()) || (f.documento || '').includes(debouncedBusca));
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
       <div className="p-4 border-b border-gray-50 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/30">
@@ -199,7 +202,8 @@ export const FornecedoresTab = ({ fornecedores, onEdit, onDelete }: { fornecedor
 // ── Listagem: Transportadores ─────────────────────────────────────────────────
 export const TransportadoresTab = ({ transportadores, onEdit, onDelete }: { transportadores: Transportador[]; onEdit: (t: Transportador) => void; onDelete: (id: number) => void }) => {
   const [busca, setBusca] = useState('');
-  const filtrados = transportadores.filter(t => (t.nome || '').toLowerCase().includes(busca.toLowerCase()) || (t.documento || '').includes(busca));
+  const debouncedBusca = useDebounce(busca);
+  const filtrados = transportadores.filter(t => (t.nome || '').toLowerCase().includes(debouncedBusca.toLowerCase()) || (t.documento || '').includes(debouncedBusca));
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
       <div className="p-4 border-b border-gray-50 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/30">
