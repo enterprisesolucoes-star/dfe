@@ -107,6 +107,7 @@ export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
     top_clientes: [], top_produtos: [],
     contas_receber: { vencendo_7d: { qtd: 0, valor: 0 }, vencidas: { qtd: 0, valor: 0 } },
     contas_pagar:   { vencendo_7d: { qtd: 0, valor: 0 }, vencidas: { qtd: 0, valor: 0 } },
+    vendas_periodo: { total: 0, qtd: 0, trend: 0 },
   });
 
   // Filtro de período
@@ -258,9 +259,9 @@ export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
         {/* Card Vendas + Total a Receber + Total a Pagar (coluna esquerda) */}
         <div className="flex flex-col gap-6">
           <StatCard
-            label="Vendas do Mês"
-            value={summary.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-            icon={DollarSign} trend={summary.trendTotal} color="blue"
+            label={PERIODO_LABELS[periodo]}
+            value={(kpis.vendas_periodo?.total ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            icon={DollarSign} trend={kpis.vendas_periodo?.trend ?? 0} color="blue"
           />
           <StatCard
             label="Total a Receber"

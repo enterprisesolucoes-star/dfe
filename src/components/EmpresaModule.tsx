@@ -155,7 +155,7 @@ const ConfigTab = ({ emitente, onUpdate, onSave, showAlert, usuarioDfe }: { emit
     onSave();
   };
 
-  const selClass = "w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm";
+  const selClass = "w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100";
 
   return (
     <div className="max-w-3xl bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-8">
@@ -223,7 +223,7 @@ const ConfigTab = ({ emitente, onUpdate, onSave, showAlert, usuarioDfe }: { emit
             </div>
 
             {emitente.crt === '1' && (Number(usuarioDfe) === 1 || Number(usuarioDfe) === 2) && (
-              <div className="col-span-2 bg-blue-50 dark:bg-blue-900/20/50 p-4 rounded-xl border border-blue-100/50 space-y-4 animate-fadeIn">
+              <div className="col-span-2 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100/50 space-y-4 animate-fadeIn">
                 <div className="flex items-center gap-3">
                   <input 
                     type="checkbox" 
@@ -262,7 +262,7 @@ const ConfigTab = ({ emitente, onUpdate, onSave, showAlert, usuarioDfe }: { emit
                       onChange={(e) => handleChange('recolhe_ibscbs_fora', e.target.checked)} 
                       className="w-5 h-5 text-emerald-600 dark:text-emerald-400 rounded focus:ring-emerald-500 cursor-pointer" 
                     />
-                    <label htmlFor="recolhe_ibscbs_fora" className="text-sm font-semibold text-blue-800 cursor-pointer">
+                    <label htmlFor="recolhe_ibscbs_fora" className="text-sm font-semibold text-blue-800 dark:text-blue-300 cursor-pointer">
                       Recolher IBS e CBS "Por Fora" do Simples Nacional? (Opção LC 214)
                     </label>
                   </div>
@@ -275,7 +275,7 @@ const ConfigTab = ({ emitente, onUpdate, onSave, showAlert, usuarioDfe }: { emit
               <select
                 value={emitente.momento_comissao || 'emissao'}
                 onChange={(e) => handleChange('momento_comissao', e.target.value)}
-                className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               >
                 <option value="emissao">Na emissão do documento (Orçamento Aprovado / OS Concluída / Venda)</option>
                 <option value="pagamento">No pagamento do cliente (baixa em Contas a Receber)</option>
@@ -489,7 +489,7 @@ const DfeConfigPage = ({
   showAlert: (t: string, m: string) => void;
 }) => {
   const [uploadingCert, setUploadingCert] = useState(false);
-  const selClass = "w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm";
+  const selClass = "w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100";
 
   const handleChange = (field: keyof Emitente, value: any) => onUpdate({ ...emitente, [field]: value });
 

@@ -277,7 +277,15 @@ switch ($action) {
                 FROM financeiro WHERE tipo='P' AND status IN ('Pendente','Parcial')
                 AND vencimento < '{$hoje}' {$empFilter}")->fetch(PDO::FETCH_ASSOC);
 
-            echo json_encode([
+            
+            // Vendas do periodo filtrado pelo periodo selecionado
+            $stmtV = $pdo->prepare("SELECT COUNT(*) qtd, COALESCE(SUM(valor_total),0) total FROM vendas WHERE status='Autorizada' AND data_emissao >= ? AND data_emissao <= ?" . ($empresaId ? " AND empresa_id = " . (int)$empresaId : ""));
+            $stmtV->execute([$dtIni, $dtFim . ' 23:59:59']);
+            $vendasAtual = $stmtV->fetch(PDO::FETCH_ASSOC);
+            $stmtV->execute([$dtIniAnt, $dtFimAnt . ' 23:59:59']);
+            $vendasAnt = $stmtV->fetch(PDO::FETCH_ASSOC);
+
+echo json_encode([
                 'success' => true,
                 'periodo' => ['dt_inicio' => $dtIni, 'dt_fim' => $dtFim, 'dt_ini_ant' => $dtIniAnt, 'dt_fim_ant' => $dtFimAnt],
                 'orcamentos_pendentes' => [
@@ -308,6 +316,11 @@ switch ($action) {
                     'vencendo_7d' => ['qtd' => (int)$pagVenc['qtd'], 'valor' => (float)$pagVenc['val']],
                     'vencidas'    => ['qtd' => (int)$pagVencidas['qtd'], 'valor' => (float)$pagVencidas['val']],
                 ],
+            'vendas_periodo' => [
+                    'total' => (float)$vendasAtual['total'],
+                    'qtd'   => (int)$vendasAtual['qtd'],
+                    'trend' => $trend((float)$vendasAtual['total'], (float)$vendasAnt['total']),
+                ],
             ]);
         } catch (\Exception $e) {
             echo json_encode([
@@ -320,6 +333,7 @@ switch ($action) {
                 'top_clientes' => [], 'top_produtos' => [],
                 'contas_receber' => ['vencendo_7d' => ['qtd'=>0,'valor'=>0], 'vencidas' => ['qtd'=>0,'valor'=>0]],
                 'contas_pagar'   => ['vencendo_7d' => ['qtd'=>0,'valor'=>0], 'vencidas' => ['qtd'=>0,'valor'=>0]],
+            'vendas_periodo' => ['total' => 0, 'qtd' => 0, 'trend' => 0],
             ]);
         }
         break;
