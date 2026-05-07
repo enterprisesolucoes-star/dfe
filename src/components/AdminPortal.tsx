@@ -89,14 +89,16 @@ const AdminPortal = () => {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if ((e.ctrlKey && e.key === '5') || (e.ctrlKey && e.shiftKey && e.key === 'R')) {
-        e.preventDefault();
-        handleLogout();
+      const isHardRefresh =
+        (e.ctrlKey && e.key === 'F5') ||
+        (e.ctrlKey && e.shiftKey && (e.key === 'R' || e.key === 'r'));
+      if (isHardRefresh) {
+        localStorage.removeItem('dfe_admin_token');
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [loggedIn]);
+  }, []);
 
   const abrirModal = async (emp?: any) => {
     setTab('dados');
