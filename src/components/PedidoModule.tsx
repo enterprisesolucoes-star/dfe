@@ -835,7 +835,7 @@ ${observacao?`<div style="border:1px solid #ddd;border-radius:4px;padding:10px;m
                 <p className="text-sm font-bold text-green-700 dark:text-green-300">Troco</p>
                 <p className="text-lg font-bold text-green-700 dark:text-green-300">R$ {brl(troco)}</p>
               </div>}
-              <div className={`mt-3 px-3 py-2 rounded-xl text-xs font-medium text-center ${Math.abs(totalPago-totalPedido)<0.02?'bg-green-100 text-green-700 dark:text-green-300':'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300'}`}>
+              <div className={`mt-3 px-3 py-2 rounded-xl text-xs font-medium text-center ${Math.abs(totalPago-totalPedido)<0.02?'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300':'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300'}`}>
                 {Math.abs(totalPago-totalPedido)<0.02 ? '✓ Valores conferem' : `Pendente R$ ${brl(Math.abs(totalPedido-totalPago))}`}
               </div>
             </div>

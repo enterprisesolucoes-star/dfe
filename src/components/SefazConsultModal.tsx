@@ -196,7 +196,7 @@ const SefazConsultModal = ({ onClose, onImportXml, showAlert, emitente, onUpdate
                     {Number(doc.manifesto) === 2 ? (
                       <span className="px-2 py-1 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 uppercase">Confirmado</span>
                     ) : Number(doc.manifesto) === 1 ? (
-                      <span className="px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 dark:text-green-300 uppercase">Ciência</span>
+                      <span className="px-2 py-1 rounded-full text-xs font-semibold bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 uppercase">Ciência</span>
                     ) : (
                       <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 uppercase">Pendente</span>
                     )}

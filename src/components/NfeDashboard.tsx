@@ -1288,7 +1288,7 @@ const NfeDashboard: React.FC<Props> = ({
                     Total NF: <span className="font-semibold">R$ {totalNF.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span> | Total Informado: <span className="font-semibold">R$ {totalPago.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </p>
                 </div>
-                <div className={`px-4 py-2 rounded-xl text-sm font-medium ${Math.abs(totalPago - totalNF) < 0.02 ? 'bg-green-100 text-green-700 dark:text-green-300' : 'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300'}`}>
+                <div className={`px-4 py-2 rounded-xl text-sm font-medium ${Math.abs(totalPago - totalNF) < 0.02 ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' : 'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300'}`}>
                   {Math.abs(totalPago - totalNF) < 0.02 ? '✓ Valores informados corretamente' : `Pendente R$ ${Math.abs(totalNF - totalPago).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
                 </div>
               </div>

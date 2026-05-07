@@ -80,8 +80,8 @@ const UsuariosTab = ({ session, showAlert, showConfirm }: { session: Session; sh
                   <tr key={u.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="px-5 py-3 font-medium">{u.nome}</td>
                     <td className="px-5 py-3 font-mono text-gray-500 dark:text-gray-400">{u.login}</td>
-                    <td className="px-5 py-3"><span className={`px-2 py-0.5 rounded-full text-xs font-medium ${u.perfil === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'}`}>{u.perfil}</span></td>
-                    <td className="px-5 py-3"><span className={`px-2 py-0.5 rounded-full text-xs ${u.ativo ? 'bg-green-100 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'}`}>{u.ativo ? 'Ativo' : 'Inativo'}</span></td>
+                    <td className="px-5 py-3"><span className={`px-2 py-0.5 rounded-full text-xs font-medium ${u.perfil === 'admin' ? 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300' : 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'}`}>{u.perfil}</span></td>
+                    <td className="px-5 py-3"><span className={`px-2 py-0.5 rounded-full text-xs ${u.ativo ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'}`}>{u.ativo ? 'Ativo' : 'Inativo'}</span></td>
                     <td className="px-5 py-3">
                       <div className="flex gap-2">
                         <button onClick={() => { setEditando(u); setShowModal(true); }} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg"><Edit className="w-4 h-4" /></button>
@@ -129,7 +129,7 @@ const UsuariosTab = ({ session, showAlert, showConfirm }: { session: Session; sh
                   <td className="px-4 py-3">
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                       p.status === 'aguardando' ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300' :
-                      p.status === 'aprovado'   ? 'bg-green-100 text-green-700 dark:text-green-300' :
+                      p.status === 'aprovado'   ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' :
                                                   'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'}`}>
                       {p.status === 'aguardando' ? 'Aguardando' : p.status === 'aprovado' ? 'Aprovado' : 'Reprovado'}
                     </span>

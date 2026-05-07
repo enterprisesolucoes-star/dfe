@@ -76,7 +76,7 @@ const VendedoresTab = ({ showAlert, showConfirm }: { showAlert: (t: string, m: s
                 <td className="px-5 py-3 text-gray-500 dark:text-gray-400">{v.email || <span className="text-gray-300 dark:text-gray-600 italic">—</span>}</td>
                 <td className="px-5 py-3 text-right font-semibold text-blue-700 dark:text-blue-300">{Number(v.percentual_comissao).toFixed(2)}%</td>
                 <td className="px-5 py-3 text-center">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${v.ativo ? 'bg-green-100 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400'}`}>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${v.ativo ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400'}`}>
                     {v.ativo ? 'Ativo' : 'Inativo'}
                   </span>
                 </td>

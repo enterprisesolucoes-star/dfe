@@ -902,10 +902,10 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
                             <div key={i} className={`rounded-lg border ${cardCls}`}>
                               <div className="flex items-center justify-between gap-2 px-2 py-1.5">
                                 <div className="flex flex-wrap gap-1.5 text-[11px] text-gray-600 dark:text-gray-300 flex-1 min-w-0">
-                                  <span className={`font-mono px-1.5 rounded ${specific ? 'bg-amber-200 text-amber-800' : isPadrao ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200' : 'bg-purple-100 text-purple-700'}`}>{r.cst || '—'}</span>
+                                  <span className={`font-mono px-1.5 rounded ${specific ? 'bg-amber-200 text-amber-800' : isPadrao ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200' : 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300'}`}>{r.cst || '—'}</span>
                                   <span className="text-gray-700 dark:text-gray-200 font-medium">{r.classtrib || ''}</span>
                                   <span className="bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-1.5 rounded font-bold">CBS</span>
-                                  <span className="bg-green-100 text-green-700 dark:text-green-300 px-1.5 rounded font-bold">IBS</span>
+                                  <span className="bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 px-1.5 rounded font-bold">IBS</span>
                                   {r.nome_classtrib ? <span className={`text-[10px] ${specific ? 'text-amber-700 dark:text-amber-300 font-medium' : isPadrao ? 'text-gray-500 dark:text-gray-400 italic' : 'text-gray-500 dark:text-gray-400'}`}>{r.nome_classtrib}</span> : null}
                                   {r.legislacao ? <span className="text-gray-400 dark:text-gray-500 text-[10px]">{r.legislacao}{r.anexo ? ` Anx.${r.anexo}` : ''}</span> : null}
                                   {specific && <span className="text-[9px] font-bold bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded-full uppercase">Finalidade específica</span>}
@@ -1056,7 +1056,7 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
               <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[10px] font-bold text-purple-500 uppercase flex items-center gap-1">
-                    Reforma Tributária (IBS / CBS){rtcCstList.length > 0 && <span className="ml-1 text-[9px] bg-purple-100 text-purple-600 px-1.5 py-0.5 rounded-full">LC 214 importada</span>}
+                    Reforma Tributária (IBS / CBS){rtcCstList.length > 0 && <span className="ml-1 text-[9px] bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 px-1.5 py-0.5 rounded-full">LC 214 importada</span>}
                   </p>
                 </div>
 

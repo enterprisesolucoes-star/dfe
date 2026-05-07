@@ -59,7 +59,7 @@ const STATUS_MAP: Record<number, { label: string; color: string }> = {
   1: { label: 'Solicitado',     color: 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300' },
   2: { label: 'Processando',    color: 'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400' },
   3: { label: 'Aguardando',     color: 'bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400' },
-  4: { label: 'Pago',           color: 'bg-green-100 text-green-700 dark:text-green-300' },
+  4: { label: 'Pago',           color: 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' },
   5: { label: 'Cancelado/Erro', color: 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400' },
 };
 const TIPO_MAP: Record<string, string> = { '1': 'Débito', '2': 'Crédito', '3': 'PIX' };

@@ -1124,7 +1124,7 @@ const BackupPanel = ({ onClose, adminToken }: { onClose: () => void; adminToken:
                     {(tab === 'local' ? backups.local : backups.nuvem)?.map((b: any) => (
                       <tr key={b.nome} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                         <td className="px-3 py-2 text-gray-800 dark:text-gray-100 font-mono text-xs">{b.nome}</td>
-                        <td className="px-3 py-2"><span className={`text-xs px-2 py-0.5 rounded-full font-medium ${b.tipo === 'Banco de Dados' ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300' : 'bg-purple-100 text-purple-700'}`}>{b.tipo}</span></td>
+                        <td className="px-3 py-2"><span className={`text-xs px-2 py-0.5 rounded-full font-medium ${b.tipo === 'Banco de Dados' ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300' : 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300'}`}>{b.tipo}</span></td>
                         <td className="px-3 py-2 text-gray-600 dark:text-gray-300">{b.data}</td>
                         <td className="px-3 py-2 text-right font-medium text-gray-700 dark:text-gray-200">{b.tamanho}</td>
                         <td className="px-3 py-2 text-center">

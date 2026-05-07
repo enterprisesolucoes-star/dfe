@@ -296,7 +296,7 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobranc
                   <p className="text-xs text-gray-600 dark:text-gray-300">{t.vencimento ? new Date(t.vencimento + 'T12:00:00').toLocaleDateString('pt-BR') : '-'}</p>
                 </td>
                 <td className="px-6 py-4">
-                  <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${t.status === 'Pago' ? 'bg-green-100 text-green-700 dark:text-green-300' : 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300'}`}>
+                  <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${t.status === 'Pago' ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' : 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300'}`}>
                     {t.status || 'Pendente'}
                   </span>
                 </td>
@@ -1044,7 +1044,7 @@ const BoletoModal = ({ titulo, onClose, showAlert }: { titulo: any; onClose: () 
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500 dark:text-gray-400">Status:</span>
                 <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                  boleto.boleto_status === 'registrado' ? 'bg-green-100 text-green-700 dark:text-green-300' :
+                  boleto.boleto_status === 'registrado' ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' :
                   boleto.boleto_status === 'pago'       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300' :
                   'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300'
                 }`}>{boleto.boleto_status || 'pendente'}</span>

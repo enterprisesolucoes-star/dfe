@@ -22,7 +22,7 @@ const STATUS_OS_COLORS: Record<string, string> = {
   Rascunho:       'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300',
   Aberta:         'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300',
   'Em Andamento': 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300',
-  'Concluída':    'bg-green-100 text-green-700 dark:text-green-300',
+  'Concluída':    'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300',
   Cancelada:      'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400',
 };
 
@@ -379,7 +379,7 @@ export const OrdemServicoTab = ({
                       {form.itens.map((item, idx) => (
                         <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                           <td className="px-3 py-2 max-w-[200px] truncate" title={item.descricao}>{item.descricao}</td>
-                          <td className="px-3 py-2 text-center"><span className={`text-xs px-2 py-0.5 rounded-full font-medium ${item.tipo === 'servico' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'}`}>{item.tipo === 'servico' ? 'Serviço' : 'Peça'}</span></td>
+                          <td className="px-3 py-2 text-center"><span className={`text-xs px-2 py-0.5 rounded-full font-medium ${item.tipo === 'servico' ? 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300' : 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'}`}>{item.tipo === 'servico' ? 'Serviço' : 'Peça'}</span></td>
                           <td className="px-3 py-2 text-center text-gray-500 dark:text-gray-400">{item.unidade}</td>
                           <td className="px-3 py-2 text-right text-gray-600 dark:text-gray-300">{Number(item.quantidade).toLocaleString('pt-BR', { maximumFractionDigits: 3 })}</td>
                           <td className="px-3 py-2 text-right text-gray-600 dark:text-gray-300">{fmtVal(item.valor_unitario)}</td>
@@ -426,7 +426,7 @@ export const OrdemServicoTab = ({
                       {form.itens.map((item, idx) => (
                         <tr key={idx}>
                           <td className="px-3 py-2 text-gray-800 dark:text-gray-100">{item.descricao}</td>
-                          <td className="px-3 py-2 text-center"><span className={`text-xs px-2 py-0.5 rounded-full font-medium ${item.tipo === 'servico' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'}`}>{item.tipo === 'servico' ? 'Serviço' : 'Peça'}</span></td>
+                          <td className="px-3 py-2 text-center"><span className={`text-xs px-2 py-0.5 rounded-full font-medium ${item.tipo === 'servico' ? 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300' : 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'}`}>{item.tipo === 'servico' ? 'Serviço' : 'Peça'}</span></td>
                           <td className="px-3 py-2 text-right text-gray-600 dark:text-gray-300">{Number(item.quantidade).toLocaleString('pt-BR', { maximumFractionDigits: 3 })}</td>
                           <td className="px-3 py-2 text-right text-gray-600 dark:text-gray-300">{fmtVal(item.valor_unitario)}</td>
                           <td className="px-3 py-2 text-right font-semibold text-blue-600 dark:text-blue-400">{fmtVal(item.valor_total)}</td>
