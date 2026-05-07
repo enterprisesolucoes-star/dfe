@@ -172,16 +172,35 @@ const OrcamentosTab = ({
     setSaving(false);
   };
 
-  const handleWhatsApp = (orc: Orcamento) => {
+  const handleWhatsApp = async (orc: Orcamento) => {
     const num = String(orc.numero ?? '').padStart(4, '0');
     const val = 'R$ ' + Number(orc.valor_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    const tel = (orc.cliente_telefone || '').replace(/\D/g, '');
+    const caption = `📄 *Orçamento Nº ${num}*\nCliente: ${orc.cliente_nome || '-'}\nTotal: ${val}`;
+
+    // Tenta Evolution API primeiro (envia PDF direto)
+    try {
+      const sr = await fetch('/api/whatsapp/status');
+      if (sr.ok) {
+        const sd = await sr.json();
+        if (sd.state === 'open' && tel) {
+          const dr = await fetch('/api/whatsapp/send-document', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone: tel, action: 'orcamento_pdf', id: orc.id, filename: `orcamento_${num}.pdf`, caption })
+          });
+          const dd = await dr.json();
+          if (dd.success) { showAlert('WhatsApp', 'Orçamento enviado com sucesso!'); return; }
+        }
+      }
+    } catch {}
+
+    // Fallback: abre wa.me com link
     const val2 = orc.validade ? new Date(orc.validade + 'T12:00:00').toLocaleDateString('pt-BR') : 'Sem prazo';
     const base = window.location.origin + window.location.pathname.replace(/\/$/, '');
     const linkPdf = `${base}/./api.php?action=orcamento_pdf&id=${orc.id}`;
     let msg = `*Orçamento Nº ${num}*\nCliente: ${orc.cliente_nome || '-'}\nTotal: ${val}\nValidade: ${val2}\n`;
     if (orc.observacao) msg += `Obs: ${orc.observacao}\n`;
     msg += `\n📄 *Visualize seu Orçamento em PDF clicando abaixo:*\n${linkPdf}`;
-    const tel = (orc.cliente_telefone || '').replace(/\D/g, '');
     window.open(tel ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
   };
 

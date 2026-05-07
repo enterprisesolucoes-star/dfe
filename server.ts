@@ -7,6 +7,8 @@ import cors from "cors";
 import { login } from "./src/routes/auth.ts";
 import rateLimit from "express-rate-limit";
 
+import * as WhatsApp from './src/services/WhatsAppService.ts';
+
 
 // Carregar .env com path explícito (compatível com Docker)
 const __filename = fileURLToPath(import.meta.url);
@@ -242,6 +244,56 @@ app.all("/api.php", async (req, res) => {
     res.status(500).json({ error: "PHP error: " + e.message });
   }
 });
+
+// ── WhatsApp / Evolution API ─────────────────────────────────────────────────
+const waMiddleware = (req: any, res: any, next: any) => {
+  const cookie = req.headers.cookie || '';
+  const m = cookie.match(/empresa_id=(\d+)/);
+  req.wEmpresaId = m ? parseInt(m[1]) : 0;
+  if (!req.wEmpresaId) return res.status(401).json({ success: false, message: 'Não autenticado.' });
+  if (!process.env.EVOLUTION_API_URL) return res.status(503).json({ success: false, message: 'WhatsApp não configurado no servidor.' });
+  next();
+};
+
+app.get('/api/whatsapp/status', waMiddleware, async (req: any, res) => {
+  try {
+    const s = await WhatsApp.getStatus(req.wEmpresaId);
+    res.json({ success: true, ...s });
+  } catch (e: any) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+app.get('/api/whatsapp/qrcode', waMiddleware, async (req: any, res) => {
+  try {
+    const q = await WhatsApp.getQrCode(req.wEmpresaId);
+    res.json({ success: true, ...q });
+  } catch (e: any) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+app.post('/api/whatsapp/send-text', waMiddleware, async (req: any, res) => {
+  const { phone, text } = req.body;
+  if (!phone || !text) return res.status(400).json({ success: false, message: 'phone e text obrigatórios.' });
+  const ok = await WhatsApp.sendText(req.wEmpresaId, phone, text);
+  res.json({ success: ok });
+});
+
+app.post('/api/whatsapp/send-document', waMiddleware, async (req: any, res) => {
+  const { phone, action, id, filename, caption } = req.body;
+  if (!phone || !action || !id) return res.status(400).json({ success: false, message: 'Parâmetros inválidos.' });
+  const internalToken = process.env.INTERNAL_API_TOKEN || '';
+  try {
+    const nodeFetch = (await import('node-fetch')).default;
+    const pdfRes = await nodeFetch(`http://172.17.0.1:8080/api.php?action=${action}&id=${encodeURIComponent(id)}`, {
+      headers: { 'X-Internal-Token': internalToken, 'X-Empresa-Id': String(req.wEmpresaId) }
+    });
+    if (!pdfRes.ok) return res.status(502).json({ success: false, message: 'Falha ao buscar PDF.' });
+    const buf = await pdfRes.buffer();
+    const base64 = buf.toString('base64');
+    const ok = await WhatsApp.sendDocument(req.wEmpresaId, phone, base64, filename || 'documento.pdf', caption || '');
+    res.json({ success: ok });
+  } catch (e: any) { res.status(500).json({ success: false, message: e.message }); }
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
 
 app.use(express.static(path.join(process.cwd(), "dist")));
 app.get("*", (req, res) => {

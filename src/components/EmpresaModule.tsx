@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Input } from './UIComponents';
 import { Emitente } from '../types/nfce';
 import { ReformaTributariaTab } from './ReformaTributariaModule';
-import { FileText, Send, AlertCircle, QrCode, Trash2, RefreshCw, Upload, DollarSign, ShieldCheck, ExternalLink, Building, Pencil, Image as ImageIcon } from 'lucide-react';
+import { FileText, Send, AlertCircle, QrCode, Trash2, RefreshCw, Upload, DollarSign, ShieldCheck, ExternalLink, Building, Pencil, Image as ImageIcon, MessageCircle, CheckCircle, WifiOff } from 'lucide-react';
 
 const ESTADOS_BR = [
   { sigla: 'AC', nome: 'Acre' }, { sigla: 'AL', nome: 'Alagoas' }, { sigla: 'AP', nome: 'Amapá' },
@@ -425,6 +425,107 @@ const EmpresaPage = ({
   </div>
 );
 
+
+// ── WhatsAppSection ───────────────────────────────────────────────────────────
+const WhatsAppSection = ({ showAlert }: { showAlert: (t: string, m: string) => void }) => {
+  const [status, setStatus] = React.useState<'loading'|'open'|'close'|'unconfigured'>('loading');
+  const [phone, setPhone] = React.useState('');
+  const [qrCode, setQrCode] = React.useState('');
+  const [loadingQr, setLoadingQr] = React.useState(false);
+
+  const checkStatus = async () => {
+    try {
+      const r = await fetch('/api/whatsapp/status');
+      if (r.status === 503) { setStatus('unconfigured'); return; }
+      const d = await r.json();
+      const st = d.state === 'open' ? 'open' : 'close';
+      setStatus(st);
+      if (d.phone) setPhone(d.phone.replace('@s.whatsapp.net', '').replace(/^55/, ''));
+    } catch { setStatus('unconfigured'); }
+  };
+
+  const loadQr = async () => {
+    setLoadingQr(true);
+    try {
+      const r = await fetch('/api/whatsapp/qrcode');
+      const d = await r.json();
+      if (d.qrcode) setQrCode(d.qrcode);
+      if (d.status === 'open') { setStatus('open'); setQrCode(''); }
+    } catch {}
+    setLoadingQr(false);
+  };
+
+  React.useEffect(() => { checkStatus(); }, []);
+
+  React.useEffect(() => {
+    if (status !== 'close') return;
+    loadQr();
+    const iv = setInterval(async () => {
+      try {
+        const r = await fetch('/api/whatsapp/status');
+        const d = await r.json();
+        if (d.state === 'open') {
+          setStatus('open');
+          setPhone((d.phone || '').replace('@s.whatsapp.net', '').replace(/^55/, ''));
+          setQrCode('');
+          clearInterval(iv);
+        } else {
+          loadQr();
+        }
+      } catch {}
+    }, 12000);
+    return () => clearInterval(iv);
+  }, [status]);
+
+  if (status === 'unconfigured') return (
+    <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-sm text-gray-500 dark:text-gray-400">
+      <WifiOff className="w-4 h-4" /> Evolution API não configurada no servidor.
+    </div>
+  );
+
+  if (status === 'loading') return (
+    <div className="flex items-center gap-2 text-sm text-gray-400 dark:text-gray-500">
+      <RefreshCw className="w-4 h-4 animate-spin" /> Verificando conexão...
+    </div>
+  );
+
+  if (status === 'open') return (
+    <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+      <div className="flex items-center gap-2">
+        <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse" />
+        <span className="text-sm font-medium text-green-700 dark:text-green-300">Conectado</span>
+        {phone && <span className="text-xs text-green-600 dark:text-green-400">— +55 {phone}</span>}
+      </div>
+      <button onClick={checkStatus} className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 flex items-center gap-1">
+        <RefreshCw className="w-3 h-3" /> Verificar
+      </button>
+    </div>
+  );
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400">
+        <div className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+        Aguardando conexão — escaneie o QR Code com o WhatsApp
+      </div>
+      {loadingQr && !qrCode && (
+        <div className="flex items-center gap-2 text-sm text-gray-400 dark:text-gray-500">
+          <RefreshCw className="w-4 h-4 animate-spin" /> Gerando QR Code...
+        </div>
+      )}
+      {qrCode && (
+        <div className="flex flex-col items-start gap-3">
+          <img src={qrCode} alt="QR Code WhatsApp" className="w-48 h-48 rounded-lg border border-gray-200 dark:border-gray-700 bg-white p-1" />
+          <button onClick={loadQr} disabled={loadingQr} className="flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-50">
+            <RefreshCw className={`w-3 h-3 ${loadingQr ? 'animate-spin' : ''}`} /> Atualizar QR Code
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ── IntegracaoPage ────────────────────────────────────────────────────────────
 const IntegracaoPage = ({
   emitente, onUpdate, showAlert,
@@ -465,8 +566,13 @@ const IntegracaoPage = ({
 
         <div className="border-t border-gray-100 dark:border-gray-700" />
 
-
-
+        {/* WhatsApp Business — Evolution API */}
+        <div>
+          <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-3 flex items-center gap-2">
+            <MessageCircle className="w-4 h-4 text-green-600 dark:text-green-400" /> WhatsApp Business
+          </h4>
+          <WhatsAppSection showAlert={showAlert} />
+        </div>
 
 
         <div className="pt-4">
