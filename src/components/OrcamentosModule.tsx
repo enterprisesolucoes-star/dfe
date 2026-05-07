@@ -3,6 +3,11 @@ import { Cliente, Produto, Emitente } from '../types/nfce';
 import { Plus, CheckCircle, Search, Edit, Trash2, RefreshCw, X, ClipboardList, Printer, Mail, MessageCircle, ArrowRight } from 'lucide-react';
 
 import type { Vendedor } from '../contexts/AppDataContext';
+const getLocalToday = () => {
+  const tzOffset = new Date().getTimezoneOffset() * 60000;
+  return new Date(Date.now() - tzOffset).toISOString().split('T')[0];
+};
+
 const STATUS_ORC_COLORS: Record<string, string> = {
   Rascunho: 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300',
   Enviado:  'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300',
