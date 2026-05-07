@@ -137,6 +137,17 @@ setInterval(() => {
 app.all("/api.php", async (req, res) => {
   const action = (req.body && req.body.action) || req.query.action;
 
+  if (action === "logout") {
+    const clear = `Path=/; HttpOnly; SameSite=Strict; Max-Age=0${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`;
+    res.setHeader('Set-Cookie', [
+      `dfe_token=; ${clear}`,
+      `empresa_id=; ${clear}`,
+      `usuario_id=; ${clear}`,
+      `usuario_nome=; ${clear}`,
+    ]);
+    return res.json({ success: true });
+  }
+
   if (action === "login") {
     const ip = (req.headers['x-forwarded-for'] as string || req.socket.remoteAddress || '').split(',')[0].trim();
     const loginName = (req.body.login || req.query.login || '').toString().trim().toLowerCase();
@@ -165,14 +176,16 @@ app.all("/api.php", async (req, res) => {
     const data = loginRes._data;
     if (data && data.success) {
       registerSuccess(loginName);
-      if (data.empresaId) {
-        const cookies = [
-          `empresa_id=${data.empresaId}; Path=/; HttpOnly`,
-          `usuario_id=${data.usuarioId || ''}; Path=/; HttpOnly`,
-          `usuario_nome=${encodeURIComponent(data.nome || '')}; Path=/; HttpOnly`
-        ];
-        res.setHeader("Set-Cookie", cookies);
-      }
+      const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
+      const base = `Path=/; HttpOnly; SameSite=Strict${secure}; Max-Age=${24 * 60 * 60}`;
+      res.setHeader("Set-Cookie", [
+        `dfe_token=${data.token}; ${base}`,
+        `empresa_id=${data.empresaId ?? ''}; ${base}`,
+        `usuario_id=${data.usuarioId ?? ''}; ${base}`,
+        `usuario_nome=${encodeURIComponent(data.nome || '')}; ${base}`,
+      ]);
+      const { token: _tok, ...safeData } = data;
+      return res.json(safeData);
     } else if (loginName) {
       registerFailure(loginName);
     }

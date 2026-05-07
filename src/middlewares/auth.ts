@@ -9,13 +9,19 @@ export interface AuthRequest extends Request {
 }
 
 export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization;
+  // Lê token do cookie httpOnly (preferência) ou header Bearer (fallback)
+  const token = (() => {
+    const cookieStr = req.headers.cookie || '';
+    const m = cookieStr.match(/(?:^|;\s*)dfe_token=([^;]+)/);
+    if (m) return decodeURIComponent(m[1]);
+    const h = req.headers.authorization;
+    if (h?.startsWith('Bearer ')) return h.split(' ')[1];
+    return null;
+  })();
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  if (!token) {
     return res.status(401).json({ error: "Token não fornecido" });
   }
-
-  const token = authHeader.split(" ")[1];
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
