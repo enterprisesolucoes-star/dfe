@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Input } from './UIComponents';
 import { Emitente } from '../types/nfce';
-import { FileText, Send, AlertCircle, QrCode, Trash2, RefreshCw, Upload, DollarSign, ShieldCheck, ExternalLink, Building, Pencil } from 'lucide-react';
+import { ReformaTributariaTab } from './ReformaTributariaModule';
+import { FileText, Send, AlertCircle, QrCode, Trash2, RefreshCw, Upload, DollarSign, ShieldCheck, ExternalLink, Building, Pencil, Image as ImageIcon } from 'lucide-react';
 
 const ESTADOS_BR = [
   { sigla: 'AC', nome: 'Acre' }, { sigla: 'AL', nome: 'Alagoas' }, { sigla: 'AP', nome: 'Amapá' },

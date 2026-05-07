@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { Session } from '../App';
+import FormAlert from './FormAlert';
 import { X, DollarSign } from 'lucide-react';
 
 const AbrirCaixaModal = ({ session, onClose, onAberto }: { session: Session; onClose: () => void; onAberto: (caixaId: number) => void }) => {
