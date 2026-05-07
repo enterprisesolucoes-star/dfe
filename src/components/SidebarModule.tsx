@@ -265,7 +265,7 @@ export const Sidebar = ({
           <SubItem id="comissoes" label="Comissões" icon={TrendingUp} activeTab={activeTab} onClick={handleSetActiveTab} />
           <SubItem id="cobranca_config" label="Cobrança" icon={Landmark} activeTab={activeTab} onClick={handleSetActiveTab} />
           {isFiscal && <SubItem id="config_integracao" label="Integração" icon={Zap} activeTab={activeTab} onClick={handleSetActiveTab} />}
-          {isFiscal && <SubItem id="dfe_config" label="DFe" icon={Settings} activeTab={activeTab} onClick={handleSetActiveTab} />}
+          {isFiscal && <SubItem id="dfe_config" label="Config. DFe" icon={Settings} activeTab={activeTab} onClick={handleSetActiveTab} />}
           <SubItem id="usuarios" label="Usuários" icon={ShieldCheck} activeTab={activeTab} onClick={handleSetActiveTab} />
         </SidebarGroup>
 
