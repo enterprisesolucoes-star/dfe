@@ -215,7 +215,7 @@ switch ($action) {
             $stmt = $pdo->prepare("
                 SELECT cliente_id, cliente_nome, SUM(valor) total
                 FROM (
-                    SELECT v.cliente_id, COALESCE(c.nome, c.razao_social, 'Consumidor') AS cliente_nome, v.valor_total AS valor
+                    SELECT v.cliente_id, COALESCE(c.nome, 'Consumidor') AS cliente_nome, v.valor_total AS valor
                     FROM vendas v
                     LEFT JOIN clientes c ON c.id = v.cliente_id
                     WHERE v.status='Autorizada' AND v.data_emissao >= ? AND v.data_emissao <= ?
@@ -224,7 +224,7 @@ switch ($action) {
 
                     UNION ALL
 
-                    SELECT o.cliente_id, COALESCE(c.nome, c.razao_social, o.cliente_nome) AS cliente_nome, o.valor_total AS valor
+                    SELECT o.cliente_id, COALESCE(c.nome, o.cliente_nome) AS cliente_nome, o.valor_total AS valor
                     FROM orcamentos o
                     LEFT JOIN clientes c ON c.id = o.cliente_id
                     WHERE o.status='Aprovado' AND o.data_criacao >= ? AND o.data_criacao <= ?
@@ -232,7 +232,7 @@ switch ($action) {
 
                     UNION ALL
 
-                    SELECT os.cliente_id, COALESCE(c.nome, c.razao_social, os.cliente_nome) AS cliente_nome, os.valor_total AS valor
+                    SELECT os.cliente_id, COALESCE(c.nome, os.cliente_nome) AS cliente_nome, os.valor_total AS valor
                     FROM ordens_servico os
                     LEFT JOIN clientes c ON c.id = os.cliente_id
                     WHERE os.status='Concluída' AND os.data_criacao >= ? AND os.data_criacao <= ?
