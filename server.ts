@@ -1,16 +1,23 @@
-import "dotenv/config";
+import { config } from "dotenv";
+import { resolve, dirname } from "path";
+import { fileURLToPath } from "url";
+import express from "express";
+import path from "path";
+import cors from "cors";
+import { login } from "./src/routes/auth.ts";
 
-// Validação de variáveis críticas no startup
+
+// Carregar .env com path explícito (compatível com Docker)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+config({ path: resolve(__dirname, ".env") });
+
+// Validar JWT_SECRET antes de iniciar
 const _jwtSecret = process.env.JWT_SECRET;
 if (!_jwtSecret || _jwtSecret.length < 32) {
   console.error("[CRÍTICO] JWT_SECRET ausente ou fraco. Encerrando o servidor.");
   process.exit(1);
 }
-
-import express from "express";
-import path from "path";
-import cors from "cors";
-import { login } from "./src/routes/auth.ts";
 
 const app = express();
 const allowedOrigins = [
