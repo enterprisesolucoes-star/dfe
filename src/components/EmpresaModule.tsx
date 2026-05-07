@@ -632,7 +632,10 @@ const DfeConfigPage = ({
   showAlert: (t: string, m: string) => void;
 }) => {
   const [uploadingCert, setUploadingCert] = useState(false);
+  const [tabAtivo, setTabAtivo] = useState<'nfce'|'nfe'>('nfce');
   const selClass = "w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100";
+  const tabClass = (t: string) =>
+    `px-4 py-2 text-sm font-medium rounded-lg transition-colors ${tabAtivo === t ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`;
 
   const handleChange = (field: keyof Emitente, value: any) => onUpdate({ ...emitente, [field]: value });
 
@@ -642,19 +645,13 @@ const DfeConfigPage = ({
     }
     setUploadingCert(true);
     try {
-      // Converte arquivo para base64
       const base64 = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result as string);
         reader.onerror = reject;
         reader.readAsDataURL(file);
       });
-      // Envia junto com os dados da empresa via salvar_empresa
-      const payload = {
-        ...emitente,
-        certificadoPfx: base64,
-        certificadoFileName: file.name,
-      };
+      const payload = { ...emitente, certificadoPfx: base64, certificadoFileName: file.name };
       const res = await fetch('./api.php?action=salvar_empresa', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -678,7 +675,7 @@ const DfeConfigPage = ({
 
       <div className="max-w-3xl space-y-6">
 
-        {/* Certificado Digital */}
+        {/* Certificado Digital — sempre visível */}
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
           <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
             <ShieldCheck className="w-4 h-4 text-blue-600 dark:text-blue-400" /> Certificado Digital (A1)
@@ -708,106 +705,128 @@ const DfeConfigPage = ({
           </div>
         </div>
 
-        {/* NFC-e */}
+        {/* Navegação de abas */}
+        <div className="flex gap-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-2">
+          <button onClick={() => setTabAtivo('nfce')} className={tabClass('nfce')}>
+            NFC-e (Modelo 65)
+          </button>
+          <button onClick={() => setTabAtivo('nfe')} className={tabClass('nfe')}>
+            NF-e (Modelo 55)
+          </button>
+        </div>
+
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-          <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
-            <QrCode className="w-4 h-4 text-blue-600 dark:text-blue-400" /> NFC-e (Modelo 65)
-          </h4>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Ambiente NFC-e</label>
-              <select value={emitente.ambiente || '2'} onChange={e => handleChange('ambiente', e.target.value as '1' | '2')} className={selClass}>
-                <option value="2">2 - Homologação (Testes)</option>
-                <option value="1">1 - Produção</option>
-              </select>
-            </div>
-            <Input
-              label="Série NFC-e"
-              type="number"
-              value={emitente.serieNfce ?? ''}
-              onChange={(e: any) => handleChange('serieNfce', parseInt(e.target.value) || 1)}
-            />
-            <Input
-              label="Próximo Número NFC-e"
-              type="number"
-              value={emitente.numeroNfce ?? ''}
-              onChange={(e: any) => handleChange('numeroNfce', parseInt(e.target.value) || 1)}
-            />
-            <Input
-              label="CSC Token (ID_TOKEN)"
-              value={emitente.cscToken || ''}
-              onChange={(e: any) => handleChange('cscToken', e.target.value)}
-              placeholder="Token fornecido pela SEFAZ"
-            />
-            <Input
-              label="CSC ID"
-              value={emitente.cscId || ''}
-              onChange={(e: any) => handleChange('cscId', e.target.value)}
-              placeholder="Identificador do CSC"
-            />
-            <div className="col-span-2 border-t border-gray-100 dark:border-gray-700 pt-4 mt-2">
-              <h5 className="text-xs font-semibold text-orange-600 dark:text-orange-400 mb-3 flex items-center gap-2">
-                <AlertCircle className="w-4 h-4" /> Contingência
-              </h5>
-              <div className="flex items-center gap-3">
-                <input
-                  type="checkbox"
-                  id="contingenciaAuto"
-                  checked={emitente.contingenciaAutomatica || false}
-                  onChange={e => handleChange('contingenciaAutomatica', e.target.checked)}
-                  className="w-5 h-5 text-blue-600 dark:text-blue-400 rounded focus:ring-blue-500 cursor-pointer"
+
+          {/* ABA: NFC-e */}
+          {tabAtivo === 'nfce' && (
+            <div className="space-y-4">
+              <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-2 flex items-center gap-2">
+                <QrCode className="w-4 h-4 text-blue-600 dark:text-blue-400" /> NFC-e (Modelo 65)
+              </h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Ambiente NFC-e</label>
+                  <select value={emitente.ambiente || '2'} onChange={e => handleChange('ambiente', e.target.value as '1' | '2')} className={selClass}>
+                    <option value="2">2 - Homologação (Testes)</option>
+                    <option value="1">1 - Produção</option>
+                  </select>
+                </div>
+                <Input
+                  label="Série NFC-e"
+                  type="number"
+                  value={emitente.serieNfce ?? ''}
+                  onChange={(e: any) => handleChange('serieNfce', parseInt(e.target.value) || 1)}
                 />
-                <label htmlFor="contingenciaAuto" className="text-sm font-medium text-gray-700 dark:text-gray-200 cursor-pointer">
-                  Contingência automática quando SEFAZ indisponível
-                </label>
+                <Input
+                  label="Próximo Número NFC-e"
+                  type="number"
+                  value={emitente.numeroNfce ?? ''}
+                  onChange={(e: any) => handleChange('numeroNfce', parseInt(e.target.value) || 1)}
+                />
+                <Input
+                  label="CSC Token (ID_TOKEN)"
+                  value={emitente.cscToken || ''}
+                  onChange={(e: any) => handleChange('cscToken', e.target.value)}
+                  placeholder="Token fornecido pela SEFAZ"
+                />
+                <Input
+                  label="CSC ID"
+                  value={emitente.cscId || ''}
+                  onChange={(e: any) => handleChange('cscId', e.target.value)}
+                  placeholder="Identificador do CSC"
+                />
+                <div className="col-span-2 border-t border-gray-100 dark:border-gray-700 pt-4 mt-2">
+                  <h5 className="text-xs font-semibold text-orange-600 dark:text-orange-400 mb-3 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4" /> Contingência
+                  </h5>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="contingenciaAuto"
+                      checked={emitente.contingenciaAutomatica || false}
+                      onChange={e => handleChange('contingenciaAutomatica', e.target.checked)}
+                      className="w-5 h-5 text-blue-600 dark:text-blue-400 rounded focus:ring-blue-500 cursor-pointer"
+                    />
+                    <label htmlFor="contingenciaAuto" className="text-sm font-medium text-gray-700 dark:text-gray-200 cursor-pointer">
+                      Contingência automática quando SEFAZ indisponível
+                    </label>
+                  </div>
+                </div>
+                <div className="col-span-2 pt-2">
+                  <button onClick={onSave} className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm">
+                    Salvar NFC-e
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          )}
 
-        {/* NF-e */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-          <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
-            <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" /> NF-e (Modelo 55)
-          </h4>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Ambiente NF-e</label>
-              <select value={emitente.ambienteNfe || '2'} onChange={e => handleChange('ambienteNfe', e.target.value as '1' | '2')} className={selClass}>
-                <option value="2">2 - Homologação (Testes)</option>
-                <option value="1">1 - Produção</option>
-              </select>
+          {/* ABA: NF-e */}
+          {tabAtivo === 'nfe' && (
+            <div className="space-y-4">
+              <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-2 flex items-center gap-2">
+                <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" /> NF-e (Modelo 55)
+              </h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Ambiente NF-e</label>
+                  <select value={emitente.ambienteNfe || '2'} onChange={e => handleChange('ambienteNfe', e.target.value as '1' | '2')} className={selClass}>
+                    <option value="2">2 - Homologação (Testes)</option>
+                    <option value="1">1 - Produção</option>
+                  </select>
+                </div>
+                <Input
+                  label="Série NF-e"
+                  type="number"
+                  value={emitente.serieNfe ?? ''}
+                  onChange={(e: any) => handleChange('serieNfe', parseInt(e.target.value) || 1)}
+                />
+                <Input
+                  label="Próximo Número NF-e"
+                  type="number"
+                  value={emitente.numeroNfe ?? ''}
+                  onChange={(e: any) => handleChange('numeroNfe', parseInt(e.target.value) || 1)}
+                />
+                <div className="col-span-2">
+                  <Input
+                    label="Último NSU (DF-e / Distribuição)"
+                    type="number"
+                    value={emitente.ultimoNsu ?? '0'}
+                    onChange={(e: any) => handleChange('ultimoNsu', e.target.value || '0')}
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Número do último NSU consultado na SEFAZ. Ajuste apenas se necessário (ex: ressincronizar consulta de NF-es recebidas).
+                  </p>
+                </div>
+                <div className="col-span-2 pt-2">
+                  <button onClick={onSave} className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm">
+                    Salvar NF-e
+                  </button>
+                </div>
+              </div>
             </div>
-            <Input
-              label="Série NF-e"
-              type="number"
-              value={emitente.serieNfe ?? ''}
-              onChange={(e: any) => handleChange('serieNfe', parseInt(e.target.value) || 1)}
-            />
-            <Input
-              label="Próximo Número NF-e"
-              type="number"
-              value={emitente.numeroNfe ?? ''}
-              onChange={(e: any) => handleChange('numeroNfe', parseInt(e.target.value) || 1)}
-            />
-            <div className="md:col-span-2">
-              <Input
-                label="Último NSU (DF-e / Distribuição)"
-                type="number"
-                value={emitente.ultimoNsu ?? '0'}
-                onChange={(e: any) => handleChange('ultimoNsu', e.target.value || '0')}
-              />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Número do último NSU consultado na SEFAZ. Ajuste apenas se necessário (ex: ressincronizar consulta de NF-es recebidas).
-              </p>
-            </div>
-          </div>
-        </div>
+          )}
 
-        <div className="pt-2">
-          <button onClick={onSave} className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm">
-            Salvar Configurações DFe
-          </button>
         </div>
       </div>
     </div>
