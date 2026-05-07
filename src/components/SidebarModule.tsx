@@ -155,10 +155,6 @@ export const Sidebar = ({
   financeiroOpen,
   setFinanceiroOpen,
   cobrancaAtiva,
-  dfeNfeOpen,
-  setDfeNfeOpen,
-  dfeNfceOpen,
-  setDfeNfceOpen,
   cadastrosOpen,
   setCadastrosOpen,
   usuarioDfe
@@ -176,8 +172,8 @@ export const Sidebar = ({
     Number(usuarioDfe ?? session?.usuarioDfe ?? 0) !== 4;
 
   const financeiroActive = ['fin_receber', 'fin_pagar', 'fin_caixa', 'cobranca_boletos', 'cobranca_historico'].includes(activeTab);
-  const nfeActive = ['dfe_nfe', 'dfe_nfe_geral'].includes(activeTab);
-  const nfceActive = ['vendas', 'vendas_geral'].includes(activeTab);
+  const nfeActive = activeTab === 'dfe';
+  const nfceActive = activeTab === 'vendas';
   const cadastrosActive = ['ncm', 'usuarios', 'medidas', 'bandeiras', 'transportadores', 'vendedores',
     'comissoes', 'cobranca_config', 'config_integracao', 'dfe_config', 'dfe_nfe_dados', 'dfe_nfce_dados', 'dfe_provedor'].includes(activeTab);
 
@@ -235,31 +231,10 @@ export const Sidebar = ({
         </SidebarGroup>
 
         {isFiscal && (
-          <SidebarGroup
-            icon={FileText}
-            label="NF-e"
-            isOpen={dfeNfeOpen}
-            onToggle={() => setDfeNfeOpen(!dfeNfeOpen)}
-            isActive={nfeActive}
-            collapsed={collapsed}
-          >
-            <SubItem id="dfe_nfe" label="Emissão" icon={Send} activeTab={activeTab} onClick={handleSetActiveTab} />
-            <SubItem id="dfe_nfe_geral" label="Geral" icon={FileText} activeTab={activeTab} onClick={handleSetActiveTab} />
-          </SidebarGroup>
+          <SidebarItem icon={FileText} label="DFe" active={nfeActive} onClick={() => handleSetActiveTab('dfe')} collapsed={collapsed} />
         )}
-
         {isFiscal && (
-          <SidebarGroup
-            icon={QrCode}
-            label="NFC-e"
-            isOpen={dfeNfceOpen}
-            onToggle={() => setDfeNfceOpen(!dfeNfceOpen)}
-            isActive={nfceActive}
-            collapsed={collapsed}
-          >
-            <SubItem id="vendas" label="Emissão" icon={Send} activeTab={activeTab} onClick={handleSetActiveTab} />
-            <SubItem id="vendas_geral" label="Geral" icon={FileText} activeTab={activeTab} onClick={handleSetActiveTab} />
-          </SidebarGroup>
+          <SidebarItem icon={QrCode} label="PDV / NFCe" active={nfceActive} onClick={() => handleSetActiveTab('vendas')} collapsed={collapsed} />
         )}
 
         {!isFiscal && (

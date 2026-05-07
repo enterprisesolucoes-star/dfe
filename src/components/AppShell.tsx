@@ -130,7 +130,7 @@ const AppShell: React.FC<{ session: Session; onLogout: () => void; onUpdateSessi
   const isFiscal = usuarioDfeAtual !== 0 && usuarioDfeAtual !== 4;
 
 // Se empresa não está configurada, força aba de configurações e bloqueia as demais
-const [activeTab, setActiveTab] = useState<'dashboard' | 'vendas' | 'vendas_geral' | 'produtos' | 'clientes' | 'fornecedores' | 'compras' | 'orcamentos' | 'transportadores' | 'config' | 'ncm' | 'usuarios' | 'medidas' | 'bandeiras' | 'dfe_nfe' | 'dfe_nfe_geral' | 'dfe_nfe_parametros' | 'dfe_nfce_parametros' | 'reforma_tributaria' | 'config_empresa' | 'config_email' | 'config_smartpos' | 'config_integracao' | 'dfe_nfe_dados' | 'dfe_nfce_dados' | 'dfe_provedor' | 'empresa' | 'dfe_config' | 'fin_receber' | 'fin_pagar' | 'fin_caixa' | 'relatorios_tef' | 'vendedores' | 'comissoes' | 'pedidos' | 'cobranca_config' | 'cobranca_boletos' | 'cobranca_historico'>(
+const [activeTab, setActiveTab] = useState<'dashboard' | 'vendas' | 'vendas_geral' | 'produtos' | 'clientes' | 'fornecedores' | 'compras' | 'orcamentos' | 'transportadores' | 'config' | 'ncm' | 'usuarios' | 'medidas' | 'bandeiras' | 'dfe_nfe' | 'dfe_nfe_geral' | 'dfe_nfe_parametros' | 'dfe_nfce_parametros' | 'reforma_tributaria' | 'config_empresa' | 'config_email' | 'config_smartpos' | 'config_integracao' | 'dfe_nfe_dados' | 'dfe_nfce_dados' | 'dfe_provedor' | 'empresa' | 'dfe_config' | 'fin_receber' | 'fin_pagar' | 'fin_caixa' | 'relatorios_tef' | 'vendedores' | 'comissoes' | 'pedidos' | 'cobranca_config' | 'cobranca_boletos' | 'cobranca_historico' | 'dfe'>(
   session.empresaConfigurada ? 'dashboard' : 'empresa'
 );
 const empresaBloqueada = !session.empresaConfigurada;
@@ -145,8 +145,6 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
   setActiveTab(tab);
 };
   const [cadastrosOpen, setCadastrosOpen] = useState(false);
-  const [dfeNfceOpen, setDfeNfceOpen] = useState(true);
-  const [dfeNfeOpen, setDfeNfeOpen] = useState(true);
   const [configEmpresaOpen, setConfigEmpresaOpen] = useState(false);
   const [configDfeOpen, setConfigDfeOpen] = useState(false);
   const [financeiroOpen, setFinanceiroOpen] = useState(false);
@@ -597,6 +595,54 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
     }
   };
 
+
+  const DfeUnificado = () => {
+    const [abaAtiva, setAbaAtiva] = React.useState<'nfe'|'nfce'>('nfe');
+    const tabClass = (t: string) =>
+      `px-4 py-2 text-sm font-medium rounded-lg transition-colors ${abaAtiva === t ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`;
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex gap-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-2">
+            <button onClick={() => setAbaAtiva('nfe')} className={tabClass('nfe')}>NF-e (Modelo 55)</button>
+            <button onClick={() => setAbaAtiva('nfce')} className={tabClass('nfce')}>NFC-e (Modelo 65)</button>
+          </div>
+          {abaAtiva === 'nfe' && (
+            <button
+              onClick={() => setIsNfeModalOpen(true)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors text-sm font-medium"
+            >
+              <Plus className="w-4 h-4" /> Nova NF-e
+            </button>
+          )}
+        </div>
+        {abaAtiva === 'nfe' && (
+          <GeralNfeTab
+            showAlert={showAlert}
+            showConfirm={showConfirm}
+            showPrompt={showPrompt}
+            onEmailDoc={handleEmailDoc}
+            onDevolucao={handleDevolucao}
+            emitente={emitente}
+          />
+        )}
+        {abaAtiva === 'nfce' && (
+          <GeralNfceTab
+            showAlert={showAlert}
+            showConfirm={showConfirm}
+            showPrompt={showPrompt}
+            onEmailDoc={handleEmailDoc}
+            onDevolucao={handleDevolucao}
+            onCancelar={handleCancelar}
+            onRetryTef={handleRetryTef}
+            onExcluir={handleExcluirVenda}
+            emitente={emitente}
+          />
+        )}
+      </div>
+    );
+  };
+
   const renderTab = () => {
     switch (activeTab) {
       case 'dashboard': return <DashboardTab isFiscal={isFiscal} onNavigate={(t: any) => handleSetActiveTab(t)} />;
@@ -604,6 +650,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       case 'fin_pagar': return <FinanceiroView tipo="P" emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} />;
       case 'fin_caixa': return <CaixaView emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} />;
       case 'vendas_geral': return <GeralNfceTab showAlert={showAlert} showConfirm={showConfirm} showPrompt={showPrompt} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} onCancelar={handleCancelar} onRetryTef={handleRetryTef} onExcluir={handleExcluirVenda} emitente={emitente} />;
+      case 'dfe': return <DfeUnificado />;
       case 'vendas': return <VendasTab vendas={vendas} onCancelar={handleCancelar} onSincronizar={handleSincronizarContingencia} onRetryTef={handleRetryTef} onExcluir={handleExcluirVenda} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} />;
       case 'produtos': return (
         <ProdutosTab
@@ -895,10 +942,6 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           financeiroOpen={financeiroOpen}
           setFinanceiroOpen={setFinanceiroOpen}
           cobrancaAtiva={cobrancaAtiva}
-          dfeNfeOpen={dfeNfeOpen}
-          setDfeNfeOpen={setDfeNfeOpen}
-          dfeNfceOpen={dfeNfceOpen}
-          setDfeNfceOpen={setDfeNfceOpen}
           cadastrosOpen={cadastrosOpen}
           setCadastrosOpen={setCadastrosOpen}
           usuarioDfe={usuarioDfeAtual}
@@ -918,18 +961,10 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
         )}
         <header className="bg-white dark:bg-gray-800 h-16 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-8">
           <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 capitalize">
-            {{ dashboard: 'Dashboard', fin_receber: 'Financeiro - Contas à Receber', fin_pagar: 'Financeiro - Contas à Pagar', fin_caixa: 'Financeiro - Movimento de Caixa', vendas: 'DFe - NFCe - Emissão', vendas_geral: 'DFe - NFCe - Geral', produtos: 'Produtos', clientes: 'Clientes', fornecedores: 'Fornecedores', compras: 'Compras', orcamentos: 'Orçamentos', ordens_servico: 'Ordem de Serviços', relatorios_tef: 'Relatórios do Sistema', config: 'Empresa', config_empresa: 'Empresa', config_email: 'Empresa', config_smartpos: 'Empresa', config_integracao: 'Integração', ncm: 'NCM / Tabela IBPT', usuarios: 'Usuários', vendedores: 'Vendedores', comissoes: 'Comissões', pedidos: 'Pedidos', cobranca_config: 'Cobrança - Configuração', cobranca_boletos: 'Cobrança - Boletos', cobranca_historico: 'Cobrança - Histórico', medidas: 'Medidas', bandeiras: 'Bandeiras de Cartão', dfe_nfe: 'DFe - NFe - Emissão', dfe_nfe_geral: 'DFe - NFe - Geral', dfe_nfce_parametros: 'DFe - NFCe - Parâmetros', dfe_nfe_parametros: 'DFe - NFe - Parâmetros', dfe_nfe_dados: 'DFe Configurações', dfe_nfce_dados: 'DFe Configurações', dfe_provedor: 'DFe Configurações', reforma_tributaria: 'Reforma Tributária', transportadores: 'Transportadores', empresa: 'Empresa', dfe_config: 'DFe Configurações' }[activeTab]}
+            {{ dashboard: 'Dashboard', fin_receber: 'Financeiro - Contas à Receber', fin_pagar: 'Financeiro - Contas à Pagar', fin_caixa: 'Financeiro - Movimento de Caixa', vendas: 'DFe - NFCe - Emissão', vendas_geral: 'DFe - NFCe - Geral', produtos: 'Produtos', clientes: 'Clientes', fornecedores: 'Fornecedores', compras: 'Compras', orcamentos: 'Orçamentos', ordens_servico: 'Ordem de Serviços', relatorios_tef: 'Relatórios do Sistema', config: 'Empresa', config_empresa: 'Empresa', config_email: 'Empresa', config_smartpos: 'Empresa', config_integracao: 'Integração', ncm: 'NCM / Tabela IBPT', usuarios: 'Usuários', vendedores: 'Vendedores', comissoes: 'Comissões', pedidos: 'Pedidos', cobranca_config: 'Cobrança - Configuração', cobranca_boletos: 'Cobrança - Boletos', cobranca_historico: 'Cobrança - Histórico', medidas: 'Medidas', bandeiras: 'Bandeiras de Cartão', dfe: 'DFe - Documentos Fiscais', dfe_nfe: 'DFe - NFe - Emissão', dfe_nfe_geral: 'DFe - NFe - Geral', dfe_nfce_parametros: 'DFe - NFCe - Parâmetros', dfe_nfe_parametros: 'DFe - NFe - Parâmetros', dfe_nfe_dados: 'DFe Configurações', dfe_nfce_dados: 'DFe Configurações', dfe_provedor: 'DFe Configurações', reforma_tributaria: 'Reforma Tributária', transportadores: 'Transportadores', empresa: 'Empresa', dfe_config: 'DFe Configurações' }[activeTab]}
           </h2>
           <div className="flex items-center gap-4">
-            {activeTab === 'dfe_nfe' && (
-              <button
-                onClick={() => setIsNfeModalOpen(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                Nova NF-e
-              </button>
-            )}
+
             {activeTab === 'vendas' && (
               <>
                 {session.caixaId ? (
