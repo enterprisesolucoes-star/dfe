@@ -1018,6 +1018,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           cadastrosOpen={cadastrosOpen}
           setCadastrosOpen={setCadastrosOpen}
           usuarioDfe={usuarioDfeAtual}
+          session={session}
         />
 
       {/* Main Content */}
