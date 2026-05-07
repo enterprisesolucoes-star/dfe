@@ -24,15 +24,18 @@ export default defineConfig(({ mode }) => {
           chunkFileNames: 'assets/[name]-[hash].js',
           assetFileNames: 'assets/[name]-[hash].[ext]',
           manualChunks(id) {
-            if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
-              return 'vendor-react';
-            }
-            if (id.includes('node_modules/motion/')) {
-              return 'vendor-motion';
-            }
-            if (id.includes('node_modules/lucide-react/')) {
-              return 'vendor-lucide';
-            }
+            // Vendor splits
+            if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) return 'vendor-react';
+            if (id.includes('node_modules/motion/')) return 'vendor-motion';
+            if (id.includes('node_modules/lucide-react/')) return 'vendor-lucide';
+            if (id.includes('node_modules/recharts') || id.includes('node_modules/d3-') || id.includes('node_modules/victory-')) return 'vendor-charts';
+
+            // App module splits
+            if (id.includes('FiscalModule') || id.includes('NfeDashboard')) return 'chunk-fiscal';
+            if (id.includes('FinanceiroModule') || id.includes('CobrancaModule') || id.includes('ComissoesModule')) return 'chunk-financeiro';
+            if (id.includes('CadastrosModule')) return 'chunk-cadastros';
+            if (id.includes('VendaModule') || id.includes('OrdemServicoModule') || id.includes('PedidoModule') || id.includes('ComprasModule')) return 'chunk-comercial';
+            if (id.includes('DashboardModule') || id.includes('RelatorioTefModule') || id.includes('UIComponents')) return 'chunk-ui';
           },
         },
       },
