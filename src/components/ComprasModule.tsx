@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Produto, Fornecedor } from '../types/nfce';
+import { SkeletonTable, EmptyState } from './UIComponents';
 
 interface Compra {
   id: number;
