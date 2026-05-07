@@ -122,6 +122,12 @@ switch ($action) {
     case 'importar_xml':
         try {
             if (empty($_FILES['xml']['tmp_name'])) throw new Exception("Nenhum arquivo enviado.");
+            $_xmlMime = mime_content_type($_FILES['xml']['tmp_name']);
+            if (!$_xmlMime || !in_array($_xmlMime, ['text/xml','application/xml','text/plain'])) {
+                throw new Exception('Formato inválido. Envie um arquivo XML.');
+            }
+            $_xmlExt = strtolower(pathinfo($_FILES['xml']['name'], PATHINFO_EXTENSION));
+            if ($_xmlExt !== 'xml') throw new Exception('Extensão inválida. Use .xml');
             $xmlString = file_get_contents($_FILES['xml']['tmp_name']);
             $xml = @simplexml_load_string($xmlString);
             if (!$xml) throw new Exception("Falha ao ler XML.");

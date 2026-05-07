@@ -5,6 +5,7 @@ import express from "express";
 import path from "path";
 import cors from "cors";
 import { login } from "./src/routes/auth.ts";
+import rateLimit from "express-rate-limit";
 
 
 // Carregar .env com path explícito (compatível com Docker)
@@ -48,6 +49,28 @@ app.use((req, res, next) => {
   res.removeHeader('X-Powered-By');
   next();
 });
+// Rate limit geral: 120 req/min por IP
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: "Muitas requisições. Tente novamente em 1 minuto." }
+});
+
+// Rate limit para login: 10 tentativas/15min por IP
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  message: { success: false, error: "Muitas tentativas de login. Aguarde 15 minutos." }
+});
+
+app.use("/api.php", apiLimiter);
+app.post("/api/login", loginLimiter);
+
 app.use(express.text({ type: 'text/plain' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -205,7 +228,6 @@ app.all("/api.php", async (req, res) => {
   }
 });
 
-app.use("/pma", express.static(path.join("/usr/share/phpmyadmin")))
 app.use(express.static(path.join(process.cwd(), "dist")));
 app.get("*", (req, res) => {
   const hasExt = req.path.indexOf(".") !== -1;

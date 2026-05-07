@@ -48,6 +48,13 @@ switch ($action) {
         if (empty($_FILES['csv']) || $_FILES['csv']['error'] !== UPLOAD_ERR_OK) {
             echo json_encode(['success' => false, 'message' => 'Arquivo não recebido.']); break;
         }
+        $_csvMime = mime_content_type($_FILES['csv']['tmp_name']);
+        if (!$_csvMime || !in_array($_csvMime, ['text/plain','text/csv','application/csv','application/vnd.ms-excel'])) {
+            echo json_encode(['success' => false, 'message' => 'Formato inválido. Envie um arquivo CSV.']); break;
+        }
+        if (strtolower(pathinfo($_FILES['csv']['name'], PATHINFO_EXTENSION)) !== 'csv') {
+            echo json_encode(['success' => false, 'message' => 'Extensão inválida. Use .csv']); break;
+        }
         $uf = strtoupper(trim($_POST['uf'] ?? ''));
         if (strlen($uf) !== 2) { echo json_encode(['success' => false, 'message' => 'UF inválida.']); break; }
 
