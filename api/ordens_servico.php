@@ -222,14 +222,14 @@ switch ($action) {
         $total = (int)$cStmt->fetchColumn();
 
         $stmt = $pdo->prepare("
-            SELECT o.*,
+            SELECT o.*, COALESCE(o.cliente_telefone, c.telefone) as cliente_telefone,
                    (SELECT JSON_ARRAYAGG(JSON_OBJECT(
                        'id', i.id, 'tipo', i.tipo, 'produto_id', i.produto_id,
                        'descricao', i.descricao, 'unidade', i.unidade,
                        'quantidade', i.quantidade+0, 'valor_unitario', i.valor_unitario+0,
                        'valor_total', i.valor_total+0
                    )) FROM ordens_servico_itens i WHERE i.ordem_id = o.id) AS itens
-            FROM ordens_servico o
+            FROM ordens_servico o LEFT JOIN clientes c ON c.id = o.cliente_id
             {$whereStr}
             ORDER BY o.data_criacao DESC
             LIMIT $limit OFFSET $offset

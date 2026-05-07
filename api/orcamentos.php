@@ -460,10 +460,10 @@ switch ($action) {
         $whereStr = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
         
         $stmt = $pdo->prepare("
-            SELECT o.id, o.numero, o.data_criacao, o.status, o.cliente_nome, o.valor_total,
+            SELECT o.id, o.numero, o.data_criacao, o.status, o.cliente_nome, o.valor_total, COALESCE(o.cliente_telefone, c.telefone) as cliente_telefone,
                    (SELECT SUM(i.valor_total) FROM orcamentos_itens i WHERE i.orcamento_id = o.id AND i.tipo = 'produto') as total_produtos,
                    (SELECT SUM(i.valor_total) FROM orcamentos_itens i WHERE i.orcamento_id = o.id AND i.tipo = 'servico') as total_servicos
-            FROM orcamentos o
+            FROM orcamentos o LEFT JOIN clientes c ON c.id = o.cliente_id
             {$whereStr}
             ORDER BY o.data_criacao DESC, o.numero DESC
             LIMIT 500

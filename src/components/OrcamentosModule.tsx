@@ -185,7 +185,7 @@ const OrcamentosTab = ({
 
   const handleClienteCadastrado = (id: string) => {
     const c = clientes.find(x => String(x.id) === id);
-    if (c) setForm(p => ({ ...p, cliente_id: c.id, cliente_nome: c.nome, cliente_documento: c.documento, cliente_telefone: '', cliente_email: c.email || '' }));
+    if (c) setForm(p => ({ ...p, cliente_id: c.id, cliente_nome: c.nome, cliente_documento: c.documento, cliente_telefone: c.telefone || '', cliente_email: c.email || '' }));
   };
 
   const handleSalvar = async () => {
@@ -212,7 +212,6 @@ const OrcamentosTab = ({
       if (d.success) { setWaTarget(null); showAlert('WhatsApp', 'Enviado com sucesso!'); setWaSending(false); return; }
     } catch {}
     setWaSending(false);
-    showAlert('WhatsApp', 'Não foi possível enviar pelo Evolution API. Abrindo WhatsApp Web...');
     window.open(phone ? `https://wa.me/55${phone}?text=${encodeURIComponent(waTarget.caption)}` : `https://wa.me/?text=${encodeURIComponent(waTarget.caption)}`, '_blank');
     setWaTarget(null);
   };
@@ -706,7 +705,7 @@ const OrcamentoModal = ({
 
   const handleClienteCadastrado = (id: string) => {
     const c = clientes.find(x => String(x.id) === id);
-    if (c) setForm(p => ({ ...p, cliente_id: c.id, cliente_nome: c.nome, cliente_documento: c.documento, cliente_telefone: '', cliente_email: c.email || '' }));
+    if (c) setForm(p => ({ ...p, cliente_id: c.id, cliente_nome: c.nome, cliente_documento: c.documento, cliente_telefone: c.telefone || '', cliente_email: c.email || '' }));
   };
 
   const handleSalvar = async () => {
