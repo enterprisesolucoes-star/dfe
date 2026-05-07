@@ -47,3 +47,43 @@ export const Input = React.forwardRef<HTMLInputElement, any>(({ label, ...props 
   </div>
 ));
 Input.displayName = 'Input';
+
+const shimmer = 'animate-pulse bg-gray-200 dark:bg-gray-700 rounded';
+
+function SkeletonRow({ cols }: { cols: number[] }) {
+  return (
+    <tr>
+      {cols.map((w, i) => (
+        <td key={i} className="px-6 py-4">
+          <div className={`${shimmer} h-3 rounded`} style={{ width: `${w}%` }} />
+          {i === 0 && <div className={`${shimmer} h-2.5 rounded mt-1.5`} style={{ width: `${Math.max(w - 20, 30)}%` }} />}
+        </td>
+      ))}
+    </tr>
+  );
+}
+
+export function SkeletonTable({ cols, rows = 6 }: { cols: number; rows?: number }) {
+  const widths = Array.from({ length: cols }, (_, i) => [80, 60, 50, 40, 55, 45][i % 6]);
+  return (
+    <>
+      {Array.from({ length: rows }).map((_, i) => (
+        <SkeletonRow key={i} cols={widths} />
+      ))}
+    </>
+  );
+}
+
+export function SkeletonCards({ count = 3 }: { count?: number }) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700 space-y-3">
+          <div className={`${shimmer} h-3 w-1/3`} />
+          <div className={`${shimmer} h-6 w-2/3`} />
+          <div className={`${shimmer} h-2.5 w-1/2`} />
+        </div>
+      ))}
+    </div>
+  );
+}

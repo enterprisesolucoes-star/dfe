@@ -1,3 +1,4 @@
+import { SkeletonTable } from './UIComponents';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { FileText, Search, RefreshCw, X, Printer, 
@@ -163,7 +164,7 @@ export const GeralNfeTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, on
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                        {loading && <tr><td colSpan={6} className="px-6 py-8 text-center text-xs text-gray-400 dark:text-gray-500">Carregando...</td></tr>}
+                        {loading && <SkeletonTable cols={6} />}
                         {!loading && lista.length === 0 && <tr><td colSpan={6} className="px-6 py-8 text-center text-xs text-gray-400 dark:text-gray-500">Nenhuma NF-e encontrada.</td></tr>}
                         {!loading && lista.map((n: any) => (
                             <tr key={n.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
@@ -257,7 +258,7 @@ const CceModal = ({ nfe, showAlert, onClose }: any) => {
                     <div>
                         <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-2">Histórico</p>
                         {loading ? (
-                            <p className="text-xs text-gray-400 dark:text-gray-500 text-center py-6">Carregando...</p>
+                            <div className="px-6 py-4"><div className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded h-3 w-1/2 mx-auto"></div></div>
                         ) : cceList.length === 0 ? (
                             <p className="text-xs text-gray-400 dark:text-gray-500 text-center py-6">Nenhuma carta de correção emitida.</p>
                         ) : (
@@ -424,7 +425,7 @@ export const GeralNfceTab = ({ showAlert, showConfirm, showPrompt, onEmailDoc, o
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                        {loading && <tr><td colSpan={6} className="px-6 py-8 text-center text-xs text-gray-400 dark:text-gray-500">Carregando...</td></tr>}
+                        {loading && <SkeletonTable cols={6} />}
                         {!loading && lista.length === 0 && <tr><td colSpan={6} className="px-6 py-8 text-center text-xs text-gray-400 dark:text-gray-500">Nenhuma NFC-e encontrada.</td></tr>}
                         {!loading && lista.map((n: any) => (
                             <tr key={n.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">

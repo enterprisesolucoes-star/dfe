@@ -116,7 +116,7 @@ export const ComprasTab = ({
           </thead>
           <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
             {loading ? (
-              <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400 dark:text-gray-500">Carregando...</td></tr>
+              <SkeletonTable cols={6} />
             ) : filtradas.length === 0 ? (
               <tr><td colSpan={6} className="px-4 py-12 text-center text-gray-400 dark:text-gray-500">Nenhuma compra localizada no período.</td></tr>
             ) : filtradas.map(c => (

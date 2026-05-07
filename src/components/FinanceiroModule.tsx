@@ -1,3 +1,4 @@
+import { SkeletonTable } from './UIComponents';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { DollarSign, CheckCircle, Trash2, Search, TrendingUp, TrendingDown, Plus, RotateCcw, Edit2, FileText, Loader2, Copy, ExternalLink } from 'lucide-react';
@@ -211,7 +212,7 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobranc
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
             {loading && (
-              <tr><td colSpan={5} className="px-6 py-8 text-center text-xs text-gray-400 dark:text-gray-500">Carregando...</td></tr>
+              <SkeletonTable cols={5} />
             )}
             {!loading && titulos.length === 0 && (
               <tr><td colSpan={5} className="px-6 py-8 text-center text-xs text-gray-400 dark:text-gray-500">Nenhum registro encontrado.</td></tr>
@@ -855,7 +856,7 @@ export const CaixaView = ({ emitente, showAlert, showConfirm }: { emitente: any,
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-            {loading && <tr><td colSpan={6} className="px-6 py-8 text-center text-xs text-gray-400 dark:text-gray-500">Carregando...</td></tr>}
+            {loading && <SkeletonTable cols={6} />}
             {!loading && movimentos.length === 0 && <tr><td colSpan={6} className="px-6 py-8 text-center text-xs text-gray-400 dark:text-gray-500">Nenhum movimento encontrado.</td></tr>}
             {!loading && movimentos.map((m) => (
               <tr key={m.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
