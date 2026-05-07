@@ -212,12 +212,14 @@ app.all("/api.php", async (req, res) => {
     let parsedBody = req.body;
     if (typeof parsedBody === 'string') { try { parsedBody = JSON.parse(parsedBody); } catch {} }
     const hasBody = parsedBody && typeof parsedBody === 'object' && Object.keys(parsedBody).length > 0;
+    const internalToken = process.env.INTERNAL_API_TOKEN || '';
     const proxyHeaders: any = {
       'X-Real-IP': realIp,
       'X-Forwarded-For': realIp,
       'X-Usuario-Id': String(usuarioId),
       'X-Usuario-Nome': encodeURIComponent(usuarioNome),
       'X-Empresa-Id': String(empresaId),
+      'X-Internal-Token': internalToken,
       'User-Agent': req.headers['user-agent'] || 'unknown'
     };
     if (hasBody) proxyHeaders['Content-Type'] = 'application/json';

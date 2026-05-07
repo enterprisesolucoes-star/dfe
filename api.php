@@ -1,5 +1,11 @@
 <?php
 date_default_timezone_set('America/Sao_Paulo');
+// Cabeçalhos de segurança
+if (!headers_sent()) {
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: DENY');
+    header('Referrer-Policy: no-referrer');
+}
 // api.php - Ponto de entrada para o Frontend React
 // Hospedado em Hostinger (Shared Hosting)
 
@@ -8,8 +14,9 @@ session_start();
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
 set_exception_handler(function($e) {
+    error_log('[DFe ERROR] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
     if (!headers_sent()) header('Content-Type: application/json');
-    echo json_encode(['error' => true, 'message' => $e->getMessage(), 'file' => basename($e->getFile()), 'line' => $e->getLine()]);
+    echo json_encode(['error' => true, 'message' => 'Erro interno do servidor.']);
     exit;
 });
 set_error_handler(function($errno, $errstr, $errfile, $errline) {
@@ -256,6 +263,17 @@ function notificarRejeicaoSefaz($empresa, $venda, $erro, $xml = '') {
         }
         $mail->send();
     } catch (\Exception $e) {}
+}
+
+// Validar X-Internal-Token — bloqueia chamadas que bypassa o proxy Node.js
+$_internalToken = getenv('INTERNAL_API_TOKEN') ?: '';
+if ($_internalToken !== '') {
+    $_reqToken = $_SERVER['HTTP_X_INTERNAL_TOKEN'] ?? '';
+    if ($_reqToken !== $_internalToken) {
+        http_response_code(403);
+        echo json_encode(['error' => true, 'message' => 'Acesso negado.']);
+        exit;
+    }
 }
 
 $action = $_GET['action'] ?? '';

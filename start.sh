@@ -6,4 +6,7 @@ fi
 if [ -f /run/secrets/dfe_jwt_secret ]; then
   export JWT_SECRET=$(cat /run/secrets/dfe_jwt_secret)
 fi
+if [ -f /run/secrets/dfe_internal_token ]; then
+  export INTERNAL_API_TOKEN=$(cat /run/secrets/dfe_internal_token)
+fi
 npm install && npx prisma generate && exec npx tsx server.ts
