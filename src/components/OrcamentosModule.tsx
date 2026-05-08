@@ -351,7 +351,7 @@ const OrcamentosTab = ({
                 </div>
               </div>
               {tipoItem === 'produto' && (
-                <div className="bg-blue-50 dark:bg-blue-900/20/50 rounded-xl p-3 space-y-2">
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3 space-y-2">
                   <div className="flex gap-2 items-end flex-wrap">
                     <div className="flex-1 min-w-[200px] relative">
                       <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Buscar Produto</label>
@@ -805,7 +805,7 @@ const OrcamentoModal = ({
 
             {/* �â€â‚¬�â€â‚¬ Adicionar produto (igual NFC-e) �â€â‚¬�â€â‚¬ */}
             {tipoItem === 'produto' && (
-              <div className="bg-blue-50 dark:bg-blue-900/20/50 rounded-xl p-3 space-y-2">
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3 space-y-2">
                 <div className="flex gap-2 items-end">
                   {/* Busca */}
                   <div className="flex-1 relative">
