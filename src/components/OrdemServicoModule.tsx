@@ -354,7 +354,7 @@ export const OrdemServicoTab = ({
                 </div>
               </div>
               {tipoItem === 'produto' && (
-                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3 space-y-2">
+                <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-3 space-y-2">
                   <div className="flex gap-2 items-end flex-wrap">
                     <div className="flex-1 min-w-[200px] relative">
                       <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Buscar Peça/Produto</label>
@@ -386,7 +386,7 @@ export const OrdemServicoTab = ({
                 </div>
               )}
               {tipoItem === 'servico' && (
-                <div className="bg-purple-50 dark:bg-purple-900/20/50 rounded-xl p-3">
+                <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-3">
                   <div className="flex gap-2 items-end flex-wrap">
                     <div className="flex-1 min-w-[200px]"><label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Descrição do Serviço</label><input value={descServ} onChange={e => setDescServ(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleAddServico()} placeholder="Ex: Troca de tela, Formatação..." className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500" /></div>
                     <div className="w-20"><label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Unid.</label><input value={unidServ} onChange={e => setUnidServ(e.target.value)} className="w-full px-2 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500" /></div>
