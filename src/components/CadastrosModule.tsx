@@ -704,7 +704,21 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
         fetch(`./api.php?action=ncm_listar&q=${clean}&limit=5`).then(r => r.json()).catch(() => ({ data: [] })),
         fetch(`./api.php?action=rtc_consultar_ncm&ncm=${clean}&modelo=55`).then(r => r.json()).catch(() => []),
       ]);
-      const ibpt = (r1.data || []).find((x: any) => x.codigo === clean) || r1.data?.[0] || null;
+      let ibpt = (r1.data || []).find((x: any) => x.codigo === clean) || r1.data?.[0] || null;
+      // Fallback: NCM nao esta na tabela local → consulta API IBPT online e salva em cache
+      if (!ibpt) {
+        const online = await fetch(`./api.php?action=ibpt_buscar_online&ncm=${clean}`).then(r => r.json()).catch(() => null);
+        if (online?.success) {
+          ibpt = {
+            codigo: online.codigo,
+            descricao: online.descricao,
+            aliquota_nacional: online.nacional,
+            aliquota_estadual: online.estadual,
+            uf: online.uf,
+            _online: true,
+          };
+        }
+      }
       let rtc: any[] = Array.isArray(r2) ? r2 : [];
       // NCM sem enquadramento especial nos anexos LC 214 → sugere tributação integral padrão
       if (rtc.length === 0 && ibpt) {

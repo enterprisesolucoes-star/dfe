@@ -301,7 +301,7 @@ $modules = [
     'nfe_danfe' => 'nfe', 'nfe_baixar_xml_lote' => 'nfe', 'nfe_enviar_xml_contador' => 'nfe', 'nfe_buscar_email_cliente' => 'nfe', 'nfe_enviar_email_doc' => 'nfe',
     'nfe_devolucao' => 'nfe', 'nfe_buscar_para_devolucao' => 'nfe',
     'nfe_salvar_pendente' => 'nfe', 'nfe_emitir_pendente' => 'nfe',
-    'ncm_listar' => 'ncm', 'ncm_ufs' => 'ncm', 'ncm_importar' => 'ncm',
+    'ncm_listar' => 'ncm', 'ncm_ufs' => 'ncm', 'ncm_importar' => 'ncm', 'ibpt_buscar_online' => 'ncm',
     'login' => 'usuarios', 'logout' => 'usuarios', 'listar_usuarios' => 'usuarios', 'salvar_usuario' => 'usuarios', 'excluir_usuario' => 'usuarios',
     'listar_pre_cadastros' => 'usuarios', 'aprovar_pre_cadastro' => 'usuarios', 'reprovar_pre_cadastro' => 'usuarios',
     'abrir_caixa' => 'caixa', 'fechar_caixa' => 'caixa', 'caixa_atual' => 'caixa', 'relatorio_caixa' => 'caixa', 'relatorio_caixa_pdf' => 'caixa',
