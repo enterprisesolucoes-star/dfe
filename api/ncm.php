@@ -132,73 +132,111 @@ switch ($action) {
         fclose($handle);
         break;
 
-    // IBPT Online: consulta NCM na API De Olho no Imposto + cache em rtc_ncm
+    // IBPT Online: consulta NCM na API De Olho no Imposto + salva cache em rtc_ncm
     case 'ibpt_buscar_online':
-         = preg_replace('/[^0-9]/', '', ['ncm'] ?? '');
-        if (strlen() !== 8) { echo json_encode(['success' => false, 'message' => 'NCM deve ter 8 digitos.']); break; }
-         = ['IBPT_TOKEN'] ?? '';
-          = ['IBPT_CNPJ']  ?? '';
-        if (empty() || empty()) {
+        $ncm = preg_replace('/[^0-9]/', '', $_GET['ncm'] ?? '');
+        if (strlen($ncm) !== 8) {
+            echo json_encode(['success' => false, 'message' => 'NCM deve ter 8 digitos.']); break;
+        }
+        $ibptToken = $_ENV['IBPT_TOKEN'] ?? '';
+        $ibptCnpj  = $_ENV['IBPT_CNPJ']  ?? '';
+        if (empty($ibptToken) || empty($ibptCnpj)) {
             echo json_encode(['success' => false, 'message' => 'Token IBPT nao configurado.']); break;
         }
-         = ->prepare(SELECT uf FROM empresas WHERE id = ?);
-        ->execute([ ?: 1]);
-         = strtoupper(->fetchColumn() ?: 'GO');
-         = 'https://apidoni.ibpt.org.br/api/v1/produtos?' . http_build_query([
-            'token' => , 'cnpj' => , 'codigo' => ,
-            'uf' => , 'ex' => 0, 'descricao' => 'Produto',
-            'unidadeMedida' => 'UN', 'valor' => 1, 'gtin' => 'SEM GTIN',
+        $empRow = $pdo->prepare("SELECT uf FROM empresas WHERE id = ?");
+        $empRow->execute([$empresaId ?: 1]);
+        $uf = strtoupper($empRow->fetchColumn() ?: 'GO');
+        $url = 'https://apidoni.ibpt.org.br/api/v1/produtos?' . http_build_query([
+            'token'         => $ibptToken,
+            'cnpj'          => $ibptCnpj,
+            'codigo'        => $ncm,
+            'uf'            => $uf,
+            'ex'            => 0,
+            'descricao'     => 'Produto',
+            'unidadeMedida' => 'UN',
+            'valor'         => 1,
+            'gtin'          => 'SEM GTIN',
         ]);
-         = false;  = 0;
-        if (function_exists('curl_init')) {
-             = curl_init();
-            curl_setopt_array(, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 15,
-                CURLOPT_SSL_VERIFYPEER => false, CURLOPT_USERAGENT => 'DFeIA/1.0',
-                CURLOPT_HTTPHEADER => ['Accept: application/json']]);
-             = curl_exec();
-             = curl_getinfo(, CURLINFO_HTTP_CODE);
-            curl_close();
-            if ( !== 200)  = false;
+        // Retry automatico: ate 3 tentativas em caso de 503
+        $resp = false;
+        for ($t = 0; $t < 3; $t++) {
+            if ($t > 0) sleep(1);
+            if (function_exists('curl_init')) {
+                $ch = curl_init($url);
+                curl_setopt_array($ch, [
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_TIMEOUT        => 15,
+                    CURLOPT_SSL_VERIFYPEER => false,
+                    CURLOPT_USERAGENT      => 'DFeIA/1.0',
+                    CURLOPT_HTTPHEADER     => ['Accept: application/json'],
+                ]);
+                $r = curl_exec($ch);
+                $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
+                if ($code === 200 && $r) { $resp = $r; break; }
+            }
         }
-        if ( === false && ini_get('allow_url_fopen')) {
-             = stream_context_create(['http' => ['timeout' => 15, 'header' => 'Accept: application/json', 'user_agent' => 'DFeIA/1.0']]);
-             = @file_get_contents(, false, );
+        if (!$resp && ini_get('allow_url_fopen')) {
+            $ctx = stream_context_create(['http' => [
+                'timeout'    => 15,
+                'header'     => 'Accept: application/json',
+                'user_agent' => 'DFeIA/1.0',
+            ]]);
+            $resp = @file_get_contents($url, false, $ctx);
         }
-         =  ? json_decode(, true) : null;
-        if (! || !is_array() || empty() || isset(['Message'])) {
-             = isset(['Message']) ? ['Message'] : 'NCM nao encontrado na API IBPT.';
-            echo json_encode(['success' => false, 'message' => ]); break;
+        $apiData = $resp ? json_decode($resp, true) : null;
+        if (!$apiData || !is_array($apiData) || empty($apiData) || isset($apiData['Message'])) {
+            $msg = isset($apiData['Message']) ? $apiData['Message'] : 'NCM nao encontrado na API IBPT.';
+            echo json_encode(['success' => false, 'message' => $msg]); break;
         }
-         = [0];
-          = (float)(['Nacional']  ?? 0);
-          = (float)(['Estadual']  ?? 0);
-         = (float)(['Importado'] ?? 0);
-         = (float)(['Municipal'] ?? 0);
-         = ['Descricao'] ?? '';
-         = ['VigenciaInicio'] ?? null;
-         = ['VigenciaFim']    ?? null;
-          = ['Chave']  ?? null;
-         = ['Versao'] ?? null;
-          = ['Fonte']  ?? null;
-        // Upsert cache em rtc_ncm
-         = ->prepare("SELECT id FROM rtc_ncm WHERE tipo='ibpt' AND ncm=? AND uf=? AND (ex='0' OR ex='') LIMIT 1");
-        ->execute([, ]);
-        if (->fetchColumn()) {
-            ->prepare("UPDATE rtc_ncm SET descricao=?, aliq_nacional=?, aliq_importados=?, aliq_estadual=?,
-                aliq_municipal=?, vigencia_inicio=?, vigencia_fim=?, chave=?, versao=?, fonte=?
-                WHERE tipo='ibpt' AND ncm=? AND uf=? AND (ex='0' OR ex='')")
-                ->execute([, , , , ,
-                    , , , , , , ]);
+        $item      = $apiData[0];
+        $nacional  = (float)($item['Nacional']  ?? 0);
+        $estadual  = (float)($item['Estadual']  ?? 0);
+        $importado = (float)($item['Importado'] ?? 0);
+        $municipal = (float)($item['Municipal'] ?? 0);
+        $descricao = $item['Descricao'] ?? '';
+        $vigIni    = $item['VigenciaInicio'] ?? null;
+        $vigFim    = $item['VigenciaFim']    ?? null;
+        $chave     = $item['Chave']  ?? null;
+        $versao    = $item['Versao'] ?? null;
+        $fonte     = $item['Fonte']  ?? null;
+        // Upsert cache em rtc_ncm para proximas consultas serem locais
+        $exists = $pdo->prepare(
+            "SELECT id FROM rtc_ncm WHERE tipo='ibpt' AND ncm=? AND uf=? AND (ex='0' OR ex='') LIMIT 1"
+        );
+        $exists->execute([$ncm, $uf]);
+        if ($exists->fetchColumn()) {
+            $pdo->prepare(
+                "UPDATE rtc_ncm SET descricao=?, aliq_nacional=?, aliq_importados=?, aliq_estadual=?,
+                 aliq_municipal=?, vigencia_inicio=?, vigencia_fim=?, chave=?, versao=?, fonte=?
+                 WHERE tipo='ibpt' AND ncm=? AND uf=? AND (ex='0' OR ex='')"
+            )->execute([
+                $descricao, $nacional, $importado, $estadual, $municipal,
+                $vigIni, $vigFim, $chave, $versao, $fonte, $ncm, $uf,
+            ]);
         } else {
-            ->prepare("INSERT INTO rtc_ncm (tipo,ncm,ex,tabela,descricao,aliq_nacional,aliq_importados,
-                aliq_estadual,aliq_municipal,vigencia_inicio,vigencia_fim,chave,versao,fonte,uf)
-                VALUES ('ibpt',?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
-                ->execute([,'0','II',,,,,,
-                    ,,,,,]);
+            $pdo->prepare(
+                "INSERT INTO rtc_ncm
+                 (tipo, ncm, ex, tabela, descricao, aliq_nacional, aliq_importados,
+                  aliq_estadual, aliq_municipal, vigencia_inicio, vigencia_fim, chave, versao, fonte, uf)
+                 VALUES ('ibpt',?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+            )->execute([
+                $ncm, '0', 'II', $descricao, $nacional, $importado, $estadual, $municipal,
+                $vigIni, $vigFim, $chave, $versao, $fonte, $uf,
+            ]);
         }
-        echo json_encode(['success'=>true,'codigo'=>,'uf'=>,'descricao'=>,
-            'nacional'=>,'estadual'=>,'importado'=>,'municipal'=>,
-            'versao'=>,'fonte'=>]);
+        echo json_encode([
+            'success'   => true,
+            'codigo'    => $ncm,
+            'uf'        => $uf,
+            'descricao' => $descricao,
+            'nacional'  => $nacional,
+            'estadual'  => $estadual,
+            'importado' => $importado,
+            'municipal' => $municipal,
+            'versao'    => $versao,
+            'fonte'     => $fonte,
+        ]);
         break;
 
 
