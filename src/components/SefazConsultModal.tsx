@@ -133,10 +133,10 @@ const SefazConsultModal = ({ onClose, onImportXml, showAlert, emitente, onUpdate
           <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"><X className="w-5 h-5 text-gray-400 dark:text-gray-500" /></button>
         </div>
         
-        <div className="p-6 bg-blue-50 dark:bg-blue-900/20/50 flex items-end gap-4 border-b border-blue-100">
+        <div className="p-6 bg-blue-50 dark:bg-gray-900/60 flex items-end gap-4 border-b border-blue-100 dark:border-gray-700">
            <div className="flex-1 max-w-[200px]">
-             <label className="block text-[10px] font-bold text-blue-900 uppercase mb-1">Último NSU</label>
-             <input type="text" value={nsu} onChange={e => setNsu(e.target.value)} className="w-full px-4 py-2 border border-blue-200 dark:border-blue-800 rounded-xl text-sm font-bold focus:ring-4 focus:ring-blue-500/10 outline-none" />
+             <label className="block text-[10px] font-bold text-blue-900 dark:text-blue-300 uppercase mb-1">Último NSU</label>
+             <input type="text" value={nsu} onChange={e => setNsu(e.target.value)} className="w-full px-4 py-2 border border-blue-200 dark:border-blue-800 rounded-xl text-sm font-bold bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-4 focus:ring-blue-500/10 outline-none" />
              {lastQuery && (
                <p className="text-[9px] text-blue-400 mt-1 font-medium">Última consulta: {new Date(lastQuery).toLocaleString('pt-BR')}</p>
              )}
