@@ -456,17 +456,19 @@ export const NcmTab = ({ ufEmpresa }: { ufEmpresa?: string }) => {
 
 const NcmImportModal = ({ defaultUf, onClose }: { defaultUf: string; onClose: () => void }) => {
   const [uf, setUf] = useState(defaultUf);
+  const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState('');
 
   const handleImport = async () => {
     if (!uf) { setMsg('Selecione o estado.'); return; }
+    if (!file) { setMsg('Selecione o arquivo CSV do IBPT.'); return; }
     setLoading(true); setMsg('');
     try {
-      const res = await fetch('./api.php?action=ncm_importar_ibpt', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ uf }),
-      });
+      const fd = new FormData();
+      fd.append('uf', uf);
+      fd.append('csv', file);
+      const res = await fetch('./api.php?action=ncm_importar', { method: 'POST', body: fd });
       const data = await res.json();
       setMsg(data.success ? `Importado com sucesso! ${data.total ?? ''} registros.` : data.message || 'Erro ao importar.');
     } catch { setMsg('Falha de comunicação.'); } finally { setLoading(false); }
@@ -479,13 +481,23 @@ const NcmImportModal = ({ defaultUf, onClose }: { defaultUf: string; onClose: ()
           <h3 className="font-bold text-gray-800 dark:text-gray-100">Importar Tabela IBPT</h3>
           <button onClick={onClose}><X className="w-5 h-5 text-gray-400 dark:text-gray-500" /></button>
         </div>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Selecione o estado para importar as alíquotas de tributos (IBPT) do servidor.</p>
-        <div className="mb-4">
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 mb-4 text-xs text-blue-700 dark:text-blue-300">
+          <p className="font-semibold mb-1">Como obter o arquivo CSV:</p>
+          <p>1. Acesse <strong>ibpt.com.br/tabela</strong></p>
+          <p>2. Selecione seu estado e baixe o CSV</p>
+          <p>3. Selecione o estado abaixo e envie o arquivo</p>
+        </div>
+        <div className="mb-3">
           <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Estado (UF)</label>
           <select value={uf} onChange={e => setUf(e.target.value)} className={selClass}>
             <option value="">Selecione...</option>
             {ESTADOS_BR.map(e => <option key={e.sigla} value={e.sigla}>{e.sigla} — {e.nome}</option>)}
           </select>
+        </div>
+        <div className="mb-4">
+          <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Arquivo CSV do IBPT</label>
+          <input type="file" accept=".csv" onChange={e => setFile(e.target.files?.[0] || null)}
+            className="w-full text-xs text-gray-700 dark:text-gray-200 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-orange-50 dark:file:bg-orange-900/30 file:text-orange-700 dark:file:text-orange-300 hover:file:bg-orange-100 dark:hover:file:bg-orange-900/50 cursor-pointer" />
         </div>
         {msg && <p className={`text-sm mb-4 ${msg.includes('sucesso') ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>{msg}</p>}
         <button onClick={handleImport} disabled={loading} className="w-full py-2 bg-orange-500 text-white rounded-xl font-bold text-sm hover:bg-orange-600 disabled:opacity-50 flex items-center justify-center gap-2">
