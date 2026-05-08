@@ -315,7 +315,7 @@ export const ImportXmlModal = ({
                     <p className="font-bold text-gray-700 dark:text-gray-200">{it.nome_xml}</p>
                     <p className="text-[10px] text-gray-400 dark:text-gray-500">Cód: {it.codigo_xml} • EAN: {it.barras_xml}</p>
                   </td>
-                  <td className={`px-4 py-3 ${!it.matching_id ? 'bg-red-50 dark:bg-red-900/20/30' : ''}`}>
+                  <td className={`px-4 py-3 ${!it.matching_id ? 'bg-red-50 dark:bg-red-900/20' : ''}`}>
                     {it.matching_id ? (
                       <div className="flex items-center justify-between group">
                         <div>
