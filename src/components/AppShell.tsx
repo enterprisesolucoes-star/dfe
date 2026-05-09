@@ -21,6 +21,7 @@ import { DevolucaoModal } from './DevolucaoModal';
 import { AbrirCaixaModal, FecharCaixaModal } from './CaixaModals';
 import { VendedoresTab } from './VendedoresModule';
 import { UsuariosTab } from './UsuariosModule';
+import InstallPrompt from './InstallPrompt';
 import { ReformaTributariaTab } from './ReformaTributariaModule';
 import { EmpresaPage, IntegracaoPage, DfeConfigPage } from './EmpresaModule';
 import { OrcamentosTab } from './OrcamentosModule';
@@ -952,7 +953,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
                   <Plus className="w-4 h-4" />
                   Nova Venda
                 </button>
-              </>
+    </>
             )}
             {activeTab === 'produtos' && (
               <button 
@@ -1287,6 +1288,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       />
       </div>
     </div>
+      <InstallPrompt />
     </>
   );
 };
