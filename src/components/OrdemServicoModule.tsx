@@ -87,13 +87,13 @@ export const OrdemServicoTab = ({
   // ── Form data ────────────────────────────────────────────────────────────
   const emptyOs = (): OrdemServico => ({ status: 'Rascunho', valor_total: 0, itens: [] });
   const [form, setForm] = useState<OrdemServico>(emptyOs());
-  const [clienteMode, setClienteMode] = useState<'cadastrado' | 'manual'>('manual');
+  const [clienteMode, setClienteMode] = useState<'cadastrado' | 'manual'>('cadastrado');
   const [buscaCliente, setBuscaCliente] = useState('');
   const [dropCliente, setDropCliente] = useState(false);
   const [saving, setSaving] = useState(false);
 
   // ── Item add state ────────────────────────────────────────────────────────
-  const [tipoItem, setTipoItem] = useState<'produto' | 'servico'>('servico');
+  const [tipoItem, setTipoItem] = useState<'produto' | 'servico'>('produto');
   const [buscaProd, setBuscaProd] = useState('');
   const [prodFiltrados, setProdFiltrados] = useState<Produto[]>([]);
   const [searchIdx, setSearchIdx] = useState(-1);
@@ -256,66 +256,37 @@ export const OrdemServicoTab = ({
 
   const ordensFiltradas = ordens;
 
-  // ── Wizard form view ──────────────────────────────────────────────────────
+  // ── Wizard form view ────────────────────────────────────────────
   if (viewMode === 'form') {
     const steps = [{ n: 1, label: 'Identificação' }, { n: 2, label: 'Itens' }, { n: 3, label: 'Finalizar' }];
     return (
-      <div className="space-y-4">
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 px-6 py-4">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-              <Wrench className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              {form.id ? `Editar OS #${String(form.numero ?? '').padStart(4, '0')}` : 'Nova Ordem de Serviço'}
-            </h2>
-            <button onClick={() => setViewMode('list')} className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 px-3 py-1.5 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
-              <X className="w-4 h-4" /> Cancelar
-            </button>
-          </div>
-          <div className="flex items-center">
+      <div className="fixed inset-0 z-40 flex flex-col bg-gray-50 dark:bg-gray-900">
+        <div className="shrink-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between gap-3">
+          <h2 className="text-base font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2 shrink-0">
+            <Wrench className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            {form.id ? `Editar OS #${String(form.numero ?? '').padStart(4, '0')}` : 'Nova Ordem de Serviço'}
+          </h2>
+          <div className="flex items-center gap-1 overflow-x-auto">
             {steps.map((s, i) => (
               <React.Fragment key={s.n}>
                 <button onClick={() => setFormStep(s.n as 1 | 2 | 3)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${formStep === s.n ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300' : formStep > s.n ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`}>
-                  <span className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold ${formStep === s.n ? 'bg-blue-600 text-white' : formStep > s.n ? 'bg-green-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}>{s.n}</span>
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-colors whitespace-nowrap ${formStep === s.n ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300' : formStep > s.n ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`}>
+                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${formStep === s.n ? 'bg-blue-600 text-white' : formStep > s.n ? 'bg-green-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}>{s.n}</span>
                   <span className="text-sm font-medium hidden sm:block">{s.label}</span>
                 </button>
-                {i < steps.length - 1 && <div className={`flex-1 h-0.5 mx-2 ${formStep > s.n ? 'bg-green-400' : 'bg-gray-200 dark:bg-gray-700'}`} />}
+                {i < steps.length - 1 && <div className={`w-6 h-0.5 shrink-0 ${formStep > s.n ? 'bg-green-400' : 'bg-gray-200 dark:bg-gray-700'}`} />}
               </React.Fragment>
             ))}
           </div>
+          <button onClick={() => setViewMode('list')} className="shrink-0 flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 px-3 py-1.5 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+            <X className="w-4 h-4" /> Cancelar
+          </button>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <div className="flex-1 overflow-y-auto p-4">
           {formStep === 1 && (
-            <div className="space-y-5 max-w-2xl mx-auto">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Status</label>
-                  <select value={form.status} onChange={e => setField('status', e.target.value)} className={ic}>
-                    {['Rascunho','Aberta','Em Andamento','Concluída','Cancelada'].map(s => <option key={s}>{s}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Previsão</label>
-                  <input type="date" value={form.previsao || ''} onChange={e => setField('previsao', e.target.value)} className={ic} />
-                </div>
-                <div className="col-span-2">
-                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Observações</label>
-                  <textarea value={form.observacao || ''} onChange={e => setField('observacao', e.target.value)} rows={3} className={ic + ' resize-none'} placeholder="Defeito relatado, peças necessárias, etc." />
-                </div>
-                {vendedores.length > 0 && (
-                  <div className="col-span-2">
-                    <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Vendedor</label>
-                    <select value={form.vendedor_id ? String(form.vendedor_id) : ''} onChange={e => setField('vendedor_id', e.target.value ? Number(e.target.value) : null)} className={ic}>
-                      <option value="">Sem vendedor</option>
-                      {vendedores.filter(v => v.ativo).map(v => (
-                        <option key={v.id} value={String(v.id)}>{v.nome} ({Number(v.percentual_comissao).toFixed(2)}%)</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-              </div>
-              <div className="border border-gray-100 dark:border-gray-700 rounded-xl p-4">
+            <div className="space-y-4 max-w-3xl mx-auto">
+              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">Cliente</span>
                   <div className="flex rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
@@ -330,7 +301,7 @@ export const OrdemServicoTab = ({
                   <div className="relative">
                     <input
                       type="text"
-                      placeholder="Buscar por nome ou documento..."
+                      placeholder="Localizar por nome, documento ou celular..."
                       value={buscaCliente}
                       onChange={e => { setBuscaCliente(e.target.value); setDropCliente(true); }}
                       onFocus={() => setDropCliente(true)}
@@ -369,55 +340,85 @@ export const OrdemServicoTab = ({
                   </div>
                 )}
               </div>
+
+              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+                <div className="grid grid-cols-2 gap-4">
+                  {vendedores.length > 0 && (
+                    <div className="col-span-2 sm:col-span-1">
+                      <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Vendedor</label>
+                      <select value={form.vendedor_id ? String(form.vendedor_id) : ''} onChange={e => setField('vendedor_id', e.target.value ? Number(e.target.value) : null)} className={ic}>
+                        <option value="">Sem vendedor</option>
+                        {vendedores.filter(v => v.ativo).map(v => (
+                          <option key={v.id} value={String(v.id)}>{v.nome} ({Number(v.percentual_comissao).toFixed(2)}%)</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                  <div className={vendedores.length > 0 ? 'col-span-2 sm:col-span-1' : 'col-span-1'}>
+                    <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Status</label>
+                    <select value={form.status} onChange={e => setField('status', e.target.value)} className={ic}>
+                      {['Rascunho','Aberta','Em Andamento','Concluída','Cancelada'].map(s => <option key={s}>{s}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Previsão</label>
+                    <input type="date" value={form.previsao || ''} onChange={e => setField('previsao', e.target.value)} className={ic} />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Observações</label>
+                    <textarea value={form.observacao || ''} onChange={e => setField('observacao', e.target.value)} rows={3} className={ic + ' resize-none'} placeholder="Defeito relatado, peças necessárias, etc." />
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
           {formStep === 2 && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">Adicionar Item</span>
-                <div className="flex rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-                  {(['servico', 'produto'] as const).map(t => (
-                    <button key={t} onClick={() => setTipoItem(t)} className={`px-3 py-1.5 text-xs font-medium transition-colors ${tipoItem === t ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`}>
-                      {t === 'produto' ? 'Peça/Produto' : 'Serviço'}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              {tipoItem === 'produto' && (
-                <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-3 space-y-2">
-                  <div className="flex gap-2 items-end flex-wrap">
-                    <div className="flex-1 min-w-[200px] relative">
-                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Buscar Peça/Produto</label>
-                      <input ref={buscaRef} type="text" value={buscaProd} onChange={e => handleBusca(e.target.value)}
-                        onKeyDown={e => {
-                          if (e.key === 'ArrowDown') { e.preventDefault(); setSearchIdx(p => Math.min(p + 1, prodFiltrados.length - 1)); }
-                          else if (e.key === 'ArrowUp') { e.preventDefault(); setSearchIdx(p => Math.max(p - 1, -1)); }
-                          else if (e.key === 'Enter' && prodFiltrados.length > 0) { e.preventDefault(); selecionarProduto(searchIdx >= 0 ? prodFiltrados[searchIdx] : prodFiltrados[0]); }
-                          else if (e.key === 'Escape') { setProdFiltrados([]); }
-                        }}
-                        placeholder="Código, cód. de barras ou nome..." className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500" autoComplete="off" />
-                      {prodFiltrados.length > 0 && (
-                        <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-52 overflow-auto z-50">
-                          {prodFiltrados.map((p, idx) => (
-                            <button key={p.id} type="button" onClick={() => selecionarProduto(p)} className={`w-full text-left px-3 py-2.5 flex justify-between items-center border-b border-gray-50 dark:border-gray-700 last:border-0 transition-colors ${searchIdx === idx ? 'bg-blue-100 dark:bg-blue-900/40' : 'hover:bg-blue-50 dark:hover:bg-blue-900/30'}`}>
-                              <div><p className="font-medium text-gray-800 dark:text-gray-100 text-sm">{p.descricao}</p><p className="text-xs text-gray-400 dark:text-gray-500">{p.codigoInterno}{p.codigoBarras ? ` • ${p.codigoBarras}` : ''}</p></div>
-                              <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 ml-3 whitespace-nowrap">{Number(p.valorUnitario).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <div className="w-20"><label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Unid.</label><input value={unid} onChange={e => setUnid(e.target.value)} className="w-full px-2 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
-                    <div className="w-24"><label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Qtd</label><input ref={qtdRef} type="text" value={qtd} onChange={e => setQtd(e.target.value.replace(/[^0-9,]/g, ''))} onKeyDown={e => e.key === 'Enter' && handleAddProduto()} className="w-full px-2 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
-                    <div className="w-32"><label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Valor Unit.</label><input type="text" value={vUnit} onChange={e => setVUnit(e.target.value.replace(/[^0-9,]/g, ''))} onKeyDown={e => e.key === 'Enter' && handleAddProduto()} placeholder="0,00" className="w-full px-2 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
-                    <button onClick={handleAddProduto} className="mb-0.5 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-1 text-sm whitespace-nowrap"><Plus className="w-4 h-4" /> Adicionar</button>
+            <div className="space-y-4 max-w-5xl mx-auto">
+              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">Adicionar Item</span>
+                  <div className="flex rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                    {(['produto', 'servico'] as const).map(t => (
+                      <button key={t} onClick={() => setTipoItem(t)} className={`px-3 py-1.5 text-xs font-medium transition-colors ${tipoItem === t ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`}>
+                        {t === 'produto' ? 'Peça/Produto' : 'Serviço'}
+                      </button>
+                    ))}
                   </div>
-                  {selectedProd && <p className="text-xs text-blue-600 dark:text-blue-400 pl-1">✓ {selectedProd.descricao} — {Number(selectedProd.valorUnitario).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>}
                 </div>
-              )}
-              {tipoItem === 'servico' && (
-                <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-3">
+                {tipoItem === 'produto' && (
+                  <div className="space-y-2">
+                    <div className="flex gap-2 items-end flex-wrap">
+                      <div className="flex-1 min-w-[200px] relative">
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Buscar Peça/Produto</label>
+                        <input ref={buscaRef} type="text" value={buscaProd} onChange={e => handleBusca(e.target.value)}
+                          onKeyDown={e => {
+                            if (e.key === 'ArrowDown') { e.preventDefault(); setSearchIdx(p => Math.min(p + 1, prodFiltrados.length - 1)); }
+                            else if (e.key === 'ArrowUp') { e.preventDefault(); setSearchIdx(p => Math.max(p - 1, -1)); }
+                            else if (e.key === 'Enter' && prodFiltrados.length > 0) { e.preventDefault(); selecionarProduto(searchIdx >= 0 ? prodFiltrados[searchIdx] : prodFiltrados[0]); }
+                            else if (e.key === 'Escape') { setProdFiltrados([]); }
+                          }}
+                          placeholder="Localizar por nome, código ou código de barras..." className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500" autoComplete="off" />
+                        {prodFiltrados.length > 0 && (
+                          <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-52 overflow-auto z-50">
+                            {prodFiltrados.map((p, idx) => (
+                              <button key={p.id} type="button" onClick={() => selecionarProduto(p)} className={`w-full text-left px-3 py-2.5 flex justify-between items-center border-b border-gray-50 dark:border-gray-700 last:border-0 transition-colors ${searchIdx === idx ? 'bg-blue-100 dark:bg-blue-900/40' : 'hover:bg-blue-50 dark:hover:bg-blue-900/30'}`}>
+                                <div><p className="font-medium text-gray-800 dark:text-gray-100 text-sm">{p.descricao}</p><p className="text-xs text-gray-400 dark:text-gray-500">{p.codigoInterno}{p.codigoBarras ? ` • ${p.codigoBarras}` : ''}</p></div>
+                                <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 ml-3 whitespace-nowrap">{Number(p.valorUnitario).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <div className="w-20"><label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Unid.</label><input value={unid} onChange={e => setUnid(e.target.value)} className="w-full px-2 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
+                      <div className="w-24"><label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Qtd</label><input ref={qtdRef} type="text" value={qtd} onChange={e => setQtd(e.target.value.replace(/[^0-9,]/g, ''))} onKeyDown={e => e.key === 'Enter' && handleAddProduto()} className="w-full px-2 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
+                      <div className="w-32"><label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Valor Unit.</label><input type="text" value={vUnit} onChange={e => setVUnit(e.target.value.replace(/[^0-9,]/g, ''))} onKeyDown={e => e.key === 'Enter' && handleAddProduto()} placeholder="0,00" className="w-full px-2 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
+                      <button onClick={handleAddProduto} className="mb-0.5 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-1 text-sm whitespace-nowrap"><Plus className="w-4 h-4" /> Adicionar</button>
+                    </div>
+                    {selectedProd && <p className="text-xs text-blue-600 dark:text-blue-400 pl-1">✓ {selectedProd.descricao} — {Number(selectedProd.valorUnitario).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>}
+                  </div>
+                )}
+                {tipoItem === 'servico' && (
                   <div className="flex gap-2 items-end flex-wrap">
                     <div className="flex-1 min-w-[200px]"><label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Descrição do Serviço</label><input value={descServ} onChange={e => setDescServ(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleAddServico()} placeholder="Ex: Troca de tela, Formatação..." className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500" /></div>
                     <div className="w-20"><label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Unid.</label><input value={unidServ} onChange={e => setUnidServ(e.target.value)} className="w-full px-2 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500" /></div>
@@ -425,10 +426,10 @@ export const OrdemServicoTab = ({
                     <div className="w-32"><label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Valor</label><input type="text" value={vServ} onChange={e => setVServ(e.target.value.replace(/[^0-9,]/g, ''))} onKeyDown={e => e.key === 'Enter' && handleAddServico()} placeholder="0,00" className="w-full px-2 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500" /></div>
                     <button onClick={handleAddServico} className="mb-0.5 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-1 text-sm whitespace-nowrap"><Plus className="w-4 h-4" /> Adicionar</button>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
               {form.itens.length > 0 ? (
-                <div className="border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden">
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
                   <table className="w-full text-sm">
                     <thead className="bg-gray-50 dark:bg-gray-900 text-xs text-gray-500 dark:text-gray-400 uppercase border-b border-gray-100 dark:border-gray-700">
                       <tr>
@@ -463,7 +464,7 @@ export const OrdemServicoTab = ({
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-12 text-gray-400 dark:text-gray-500 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl">
+                <div className="text-center py-12 text-gray-400 dark:text-gray-500 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800">
                   <p className="text-sm">Nenhum item adicionado. Use os campos acima para adicionar peças/produtos ou serviços.</p>
                 </div>
               )}
@@ -471,15 +472,15 @@ export const OrdemServicoTab = ({
           )}
 
           {formStep === 3 && (
-            <div className="space-y-5 max-w-2xl mx-auto">
-              <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 space-y-2 text-sm">
+            <div className="space-y-5 max-w-3xl mx-auto">
+              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 space-y-2 text-sm">
                 <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Cliente:</span><span className="font-medium text-gray-800 dark:text-gray-100">{form.cliente_nome || 'Não informado'}</span></div>
                 <div className="flex justify-between items-center"><span className="text-gray-500 dark:text-gray-400">Status:</span><span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_OS_COLORS[form.status] ?? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>{form.status}</span></div>
                 <div className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Previsão:</span><span className="font-medium text-gray-800 dark:text-gray-100">{form.previsao ? new Date(form.previsao + 'T12:00:00').toLocaleDateString('pt-BR') : 'Sem prazo'}</span></div>
                 {form.observacao && <div className="flex justify-between gap-4"><span className="text-gray-500 dark:text-gray-400 shrink-0">Obs:</span><span className="text-gray-700 dark:text-gray-200 text-right">{form.observacao}</span></div>}
               </div>
               {form.itens.length > 0 ? (
-                <div className="border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden">
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
                   <table className="w-full text-sm">
                     <thead className="bg-gray-50 dark:bg-gray-900 text-xs text-gray-500 dark:text-gray-400 uppercase border-b border-gray-100 dark:border-gray-700">
                       <tr><th className="px-3 py-2 text-left">Descrição</th><th className="px-3 py-2 text-center">Tipo</th><th className="px-3 py-2 text-right">Qtd</th><th className="px-3 py-2 text-right">Unit.</th><th className="px-3 py-2 text-right">Total</th></tr>
@@ -519,7 +520,6 @@ export const OrdemServicoTab = ({
       </div>
     );
   }
-
   // ── List view ──────────────────────────────────────────────────────────────
   return (
     <div className="space-y-4">
