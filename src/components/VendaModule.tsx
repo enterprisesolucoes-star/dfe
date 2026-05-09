@@ -771,11 +771,16 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
               <div className="flex gap-4 items-end">
                 <div className="flex-1 relative">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Buscar Produto</label>
-                  <input ref={buscaProdutoInputRef} type="text" value={buscaProduto} placeholder="Código ou nome..." className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+                  <input ref={buscaProdutoInputRef} type="text" value={buscaProduto} placeholder="Por código, código de barras ou nome..." className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
                     onChange={(e) => {
                       const t = e.target.value; setBuscaProduto(t); setSelectedProduto('');
                       if (t.length < 1) { setProdutosFiltrados([]); return; }
-                      const f = produtos.filter(p => p.descricao.toLowerCase().includes(t.toLowerCase()) || (p.codigoInterno || '').includes(t) || (p.codigoBarras || '').includes(t));
+                      const qtyMatch = t.match(/^(\d+)[*xX]\s*(.*)/);
+                      const termo = qtyMatch ? qtyMatch[2] : t;
+                      if (qtyMatch) { const q = parseInt(qtyMatch[1], 10); if (q > 0) setQuantidade(q); }
+                      if (termo.length < 1) { setProdutosFiltrados([]); return; }
+                      const tl = termo.toLowerCase();
+                      const f = produtos.filter(p => p.descricao.toLowerCase().includes(tl) || (p.codigoInterno || '').includes(termo) || (p.codigoBarras || '').includes(termo));
                       setProdutosFiltrados(f);
                       if (f.length === 1) { setSelectedProduto(String(f[0].id)); setBuscaProduto(f[0].descricao); setValorAtual(f[0].valorUnitario); setProdutosFiltrados([]); setTimeout(() => inputQtdRef.current?.focus(), 10); }
                     }}
@@ -805,15 +810,33 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
                 <div className="w-32"><label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Valor</label><input ref={inputValorRef} type="text" value={valorAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} onChange={e => setValorAtual(Number(e.target.value.replace(/\D/g, '')) / 100)} onKeyDown={e => { if (e.key === 'Enter') addItem(); }} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-right font-bold" /></div>
                 <button ref={btnAddRef} onClick={addItem} disabled={!selectedProduto} className="p-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-200"><Plus className="w-5 h-5" /></button>
               </div>
-              <div className="flex-1 border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden flex flex-col min-h-0">
-                <table className="w-full text-left text-sm">
-                  <thead className="bg-gray-50 dark:bg-gray-900 sticky top-0 z-10"><tr><th className="px-4 py-3">Produto</th><th className="px-4 py-3 w-16">Qtd</th><th className="px-4 py-3 w-24">Unit.</th><th className="px-4 py-3 w-28">Total</th><th className="w-10"></th></tr></thead>
-                </table>
-                <div className="flex-1 overflow-y-auto">
+              <div className="flex-1 border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden min-h-0">
+                <div className="h-full overflow-y-auto">
                   <table className="w-full text-left text-sm">
+                    <thead className="bg-gray-50 dark:bg-gray-900 sticky top-0 z-10">
+                      <tr>
+                        <th className="px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase">Produto</th>
+                        <th className="px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase text-center w-16">Qtd</th>
+                        <th className="px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase text-right w-28">Unit.</th>
+                        <th className="px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase text-right w-32">Total</th>
+                        <th className="w-10"></th>
+                      </tr>
+                    </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                      {itens.length === 0 ? <tr><td colSpan={5} className="py-16 text-center text-gray-300 dark:text-gray-600 font-bold uppercase tracking-widest text-lg">Caixa Livre</td></tr> :
-                        itens.map((it, i) => { const p = produtos.find(x => x.id === it.produtoId); return <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-700/40"><td className="px-4 py-3 font-medium text-gray-800 dark:text-gray-100">{p?.descricao}</td><td className="px-4 py-3 text-gray-600 dark:text-gray-300">{it.quantidade}</td><td className="px-4 py-3 text-gray-600 dark:text-gray-300">R$ {brl(it.valorUnitario)}</td><td className="px-4 py-3 font-bold text-gray-800 dark:text-gray-100">R$ {brl(it.quantidade * it.valorUnitario)}</td><td className="px-4 py-3 text-right"><button onClick={() => removeItem(i)} className="text-red-400 hover:text-red-600 dark:hover:text-red-400"><Trash2 className="w-4 h-4" /></button></td></tr>; })}
+                      {itens.length === 0
+                        ? <tr><td colSpan={5} className="py-16 text-center text-gray-300 dark:text-gray-600 font-bold uppercase tracking-widest text-lg">Caixa Livre</td></tr>
+                        : itens.map((it, i) => {
+                            const p = produtos.find(x => x.id === it.produtoId);
+                            return (
+                              <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-700/40">
+                                <td className="px-4 py-3 font-medium text-gray-800 dark:text-gray-100">{p?.descricao}</td>
+                                <td className="px-4 py-3 text-center text-gray-600 dark:text-gray-300">{it.quantidade}</td>
+                                <td className="px-4 py-3 text-right text-gray-600 dark:text-gray-300">R$ {brl(it.valorUnitario)}</td>
+                                <td className="px-4 py-3 text-right font-bold text-gray-800 dark:text-gray-100">R$ {brl(it.quantidade * it.valorUnitario)}</td>
+                                <td className="px-4 py-3 text-right"><button onClick={() => removeItem(i)} className="text-red-400 hover:text-red-600 dark:hover:text-red-400"><Trash2 className="w-4 h-4" /></button></td>
+                              </tr>
+                            );
+                          })}
                     </tbody>
                   </table>
                 </div>
