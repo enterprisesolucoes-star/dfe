@@ -230,7 +230,7 @@ class NfceService
                 $nfe->tagCOFINS((object) ['item' => $nItem, 'CST' => '07']);
 
                 // Injeta as tags IBSCBS nativas pelo novo schema (Reforma Tributária)
-                $cbsCst = $item["cbs_cst"] ?? $item["cbsCst"] ?? "01"; // default: Tributada
+                $cbsCst = $item["cbs_cst"] ?? $item["cbsCst"] ?? "000"; // default NT 2024.002: Tributada
                 if ($cbsCst && !empty($aliquotasRtc)) {
                     $pCBS = $aliquotasRtc['CBS'] ?? 0.0;
                     $pIBSUF = $aliquotasRtc['IBS_UF'] ?? 0.0;
