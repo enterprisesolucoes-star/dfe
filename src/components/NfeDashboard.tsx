@@ -499,11 +499,11 @@ const NfeDashboard: React.FC<Props> = ({
   // ── Helpers de filtro ────────────────────────────────────────────────────
 
   const clientesFiltrados = clientes.filter(c =>
-    !buscaCliente || c.nome.toLowerCase().includes(buscaCliente.toLowerCase()) || c.documento.includes(buscaCliente)
+    !buscaCliente || (c.nome || '').toLowerCase().includes(buscaCliente.toLowerCase()) || (c.documento || '').includes(buscaCliente)
   ).slice(0, 10);
 
   const produtosFiltrados = produtos.filter(p =>
-    !buscaProduto || p.descricao.toLowerCase().includes(buscaProduto.toLowerCase()) || p.codigoInterno.includes(buscaProduto)
+    !buscaProduto || (p.descricao || '').toLowerCase().includes(buscaProduto.toLowerCase()) || (p.codigoInterno || '').includes(buscaProduto)
   ).slice(0, 10);
 
   return (
