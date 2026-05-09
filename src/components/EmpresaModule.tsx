@@ -603,13 +603,15 @@ const IntegracaoPage = ({
 
         <div className="border-t border-gray-100 dark:border-gray-700" />
 
-        {/* WhatsApp Business — Evolution API */}
-        <div>
-          <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-3 flex items-center gap-2">
-            <MessageCircle className="w-4 h-4 text-green-600 dark:text-green-400" /> WhatsApp Business
-          </h4>
-          <WhatsAppSection showAlert={showAlert} />
-        </div>
+        {/* WhatsApp Business — Evolution API (apenas se habilitado pelo admin) */}
+        {!!(emitente as any).integracaowhatsapp && (
+          <div>
+            <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-3 flex items-center gap-2">
+              <MessageCircle className="w-4 h-4 text-green-600 dark:text-green-400" /> WhatsApp Business
+            </h4>
+            <WhatsAppSection showAlert={showAlert} />
+          </div>
+        )}
 
 
         <div className="pt-4">

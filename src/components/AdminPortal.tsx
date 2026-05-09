@@ -507,6 +507,23 @@ const AdminPortal = () => {
                       </select>
                     </div>
                   </div>
+
+                  {/* WhatsApp Integration toggle */}
+                  <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                    <label className="flex items-center gap-3 cursor-pointer select-none group">
+                      <div
+                        onClick={() => set('integracaowhatsapp', Number(form.integracaowhatsapp) === 1 ? 0 : 1)}
+                        className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${Number(form.integracaowhatsapp) === 1 ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'}`}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${Number(form.integracaowhatsapp) === 1 ? 'translate-x-5' : 'translate-x-0'}`} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">Integração WhatsApp Business</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">Habilita envio de documentos e mensagens via WhatsApp para esta empresa</p>
+                      </div>
+                    </label>
+                  </div>
                 </div>
               )}
 
