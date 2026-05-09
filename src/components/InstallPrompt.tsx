@@ -6,28 +6,47 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
+declare global {
+  interface Window {
+    _deferredInstallPrompt: BeforeInstallPromptEvent | null;
+  }
+}
+
 export default function InstallPrompt() {
   const [show, setShow] = useState(false);
-  const deferredPrompt = useRef<BeforeInstallPromptEvent | null>(null);
+  const promptRef = useRef<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
     if (localStorage.getItem('pwa_install_dismissed') === '1') return;
 
-    const handler = (e: Event) => {
-      e.preventDefault();
-      deferredPrompt.current = e as BeforeInstallPromptEvent;
+    // Se o evento já foi capturado antes do React montar
+    if (window._deferredInstallPrompt) {
+      promptRef.current = window._deferredInstallPrompt;
       setShow(true);
+      return;
+    }
+
+    // Ou escuta o evento customizado disparado pelo script global
+    const onInstallable = () => {
+      if (window._deferredInstallPrompt) {
+        promptRef.current = window._deferredInstallPrompt;
+        setShow(true);
+      }
     };
-    window.addEventListener('beforeinstallprompt', handler);
-    return () => window.removeEventListener('beforeinstallprompt', handler);
+    window.addEventListener('pwa-installable', onInstallable);
+    return () => window.removeEventListener('pwa-installable', onInstallable);
   }, []);
 
   const handleInstall = async () => {
-    if (!deferredPrompt.current) return;
-    await deferredPrompt.current.prompt();
-    const { outcome } = await deferredPrompt.current.userChoice;
-    if (outcome === 'accepted') setShow(false);
-    deferredPrompt.current = null;
+    const prompt = promptRef.current;
+    if (!prompt) return;
+    await prompt.prompt();
+    const { outcome } = await prompt.userChoice;
+    if (outcome === 'accepted') {
+      window._deferredInstallPrompt = null;
+      setShow(false);
+    }
+    promptRef.current = null;
   };
 
   const handleDismiss = () => {
@@ -38,17 +57,17 @@ export default function InstallPrompt() {
   if (!show) return null;
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[9999] w-[calc(100%-2rem)] max-w-sm">
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[9999] w-[calc(100%-2rem)] max-w-sm animate-in fade-in slide-in-from-bottom-4 duration-300">
       <div className="flex items-center gap-3 bg-gradient-to-r from-[#0c2461] to-[#1a56db] text-white rounded-2xl shadow-2xl px-4 py-3 border border-blue-400/30">
-        <img src="./icons/icon-192.png" alt="DFe IA" className="w-12 h-12 rounded-xl shrink-0" />
+        <img src="./icons/icon-192.png" alt="DFe IA" className="w-12 h-12 rounded-xl shrink-0 shadow-md" />
         <div className="flex-1 min-w-0">
           <p className="font-bold text-sm leading-tight">Instale o DFe IA</p>
-          <p className="text-xs text-blue-200 leading-tight mt-0.5">Acesso rápido, funciona como app nativo no seu dispositivo.</p>
+          <p className="text-xs text-blue-200 leading-tight mt-0.5">Acesso rápido como app nativo — sem precisar abrir o navegador.</p>
         </div>
         <div className="flex flex-col gap-1.5 shrink-0">
           <button
             onClick={handleInstall}
-            className="flex items-center gap-1 bg-white text-blue-700 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors whitespace-nowrap"
+            className="flex items-center gap-1 bg-white text-blue-700 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors whitespace-nowrap shadow-sm"
           >
             <Download className="w-3.5 h-3.5" /> Instalar
           </button>

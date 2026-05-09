@@ -9,7 +9,17 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
-    <script>if(localStorage.getItem('dfe_dark_mode')==='true')document.documentElement.classList.add('dark');</script>
+    <script>
+      // Dark mode imediato
+      if(localStorage.getItem('dfe_dark_mode')==='true') document.documentElement.classList.add('dark');
+      // Captura o evento de instalação PWA antes do React montar
+      window._deferredInstallPrompt = null;
+      window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        window._deferredInstallPrompt = e;
+        window.dispatchEvent(new CustomEvent('pwa-installable'));
+      });
+    </script>
   </head>
   <body>
     <div id="root"></div>
