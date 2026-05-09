@@ -93,8 +93,8 @@ export const PedidoTab = ({ produtos, clientes, vendedores, emitente, showAlert,
   }, []);
 
   const clientesFiltrados = clientes.filter(c =>
-    c.nome?.toLowerCase().includes(buscaCliente.toLowerCase()) || c.documento?.includes(buscaCliente)
-  );
+    !buscaCliente || c.nome?.toLowerCase().includes(buscaCliente.toLowerCase()) || c.documento?.includes(buscaCliente)
+  ).slice(0, 10);
   const produtosFiltrados = produtos.filter(p =>
     buscaProduto.length > 0 && (
       p.descricao.toLowerCase().includes(buscaProduto.toLowerCase()) ||
@@ -613,6 +613,7 @@ ${observacao?`<div style="border:1px solid #ddd;border-radius:4px;padding:10px;m
               <input ref={refBuscaCliente} value={buscaCliente}
                 onChange={e => { setBuscaCliente(e.target.value); setDropCliente(true); }}
                 onFocus={() => setDropCliente(true)}
+                onBlur={() => setTimeout(() => setDropCliente(false), 150)}
                 placeholder="Buscar cliente por nome ou CPF/CNPJ..."
                 className="w-full pl-11 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none shadow-sm" />
               {dropCliente && clientesFiltrados.length > 0 && (
@@ -679,6 +680,7 @@ ${observacao?`<div style="border:1px solid #ddd;border-radius:4px;padding:10px;m
                 <input ref={refBuscaProduto} value={buscaProduto}
                   onChange={e => { setBuscaProduto(e.target.value); setDropProduto(true); }}
                   onFocus={() => setDropProduto(true)}
+                  onBlur={() => setTimeout(() => setDropProduto(false), 150)}
                   placeholder="Buscar produto por nome ou código..."
                   className="w-full pl-11 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm" />
                 {dropProduto && produtosFiltrados.length > 0 && (

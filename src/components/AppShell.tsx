@@ -359,13 +359,16 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
   // Lazy loading de catálogos por aba
   useEffect(() => {
     if (activeTab === 'produtos' || activeTab === 'vendas' || activeTab === 'pedidos' || activeTab === 'orcamentos' || activeTab === 'ordens_servico') fetchProdutos();
-    if (activeTab === 'clientes' || activeTab === 'pedidos' || activeTab === 'orcamentos' || activeTab === 'ordens_servico') fetchClientes();
+    if (activeTab === 'clientes' || activeTab === 'pedidos' || activeTab === 'orcamentos' || activeTab === 'ordens_servico' || activeTab === 'dfe_nfe') fetchClientes();
     if (activeTab === 'fornecedores') fetchFornecedores();
     if (activeTab === 'vendedores' || activeTab === 'pedidos' || activeTab === 'orcamentos' || activeTab === 'ordens_servico') fetchVendedores();
     if (activeTab === 'transportadores') fetchTransportadores();
     if (activeTab === 'medidas') fetchMedidas();
     if (activeTab === 'bandeiras') fetchBandeiras();
   }, [activeTab]);
+
+  // Garante clientes carregados ao abrir modais que precisam de busca
+  useEffect(() => { if (isNfeModalOpen) { fetchClientes(); fetchProdutos(); } }, [isNfeModalOpen]);
 
   const handleNovaVenda = (novaVenda: Nfce) => {
     fetchVendas();

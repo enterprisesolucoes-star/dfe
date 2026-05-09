@@ -621,6 +621,7 @@ const NfeDashboard: React.FC<Props> = ({
                   value={buscaCliente}
                   onChange={e => { setBuscaCliente(e.target.value); setDropCliente(true); }}
                   onFocus={() => setDropCliente(true)}
+                  onBlur={() => setTimeout(() => setDropCliente(false), 150)}
                   placeholder="Buscar por nome ou CPF/CNPJ..."
                   className="w-full pl-11 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none shadow-sm"
                 />
@@ -755,6 +756,7 @@ const NfeDashboard: React.FC<Props> = ({
                     value={buscaProduto}
                     onChange={e => { setBuscaProduto(e.target.value); setDropProduto(true); } }
                     onFocus={() => setDropProduto(true)}
+                    onBlur={() => setTimeout(() => setDropProduto(false), 150)}
                     placeholder="Buscar produto..."
                     className="w-full pl-11 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl text-base outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 shadow-sm transition-all"
                   />
