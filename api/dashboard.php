@@ -219,7 +219,7 @@ switch ($action) {
                     SELECT v.cliente_id, COALESCE(c.nome, 'Consumidor') AS cliente_nome, v.valor_total AS valor
                     FROM vendas v
                     LEFT JOIN clientes c ON c.id = v.cliente_id
-                    WHERE v.status='Autorizada' AND v.data_emissao >= ? AND v.data_emissao <= ?
+                    WHERE v.status='Autorizada' AND v.devolucao_de_id IS NULL AND v.data_emissao >= ? AND v.data_emissao <= ?
                       " . ($empresaId ? "AND v.empresa_id = " . (int)$empresaId : "") . "
                       AND v.cliente_id IS NOT NULL
 
@@ -255,7 +255,7 @@ switch ($action) {
                 FROM vendas_itens vi
                 INNER JOIN vendas v ON v.id = vi.venda_id
                 LEFT JOIN produtos p ON p.id = vi.produto_id
-                WHERE v.status='Autorizada' AND v.data_emissao >= ? AND v.data_emissao <= ?
+                WHERE v.status='Autorizada' AND v.devolucao_de_id IS NULL AND v.data_emissao >= ? AND v.data_emissao <= ?
                   " . ($empresaId ? "AND v.empresa_id = " . (int)$empresaId : "") . "
                 GROUP BY vi.produto_id, p.descricao
                 ORDER BY total DESC
@@ -349,7 +349,7 @@ echo json_encode([
             $rows = $pdo->query("
                 SELECT modelo, status, COUNT(*) qtd, COALESCE(SUM(valor_total),0) val
                 FROM vendas
-                WHERE data_emissao >= '{$hojeIni}' AND data_emissao <= '{$hojeFim}' {$empFilter}
+                WHERE data_emissao >= '{$hojeIni}' AND data_emissao <= '{$hojeFim}' AND devolucao_de_id IS NULL {$empFilter}
                 GROUP BY modelo, status
             ")->fetchAll(PDO::FETCH_ASSOC);
 

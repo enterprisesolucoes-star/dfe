@@ -76,7 +76,7 @@ const OrcamentosTab = ({
   // ── Form data ────────────────────────────────────────────────────────────
   const emptyOrc = (): Orcamento => ({ status: 'Rascunho', valor_total: 0, itens: [] });
   const [form, setForm] = useState<Orcamento>(emptyOrc());
-  const [clienteMode, setClienteMode] = useState<'cadastrado' | 'manual'>('manual');
+  const [clienteMode, setClienteMode] = useState<'cadastrado' | 'manual'>('cadastrado');
   const [buscaCliente, setBuscaCliente] = useState('');
   const [dropCliente, setDropCliente] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -115,7 +115,7 @@ const OrcamentosTab = ({
 
   const openForm = (orc: Orcamento | null) => {
     setForm(orc ? { ...orc } : { status: 'Rascunho', valor_total: 0, itens: [] });
-    setClienteMode(orc?.cliente_id ? 'cadastrado' : 'manual');
+    setClienteMode(orc ? (orc.cliente_id ? 'cadastrado' : 'manual') : 'cadastrado');
     setBuscaProd(''); setProdFiltrados([]); setSelectedProd(null);
     setQtd('1'); setVUnit(''); setUnid('UN');
     setDescServ(''); setQtdServ('1'); setVServ(''); setUnidServ('UN');

@@ -134,11 +134,11 @@ export const OrdemServicoTab = ({
 
   const openForm = (os: OrdemServico | null) => {
     setForm(os ? { ...os } : { status: 'Rascunho', valor_total: 0, itens: [] });
-    setClienteMode(os?.cliente_id ? 'cadastrado' : 'manual');
+    setClienteMode(os ? (os.cliente_id ? 'cadastrado' : 'manual') : 'cadastrado');
     setBuscaProd(''); setProdFiltrados([]); setSelectedProd(null);
     setQtd('1'); setVUnit(''); setUnid('UN');
     setDescServ(''); setQtdServ('1'); setVServ(''); setUnidServ('UN');
-    setTipoItem('servico'); setFormStep(1); setViewMode('form');
+    setTipoItem('produto'); setFormStep(1); setViewMode('form');
   };
 
   const handleExcluir = (id: number) => {
