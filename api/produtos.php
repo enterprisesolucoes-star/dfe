@@ -13,12 +13,16 @@ switch ($action) {
         if ($empRef) {
             $pdo->prepare("UPDATE produtos SET empresa_id=? WHERE empresa_id IS NULL")->execute([$empRef]);
         }
+        try { $pdo->query("SELECT ativo FROM produtos LIMIT 1"); } catch (PDOException $e) {
+            $pdo->exec("ALTER TABLE produtos ADD COLUMN ativo TINYINT(1) NOT NULL DEFAULT 1");
+            $pdo->exec("UPDATE produtos SET ativo = 1 WHERE ativo IS NULL");
+        }
         try { $pdo->query("SELECT codigo_fornecedor FROM produtos LIMIT 1"); } catch (PDOException $e) {
             $pdo->exec("ALTER TABLE produtos ADD COLUMN codigo_fornecedor VARCHAR(60) DEFAULT NULL, ADD INDEX idx_cod_forn (codigo_fornecedor)");
         }
         if ($empresaId) {
             $busca  = trim($_GET['busca'] ?? '');
-            $pWhere = ["empresa_id = ?"];
+            $pWhere = ["empresa_id = ?", "ativo = 1"];
             $pParams = [$empresaId];
             if ($busca !== '') {
                 $pWhere[] = "(descricao LIKE ? OR codigo_interno LIKE ? OR codigo_barras LIKE ?)";
@@ -138,9 +142,9 @@ switch ($action) {
     case 'excluir_produto':
         $id = (int)($_GET['id'] ?? 0);
         if ($empresaId) {
-            $pdo->prepare("DELETE FROM produtos WHERE id=? AND empresa_id=?")->execute([$id, $empresaId]);
+            $pdo->prepare("UPDATE produtos SET ativo = 0 WHERE id = ? AND empresa_id = ?")->execute([$id, $empresaId]);
         } else {
-            $pdo->prepare("DELETE FROM produtos WHERE id=?")->execute([$id]);
+            $pdo->prepare("UPDATE produtos SET ativo = 0 WHERE id = ?")->execute([$id]);
         }
         echo json_encode(['success' => true]);
         break;

@@ -148,7 +148,7 @@ switch ($action) {
             $produtosXml = [];
             foreach ($nfe->det as $det) {
                 $prod = $det->prod;
-                $stmtP = $pdo->prepare("SELECT id, descricao, valor_unitario, cfop, codigo_interno FROM produtos WHERE (codigo_fornecedor = ? OR codigo_barras = ? OR descricao LIKE ?) AND empresa_id = ? LIMIT 1");
+                $stmtP = $pdo->prepare("SELECT id, descricao, valor_unitario, cfop, codigo_interno FROM produtos WHERE (codigo_fornecedor = ? OR codigo_barras = ? OR descricao LIKE ?) AND empresa_id = ? AND ativo = 1 LIMIT 1");
                 $searchDesc = mb_substr((string)$prod->xProd, 0, 30) . '%';
                 $stmtP->execute([(string)$prod->cProd, (string)$prod->cEAN, $searchDesc, $empresaId]);
                 $match = $stmtP->fetch();
@@ -391,7 +391,7 @@ switch ($action) {
             $itens = [];
             foreach ($nfe->det as $det) {
                 $p = $det->prod;
-                $stmtP = $pdo->prepare("SELECT id, descricao, valor_unitario, cfop, codigo_interno FROM produtos WHERE (codigo_fornecedor = ? OR codigo_barras = ? OR descricao LIKE ?) AND empresa_id = ? LIMIT 1");
+                $stmtP = $pdo->prepare("SELECT id, descricao, valor_unitario, cfop, codigo_interno FROM produtos WHERE (codigo_fornecedor = ? OR codigo_barras = ? OR descricao LIKE ?) AND empresa_id = ? AND ativo = 1 LIMIT 1");
                 $stmtP->execute([(string)$p->cProd, (string)$p->cEAN, mb_substr((string)$p->xProd, 0, 30) . '%', $empresaId]);
                 $match = $stmtP->fetch();
                 $itens[] = ['codigo_xml' => (string)$p->cProd, 'barras_xml' => (string)$p->cEAN, 'nome_xml' => (string)$p->xProd, 'cfop_xml' => (string)$p->CFOP, 'un_xml' => (string)$p->uCom, 'qtd_xml' => (float)$p->qCom, 'vun_xml' => (float)$p->vUnCom, 'total_xml' => (float)$p->vProd, 'matching_id' => $match['id'] ?? null, 'matching_desc' => $match['descricao'] ?? "NÃO LOCALIZADO", 'valor_venda_atual' => (float)($match['valor_unitario'] ?? 0)];
