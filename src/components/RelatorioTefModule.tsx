@@ -234,9 +234,14 @@ const RelatorioEstoqueTab = ({ showAlert, onVoltar }: any) => {
   const buscar = async () => {
     setLoading(true);
     try {
-      const resp = await fetch('./api.php?action=produtos');
-      const d = await resp.json();
-      if (Array.isArray(d)) setProdutos(d);
+      let all: any[] = [];
+      let page = 1, pages = 1;
+      do {
+        const d = await fetch(`./api.php?action=produtos&page=${page}&limit=200`).then(r => r.json());
+        if (d && Array.isArray(d.data)) { all = [...all, ...d.data]; pages = d.pages || 1; page++; }
+        else break;
+      } while (page <= pages);
+      setProdutos(all);
     } catch { showAlert('Erro', 'Falha ao buscar produtos.'); }
     setLoading(false);
   };
@@ -252,7 +257,7 @@ const RelatorioEstoqueTab = ({ showAlert, onVoltar }: any) => {
     return match;
   });
 
-  const totalEstoque = lista.reduce((s, p) => s + (parseFloat(p.estoque || 0) * parseFloat(p.preco_venda || 0)), 0);
+  const totalEstoque = lista.reduce((s, p) => s + (parseFloat(p.estoque || 0) * parseFloat(p.valor_unitario || 0)), 0);
   const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   return (
@@ -313,13 +318,13 @@ const RelatorioEstoqueTab = ({ showAlert, onVoltar }: any) => {
             {!loading && lista.map((p: any) => {
               const est = parseFloat(p.estoque || 0);
               const estColor = est <= 0 ? 'text-red-600 dark:text-red-400 font-bold' : est <= 5 ? 'text-orange-500 font-bold' : 'text-gray-700 dark:text-gray-200';
-              const valorTotal = est * parseFloat(p.preco_venda || 0);
+              const valorTotal = est * parseFloat(p.valor_unitario || 0);
               return (
                 <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
                   <td className="px-6 py-4 text-xs text-gray-500 dark:text-gray-400">{p.codigo_interno || '-'}</td>
                   <td className="px-6 py-4 text-xs font-medium text-gray-800 dark:text-gray-100">{p.descricao}</td>
-                  <td className="px-6 py-4 text-xs text-gray-500 dark:text-gray-400">{p.unidade || 'UN'}</td>
-                  <td className="px-6 py-4 text-xs text-gray-700 dark:text-gray-200 text-right">{fmt(parseFloat(p.preco_venda || 0))}</td>
+                  <td className="px-6 py-4 text-xs text-gray-500 dark:text-gray-400">{p.unidade_comercial || 'UN'}</td>
+                  <td className="px-6 py-4 text-xs text-gray-700 dark:text-gray-200 text-right">{fmt(parseFloat(p.valor_unitario || 0))}</td>
                   <td className={`px-6 py-4 text-xs text-right ${estColor}`}>{est.toLocaleString('pt-BR', {maximumFractionDigits:3})}</td>
                   <td className="px-6 py-4 text-xs font-medium text-gray-700 dark:text-gray-200 text-right">{fmt(valorTotal)}</td>
                 </tr>
