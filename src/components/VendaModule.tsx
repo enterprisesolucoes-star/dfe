@@ -757,8 +757,8 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
           </div>
         </div>
       )}
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[200] p-4">
-        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden flex flex-col">
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[200] sm:p-2">
+        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-none sm:rounded-2xl w-full h-full sm:max-w-[98vw] sm:max-h-[98vh] overflow-hidden flex flex-col">
           <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-4">
             <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 flex-1">Nova NFC-e #{proximoNumero}</h3>
             {destinatario && <span className="text-xs bg-indigo-100 text-indigo-700 dark:text-indigo-300 px-2 py-1 rounded-lg flex items-center gap-1">{destinatario.nome} <button onClick={() => setDestinatario(null)}>✕</button></span>}
@@ -766,19 +766,29 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
             <button onClick={handleFinalizar} disabled={isEmitting || itens.length === 0 || totalPago < totalDevido} className={`px-5 py-2 rounded-xl text-sm font-medium flex items-center gap-2 ${isEmitting || totalPago < totalDevido ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500' : 'bg-green-600 text-white hover:bg-green-700 shadow-md'}`}>{isEmitting ? 'Transmitindo...' : <><Send className="w-4 h-4" /> Emitir NFC-e</>}</button>
             <button onClick={onClose} className="text-gray-400 dark:text-gray-500 hover:text-gray-600">✕</button>
           </div>
-          <div className="flex-1 overflow-auto p-6 grid grid-cols-1 md:grid-cols-5 gap-6">
-            <div className="md:col-span-3 space-y-6">
+          <div className="flex-1 overflow-hidden p-3 sm:p-5 grid grid-cols-1 lg:grid-cols-5 gap-4">
+            <div className="lg:col-span-3 flex flex-col gap-4 min-h-0">
               <div className="flex gap-4 items-end">
                 <div className="flex-1 relative">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Buscar Produto</label>
-                  <input ref={buscaProdutoInputRef} type="text" value={buscaProduto} placeholder="Código ou nome..." className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-blue-500" 
+                  <input ref={buscaProdutoInputRef} type="text" value={buscaProduto} placeholder="Código ou nome..." className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
                     onChange={(e) => {
                       const t = e.target.value; setBuscaProduto(t); setSelectedProduto('');
                       if (t.length < 1) { setProdutosFiltrados([]); return; }
                       const f = produtos.filter(p => p.descricao.toLowerCase().includes(t.toLowerCase()) || (p.codigoInterno || '').includes(t) || (p.codigoBarras || '').includes(t));
                       setProdutosFiltrados(f);
                       if (f.length === 1) { setSelectedProduto(String(f[0].id)); setBuscaProduto(f[0].descricao); setValorAtual(f[0].valorUnitario); setProdutosFiltrados([]); setTimeout(() => inputQtdRef.current?.focus(), 10); }
-                    }} 
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        if (selectedProduto) { setTimeout(() => inputQtdRef.current?.focus(), 10); }
+                        else if (produtosFiltrados.length > 0) {
+                          const p = produtosFiltrados[0];
+                          setSelectedProduto(String(p.id)); setBuscaProduto(p.descricao); setValorAtual(p.valorUnitario); setProdutosFiltrados([]);
+                          setTimeout(() => inputQtdRef.current?.focus(), 10);
+                        }
+                      }
+                    }}
                   />
                   {produtosFiltrados.length > 0 && (
                     <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-[200] max-h-60 overflow-auto">
@@ -791,21 +801,25 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
                     </div>
                   )}
                 </div>
-                <div className="w-20"><label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Qtd</label><input ref={inputQtdRef} type="number" min="1" value={quantidade} onChange={e => setQuantidade(Number(e.target.value))} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg" /></div>
-                <div className="w-28"><label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Valor</label><input ref={inputValorRef} type="text" value={valorAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} onChange={e => setValorAtual(Number(e.target.value.replace(/\D/g, '')) / 100)} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-right font-bold" /></div>
+                <div className="w-24"><label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Qtd</label><input ref={inputQtdRef} type="number" min="1" value={quantidade} onChange={e => setQuantidade(Number(e.target.value))} onKeyDown={e => { if (e.key === 'Enter') inputValorRef.current?.focus(); }} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg" /></div>
+                <div className="w-32"><label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Valor</label><input ref={inputValorRef} type="text" value={valorAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} onChange={e => setValorAtual(Number(e.target.value.replace(/\D/g, '')) / 100)} onKeyDown={e => { if (e.key === 'Enter') addItem(); }} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-right font-bold" /></div>
                 <button ref={btnAddRef} onClick={addItem} disabled={!selectedProduto} className="p-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-200"><Plus className="w-5 h-5" /></button>
               </div>
-              <div className="border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden">
+              <div className="flex-1 border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden flex flex-col min-h-0">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-gray-50 dark:bg-gray-900"><tr><th className="px-4 py-3">Produto</th><th className="px-4 py-3">Qtd</th><th className="px-4 py-3">Unit.</th><th className="px-4 py-3">Total</th><th></th></tr></thead>
-                  <tbody className="divide-y">
-                    {itens.length === 0 ? <tr><td colSpan={5} className="py-10 text-center text-gray-300 dark:text-gray-600 font-bold uppercase tracking-widest">Caixa Livre</td></tr> :
-                      itens.map((it, i) => { const p = produtos.find(x => x.id === it.produtoId); return <tr key={i}><td className="px-4 py-3 font-medium">{p?.descricao}</td><td className="px-4 py-3">{it.quantidade}</td><td className="px-4 py-3">R$ {brl(it.valorUnitario)}</td><td className="px-4 py-3 font-bold">R$ {brl(it.quantidade * it.valorUnitario)}</td><td className="px-4 py-3 text-right"><button onClick={() => removeItem(i)} className="text-red-400 hover:text-red-600 dark:hover:text-red-400"><Trash2 className="w-4 h-4" /></button></td></tr>; })}
-                  </tbody>
+                  <thead className="bg-gray-50 dark:bg-gray-900 sticky top-0 z-10"><tr><th className="px-4 py-3">Produto</th><th className="px-4 py-3 w-16">Qtd</th><th className="px-4 py-3 w-24">Unit.</th><th className="px-4 py-3 w-28">Total</th><th className="w-10"></th></tr></thead>
                 </table>
+                <div className="flex-1 overflow-y-auto">
+                  <table className="w-full text-left text-sm">
+                    <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                      {itens.length === 0 ? <tr><td colSpan={5} className="py-16 text-center text-gray-300 dark:text-gray-600 font-bold uppercase tracking-widest text-lg">Caixa Livre</td></tr> :
+                        itens.map((it, i) => { const p = produtos.find(x => x.id === it.produtoId); return <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-700/40"><td className="px-4 py-3 font-medium text-gray-800 dark:text-gray-100">{p?.descricao}</td><td className="px-4 py-3 text-gray-600 dark:text-gray-300">{it.quantidade}</td><td className="px-4 py-3 text-gray-600 dark:text-gray-300">R$ {brl(it.valorUnitario)}</td><td className="px-4 py-3 font-bold text-gray-800 dark:text-gray-100">R$ {brl(it.quantidade * it.valorUnitario)}</td><td className="px-4 py-3 text-right"><button onClick={() => removeItem(i)} className="text-red-400 hover:text-red-600 dark:hover:text-red-400"><Trash2 className="w-4 h-4" /></button></td></tr>; })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
-            <div className="md:col-span-2 bg-gray-50 dark:bg-gray-900 rounded-2xl p-5 flex flex-col">
+            <div className="lg:col-span-2 bg-gray-50 dark:bg-gray-900 rounded-2xl p-5 flex flex-col overflow-y-auto">
               <h4 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-6">Resumo</h4>
               <div className="space-y-4 flex-1">
                 <div className="flex justify-between text-gray-500 dark:text-gray-400"><span>Subtotal</span><span>R$ {brl(subtotal)}</span></div>
