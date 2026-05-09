@@ -10,6 +10,7 @@ switch ($action) {
                 COUNT(*) as quantidade
             FROM vendas v
             WHERE v.data_emissao >= DATE_SUB(DATE_FORMAT(NOW(), '%Y-%m-01'), INTERVAL 11 MONTH)
+              AND v.devolucao_de_id IS NULL
               " . ($empresaId ? "AND v.empresa_id = ?" : "") . "
             GROUP BY periodo, v.modelo, v.status
             ORDER BY periodo ASC
@@ -279,7 +280,7 @@ switch ($action) {
 
             
             // Vendas do periodo filtrado pelo periodo selecionado
-            $stmtV = $pdo->prepare("SELECT COUNT(*) qtd, COALESCE(SUM(valor_total),0) total FROM vendas WHERE status='Autorizada' AND data_emissao >= ? AND data_emissao <= ?" . ($empresaId ? " AND empresa_id = " . (int)$empresaId : ""));
+            $stmtV = $pdo->prepare("SELECT COUNT(*) qtd, COALESCE(SUM(valor_total),0) total FROM vendas WHERE status='Autorizada' AND devolucao_de_id IS NULL AND data_emissao >= ? AND data_emissao <= ?" . ($empresaId ? " AND empresa_id = " . (int)$empresaId : ""));
             $stmtV->execute([$dtIni, $dtFim . ' 23:59:59']);
             $vendasAtual = $stmtV->fetch(PDO::FETCH_ASSOC);
             $stmtV->execute([$dtIniAnt, $dtFimAnt . ' 23:59:59']);

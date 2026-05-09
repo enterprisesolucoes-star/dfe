@@ -113,8 +113,8 @@ switch ($action) {
                 INSERT INTO vendas 
                     (empresa_id, modelo, numero, serie, valor_total, valor_desconto,
                      valor_frete, valor_seguro, valor_outras, valor_ipi, valor_icms, valor_pis, valor_cofins,
-                     natureza_operacao, cliente_id, status, data_emissao, finalidade, devolucao_de_id)
-                VALUES (?, 55, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pendente', ?, ?, ?)
+                     natureza_operacao, cliente_id, status, data_emissao, finalidade, devolucao_de_id, usuario_id)
+                VALUES (?, 55, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pendente', ?, ?, ?, ?)
             ");
             $stmt->execute([
                 $empresaDb['id'],
@@ -133,7 +133,8 @@ switch ($action) {
                 $clienteId,
                 $dataEmissaoSql,
                 $venda['finalidade'] ?? '1',
-                $venda['devolucaoDeId'] ?? null
+                $venda['devolucaoDeId'] ?? null,
+                $usuarioId ?: null
             ]);
             $vendaId = $pdo->lastInsertId();
             $venda['id'] = $vendaId;
@@ -1093,13 +1094,14 @@ switch ($action) {
             $stmt = $pdo->prepare("
                 INSERT INTO vendas 
                     (empresa_id, modelo, numero, serie, valor_total, valor_desconto, status, data_emissao,
-                     natureza_operacao, cliente_id, devolucao_de_id, finalidade)
-                VALUES (?, 55, ?, ?, ?, ?, 'Pendente', ?, ?, ?, ?, '4')
+                     natureza_operacao, cliente_id, devolucao_de_id, finalidade, usuario_id)
+                VALUES (?, 55, ?, ?, ?, ?, 'Pendente', ?, ?, ?, ?, '4', ?)
             ");
             $stmt->execute([
                 $empresaDb['id'], $venda['numero'], $venda['serie'],
                 (float)($venda['valorTotal'] ?? 0), (float)($venda['valorDesconto'] ?? 0),
-                $dataEmissaoSql, $venda['naturezaOperacao'] ?? 'DEVOLUCAO', $clienteId, $devolucaoDeId
+                $dataEmissaoSql, $venda['naturezaOperacao'] ?? 'DEVOLUCAO', $clienteId, $devolucaoDeId,
+                $usuarioId ?: null
             ]);
             $vendaId = $pdo->lastInsertId();
             $venda['id'] = $vendaId;
