@@ -61,8 +61,11 @@ switch ($action) {
             $pdo->exec("ALTER TABLE produtos ADD COLUMN estoque DECIMAL(10,3) DEFAULT 0");
         }
         try { $pdo->query("SELECT cbs_cst FROM produtos LIMIT 1"); } catch (PDOException $e) {
-            $pdo->exec("ALTER TABLE produtos ADD COLUMN cbs_cst VARCHAR(10) DEFAULT NULL, ADD COLUMN cbs_classtrib VARCHAR(20) DEFAULT NULL, ADD COLUMN ibs_cst VARCHAR(10) DEFAULT NULL, ADD COLUMN ibs_classtrib VARCHAR(20) DEFAULT NULL, ADD COLUMN ccredpres VARCHAR(10) DEFAULT NULL");
+            $pdo->exec("ALTER TABLE produtos ADD COLUMN cbs_cst VARCHAR(10) NOT NULL DEFAULT '01', ADD COLUMN cbs_classtrib VARCHAR(20) DEFAULT NULL, ADD COLUMN ibs_cst VARCHAR(10) NOT NULL DEFAULT '01', ADD COLUMN ibs_classtrib VARCHAR(20) DEFAULT NULL, ADD COLUMN ccredpres VARCHAR(10) DEFAULT NULL");
         }
+        // Garante default 01 (Tributada) em produtos importados sem classificação CBS/IBS
+        $pdo->exec("UPDATE produtos SET cbs_cst='01' WHERE cbs_cst IS NULL OR cbs_cst=''");
+        $pdo->exec("UPDATE produtos SET ibs_cst='01' WHERE ibs_cst IS NULL OR ibs_cst=''");
         try { $pdo->query("SELECT pis_cst FROM produtos LIMIT 1"); } catch (PDOException $e) {
             $pdo->exec("ALTER TABLE produtos ADD COLUMN pis_cst VARCHAR(2) DEFAULT NULL, ADD COLUMN pis_aliquota DECIMAL(10,4) DEFAULT 0, ADD COLUMN cofins_cst VARCHAR(2) DEFAULT NULL, ADD COLUMN cofins_aliquota DECIMAL(10,4) DEFAULT 0, ADD COLUMN origem_mercadoria TINYINT DEFAULT 0");
         }
