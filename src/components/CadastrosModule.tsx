@@ -513,13 +513,30 @@ const NcmImportModal = ({ defaultUf, onClose }: { defaultUf: string; onClose: ()
 // ════════════════════════════════════════════════════════════════════════════════
 
 // ── Modal: Cliente ────────────────────────────────────────────────────────────
-export const ClienteModal = ({ cliente, onClose, onSave, showAlert }: any) => {
+export const ClienteModal = ({ cliente, onClose, onSave, showAlert, emitente }: any) => {
+  const defUf     = emitente?.uf || emitente?.endereco?.uf || 'GO';
+  const defCodMun = emitente?.codigoMunicipio || emitente?.endereco?.codigoMunicipio || '';
+  const defMun    = emitente?.endereco?.municipio || '';
   const [form, setForm] = useState<any>(cliente || {
     nome: '', documento: '', email: '', telefone: '', ie: '', indIEDest: '9',
     regimeTributario: '1', entidadeGovernamental: '0',
-    endereco: { logradouro: '', numero: '', complemento: '', bairro: '', municipio: '', codigoMunicipio: '', uf: 'GO', cep: '' }
+    endereco: { logradouro: '', numero: '', complemento: '', bairro: '', municipio: defMun, codigoMunicipio: defCodMun, uf: defUf, cep: '' }
   });
   const { municipios, loading: loadingMun, carregar } = useMunicipios(form.endereco?.uf);
+  const docDigits = (form.documento || '').replace(/\D/g, '');
+  const isPF = docDigits.length > 0 && docDigits.length <= 11;
+  const setDocumento = (val: string) => {
+    const d = val.replace(/\D/g, '');
+    if (d.length <= 11 && d.length > 0) {
+      setForm((f: any) => ({ ...f, documento: val, regimeTributario: '1', entidadeGovernamental: '0', indIEDest: '9', ie: '' }));
+    } else {
+      setForm((f: any) => ({ ...f, documento: val }));
+    }
+  };
+  const setIe = (val: string) => {
+    const ind = val.trim() !== '' && val.toUpperCase() !== 'ISENTO' ? '1' : '9';
+    setForm((f: any) => ({ ...f, ie: val, indIEDest: ind }));
+  };
 
   const setEnd = (field: string, val: string) => setForm((f: any) => ({ ...f, endereco: { ...f.endereco, [field]: val } }));
 
@@ -533,27 +550,28 @@ export const ClienteModal = ({ cliente, onClose, onSave, showAlert }: any) => {
         <div className="p-5 space-y-4 overflow-y-auto flex-1">
           <div className="grid grid-cols-2 gap-4">
             <Input label="Nome *" value={form.nome} onChange={(e: any) => setForm({ ...form, nome: e.target.value })} />
-            <MaskedInput label="CPF / CNPJ *" mask="cpfcnpj" value={form.documento} onChange={(e: any) => setForm({ ...form, documento: e.target.value })} />
+            <MaskedInput label="CPF / CNPJ *" mask="cpfcnpj" value={form.documento} onChange={(e: any) => setDocumento(e.target.value)} />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <Input label="Email" type="email" value={form.email || ''} onChange={(e: any) => setForm({ ...form, email: e.target.value })} />
             <Input label="Telefone" value={form.telefone || ''} onChange={(e: any) => setForm({ ...form, telefone: e.target.value })} />
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <Input label="Inscrição Estadual" value={form.ie || ''} onChange={(e: any) => setForm({ ...form, ie: e.target.value })} />
+            <Input label="Inscrição Estadual" disabled={isPF} value={form.ie || ''} onChange={(e: any) => setIe(e.target.value)} />
             <div>
               <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">Indicador IE Destinatário</label>
-              <select value={form.indIEDest || '9'} onChange={e => setForm({ ...form, indIEDest: e.target.value })} className={selClass}>
+              <select value={form.indIEDest || '9'} onChange={e => setForm((f: any) => ({ ...f, indIEDest: e.target.value }))} className={selClass}>
                 <option value="1">1 – Contribuinte ICMS</option>
                 <option value="2">2 – Contribuinte isento</option>
                 <option value="9">9 – Não contribuinte</option>
               </select>
             </div>
           </div>
+          {!isPF && (
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">Regime Tributário</label>
-              <select value={form.regimeTributario || '1'} onChange={e => setForm({ ...form, regimeTributario: e.target.value })} className={selClass}>
+              <select value={form.regimeTributario || '1'} onChange={e => setForm((f: any) => ({ ...f, regimeTributario: e.target.value }))} className={selClass}>
                 <option value="1">1 – Simples Nacional</option>
                 <option value="2">2 – Simples Nacional – Excesso</option>
                 <option value="3">3 – Regime Normal</option>
@@ -561,7 +579,7 @@ export const ClienteModal = ({ cliente, onClose, onSave, showAlert }: any) => {
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">Entidade Governamental</label>
-              <select value={form.entidadeGovernamental || '0'} onChange={e => setForm({ ...form, entidadeGovernamental: e.target.value })} className={selClass}>
+              <select value={form.entidadeGovernamental || '0'} onChange={e => setForm((f: any) => ({ ...f, entidadeGovernamental: e.target.value }))} className={selClass}>
                 <option value="0">0 – Não é entidade governamental</option>
                 <option value="1">1 – Administração Pública Federal</option>
                 <option value="2">2 – Administração Pública Estadual ou DF</option>
@@ -569,6 +587,7 @@ export const ClienteModal = ({ cliente, onClose, onSave, showAlert }: any) => {
               </select>
             </div>
           </div>
+          )}
           <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
             <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-3">Endereço</p>
             <div className="grid grid-cols-3 gap-4">

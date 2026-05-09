@@ -1102,6 +1102,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           onSave={handleSalvarCliente}
           cliente={editingCliente}
           showAlert={showAlert}
+          emitente={emitente}
         />
       )}
 
