@@ -228,18 +228,24 @@ const RelatorioTefTab = ({ showAlert, onVoltar }: any) => {
 const RelatorioEstoqueTab = ({ showAlert, onVoltar }: any) => {
   const [produtos, setProdutos] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState({ loaded: 0, total: 0 });
   const [busca, setBusca] = useState('');
   const [filtro, setFiltro] = useState<'todos'|'baixo'|'zerado'>('todos');
 
   const buscar = async () => {
     setLoading(true);
+    setProgress({ loaded: 0, total: 0 });
     try {
       let all: any[] = [];
       let page = 1, pages = 1;
       do {
         const d = await fetch(`./api.php?action=produtos&page=${page}&limit=200`).then(r => r.json());
-        if (d && Array.isArray(d.data)) { all = [...all, ...d.data]; pages = d.pages || 1; page++; }
-        else break;
+        if (d && Array.isArray(d.data)) {
+          all = [...all, ...d.data];
+          pages = d.pages || 1;
+          setProgress({ loaded: all.length, total: d.total || 0 });
+          page++;
+        } else break;
       } while (page <= pages);
       setProdutos(all);
     } catch { showAlert('Erro', 'Falha ao buscar produtos.'); }
@@ -259,9 +265,29 @@ const RelatorioEstoqueTab = ({ showAlert, onVoltar }: any) => {
 
   const totalEstoque = lista.reduce((s, p) => s + (parseFloat(p.estoque || 0) * parseFloat(p.custo_compra || 0)), 0);
   const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const pct = progress.total > 0 ? Math.round((progress.loaded / progress.total) * 100) : 0;
 
   return (
     <div className="space-y-4">
+      {loading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 flex flex-col items-center gap-4 min-w-[280px]">
+            <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">Carregando estoque...</p>
+            {progress.total > 0 && (
+              <>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {progress.loaded.toLocaleString('pt-BR')} de {progress.total.toLocaleString('pt-BR')} produtos
+                </p>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div className="bg-blue-600 h-2 rounded-full transition-all duration-300" style={{ width: `${pct}%` }} />
+                </div>
+                <p className="text-xs font-bold text-blue-600 dark:text-blue-400">{pct}%</p>
+              </>
+            )}
+          </div>
+        </div>
+      )}
       <div className="flex items-center gap-2">
         <button onClick={onVoltar} className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">← Relatórios</button>
         <span className="text-gray-300 dark:text-gray-600">/</span>

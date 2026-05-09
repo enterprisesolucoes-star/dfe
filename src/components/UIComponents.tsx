@@ -36,16 +36,23 @@ export const StatCard = ({ label, value, icon: Icon, color, trend }: any) => {
   );
 };
 
-export const Input = React.forwardRef<HTMLInputElement, any>(({ label, ...props }, ref) => (
-  <div>
-    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{label}</label>
-    <input
-      ref={ref}
-      {...props}
-      className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-    />
-  </div>
-));
+export const Input = React.forwardRef<HTMLInputElement, any>(({ label, onChange, ...props }, ref) => {
+  const isText = !props.type || props.type === 'text';
+  const handleChange = isText && onChange
+    ? (e: React.ChangeEvent<HTMLInputElement>) => { e.target.value = e.target.value.toUpperCase(); onChange(e); }
+    : onChange;
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{label}</label>
+      <input
+        ref={ref}
+        {...props}
+        onChange={handleChange}
+        className={`w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all${isText ? ' uppercase' : ''}`}
+      />
+    </div>
+  );
+});
 Input.displayName = 'Input';
 
 const shimmer = 'animate-pulse bg-gray-200 dark:bg-gray-700 rounded';
