@@ -279,7 +279,7 @@ if ($_internalToken !== '') {
 $action = $_GET['action'] ?? '';
 
 $modules = [
-    'produtos' => 'produtos', 'salvar_produto' => 'produtos', 'excluir_produto' => 'produtos',
+    'produtos' => 'produtos', 'salvar_produto' => 'produtos', 'excluir_produto' => 'produtos', 'check_duplicado_produto' => 'produtos',
     'clientes' => 'clientes', 'salvar_cliente' => 'clientes', 'excluir_cliente' => 'clientes', 'check_duplicado_cliente' => 'clientes',
     'fornecedores' => 'fornecedores', 'salvar_fornecedor' => 'fornecedores', 'excluir_fornecedor' => 'fornecedores', 'check_duplicado_fornecedor' => 'fornecedores',
     'transportadores' => 'transportadores', 'salvar_transportador' => 'transportadores', 'excluir_transportador' => 'transportadores',

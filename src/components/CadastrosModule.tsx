@@ -81,7 +81,7 @@ export const ProdutosTab = ({ onEdit, onDelete, refreshTrigger }: { onEdit: (p: 
         <div className="flex items-center gap-2">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
-            <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar Código ou Nome..." className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none" />
+            <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Localizar por nome, código ou código de barras..." className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none" />
           </div>
           <button onClick={() => fetchProdutos(page)} className="px-3 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all flex items-center gap-1"><RefreshCw className="w-3.5 h-3.5" /> Atualizar</button>
         </div>
@@ -132,14 +132,15 @@ export const ClientesTab = ({ clientes, onEdit, onDelete }: { clientes: Cliente[
   const debouncedBusca = useDebounce(busca);
   const filtrados = clientes.filter(c =>
     (c.nome || '').toLowerCase().includes(debouncedBusca.toLowerCase()) ||
-    (c.documento || '').includes(debouncedBusca)
+    (c.documento || '').includes(debouncedBusca) ||
+    (c.telefone || '').replace(/\D/g, '').includes(debouncedBusca.replace(/\D/g, ''))
   );
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
       <div className="p-4 border-b border-gray-50 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/30">
         <div className="relative max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
-          <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Filtrar clientes..." className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none" />
+          <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Localizar por nome, documento ou celular..." className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none" />
         </div>
       </div>
       <div className="overflow-x-auto">
@@ -182,13 +183,17 @@ export const ClientesTab = ({ clientes, onEdit, onDelete }: { clientes: Cliente[
 export const FornecedoresTab = ({ fornecedores, onEdit, onDelete }: { fornecedores: Fornecedor[]; onEdit: (f: Fornecedor) => void; onDelete: (id: number) => void }) => {
   const [busca, setBusca] = useState('');
   const debouncedBusca = useDebounce(busca);
-  const filtrados = fornecedores.filter(f => (f.nome || '').toLowerCase().includes(debouncedBusca.toLowerCase()) || (f.documento || '').includes(debouncedBusca));
+  const filtrados = fornecedores.filter(f =>
+    (f.nome || '').toLowerCase().includes(debouncedBusca.toLowerCase()) ||
+    (f.documento || '').includes(debouncedBusca) ||
+    (f.telefone || '').replace(/\D/g, '').includes(debouncedBusca.replace(/\D/g, ''))
+  );
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
       <div className="p-4 border-b border-gray-50 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/30">
         <div className="relative max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
-          <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Filtrar fornecedores..." className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none" />
+          <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Localizar por nome, documento ou celular..." className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none" />
         </div>
       </div>
       <div className="overflow-x-auto">
@@ -728,6 +733,18 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
   const [rtcConfirmIdx, setRtcConfirmIdx] = useState<number | null>(null);
   const set = (f: string, v: any) => setForm((p: any) => ({ ...p, [f]: v }));
 
+  const [dupProduto, setDupProduto] = useState<any>(null);
+  const checkDuplicataProduto = async (val: string) => {
+    const clean = val.trim().replace(/\D/g, '');
+    if (clean.length < 8) { setDupProduto(null); return; }
+    try {
+      const excId = produto?.id ? `&excluir_id=${produto.id}` : '';
+      const res = await fetch(`./api.php?action=check_duplicado_produto&codigo_barras=${encodeURIComponent(clean)}${excId}`);
+      const d = await res.json();
+      setDupProduto(d.found ? d.produto : null);
+    } catch { setDupProduto(null); }
+  };
+
   const isRtcContextSpecific = (r: any) =>
     String(r.classtrib ?? '').startsWith('2') || parseInt(r.cst ?? '0') >= 200;
 
@@ -833,7 +850,7 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <Input label="Código Interno *" value={form.codigoInterno} onChange={(e: any) => set('codigoInterno', e.target.value)} />
-                <Input label="Código de Barras (EAN)" value={form.codigoBarras || ''} onChange={(e: any) => set('codigoBarras', e.target.value)} />
+                <Input label="Código de Barras (EAN)" value={form.codigoBarras || ''} onChange={(e: any) => { set('codigoBarras', e.target.value); checkDuplicataProduto(e.target.value); }} />
                 <div>
                   <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-1 ml-1">Unidade</label>
                   <select value={form.unidadeComercial || 'UN'} onChange={e => set('unidadeComercial', e.target.value)} className={selClass}>
@@ -841,6 +858,17 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
                   </select>
                 </div>
               </div>
+              {dupProduto && (
+                <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-xl p-3 flex items-start gap-3">
+                  <span className="text-amber-500 text-lg">⚠️</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Produto já cadastrado com este código de barras</p>
+                    <p className="text-xs text-amber-700 dark:text-amber-400 truncate">{dupProduto.descricao} — Cód: {dupProduto.codigo_interno}</p>
+                  </div>
+                  <button onClick={() => { setForm(normalizeProduto(dupProduto)); setDupProduto(null); }}
+                    className="text-xs px-3 py-1.5 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 whitespace-nowrap">Carregar dados</button>
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-4">
                 <Input label="Estoque" type="number" step="0.001" value={form.estoque || 0} onChange={(e: any) => set('estoque', Number(e.target.value))} />
                 <Input label="Cód. Fornecedor" value={form.codigoFornecedor || ''} onChange={(e: any) => set('codigoFornecedor', e.target.value)} />

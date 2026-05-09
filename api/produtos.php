@@ -49,6 +49,16 @@ switch ($action) {
         }
         break;
 
+    case 'check_duplicado_produto':
+        $cb = trim($_GET['codigo_barras'] ?? '');
+        if (!$cb || !$empresaId) { echo json_encode(['found' => false]); break; }
+        $excId = (int)($_GET['excluir_id'] ?? 0);
+        $q = 'SELECT * FROM produtos WHERE ativo=1 AND empresa_id=? AND codigo_barras = ?' . ($excId ? ' AND id != ?' : '');
+        $pq = $excId ? [$empresaId, $cb, $excId] : [$empresaId, $cb];
+        $rs = $pdo->prepare($q); $rs->execute($pq); $row = $rs->fetch();
+        echo json_encode($row ? ['found' => true, 'produto' => $row] : ['found' => false]);
+        break;
+
     case 'salvar_produto':
         // Migrações de colunas
         try { $pdo->query("SELECT codigo_fornecedor FROM produtos LIMIT 1"); } catch (PDOException $e) {
