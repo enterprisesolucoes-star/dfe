@@ -88,6 +88,8 @@ export const OrdemServicoTab = ({
   const emptyOs = (): OrdemServico => ({ status: 'Rascunho', valor_total: 0, itens: [] });
   const [form, setForm] = useState<OrdemServico>(emptyOs());
   const [clienteMode, setClienteMode] = useState<'cadastrado' | 'manual'>('manual');
+  const [buscaCliente, setBuscaCliente] = useState('');
+  const [dropCliente, setDropCliente] = useState(false);
   const [saving, setSaving] = useState(false);
 
   // ── Item add state ────────────────────────────────────────────────────────
@@ -325,10 +327,39 @@ export const OrdemServicoTab = ({
                   </div>
                 </div>
                 {clienteMode === 'cadastrado' ? (
-                  <select value={form.cliente_id ? String(form.cliente_id) : ''} onChange={e => handleClienteCadastrado(e.target.value)} className={ic}>
-                    <option value="">Selecione o cliente...</option>
-                    {clientes.map(c => <option key={c.id} value={String(c.id)}>{c.nome}{c.documento ? ` — ${c.documento}` : ''}</option>)}
-                  </select>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Buscar por nome ou documento..."
+                      value={buscaCliente}
+                      onChange={e => { setBuscaCliente(e.target.value); setDropCliente(true); }}
+                      onFocus={() => setDropCliente(true)}
+                      onBlur={() => setTimeout(() => setDropCliente(false), 150)}
+                      className={ic}
+                    />
+                    {form.cliente_id && !dropCliente && (
+                      <p className="text-xs text-blue-600 dark:text-blue-400 mt-1 pl-1">
+                        ✓ {form.cliente_nome}{form.cliente_documento ? ` — ${form.cliente_documento}` : ''}
+                      </p>
+                    )}
+                    {dropCliente && (
+                      <div className="absolute z-20 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-56 overflow-y-auto">
+                        {clientes.filter(c => !buscaCliente || (c.nome || '').toLowerCase().includes(buscaCliente.toLowerCase()) || (c.documento || '').includes(buscaCliente)).slice(0, 10).map(c => (
+                          <div key={c.id} onMouseDown={() => { handleClienteCadastrado(String(c.id)); setBuscaCliente(''); setDropCliente(false); }}
+                            className="px-3 py-2 cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/30">
+                            <div className="font-medium text-sm text-gray-800 dark:text-gray-100">{c.nome}</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                              {c.documento && <span className="text-blue-600 dark:text-blue-400">{c.documento}</span>}
+                              {c.cidade && <span>{c.documento ? ' · ' : ''}{c.cidade}{c.uf ? `/${c.uf}` : ''}</span>}
+                            </div>
+                          </div>
+                        ))}
+                        {clientes.filter(c => !buscaCliente || (c.nome || '').toLowerCase().includes(buscaCliente.toLowerCase()) || (c.documento || '').includes(buscaCliente)).length === 0 && (
+                          <div className="px-3 py-2 text-sm text-gray-400 dark:text-gray-500">Nenhum cliente encontrado.</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-3">
                     <input placeholder="Nome / Razão Social" value={form.cliente_nome || ''} onChange={e => setField('cliente_nome', e.target.value)} className={ic} />
