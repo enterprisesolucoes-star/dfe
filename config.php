@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set("America/Sao_Paulo");
 // Carregar variáveis de ambiente do arquivo seguro (fora do webroot)
 $_envFile = '/etc/dfe/.env';
 if (file_exists($_envFile)) {
