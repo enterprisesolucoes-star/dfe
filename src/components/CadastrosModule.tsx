@@ -540,6 +540,18 @@ export const ClienteModal = ({ cliente, onClose, onSave, showAlert, emitente }: 
 
   const setEnd = (field: string, val: string) => setForm((f: any) => ({ ...f, endereco: { ...f.endereco, [field]: val } }));
 
+  const [dupCliente, setDupCliente] = useState<any>(null);
+  const checkDuplicataCliente = async (val: string) => {
+    const digits = val.replace(/\D/g, '');
+    if (digits.length !== 11 && digits.length !== 14) { setDupCliente(null); return; }
+    try {
+      const excId = cliente?.id ? `&excluir_id=${cliente.id}` : '';
+      const res = await fetch(`./api.php?action=check_duplicado_cliente&documento=${digits}${excId}`);
+      const d = await res.json();
+      setDupCliente(d.found ? d.cliente : null);
+    } catch { setDupCliente(null); }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[200] p-4 backdrop-blur-sm">
       <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
@@ -550,8 +562,19 @@ export const ClienteModal = ({ cliente, onClose, onSave, showAlert, emitente }: 
         <div className="p-5 space-y-4 overflow-y-auto flex-1">
           <div className="grid grid-cols-2 gap-4">
             <Input label="Nome *" value={form.nome} onChange={(e: any) => setForm({ ...form, nome: e.target.value })} />
-            <MaskedInput label="CPF / CNPJ *" mask="cpfcnpj" value={form.documento} onChange={(e: any) => setDocumento(e.target.value)} />
+            <MaskedInput label="CPF / CNPJ *" mask="cpfcnpj" value={form.documento} onChange={(e: any) => { setDocumento(e.target.value); checkDuplicataCliente(e.target.value); }} />
           </div>
+          {dupCliente && (
+            <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-xl p-3 flex items-start gap-3">
+              <span className="text-amber-500 text-lg">⚠️</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Cliente já cadastrado</p>
+                <p className="text-xs text-amber-700 dark:text-amber-400 truncate">{dupCliente.nome}</p>
+              </div>
+              <button onClick={() => { const end = dupCliente; setForm({ ...dupCliente, endereco: { logradouro: end.logradouro || '', numero: end.numero || '', complemento: end.complemento || '', bairro: end.bairro || '', municipio: end.municipio || '', codigoMunicipio: end.codigo_municipio || '', uf: end.uf || 'GO', cep: end.cep || '' } }); setDupCliente(null); if (dupCliente.uf) carregar(dupCliente.uf); }}
+                className="text-xs px-3 py-1.5 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 whitespace-nowrap">Carregar dados</button>
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-4">
             <Input label="Email" type="email" value={form.email || ''} onChange={(e: any) => setForm({ ...form, email: e.target.value })} />
             <Input label="Telefone" value={form.telefone || ''} onChange={(e: any) => setForm({ ...form, telefone: e.target.value })} />
@@ -1169,12 +1192,24 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
 // ── Modal: Fornecedor ─────────────────────────────────────────────────────────
 export const FornecedorModal = ({ fornecedor, onClose, onSave, showAlert }: any) => {
   const [form, setForm] = useState<any>(fornecedor || {
-    nome: '', documento: '', email: '', telefone: '',
+    nome: '', documento: '', email: '', telefone: '', ie: '',
     endereco: { logradouro: '', numero: '', complemento: '', bairro: '', municipio: '', codigoMunicipio: '', uf: 'GO', cep: '' }
   });
   const { municipios, loading: loadingMun, carregar } = useMunicipios(form.endereco?.uf);
   const set = (f: string, v: any) => setForm((p: any) => ({ ...p, [f]: v }));
   const setEnd = (f: string, v: string) => setForm((p: any) => ({ ...p, endereco: { ...p.endereco, [f]: v } }));
+
+  const [dupForn, setDupForn] = useState<any>(null);
+  const checkDuplicataForn = async (val: string) => {
+    const digits = val.replace(/\D/g, '');
+    if (digits.length !== 11 && digits.length !== 14) { setDupForn(null); return; }
+    try {
+      const excId = fornecedor?.id ? `&excluir_id=${fornecedor.id}` : '';
+      const res = await fetch(`./api.php?action=check_duplicado_fornecedor&documento=${digits}${excId}`);
+      const d = await res.json();
+      setDupForn(d.found ? d.fornecedor : null);
+    } catch { setDupForn(null); }
+  };
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[200] p-4 backdrop-blur-sm">
@@ -1186,10 +1221,24 @@ export const FornecedorModal = ({ fornecedor, onClose, onSave, showAlert }: any)
         <div className="p-5 space-y-4 overflow-y-auto flex-1">
           <div className="grid grid-cols-2 gap-4">
             <Input label="Nome / Razão Social *" value={form.nome} onChange={(e: any) => set('nome', e.target.value)} />
-            <MaskedInput label="CNPJ / CPF *" mask="cpfcnpj" value={form.documento} onChange={(e: any) => set('documento', e.target.value)} />
+            <MaskedInput label="CNPJ / CPF *" mask="cpfcnpj" value={form.documento} onChange={(e: any) => { set('documento', e.target.value); checkDuplicataForn(e.target.value); }} />
+          </div>
+          {dupForn && (
+            <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-xl p-3 flex items-start gap-3">
+              <span className="text-amber-500 text-lg">⚠️</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Fornecedor já cadastrado</p>
+                <p className="text-xs text-amber-700 dark:text-amber-400 truncate">{dupForn.nome}</p>
+              </div>
+              <button onClick={() => { setForm({ ...dupForn, ie: dupForn.ie || '', endereco: { logradouro: dupForn.logradouro || '', numero: dupForn.numero || '', complemento: dupForn.complemento || '', bairro: dupForn.bairro || '', municipio: dupForn.municipio || '', codigoMunicipio: dupForn.codigo_municipio || '', uf: dupForn.uf || 'GO', cep: dupForn.cep || '' } }); setDupForn(null); if (dupForn.uf) carregar(dupForn.uf); }}
+                className="text-xs px-3 py-1.5 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 whitespace-nowrap">Carregar dados</button>
+            </div>
+          )}
+          <div className="grid grid-cols-2 gap-4">
+            <Input label="Inscrição Estadual" value={form.ie || ''} onChange={(e: any) => set('ie', e.target.value)} />
+            <Input label="Email" type="email" value={form.email || ''} onChange={(e: any) => set('email', e.target.value)} />
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <Input label="Email" type="email" value={form.email || ''} onChange={(e: any) => set('email', e.target.value)} />
             <Input label="Telefone" value={form.telefone || ''} onChange={(e: any) => set('telefone', e.target.value)} />
           </div>
           <div className="pt-2 border-t border-gray-100 dark:border-gray-700">

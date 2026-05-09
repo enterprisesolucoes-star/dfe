@@ -46,12 +46,16 @@ switch ($action) {
         $end  = $data['endereco'] ?? [];
         if (isset($data['id']) && $data['id'] > 0) {
             $sql = "UPDATE transportadores SET nome=?, documento=?, ie=?, email=?, telefone=?, logradouro=?, numero=?, complemento=?, bairro=?, municipio=?, codigo_municipio=?, uf=?, cep=? WHERE id=?" . ($empresaId ? " AND empresa_id=?" : "");
-            $params = [$data['nome'], $data['documento'] ?? '', $data['ie'] ?? '', $data['email'] ?? '', $data['telefone'] ?? '', $end['logradouro'] ?? '', $end['numero'] ?? '', $end['complemento'] ?? '', $end['bairro'] ?? '', $end['municipio'] ?? '', $end['codigoMunicipio'] ?? '', $end['uf'] ?? '', $end['cep'] ?? '', $data['id']];
+            $docT = preg_replace('/[^0-9]/', '', $data['documento'] ?? '');
+            $telT = preg_replace('/[^0-9]/', '', $data['telefone'] ?? '');
+            $cepT = preg_replace('/[^0-9]/', '', $end['cep'] ?? '');
+            $ieT  = preg_replace('/[\.\-\/\s]/', '', $data['ie'] ?? '');
+            $params = [$data['nome'], $docT, $ieT, $data['email'] ?? '', $telT, $end['logradouro'] ?? '', $end['numero'] ?? '', $end['complemento'] ?? '', $end['bairro'] ?? '', $end['municipio'] ?? '', $end['codigoMunicipio'] ?? '', $end['uf'] ?? '', $cepT, $data['id']];
             if ($empresaId) $params[] = $empresaId;
             $pdo->prepare($sql)->execute($params);
         } else {
             $pdo->prepare("INSERT INTO transportadores (empresa_id, nome, documento, ie, email, telefone, logradouro, numero, complemento, bairro, municipio, codigo_municipio, uf, cep, ativo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)")
-                ->execute([$empresaId ?: null, $data['nome'], $data['documento'] ?? '', $data['ie'] ?? '', $data['email'] ?? '', $data['telefone'] ?? '', $end['logradouro'] ?? '', $end['numero'] ?? '', $end['complemento'] ?? '', $end['bairro'] ?? '', $end['municipio'] ?? '', $end['codigoMunicipio'] ?? '', $end['uf'] ?? '', $end['cep'] ?? '']);
+                ->execute([$empresaId ?: null, $data['nome'], $docT, $ieT, $data['email'] ?? '', $telT, $end['logradouro'] ?? '', $end['numero'] ?? '', $end['complemento'] ?? '', $end['bairro'] ?? '', $end['municipio'] ?? '', $end['codigoMunicipio'] ?? '', $end['uf'] ?? '', $cepT]);
         }
         echo json_encode(['success' => true]);
         break;
