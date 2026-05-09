@@ -257,7 +257,7 @@ const RelatorioEstoqueTab = ({ showAlert, onVoltar }: any) => {
     return match;
   });
 
-  const totalEstoque = lista.reduce((s, p) => s + (parseFloat(p.estoque || 0) * parseFloat(p.valor_unitario || 0)), 0);
+  const totalEstoque = lista.reduce((s, p) => s + (parseFloat(p.estoque || 0) * parseFloat(p.custo_compra || 0)), 0);
   const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   return (
@@ -307,7 +307,7 @@ const RelatorioEstoqueTab = ({ showAlert, onVoltar }: any) => {
               <th className="px-6 py-4 font-bold uppercase text-[10px]">Código</th>
               <th className="px-6 py-4 font-bold uppercase text-[10px]">Descrição</th>
               <th className="px-6 py-4 font-bold uppercase text-[10px]">Unidade</th>
-              <th className="px-6 py-4 font-bold uppercase text-[10px] text-right">Preço Venda</th>
+              <th className="px-6 py-4 font-bold uppercase text-[10px] text-right">Preço Custo</th>
               <th className="px-6 py-4 font-bold uppercase text-[10px] text-right">Estoque</th>
               <th className="px-6 py-4 font-bold uppercase text-[10px] text-right">Valor Total</th>
             </tr>
@@ -318,13 +318,13 @@ const RelatorioEstoqueTab = ({ showAlert, onVoltar }: any) => {
             {!loading && lista.map((p: any) => {
               const est = parseFloat(p.estoque || 0);
               const estColor = est <= 0 ? 'text-red-600 dark:text-red-400 font-bold' : est <= 5 ? 'text-orange-500 font-bold' : 'text-gray-700 dark:text-gray-200';
-              const valorTotal = est * parseFloat(p.valor_unitario || 0);
+              const valorTotal = est * parseFloat(p.custo_compra || 0);
               return (
                 <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
                   <td className="px-6 py-4 text-xs text-gray-500 dark:text-gray-400">{p.codigo_interno || '-'}</td>
                   <td className="px-6 py-4 text-xs font-medium text-gray-800 dark:text-gray-100">{p.descricao}</td>
                   <td className="px-6 py-4 text-xs text-gray-500 dark:text-gray-400">{p.unidade_comercial || 'UN'}</td>
-                  <td className="px-6 py-4 text-xs text-gray-700 dark:text-gray-200 text-right">{fmt(parseFloat(p.valor_unitario || 0))}</td>
+                  <td className="px-6 py-4 text-xs text-gray-700 dark:text-gray-200 text-right">{fmt(parseFloat(p.custo_compra || 0))}</td>
                   <td className={`px-6 py-4 text-xs text-right ${estColor}`}>{est.toLocaleString('pt-BR', {maximumFractionDigits:3})}</td>
                   <td className="px-6 py-4 text-xs font-medium text-gray-700 dark:text-gray-200 text-right">{fmt(valorTotal)}</td>
                 </tr>
