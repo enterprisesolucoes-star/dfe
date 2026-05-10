@@ -264,7 +264,8 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           contingenciaAutomatica: Number(data.contingencia_automatica) !== 0,
           tef_required_states: data.tef_required_states || '',
           ultimoNsu: data.ultimo_nsu || '0',
-          dataUltimaConsultaDfe: data.data_ultima_consulta_dfe || ''
+          dataUltimaConsultaDfe: data.data_ultima_consulta_dfe || '',
+          integracaowhatsapp: Number(data.integracaowhatsapp)
         }));
         console.log('usuario_dfe da API:', data.usuario_dfe); if (data.usuario_dfe !== undefined) setUsuarioDfeAtual(Number(data.usuario_dfe));
         if (data.logo_url) {
