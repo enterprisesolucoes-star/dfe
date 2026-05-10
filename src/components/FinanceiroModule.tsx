@@ -686,9 +686,10 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
   );
 
   const isBoleto = formaPgto === '15';
+  const precisaCliente = formaPgto === '15' || formaPgto === '05';
 
   useEffect(() => {
-    if (isBoleto && tipo === 'R') {
+    if (precisaCliente && tipo === 'R') {
       fetch('./api.php?action=clientes')
         .then(r => r.json())
         .then(d => setClientes(Array.isArray(d.clientes) ? d.clientes : Array.isArray(d) ? d : []))
@@ -721,7 +722,7 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
   const handleSalvar = async () => {
     if (!descricao.trim()) { showAlert('Atenção', 'Descrição é obrigatória.'); return; }
     if (valorNum <= 0)     { showAlert('Atenção', 'Valor total deve ser maior que zero.'); return; }
-    if (isBoleto && tipo === 'R' && !clienteId) { showAlert('Atenção', 'Selecione o cliente para boleto.'); return; }
+    if (precisaCliente && tipo === 'R' && !clienteId) { showAlert('Atenção', 'Selecione o cliente para Boleto ou Crédito Loja.'); return; }
     if (diferenca > 0)     { showAlert('Atenção', 'Soma das parcelas não confere com o valor total.'); return; }
     setSaving(true);
     try {
@@ -849,10 +850,10 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
             </select>
           </div>
 
-          {isBoleto && tipo === 'R' && (
+          {precisaCliente && tipo === 'R' && (
             <div className="relative">
               <label className="block text-[10px] font-bold text-indigo-500 uppercase mb-1">
-                Cliente <span className="text-red-500 dark:text-red-400">*</span> (obrigatório para boleto)
+                Cliente <span className="text-red-500 dark:text-red-400">*</span> (obrigatório para Boleto/Crédito Loja)
               </label>
               {clienteSelecionado ? (
                 <div className="flex items-center gap-2 px-3 py-2 border border-indigo-300 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl">
@@ -971,7 +972,7 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
             Cancelar
           </button>
           <button onClick={handleSalvar}
-            disabled={saving || diferenca > 0 || !descricao.trim() || valorNum <= 0 || (isBoleto && tipo === 'R' && !clienteId)}
+            disabled={saving || diferenca > 0 || !descricao.trim() || valorNum <= 0 || (precisaCliente && tipo === 'R' && !clienteId)}
             className="flex-1 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-md disabled:opacity-50 flex items-center justify-center gap-2">
             {saving ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Salvando...</> : 'Salvar'}
           </button>

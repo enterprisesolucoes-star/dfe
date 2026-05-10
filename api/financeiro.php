@@ -168,16 +168,19 @@ switch ($action) {
             $sqlW = implode(" AND ", $where);
             $stmt = $pdo->prepare("
                 SELECT
-                    COALESCE(c.id, 0) as cliente_id,
-                    COALESCE(c.nome, '') as nome,
+                    c.id as cliente_id,
+                    c.nome as nome,
                     COALESCE(c.documento, '') as documento,
-                    COALESCE(c.telefone, '') as telefone,
+                    c.telefone as telefone,
                     SUM(f.valor_total - COALESCE(f.valor_pago, 0)) as total_aberto,
                     COUNT(f.id) as qtd_parcelas
                 FROM financeiro f
-                LEFT JOIN clientes c ON f.entidade_id = c.id
-                WHERE $sqlW AND f.entidade_id IS NOT NULL
+                INNER JOIN clientes c ON f.entidade_id = c.id AND c.ativo = 1
+                WHERE $sqlW
+                  AND c.telefone IS NOT NULL AND c.telefone != ''
+                  AND LENGTH(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(c.telefone,' ',''),'-',''),'(',''),')',''),'+','')) >= 10
                 GROUP BY c.id, c.nome, c.documento, c.telefone
+                HAVING total_aberto > 0.00
                 ORDER BY total_aberto DESC
             ");
             $stmt->execute($params);

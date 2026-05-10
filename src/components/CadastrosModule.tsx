@@ -132,7 +132,7 @@ export const ClientesTab = ({ clientes, onEdit, onDelete }: { clientes: Cliente[
   const debouncedBusca = useDebounce(busca);
   const filtrados = clientes.filter(c =>
     (c.nome || '').toLowerCase().includes(debouncedBusca.toLowerCase()) ||
-    (c.documento || '').includes(debouncedBusca) ||
+    (c.documento || '').replace(/\D/g, '').includes(debouncedBusca.replace(/\D/g, '')) ||
     (c.telefone || '').replace(/\D/g, '').includes(debouncedBusca.replace(/\D/g, ''))
   );
   return (
@@ -185,7 +185,7 @@ export const FornecedoresTab = ({ fornecedores, onEdit, onDelete }: { fornecedor
   const debouncedBusca = useDebounce(busca);
   const filtrados = fornecedores.filter(f =>
     (f.nome || '').toLowerCase().includes(debouncedBusca.toLowerCase()) ||
-    (f.documento || '').includes(debouncedBusca) ||
+    (f.documento || '').replace(/\D/g, '').includes(debouncedBusca.replace(/\D/g, '')) ||
     (f.telefone || '').replace(/\D/g, '').includes(debouncedBusca.replace(/\D/g, ''))
   );
   return (
@@ -1222,6 +1222,12 @@ export const FornecedorModal = ({ fornecedor, onClose, onSave, showAlert }: any)
   const { municipios, loading: loadingMun, carregar } = useMunicipios(form.endereco?.uf);
   const set = (f: string, v: any) => setForm((p: any) => ({ ...p, [f]: v }));
   const setEnd = (f: string, v: string) => setForm((p: any) => ({ ...p, endereco: { ...p.endereco, [f]: v } }));
+  useEffect(() => {
+    if (form.endereco?.codigoMunicipio && !form.endereco?.municipio && municipios.length > 0) {
+      const m = municipios.find((x: any) => String(x.id) === String(form.endereco.codigoMunicipio));
+      if (m) setForm((p: any) => ({ ...p, endereco: { ...p.endereco, municipio: m.nome } }));
+    }
+  }, [municipios]);
 
   const [dupForn, setDupForn] = useState<any>(null);
   const checkDuplicataForn = async (val: string) => {
