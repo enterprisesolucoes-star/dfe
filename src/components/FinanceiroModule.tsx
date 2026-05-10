@@ -431,7 +431,14 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobranc
     const res = await fetch(`./api.php?action=fin_ids_por_lancamento&lancamento_id=${lancamentoId}`);
     const data = await res.json();
     if (data.ids && data.ids.length > 0) {
-      data.ids.forEach((id: number) => window.open(`./api.php?action=boleto_imprimir&id=${id}`, '_blank'));
+      data.ids.forEach((id: number, i: number) => {
+        setTimeout(() => {
+          const a = document.createElement('a');
+          a.href = `./api.php?action=boleto_imprimir&id=${id}`;
+          a.target = '_blank'; a.rel = 'noopener noreferrer';
+          document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        }, i * 300);
+      });
     }
   };
 
@@ -512,7 +519,7 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobranc
         <div className="flex items-center gap-2">
           <div className="relative">
             <Search className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input type="text" placeholder={`Buscar ${tipo === 'P' ? 'fornecedor' : 'cliente'}...`} value={busca} onChange={e => setBusca(e.target.value)} onKeyDown={e => e.key === 'Enter' && fetchTitulos()} className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none w-48" />
+            <input type="text" placeholder="Localizar por nome, documento ou celular..." value={busca} onChange={e => setBusca(e.target.value)} onKeyDown={e => e.key === 'Enter' && fetchTitulos()} className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none w-48" />
           </div>
         </div>
       </div>
@@ -792,7 +799,14 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
     setGerandoBoletos(false);
     if (erro === 0) {
       // Abre impressão de todos os boletos gerados
-      savedIds.forEach(id => window.open(`./api.php?action=boleto_imprimir&id=${id}`, '_blank'));
+      savedIds.forEach((id: number, i: number) => {
+        setTimeout(() => {
+          const a = document.createElement('a');
+          a.href = `./api.php?action=boleto_imprimir&id=${id}`;
+          a.target = '_blank'; a.rel = 'noopener noreferrer';
+          document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        }, i * 300);
+      });
       onSuccess();
     } else {
       showAlert('Atenção', `${ok} gerado(s), ${erro} com erro. Verifique configurações de cobrança.`);
@@ -825,14 +839,14 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
             <p className="text-xs text-gray-500 dark:text-gray-400 text-center">Deseja gerar os boletos agora?<br/>Você também pode gerá-los depois na lista de títulos.</p>
           </div>
           <div className="p-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex gap-3">
-            <button onClick={onSuccess} className="flex-1 py-2.5 text-gray-500 dark:text-gray-400 font-bold uppercase text-xs border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
-              Depois
+            <button onClick={onSuccess} className="flex-1 py-2.5 bg-gray-700 dark:bg-gray-600 text-white font-bold uppercase text-xs rounded-xl hover:bg-gray-600 dark:hover:bg-gray-500 transition-colors">
+              Cancelar
             </button>
             <button onClick={handleGerarBoletos} disabled={gerandoBoletos}
               className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 text-white font-bold uppercase text-xs rounded-xl flex items-center justify-center gap-2">
               {gerandoBoletos
                 ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Gerando...</>
-                : <><FileText className="w-3.5 h-3.5" /> Gerar e Imprimir Todos</>}
+                : <><FileText className="w-3.5 h-3.5" /> Gerar e Imprimir</>}
             </button>
           </div>
         </motion.div>
@@ -957,7 +971,7 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
                   Parcelas Geradas ({parcelas.length}){isBoleto && <span className="ml-2 text-indigo-500">· Boleto</span>}
                 </span>
                 <span className={`text-xs font-bold ${diferenca > 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
-                  Total: R$ {totalParcelas.toFixed(2)}
+                  Total: {totalParcelas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                 </span>
               </div>
               <table className="w-full text-xs">
@@ -978,7 +992,7 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
                           className="border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-0.5 text-xs bg-white dark:bg-gray-800" />
                       </td>
                       <td className="px-4 py-2 text-right">
-                        <input type="number" step="0.01" value={p.valor}
+                        <input type="number" step="0.01" value={Number(p.valor).toFixed(2)}
                           onChange={e => { const n = [...parcelas]; n[idx].valor = Number(e.target.value); setParcelas(n); }}
                           className="border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-0.5 text-right w-28 text-xs font-bold bg-white dark:bg-gray-800" />
                       </td>
@@ -988,7 +1002,7 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
               </table>
               {diferenca > 0 && (
                 <div className="bg-red-50 dark:bg-red-900/20 px-4 py-2 text-xs text-red-600 dark:text-red-400 font-bold border-t border-red-100">
-                  ⚠ Diferença de R$ {(diferenca / 100).toFixed(2)} — ajuste os valores antes de salvar.
+                  ⚠ Diferença de {(diferenca / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} — ajuste os valores antes de salvar.
                 </div>
               )}
             </div>
