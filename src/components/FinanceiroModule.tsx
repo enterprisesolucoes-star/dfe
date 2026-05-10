@@ -404,8 +404,8 @@ export const EditarTituloModal = ({ titulo, onClose, onSuccess, showAlert }: any
           </div>
         </div>
         <div className="p-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex gap-3">
-          <button onClick={onClose} className="flex-1 py-2.5 text-gray-500 dark:text-gray-400 font-bold uppercase text-xs border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">Cancelar</button>
-          <button onClick={handleSalvar} disabled={saving} className={`flex-1 py-2.5 ${corBtn} disabled:bg-gray-300 dark:disabled:bg-gray-600 text-white font-bold uppercase text-xs rounded-xl`}>
+          <button onClick={onClose} className="flex-1 py-3 bg-gray-700 dark:bg-gray-600 text-white text-sm font-semibold rounded-xl hover:bg-gray-600 dark:hover:bg-gray-500 transition-colors">Cancelar</button>
+          <button onClick={handleSalvar} disabled={saving} className="flex-1 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-md disabled:opacity-50">
             {saving ? 'Salvando...' : 'Salvar'}
           </button>
         </div>
@@ -723,17 +723,13 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
 
         <div className="p-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex gap-3">
           <button onClick={onClose}
-            className="flex-1 py-2.5 text-gray-500 dark:text-gray-400 font-bold uppercase text-xs border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
+            className="flex-1 py-3 bg-gray-700 dark:bg-gray-600 text-white text-sm font-semibold rounded-xl hover:bg-gray-600 dark:hover:bg-gray-500 transition-colors">
             Cancelar
           </button>
           <button onClick={handleSalvar}
             disabled={saving || diferenca > 0 || !descricao.trim() || valorNum <= 0 || (isBoleto && tipo === 'R' && !clienteId)}
-            className={`flex-1 py-2.5 ${corBtn} disabled:bg-gray-300 dark:disabled:bg-gray-600 text-white font-bold uppercase text-xs rounded-xl flex items-center justify-center gap-2`}>
-            {saving
-              ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Salvando...</>
-              : isBoleto
-                ? <><FileText className="w-3.5 h-3.5" /> Lançar {parcelas.length || 1} Parcela(s)</>
-                : `Lançar ${parcelas.length || 1} Parcela(s)`}
+            className="flex-1 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-md disabled:opacity-50 flex items-center justify-center gap-2">
+            {saving ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Salvando...</> : 'Salvar'}
           </button>
         </div>
       </motion.div>
@@ -788,8 +784,8 @@ export const ParcelamentoModal = ({ total, initialParcelas, onConfirm, onCancel 
           </table>
         </div>
         <div className="p-6 bg-gray-50 dark:bg-gray-900 flex gap-4">
-          <button onClick={onCancel} className="flex-1 py-3 text-gray-500 dark:text-gray-400 font-bold uppercase text-xs">Cancelar</button>
-          <button onClick={() => onConfirm(parcelas)} disabled={Math.abs(tP - total) > 0.01} className="flex-1 py-3 bg-blue-600 text-white font-bold uppercase text-xs rounded-xl">Salvar</button>
+          <button onClick={onCancel} className="flex-1 py-3 bg-gray-700 dark:bg-gray-600 text-white text-sm font-semibold rounded-xl hover:bg-gray-600 dark:hover:bg-gray-500 transition-colors">Cancelar</button>
+          <button onClick={() => onConfirm(parcelas)} disabled={Math.abs(tP - total) > 0.01} className="flex-1 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-md disabled:opacity-50">Salvar</button>
         </div>
       </motion.div>
     </div>
@@ -887,8 +883,8 @@ export const CaixaView = ({ emitente, showAlert, showConfirm }: { emitente: any,
               </div>
             </div>
             <div className="p-6 bg-gray-50 dark:bg-gray-900 flex gap-3">
-              <button onClick={() => setShowModal(false)} className="flex-1 py-3 text-gray-500 dark:text-gray-400 font-bold text-xs uppercase">Cancelar</button>
-              <button onClick={handleSalvar} disabled={savingMov} className="flex-1 py-3 bg-blue-600 text-white font-bold text-xs uppercase rounded-xl">{savingMov ? 'Salvando...' : 'Salvar'}</button>
+              <button onClick={() => setShowModal(false)} className="flex-1 py-3 bg-gray-700 dark:bg-gray-600 text-white text-sm font-semibold rounded-xl hover:bg-gray-600 dark:hover:bg-gray-500 transition-colors">Cancelar</button>
+              <button onClick={handleSalvar} disabled={savingMov} className="flex-1 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-md disabled:opacity-50">{savingMov ? 'Salvando...' : 'Salvar'}</button>
             </div>
           </motion.div>
         </div>

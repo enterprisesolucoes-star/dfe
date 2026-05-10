@@ -1,3 +1,4 @@
+import { Edit2, Trash2 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
 const ESTADOS_BR = [
@@ -133,8 +134,8 @@ const RtcImportButton = ({ showAlert }: { showAlert: (t: string, m: string) => v
                   <td className="py-1 text-center">{fmtDate(a.d_fim_vig)}</td>
                   <td className="py-1 text-center">{a.vigente ? <span className="text-green-600 dark:text-green-400 font-bold">Sim</span> : <span className="text-gray-400 dark:text-gray-500">Não</span>}</td>
                   <td className="py-1 text-right flex gap-1 justify-end">
-                    <button onClick={() => setEditAliq({ ...a, d_ini_vig: a.d_ini_vig, d_fim_vig: a.d_fim_vig ?? '' } as any)} className="text-blue-500 hover:text-blue-700 dark:hover:text-blue-300">✏</button>
-                    <button onClick={() => handleExcluirAliq(a.id)} className="text-red-400 hover:text-red-600 dark:hover:text-red-400">✕</button>
+                    <button onClick={() => setEditAliq({ ...a, d_ini_vig: a.d_ini_vig, d_fim_vig: a.d_fim_vig ?? '' } as any)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" title="Editar"><Edit2 className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => handleExcluirAliq(a.id)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-500 transition-colors" title="Excluir"><Trash2 className="w-3.5 h-3.5" /></button>
                   </td>
                 </tr>
               ))}
@@ -175,8 +176,8 @@ const RtcImportButton = ({ showAlert }: { showAlert: (t: string, m: string) => v
                   className="w-full px-2 py-1.5 border border-gray-200 dark:border-gray-700 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-400" />
               </div>
               <div className="col-span-2 flex gap-2">
-                <button onClick={handleSalvarAliq} className="px-4 py-1.5 bg-green-600 text-white rounded text-sm hover:bg-green-700">Salvar</button>
-                <button onClick={() => setEditAliq(null)} className="px-4 py-1.5 bg-gray-300 text-gray-700 dark:text-gray-200 rounded text-sm hover:bg-gray-400">Cancelar</button>
+                <button onClick={handleSalvarAliq} className="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors shadow-md">Salvar</button>
+                <button onClick={() => setEditAliq(null)} className="px-4 py-2 bg-gray-700 dark:bg-gray-600 text-white rounded-xl text-sm font-semibold hover:bg-gray-600 dark:hover:bg-gray-500 transition-colors">Cancelar</button>
               </div>
             </div>
           )}
