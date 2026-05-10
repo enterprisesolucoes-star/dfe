@@ -242,7 +242,8 @@ switch ($action) {
         $status           = $data['status']            ?? 'Rascunho';
         $itens            = $data['itens']             ?? [];
 
-        $valorTotal = array_reduce($itens, fn($s, $i) => $s + (float)($i['valor_total'] ?? 0), 0);
+        $desconto   = (float)($data['desconto'] ?? 0);
+        $valorTotal = max(0.0, round(array_reduce($itens, fn($s, $i) => $s + (float)($i['valor_total'] ?? 0), 0) - $desconto, 2));
 
         $pdo->beginTransaction();
         try {
@@ -257,9 +258,9 @@ switch ($action) {
                 }
                 $pdo->prepare("UPDATE orcamentos SET status=?, cliente_id=?, cliente_nome=?,
                     cliente_documento=?, cliente_telefone=?, cliente_email=?,
-                    valor_total=?, observacao=?, validade=?, vendedor_id=? WHERE id=?")
+                    desconto=?, valor_total=?, observacao=?, validade=?, vendedor_id=? WHERE id=?")
                     ->execute([$status, $clienteId, $clienteNome, $clienteDocumento,
-                               $clienteTelefone, $clienteEmail, $valorTotal, $observacao, $validade, $vendedorId, $id]);
+                               $clienteTelefone, $clienteEmail, $desconto, $valorTotal, $observacao, $validade, $vendedorId, $id]);
                 $pdo->prepare("DELETE FROM orcamentos_itens WHERE orcamento_id=?")->execute([$id]);
             } else {
                 $stmt = $pdo->prepare("SELECT COALESCE(MAX(numero),0)+1 FROM orcamentos WHERE empresa_id=?");
@@ -268,11 +269,11 @@ switch ($action) {
 
                 $pdo->prepare("INSERT INTO orcamentos
                     (empresa_id, numero, status, cliente_id, cliente_nome, cliente_documento,
-                     cliente_telefone, cliente_email, valor_total, observacao, validade, vendedor_id)
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?)")
+                     cliente_telefone, cliente_email, desconto, valor_total, observacao, validade, vendedor_id)
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)")
                     ->execute([$empresaId ?: 0, $num, $status, $clienteId, $clienteNome,
                                $clienteDocumento, $clienteTelefone, $clienteEmail,
-                               $valorTotal, $observacao, $validade, $vendedorId]);
+                               $desconto, $valorTotal, $observacao, $validade, $vendedorId]);
                 $id = (int)$pdo->lastInsertId();
             }
 

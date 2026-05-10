@@ -164,6 +164,7 @@ export const Sidebar = ({
   usuarioDfe
 }: any) => {
   const { theme } = useTheme();
+  const [relatoriosOpen, setRelatoriosOpen] = useState(false);
   const [collapsed, setCollapsed] = useState<boolean>(() => {
     try { return localStorage.getItem(COLLAPSED_KEY) === 'true'; } catch { return false; }
   });
@@ -172,6 +173,10 @@ export const Sidebar = ({
     try { localStorage.setItem(COLLAPSED_KEY, String(collapsed)); } catch { /* ignore */ }
   }, [collapsed]);
 
+  useEffect(() => {
+    if (relatoriosActive) setRelatoriosOpen(true);
+  }, [relatoriosActive]);
+
   const isFiscal = Number(usuarioDfe ?? session?.usuarioDfe ?? 0) > 0 &&
     Number(usuarioDfe ?? session?.usuarioDfe ?? 0) !== 4;
 
@@ -179,7 +184,8 @@ export const Sidebar = ({
   const nfeActive = ['dfe_nfe', 'dfe_nfe_geral'].includes(activeTab);
   const nfceActive = ['vendas', 'vendas_geral'].includes(activeTab);
   const cadastrosActive = ['ncm', 'usuarios', 'medidas', 'bandeiras', 'transportadores', 'vendedores',
-    'comissoes', 'cobranca_config', 'config_integracao', 'dfe_config', 'dfe_nfe_dados', 'dfe_nfce_dados', 'dfe_provedor'].includes(activeTab);
+    'cobranca_config', 'config_integracao', 'dfe_config', 'dfe_nfe_dados', 'dfe_nfce_dados', 'dfe_provedor'].includes(activeTab);
+  const relatoriosActive = ['relatorios_tef', 'comissoes'].includes(activeTab);
 
   return (
     <motion.aside
@@ -272,7 +278,10 @@ export const Sidebar = ({
         <SidebarItem icon={ShoppingCart} label="Compras" active={activeTab === 'compras'} onClick={() => handleSetActiveTab('compras')} collapsed={collapsed} />
         <SidebarItem icon={ClipboardList} label="Orçamentos" active={activeTab === 'orcamentos'} onClick={() => handleSetActiveTab('orcamentos')} collapsed={collapsed} />
         <SidebarItem icon={Wrench} label="Ordem Serviços" active={activeTab === 'ordens_servico'} onClick={() => handleSetActiveTab('ordens_servico')} collapsed={collapsed} />
-        <SidebarItem icon={BarChart2} label="Relatórios" active={activeTab === 'relatorios_tef'} onClick={() => handleSetActiveTab('relatorios_tef')} collapsed={collapsed} />
+        <SidebarGroup icon={BarChart2} label="Relatórios" isOpen={relatoriosOpen} onToggle={() => setRelatoriosOpen(!relatoriosOpen)} isActive={relatoriosActive} collapsed={collapsed}>
+          <SubItem id="relatorios_tef" label="Relatórios" icon={BarChart2} activeTab={activeTab} onClick={handleSetActiveTab} />
+          <SubItem id="comissoes" label="Comissões" icon={TrendingUp} activeTab={activeTab} onClick={handleSetActiveTab} />
+        </SidebarGroup>
 
         <SidebarGroup
           icon={FolderOpen}
@@ -287,7 +296,6 @@ export const Sidebar = ({
           {isFiscal && <SubItem id="bandeiras" label="Bandeiras" icon={CreditCard} activeTab={activeTab} onClick={handleSetActiveTab} />}
           <SubItem id="transportadores" label="Transportadores" icon={Truck} activeTab={activeTab} onClick={handleSetActiveTab} />
           <SubItem id="vendedores" label="Vendedores" icon={UserCircle} activeTab={activeTab} onClick={handleSetActiveTab} />
-          <SubItem id="comissoes" label="Comissões" icon={TrendingUp} activeTab={activeTab} onClick={handleSetActiveTab} />
           <SubItem id="cobranca_config" label="Cobrança" icon={Landmark} activeTab={activeTab} onClick={handleSetActiveTab} />
           {isFiscal && <SubItem id="config_integracao" label="Integração" icon={Zap} activeTab={activeTab} onClick={handleSetActiveTab} />}
           {isFiscal && <SubItem id="dfe_config" label="DFe" icon={Settings} activeTab={activeTab} onClick={handleSetActiveTab} />}

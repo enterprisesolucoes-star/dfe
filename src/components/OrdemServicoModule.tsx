@@ -41,7 +41,7 @@ type OsItem = { id?: number; tipo: 'produto' | 'servico'; produto_id?: number | 
 type OrdemServico = {
   id?: number; numero?: number; status: string; cliente_id?: number | null;
   cliente_nome?: string; cliente_documento?: string; cliente_telefone?: string; cliente_email?: string;
-  valor_total: number; observacao?: string; previsao?: string; data_criacao?: string; vendedor_id?: number | null; itens: OsItem[];
+  valor_total: number; desconto?: number; observacao?: string; previsao?: string; data_criacao?: string; vendedor_id?: number | null; itens: OsItem[];
 };
 
 const STATUS_OS_COLORS: Record<string, string> = {
@@ -85,7 +85,7 @@ export const OrdemServicoTab = ({
   const [formStep, setFormStep] = useState<1 | 2 | 3>(1);
 
   // ── Form data ────────────────────────────────────────────────────────────
-  const emptyOs = (): OrdemServico => ({ status: 'Rascunho', valor_total: 0, itens: [] });
+  const emptyOs = (): OrdemServico => ({ status: 'Rascunho', valor_total: 0, desconto: 0, itens: [] });
   const [form, setForm] = useState<OrdemServico>(emptyOs());
   const [clienteMode, setClienteMode] = useState<'cadastrado' | 'manual'>('cadastrado');
   const [buscaCliente, setBuscaCliente] = useState('');
@@ -181,7 +181,7 @@ export const OrdemServicoTab = ({
     const v = parseFloat(String(vUnit).replace(/\./g, '').replace(',', '.')) || 0;
     if (q <= 0 || v <= 0) { showAlert('Item inválido', 'Qtd e valor devem ser maiores que zero.'); return; }
     const novosItens = [...form.itens, { tipo: 'produto' as const, produto_id: selectedProd.id ?? null, descricao: selectedProd.descricao, unidade: unid, quantidade: q, valor_unitario: v, valor_total: parseFloat((q * v).toFixed(2)) }];
-    setForm(p => ({ ...p, itens: novosItens, valor_total: calcTotal(novosItens) }));
+    setForm(p => ({ ...p, itens: novosItens, valor_total: parseFloat((calcTotal(novosItens) - (p.desconto ?? 0)).toFixed(2)) }));
     setBuscaProd(''); setSelectedProd(null); setQtd('1'); setVUnit(''); setUnid('UN');
     setTimeout(() => buscaRef.current?.focus(), 10);
   };
@@ -191,13 +191,13 @@ export const OrdemServicoTab = ({
     const v = parseFloat(String(vServ).replace(/\./g, '').replace(',', '.')) || 0;
     if (!descServ.trim() || q <= 0 || v <= 0) { showAlert('Serviço inválido', 'Preencha descrição, quantidade e valor.'); return; }
     const novosItens = [...form.itens, { tipo: 'servico' as const, produto_id: null, descricao: descServ, unidade: unidServ, quantidade: q, valor_unitario: v, valor_total: parseFloat((q * v).toFixed(2)) }];
-    setForm(p => ({ ...p, itens: novosItens, valor_total: calcTotal(novosItens) }));
+    setForm(p => ({ ...p, itens: novosItens, valor_total: parseFloat((calcTotal(novosItens) - (p.desconto ?? 0)).toFixed(2)) }));
     setDescServ(''); setQtdServ('1'); setVServ(''); setUnidServ('UN');
   };
 
   const handleRemoveItem = (idx: number) => {
     const n = form.itens.filter((_, i) => i !== idx);
-    setForm(p => ({ ...p, itens: n, valor_total: calcTotal(n) }));
+    setForm(p => ({ ...p, itens: n, valor_total: parseFloat((calcTotal(n) - (p.desconto ?? 0)).toFixed(2)) }));
   };
 
   const handleEditItem = (idx: number) => {
@@ -467,7 +467,14 @@ export const OrdemServicoTab = ({
                   <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex justify-end">
                     <div className="space-y-1 text-sm w-48">
                       {totalProdutos > 0 && <div className="flex justify-between text-gray-600 dark:text-gray-300"><span>Peças</span><span className="font-medium">{fmtVal(totalProdutos)}</span></div>}
-                      {totalServicos > 0 && <div className="flex justify-between text-purple-700"><span>Serviços</span><span className="font-medium">{fmtVal(totalServicos)}</span></div>}
+{totalServicos > 0 && <div className="flex justify-between text-purple-700"><span>Serviços</span><span className="font-medium">{fmtVal(totalServicos)}</span></div>}
+                      <div className="flex justify-between items-center">
+                        <label className="text-orange-600 dark:text-orange-400 text-xs font-medium">Desconto (R$)</label>
+                        <input type="number" min="0" step="0.01" value={form.desconto ?? 0}
+                          onChange={e => { const d = Math.max(0, parseFloat(e.target.value) || 0); setForm(p => ({ ...p, desconto: d, valor_total: parseFloat((calcTotal(p.itens) - d).toFixed(2)) })); }}
+                          className="w-24 text-right border border-orange-200 dark:border-orange-800 rounded-lg px-2 py-0.5 text-sm bg-white dark:bg-gray-700 outline-none focus:ring-1 focus:ring-orange-400"
+                        />
+                      </div>
                       <div className="flex justify-between font-bold text-blue-700 dark:text-blue-300 border-t border-gray-200 dark:border-gray-700 pt-1"><span>Total</span><span>{fmtVal(form.valor_total)}</span></div>
                     </div>
                   </div>
@@ -509,7 +516,14 @@ export const OrdemServicoTab = ({
                   <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex justify-end">
                     <div className="space-y-1 text-sm w-48">
                       {totalProdutos > 0 && <div className="flex justify-between text-gray-600 dark:text-gray-300"><span>Peças</span><span className="font-medium">{fmtVal(totalProdutos)}</span></div>}
-                      {totalServicos > 0 && <div className="flex justify-between text-purple-700"><span>Serviços</span><span className="font-medium">{fmtVal(totalServicos)}</span></div>}
+{totalServicos > 0 && <div className="flex justify-between text-purple-700"><span>Serviços</span><span className="font-medium">{fmtVal(totalServicos)}</span></div>}
+                      <div className="flex justify-between items-center">
+                        <label className="text-orange-600 dark:text-orange-400 text-xs font-medium">Desconto (R$)</label>
+                        <input type="number" min="0" step="0.01" value={form.desconto ?? 0}
+                          onChange={e => { const d = Math.max(0, parseFloat(e.target.value) || 0); setForm(p => ({ ...p, desconto: d, valor_total: parseFloat((calcTotal(p.itens) - d).toFixed(2)) })); }}
+                          className="w-24 text-right border border-orange-200 dark:border-orange-800 rounded-lg px-2 py-0.5 text-sm bg-white dark:bg-gray-700 outline-none focus:ring-1 focus:ring-orange-400"
+                        />
+                      </div>
                       <div className="flex justify-between font-bold text-blue-700 dark:text-blue-300 border-t border-gray-200 dark:border-gray-700 pt-1 text-base"><span>Total</span><span>{fmtVal(form.valor_total)}</span></div>
                     </div>
                   </div>
