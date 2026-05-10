@@ -373,7 +373,7 @@ const CceModal = ({ nfe, showAlert, onClose }: any) => {
     );
 };
 
-export const NfeDashboardTab = ({ nfeList, showAlert, showPrompt, onNovaNfe, onCancelarNfe, onExcluirNfe, onRefresh, onEmailDoc, onDevolucao, onRetryTef }: any) => {
+export const NfeDashboardTab = ({ nfeList, emitente, showAlert, showPrompt, onNovaNfe, onCancelarNfe, onExcluirNfe, onRefresh, onEmailDoc, onDevolucao, onRetryTef }: any) => {
     const [cceModalNfe, setCceModalNfe] = React.useState<{open: boolean, nfe: any}>({open: false, nfe: null});
     const [busca, setBusca] = useState('');
     const debouncedBusca = useDebounce(busca);
