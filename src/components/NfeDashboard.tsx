@@ -538,7 +538,17 @@ const NfeDashboard: React.FC<Props> = ({
                   } catch {}
                 }
                 setGerandoBoletosNfe(false);
-                if (ok > 0) boletoIdsEmissao.forEach(id => window.open(`./api.php?action=boleto_imprimir&id=${id}`, '_blank'));
+                if (ok > 0) {
+            for (const id of boletoIdsEmissao) {
+              try {
+                const res = await fetch(`./api.php?action=boleto_imprimir&id=${id}`);
+                if (!res.ok) continue;
+                const html = await res.text();
+                const win = window.open('', '_blank');
+                if (win) { win.document.open(); win.document.write(html); win.document.close(); }
+              } catch { /* silent */ }
+            }
+          }
                 setBoletoIdsEmissao([]);
               }}
               className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 text-white font-bold text-xs uppercase px-3 py-1.5 rounded-xl transition-all"

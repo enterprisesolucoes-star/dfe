@@ -377,7 +377,16 @@ export const CobrancaBoletosTab = ({ showAlert, showConfirm }: {
 
   useEffect(() => { carregar(); }, [filtroStatus, dtInicio, dtFim]);
 
-  const handleImprimir = (id: number) => window.open(`./api.php?action=boleto_imprimir&id=${id}`, '_blank');
+  const handleImprimir = async (id: number) => {
+    try {
+      const res = await fetch(`./api.php?action=boleto_imprimir&id=${id}`);
+      if (!res.ok) return;
+      const html = await res.text();
+      const win = window.open('', '_blank');
+      if (!win) return;
+      win.document.open(); win.document.write(html); win.document.close();
+    } catch { /* silent */ }
+  };
 
   const handleCancelar = (id: number) => {
     showConfirm('Cancelar Boleto', 'Confirma o cancelamento deste boleto?', async () => {

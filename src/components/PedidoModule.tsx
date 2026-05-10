@@ -550,7 +550,17 @@ ${observacao?`<div style="border:1px solid #ddd;border-radius:4px;padding:10px;m
                 } catch {}
               }
               setGerandoBoletosPedido(false);
-              if (ok > 0) boletoIdsPedido.forEach(id => window.open(`./api.php?action=boleto_imprimir&id=${id}`, '_blank'));
+              if (ok > 0) {
+              for (const id of boletoIdsPedido) {
+                try {
+                  const res = await fetch(`./api.php?action=boleto_imprimir&id=${id}`);
+                  if (!res.ok) continue;
+                  const html = await res.text();
+                  const win = window.open('', '_blank');
+                  if (win) { win.document.open(); win.document.write(html); win.document.close(); }
+                } catch { /* silent */ }
+              }
+            }
               setBoletoIdsPedido([]);
             }} className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 text-white rounded-xl font-bold shadow flex items-center gap-2">
               <FileText className="w-4 h-4" />

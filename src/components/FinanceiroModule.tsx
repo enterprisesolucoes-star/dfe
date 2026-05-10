@@ -26,6 +26,18 @@ const WaModal = ({ onClose, onSend, sending, defaultPhone = '' }: { onClose: () 
   );
 };
 
+// Abre boleto via fetch+document.write (bypassa Service Worker navigation)
+const abrirBoleto = async (id: number) => {
+  try {
+    const res = await fetch(`./api.php?action=boleto_imprimir&id=${id}`);
+    if (!res.ok) return;
+    const html = await res.text();
+    const win = window.open('', '_blank');
+    if (!win) return;
+    win.document.open(); win.document.write(html); win.document.close();
+  } catch { /* silent */ }
+};
+
 const CobrancaMassaModal = ({ onClose, emitente, di, df, showAlert }: { onClose: () => void; emitente: any; di: string; df: string; showAlert: any }) => {
   const [clientes, setClientes] = React.useState<any[]>([]);
   const [selecionados, setSelecionados] = React.useState<Set<number>>(new Set());
@@ -431,14 +443,7 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobranc
     const res = await fetch(`./api.php?action=fin_ids_por_lancamento&lancamento_id=${lancamentoId}`);
     const data = await res.json();
     if (data.ids && data.ids.length > 0) {
-      data.ids.forEach((id: number, i: number) => {
-        setTimeout(() => {
-          const a = document.createElement('a');
-          a.href = `./api.php?action=boleto_imprimir&id=${id}`;
-          a.target = '_blank'; a.rel = 'noopener noreferrer';
-          document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        }, i * 300);
-      });
+      data.ids.forEach((id: number) => abrirBoleto(id));
     }
   };
 
@@ -799,14 +804,7 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
     setGerandoBoletos(false);
     if (erro === 0) {
       // Abre impressão de todos os boletos gerados
-      savedIds.forEach((id: number, i: number) => {
-        setTimeout(() => {
-          const a = document.createElement('a');
-          a.href = `./api.php?action=boleto_imprimir&id=${id}`;
-          a.target = '_blank'; a.rel = 'noopener noreferrer';
-          document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        }, i * 300);
-      });
+      savedIds.forEach((id: number) => abrirBoleto(id));
       onSuccess();
     } else {
       showAlert('Atenção', `${ok} gerado(s), ${erro} com erro. Verifique configurações de cobrança.`);
@@ -1340,7 +1338,7 @@ const BoletoModal = ({ titulo, onClose, showAlert }: { titulo: any; onClose: () 
         {/* Rodapé */}
         {!loading && boleto && (
           <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex gap-3">
-            <button onClick={() => window.open(`./api.php?action=boleto_imprimir&id=${boleto.id}`, '_blank')}
+            <button onClick={() => abrirBoleto(boleto.id)}
               className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700">
               <ExternalLink className="w-4 h-4" /> Imprimir Boleto
             </button>

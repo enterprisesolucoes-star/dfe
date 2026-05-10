@@ -1,10 +1,13 @@
 <?php
 // api/cobranca.php — Configuração de Cobrança / Boletos
 
-$empresaId = (int)($_REQUEST['empresa_id'] ?? 0);
-if ($empresaId <= 0) {
-    echo json_encode(['success' => false, 'message' => 'empresa_id inválido']);
-    exit;
+// Preserve $empresaId set by api.php from session; fallback to request param
+if (!isset($empresaId) || $empresaId <= 0) {
+    $empresaId = (int)($_REQUEST['empresa_id'] ?? 0);
+    if ($empresaId <= 0) {
+        echo json_encode(['success' => false, 'message' => 'empresa_id inválido']);
+        exit;
+    }
 }
 
 // ── Função Módulo 10 para linha digitável ────────────────────────────────────

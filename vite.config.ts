@@ -17,6 +17,7 @@ export default defineConfig(({ mode }) => {
         manifest: false, // usamos o manifest.webmanifest estático em /public
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
+          navigateFallbackDenylist: [/api\.php/],
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
