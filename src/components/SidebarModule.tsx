@@ -164,6 +164,7 @@ export const Sidebar = ({
   usuarioDfe
 }: any) => {
   const { theme } = useTheme();
+  const relatoriosActive = ['relatorios_tef', 'comissoes'].includes(activeTab);
   const [relatoriosOpen, setRelatoriosOpen] = useState(false);
   const [collapsed, setCollapsed] = useState<boolean>(() => {
     try { return localStorage.getItem(COLLAPSED_KEY) === 'true'; } catch { return false; }
@@ -185,7 +186,6 @@ export const Sidebar = ({
   const nfceActive = ['vendas', 'vendas_geral'].includes(activeTab);
   const cadastrosActive = ['ncm', 'usuarios', 'medidas', 'bandeiras', 'transportadores', 'vendedores',
     'cobranca_config', 'config_integracao', 'dfe_config', 'dfe_nfe_dados', 'dfe_nfce_dados', 'dfe_provedor'].includes(activeTab);
-  const relatoriosActive = ['relatorios_tef', 'comissoes'].includes(activeTab);
 
   return (
     <motion.aside
