@@ -571,19 +571,22 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
         showAlert("E-mail inválido", "Digite um e-mail válido.");
         return;
       }
-      showAlert("Enviando", "Aguarde, enviando e-mail...");
+      setEmailSendingOverlay(true);
       try {
         const action = isNfe ? 'nfe_enviar_email_doc' : 'enviar_email_doc';
         const res = await fetch(`./api.php?action=${action}&id=${id}&email=${encodeURIComponent(email.trim())}`, { method: 'POST' });
         const d = await res.json();
+        setEmailSendingOverlay(false);
         if(d.success) showAlert("Sucesso", "E-mail enviado com sucesso!");
         else showAlert("Erro", d.message || "Não foi possível enviar o e-mail");
       } catch (e) {
+        setEmailSendingOverlay(false);
         showAlert("Erro", "Falha de comunicação.");
       }
     }, emailSugerido);
   };
 
+  const [emailSendingOverlay, setEmailSendingOverlay] = useState(false);
   const [devolucaoModal, setDevolucaoModal] = useState<{ isOpen: boolean; vendaId: number; modeloOrigem: number; loading: boolean; data: any | null }>({ isOpen: false, vendaId: 0, modeloOrigem: 55, loading: false, data: null });
 
   const handleDevolucao = async (id: number, modeloOrigem = 55) => {
@@ -609,7 +612,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       case 'fin_receber': return <FinanceiroView tipo="R" emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} cobrancaAtiva={cobrancaAtiva} />;
       case 'fin_pagar': return <FinanceiroView tipo="P" emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} />;
       case 'fin_caixa': return <CaixaView emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} />;
-      case 'vendas_geral': return <GeralNfceTab showAlert={showAlert} showConfirm={showConfirm} showPrompt={showPrompt} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} onCancelar={handleCancelar} onRetryTef={handleRetryTef} onExcluir={handleExcluirVenda} emitente={emitente} />;
+      case 'vendas_geral': return <GeralNfceTab showAlert={showAlert} showConfirm={showConfirm} showPrompt={showPrompt} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} onCancelar={handleCancelar} onRetryTef={handleRetryTef} onExcluir={handleExcluirVenda} emitente={emitente} setEmailSending={setEmailSendingOverlay} />;
       case 'vendas': return <VendasTab vendas={vendas} onCancelar={handleCancelar} onSincronizar={handleSincronizarContingencia} onRetryTef={handleRetryTef} onExcluir={handleExcluirVenda} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} emitente={emitente} />;
       case 'produtos': return (
         <ProdutosTab
@@ -684,7 +687,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           onRetryTef={handleRetryNfeTef}
         />
       );
-      case 'dfe_nfe_geral': return <GeralNfeTab showAlert={showAlert} showConfirm={showConfirm} showPrompt={showPrompt} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} emitente={emitente} />;
+      case 'dfe_nfe_geral': return <GeralNfeTab showAlert={showAlert} showConfirm={showConfirm} showPrompt={showPrompt} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} emitente={emitente} setEmailSending={setEmailSendingOverlay} />;
       case 'compras': return (
         <ComprasTab
           onImportXml={() => fileInputRef.current?.click()}
@@ -1289,6 +1292,15 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       />
       </div>
     </div>
+      {emailSendingOverlay && (
+        <div className="fixed inset-0 bg-black/60 z-[9999] flex items-center justify-center">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl px-10 py-8 flex flex-col items-center gap-4 shadow-2xl">
+            <div className="w-10 h-10 border-4 border-purple-600 border-t-transparent rounded-full animate-spin" />
+            <p className="text-base font-semibold text-gray-700 dark:text-gray-200">Enviando e-mail...</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500">Por favor aguarde</p>
+          </div>
+        </div>
+      )}
       <InstallPrompt />
     </>
   );

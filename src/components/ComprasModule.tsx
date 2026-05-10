@@ -90,7 +90,7 @@ export const ComprasTab = ({
           <Upload className="w-4 h-4" /> Importar XML
         </button>
         <button onClick={() => setShowSourceModal(true)} className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
-          <Plus className="w-4 h-4" /> Nota Entrada
+          <ShoppingCart className="w-4 h-4" /> Nota Entrada
         </button>
 
         {showSourceModal && (

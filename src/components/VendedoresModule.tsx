@@ -1,6 +1,6 @@
 import type { Vendedor } from '../contexts/AppDataContext';
 import React, { useState, useEffect } from 'react';
-import { Plus, CheckCircle, Edit, Trash2, RefreshCw, X } from 'lucide-react';
+import { UserCheck, CheckCircle, Edit, Trash2, RefreshCw, X } from 'lucide-react';
 
 const VendedoresTab = ({ showAlert, showConfirm }: { showAlert: (t: string, m: string) => void; showConfirm: (t: string, m: string, cb: () => void) => void }) => {
   const [vendedores, setVendedores] = useState<Vendedor[]>([]);
@@ -49,7 +49,7 @@ const VendedoresTab = ({ showAlert, showConfirm }: { showAlert: (t: string, m: s
     <div className="space-y-4">
       <div className="flex justify-end">
         <button onClick={() => abrirModal(null)} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-blue-700">
-          <Plus className="w-4 h-4" /> Novo Vendedor
+          <UserCheck className="w-4 h-4" /> Novo Vendedor
         </button>
       </div>
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -135,7 +135,7 @@ const VendedoresTab = ({ showAlert, showConfirm }: { showAlert: (t: string, m: s
               <button onClick={() => setShowModal(false)} className="flex-1 border border-gray-200 dark:border-gray-700 rounded-lg py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700">Cancelar</button>
               <button onClick={handleSalvar} disabled={saving} className="flex-1 bg-blue-600 text-white rounded-lg py-2 text-sm hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2">
                 {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                {saving ? 'Salvando...' : 'Salvar Vendedor'}
+                {saving ? 'Salvando...' : 'Salvar'}
               </button>
             </div>
           </div>

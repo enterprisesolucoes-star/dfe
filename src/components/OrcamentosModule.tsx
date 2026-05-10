@@ -544,7 +544,7 @@ const OrcamentosTab = ({
         </div>
         <div className="flex-1" />
         <button onClick={() => openForm(null)} className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-          <Plus className="w-4 h-4" /> Novo Orçamento
+          <ClipboardList className="w-4 h-4" /> Novo Orçamento
         </button>
       </div>
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
