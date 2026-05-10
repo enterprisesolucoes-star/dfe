@@ -5,7 +5,7 @@ const KEY  = () => process.env.EVOLUTION_API_KEY || '';
 const hdr  = () => ({ 'apikey': KEY(), 'Content-Type': 'application/json' });
 
 export function instanceName(empresaId: number) {
-  return `dfe_${empresaId}`;
+  return `erp_empresa_${empresaId}`;
 }
 
 export async function ensureInstance(empresaId: number): Promise<boolean> {
@@ -66,6 +66,27 @@ export async function sendDocument(
         number: to, mediatype: 'document',
         mimetype: 'application/pdf',
         caption, media: base64, fileName: filename
+      })
+    });
+    return r.ok;
+  } catch { return false; }
+}
+
+export async function sendImage(
+  empresaId: number, phone: string,
+  base64: string, caption: string
+): Promise<boolean> {
+  const name = instanceName(empresaId);
+  const num  = phone.replace(/\D/g, '');
+  const to   = num.startsWith('55') ? num : `55${num}`;
+  const data64 = base64.replace(/^data:image\/[a-z]+;base64,/, '');
+  try {
+    const r = await fetch(`${BASE()}/message/sendMedia/${name}`, {
+      method: 'POST', headers: hdr(),
+      body: JSON.stringify({
+        number: to, mediatype: 'image',
+        mimetype: 'image/png',
+        caption, media: data64, fileName: 'pix_qrcode.png'
       })
     });
     return r.ok;

@@ -524,6 +524,18 @@ const AdminPortal = () => {
                       </div>
                     </label>
                   </div>
+                  {/* Chave PIX */}
+                  <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1.5">Chave PIX da Empresa</label>
+                    <input
+                      type="text"
+                      value={form.chavepix || ''}
+                      onChange={e => set('chavepix', e.target.value)}
+                      placeholder="CPF, CNPJ, e-mail, telefone ou chave aleatória"
+                      className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100"
+                    />
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Usada para gerar QR Code de cobrança via WhatsApp</p>
+                  </div>
                 </div>
               )}
 

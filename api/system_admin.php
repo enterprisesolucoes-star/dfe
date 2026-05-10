@@ -141,7 +141,8 @@ switch ($action) {
                 'codigo_municipio' => 'codigo_municipio',
                 'ambiente' => 'ambiente',
                 'tem_tef' => 'tem_tef',
-                'integracaowhatsapp' => 'integracaowhatsapp'
+                'integracaowhatsapp' => 'integracaowhatsapp',
+                'chavepix' => 'chavepix'
             ];
 
             foreach ($map as $db => $fr) {
@@ -195,7 +196,7 @@ switch ($action) {
         $fields_map = [
             'razao_social', 'nome_fantasia', 'cnpj', 'crt', 'email', 'telefone', 'cep', 
             'logradouro', 'numero', 'bairro', 'municipio', 'uf', 'status', 'usuario_dfe', 
-            'codigo_municipio', 'ambiente', 'tem_tef', 'integracaowhatsapp'
+            'codigo_municipio', 'ambiente', 'tem_tef', 'integracaowhatsapp', 'chavepix'
         ];
         // Campos com nomes diferentes entre frontend e banco
         $special = [

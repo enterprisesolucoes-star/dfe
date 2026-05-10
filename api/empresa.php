@@ -256,6 +256,9 @@ switch ($action) {
         } catch (PDOException $e) {
             $pdo->exec("ALTER TABLE empresas ADD COLUMN external_id INT DEFAULT NULL");
         }
+        try { $pdo->query("SELECT chavepix FROM empresas LIMIT 1"); } catch (PDOException $e) {
+            $pdo->exec("ALTER TABLE empresas ADD COLUMN chavepix VARCHAR(140) DEFAULT NULL");
+        }
 
         if ($empresaId) {
             $stmt = $pdo->prepare("SELECT * FROM empresas WHERE id = ?");

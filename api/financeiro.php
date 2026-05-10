@@ -129,7 +129,9 @@ switch ($action) {
             $agg = $aggStmt->fetch(PDO::FETCH_ASSOC);
 
             $query = "SELECT f.*,
-                        COALESCE(c.nome, fo.nome, c2.nome, '') as nome_entidade
+                        COALESCE(c.nome, fo.nome, c2.nome, '') as nome_entidade,
+                        COALESCE(c.documento, fo.documento, '') as documento_entidade,
+                        COALESCE(c.telefone, fo.telefone, '') as telefone_entidade
                       FROM financeiro f
                       LEFT JOIN clientes c      ON f.entidade_id = c.id
                       LEFT JOIN fornecedores fo ON f.entidade_id = fo.id
@@ -152,6 +154,36 @@ switch ($action) {
             ]);
         } catch (\Exception $e) {
             echo json_encode(['error' => true, 'message' => $e->getMessage(), 'titulos' => [], 'total_pendente' => 0, 'total_pago' => 0]);
+        }
+        break;
+
+    case 'fin_cobrar_agrupado':
+        try {
+            $di   = $_GET['di'] ?? null;
+            $df   = $_GET['df'] ?? null;
+            $where = ["f.empresa_id = ?", "f.tipo = 'R'", "f.status IN ('Pendente','Parcial')"];
+            $params = [$empresaId];
+            if ($di) { $where[] = "f.vencimento >= ?"; $params[] = $di; }
+            if ($df) { $where[] = "f.vencimento <= ?"; $params[] = $df; }
+            $sqlW = implode(" AND ", $where);
+            $stmt = $pdo->prepare("
+                SELECT
+                    COALESCE(c.id, 0) as cliente_id,
+                    COALESCE(c.nome, '') as nome,
+                    COALESCE(c.documento, '') as documento,
+                    COALESCE(c.telefone, '') as telefone,
+                    SUM(f.valor_total - COALESCE(f.valor_pago, 0)) as total_aberto,
+                    COUNT(f.id) as qtd_parcelas
+                FROM financeiro f
+                LEFT JOIN clientes c ON f.entidade_id = c.id
+                WHERE $sqlW AND f.entidade_id IS NOT NULL
+                GROUP BY c.id, c.nome, c.documento, c.telefone
+                ORDER BY total_aberto DESC
+            ");
+            $stmt->execute($params);
+            echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        } catch (Exception $e) {
+            echo json_encode(['error' => $e->getMessage()]);
         }
         break;
 

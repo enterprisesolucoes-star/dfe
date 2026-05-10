@@ -1,8 +1,206 @@
 import { SkeletonTable, EmptyState, Pagination } from './UIComponents';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { DollarSign, CheckCircle, Trash2, Search, TrendingUp, TrendingDown, Plus, RotateCcw, Edit2, FileText, Loader2, Copy, ExternalLink } from 'lucide-react';
+import { DollarSign, CheckCircle, Trash2, Search, TrendingUp, TrendingDown, Plus, RotateCcw, Edit2, FileText, Loader2, Copy, ExternalLink, MessageCircle, Send } from 'lucide-react';
 import { StatCard, Input } from './UIComponents';
+
+const WaModal = ({ onClose, onSend, sending, defaultPhone = '' }: { onClose: () => void; onSend: (phone: string) => void; sending: boolean; defaultPhone?: string }) => {
+  const [phone, setPhone] = React.useState(defaultPhone.replace(/\D/g,''));
+  return (
+    <div className="fixed inset-0 bg-black/60 z-[9990] flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+        <h3 className="font-bold text-gray-800 dark:text-gray-100">Enviar via WhatsApp</h3>
+        <div>
+          <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Telefone (somente números)</label>
+          <input type="tel" value={phone} onChange={e => setPhone(e.target.value.replace(/\D/g,''))} placeholder="11999999999" className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm outline-none focus:ring-2 focus:ring-green-400 dark:bg-gray-700 dark:text-gray-100" />
+        </div>
+        <div className="flex gap-3">
+          <button onClick={onClose} className="flex-1 py-2.5 bg-gray-700 text-white rounded-xl text-sm font-semibold hover:bg-gray-600 transition-colors">Cancelar</button>
+          <button onClick={() => onSend(phone)} disabled={sending || phone.length < 10} className="flex-1 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 disabled:opacity-50 flex items-center justify-center gap-1.5 transition-colors">
+            {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageCircle className="w-4 h-4" />}
+            {sending ? 'Enviando...' : 'Enviar'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const CobrancaMassaModal = ({ onClose, emitente, di, df, showAlert }: { onClose: () => void; emitente: any; di: string; df: string; showAlert: any }) => {
+  const [clientes, setClientes] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [enviando, setEnviando] = React.useState(false);
+  const [progresso, setProgresso] = React.useState<{atual: number; total: number; nome: string}>({ atual: 0, total: 0, nome: '' });
+  const [erros, setErros] = React.useState<string[]>([]);
+  const [concluido, setConcluido] = React.useState(false);
+
+  React.useEffect(() => {
+    const fetchAgrupado = async () => {
+      setLoading(true);
+      try {
+        const r = await fetch(`./api.php?action=fin_cobrar_agrupado&di=${di}&df=${df}`);
+        const d = await r.json();
+        setClientes(Array.isArray(d) ? d : []);
+      } catch { setClientes([]); }
+      setLoading(false);
+    };
+    fetchAgrupado();
+  }, [di, df]);
+
+  const gerarMensagem = (idx: number, nome: string, valor: string, descricao: string): string => {
+    const msgs = [
+      `Olá, ${nome}! Consta em nosso sistema o valor de ${valor} em aberto. Para sua comodidade, segue a chave PIX para pagamento: ${(emitente as any).chavepix || ''}`,
+      `Oi, ${nome}! Tudo bem? Passando só para te dar um alô sobre aquele valor de ${valor} referente a ${descricao}. Se puder enviar o Pix quando tiver um tempinho, agradeço! 😊`,
+      `Olá, ${nome}, como vai? Notamos que o pagamento de ${valor} referente a ${descricao} ainda consta em aberto. Caso já tenha realizado, desconsidere. Se precisar da chave Pix, é só avisar! Abraço.`
+    ];
+    return msgs[idx % 3];
+  };
+
+  const iniciarEnvio = async () => {
+    const comTelefone = clientes.filter(c => c.telefone && c.telefone.replace(/\D/g,'').length >= 10);
+    if (comTelefone.length === 0) { showAlert('Atenção', 'Nenhum cliente com telefone cadastrado.'); return; }
+    setEnviando(true);
+    setErros([]);
+    setProgresso({ atual: 0, total: comTelefone.length, nome: '' });
+
+    for (let i = 0; i < comTelefone.length; i++) {
+      const c = comTelefone[i];
+      const valorFmt = Number(c.total_aberto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+      const phone = c.telefone.replace(/\D/g,'');
+      setProgresso({ atual: i + 1, total: comTelefone.length, nome: c.nome });
+
+      const chavepix = (emitente as any).chavepix || '';
+      const texto = gerarMensagem(i, c.nome, valorFmt, 'nossos serviços');
+
+      // Enviar texto
+      try {
+        await fetch('/api/whatsapp/send-text', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone, text: texto })
+        });
+      } catch { setErros(p => [...p, `Falha texto: ${c.nome}`]); }
+
+      // Gerar e enviar QR Code PIX se chavepix configurado
+      if (chavepix && Number(c.total_aberto) > 0) {
+        try {
+          const { gerarPixQrCodeBase64 } = await import('../utils/pixQrCode');
+          const qr = await gerarPixQrCodeBase64(chavepix, Number(c.total_aberto), emitente.razaoSocial || 'Empresa', emitente.municipio || 'Cidade');
+          await fetch('/api/whatsapp/send-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone, base64: qr, caption: `QR Code PIX — ${valorFmt}` })
+          });
+        } catch { setErros(p => [...p, `Falha QR: ${c.nome}`]); }
+      }
+
+      // Intervalo entre mensagens (3-6 segundos) para evitar bloqueio
+      if (i < comTelefone.length - 1) {
+        await new Promise(r => setTimeout(r, 3000 + Math.random() * 3000));
+      }
+    }
+    setConcluido(true);
+    setEnviando(false);
+  };
+
+  const semTelefone = clientes.filter(c => !c.telefone || c.telefone.replace(/\D/g,'').length < 10);
+
+  return (
+    <div className="fixed inset-0 bg-black/60 z-[9990] flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh]">
+        <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+          <div>
+            <h3 className="font-bold text-gray-800 dark:text-gray-100 text-lg flex items-center gap-2"><MessageCircle className="w-5 h-5 text-green-500" /> Cobrança em Massa via WhatsApp</h3>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Período: {di} a {df}</p>
+          </div>
+          <button onClick={onClose} disabled={enviando} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50">✕</button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          {loading ? (
+            <div className="flex items-center justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-green-500" /></div>
+          ) : concluido ? (
+            <div className="text-center py-8 space-y-3">
+              <div className="w-16 h-16 bg-green-100 dark:bg-green-900/40 rounded-full flex items-center justify-center mx-auto"><MessageCircle className="w-8 h-8 text-green-600" /></div>
+              <p className="font-bold text-gray-800 dark:text-gray-100">Envio concluído!</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{progresso.total} cliente(s) processado(s)</p>
+              {erros.length > 0 && <div className="text-xs text-red-500 space-y-0.5">{erros.slice(0,5).map((e,i) => <p key={i}>{e}</p>)}</div>}
+            </div>
+          ) : enviando ? (
+            <div className="space-y-4">
+              <div className="text-center">
+                <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">Enviando para <span className="text-green-600">{progresso.nome}</span>...</p>
+                <p className="text-xs text-gray-400 mt-1">{progresso.atual} de {progresso.total}</p>
+              </div>
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div className="bg-green-500 h-2 rounded-full transition-all" style={{ width: `${(progresso.atual / progresso.total) * 100}%` }} />
+              </div>
+              <p className="text-xs text-center text-gray-400 dark:text-gray-500">Aguardando intervalo entre envios para evitar bloqueio...</p>
+            </div>
+          ) : (
+            <>
+              {clientes.length === 0 ? (
+                <div className="text-center py-8 text-gray-400 dark:text-gray-500 text-sm">Nenhum título pendente no período selecionado.</div>
+              ) : (
+                <div className="space-y-2">
+                  {!(emitente as any).chavepix && (
+                    <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-3 text-xs text-yellow-700 dark:text-yellow-300">
+                      ⚠ Chave PIX não configurada. As mensagens não incluirão QR Code. Configure em Admin → Empresas.
+                    </div>
+                  )}
+                  <div className="overflow-auto rounded-xl border border-gray-100 dark:border-gray-700">
+                    <table className="w-full text-xs">
+                      <thead className="bg-gray-50 dark:bg-gray-900">
+                        <tr>
+                          <th className="px-4 py-2.5 text-left font-bold text-gray-500 dark:text-gray-400 uppercase">Cliente</th>
+                          <th className="px-4 py-2.5 text-left font-bold text-gray-500 dark:text-gray-400 uppercase">Documento</th>
+                          <th className="px-4 py-2.5 text-right font-bold text-gray-500 dark:text-gray-400 uppercase">Total Aberto</th>
+                          <th className="px-4 py-2.5 text-center font-bold text-gray-500 dark:text-gray-400 uppercase">WhatsApp</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
+                        {clientes.map((c, i) => (
+                          <tr key={i} className={`${!c.telefone || c.telefone.replace(/\D/g,'').length < 10 ? 'opacity-50' : ''}`}>
+                            <td className="px-4 py-2.5 font-semibold text-gray-700 dark:text-gray-200">{c.nome || 'Sem nome'}</td>
+                            <td className="px-4 py-2.5 text-gray-500 dark:text-gray-400">{c.documento || '—'}</td>
+                            <td className="px-4 py-2.5 text-right font-bold text-blue-600 dark:text-blue-400">{Number(c.total_aberto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                            <td className="px-4 py-2.5 text-center">
+                              {c.telefone && c.telefone.replace(/\D/g,'').length >= 10
+                                ? <span className="text-green-500">✓ {c.telefone}</span>
+                                : <span className="text-red-400">Sem telefone</span>}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  {semTelefone.length > 0 && (
+                    <p className="text-xs text-amber-600 dark:text-amber-400">⚠ {semTelefone.length} cliente(s) sem telefone serão ignorados.</p>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        {!concluido && !enviando && clientes.length > 0 && (
+          <div className="p-6 border-t border-gray-100 dark:border-gray-700 flex gap-3">
+            <button onClick={onClose} className="flex-1 py-3 bg-gray-700 dark:bg-gray-600 text-white text-sm font-semibold rounded-xl hover:bg-gray-600 dark:hover:bg-gray-500 transition-colors">Cancelar</button>
+            <button onClick={iniciarEnvio} disabled={clientes.filter(c => c.telefone && c.telefone.replace(/\D/g,'').length >= 10).length === 0} className="flex-1 py-3 bg-green-600 text-white text-sm font-semibold rounded-xl hover:bg-green-700 transition-colors shadow-md disabled:opacity-50 flex items-center justify-center gap-2">
+              <Send className="w-4 h-4" /> Iniciar Envio ({clientes.filter(c => c.telefone && c.telefone.replace(/\D/g,'').length >= 10).length} clientes)
+            </button>
+          </div>
+        )}
+        {concluido && (
+          <div className="p-6 border-t border-gray-100 dark:border-gray-700">
+            <button onClick={onClose} className="w-full py-3 bg-gray-700 text-white text-sm font-semibold rounded-xl hover:bg-gray-600 transition-colors">Fechar</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 
 // ─── Componente Baixa de Título ──────────────────────────────────────────────
 export const BaixaModal = ({ titulo, emitente, onClose, onSuccess, showAlert }: any) => {
@@ -170,6 +368,9 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobranc
   const [showLancamento, setShowLancamento] = useState(false);
   const [editTitulo, setEditTitulo] = useState<any | null>(null);
   const [boletoTitulo, setBoletoTitulo] = useState<any | null>(null);
+  const [waTarget, setWaTarget] = React.useState<{titulo: any} | null>(null);
+  const [waSending, setWaSending] = React.useState(false);
+  const [showMassa, setShowMassa] = React.useState(false);
 
   const fetchTitulos = async (p = page) => {
     setLoading(true);
@@ -213,12 +414,47 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobranc
     });
   };
 
+  const sendWaTitulo = async (phone: string) => {
+    if (!waTarget) return;
+    const t = waTarget.titulo;
+    const valorFmt = Number(t.valor_total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    const nome = t.nome_entidade || 'Cliente';
+    setWaSending(true);
+    const msgs = [
+      `Olá, ${nome}! Consta em nosso sistema o valor de ${valorFmt} em aberto. Para sua comodidade, segue a chave PIX: ${(emitente as any).chavepix || ''}`,
+      `Oi, ${nome}! Tudo bem? Passando para avisar sobre o valor de ${valorFmt} em aberto. Se puder enviar o Pix quando tiver um tempinho, agradeço! 😊`,
+      `Olá, ${nome}, como vai? O pagamento de ${valorFmt} ainda consta em aberto. Se precisar da chave Pix, é só avisar! Abraço.`
+    ];
+    const texto = msgs[Math.floor(Math.random() * 3)];
+    try {
+      await fetch('/api/whatsapp/send-text', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, text: texto })
+      });
+      const chavepix = (emitente as any).chavepix || '';
+      if (chavepix && Number(t.valor_total) > 0) {
+        const { gerarPixQrCodeBase64 } = await import('../utils/pixQrCode');
+        const qr = await gerarPixQrCodeBase64(chavepix, Number(t.valor_total), emitente.razaoSocial || 'Empresa', emitente.municipio || 'Cidade');
+        await fetch('/api/whatsapp/send-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone, base64: qr, caption: `QR Code PIX — ${valorFmt}` })
+        });
+      }
+    } catch {}
+    setWaSending(false);
+    setWaTarget(null);
+  };
+
   return (
     <div className="space-y-4">
       {baixaTitulo && <BaixaModal titulo={baixaTitulo} emitente={emitente} onClose={() => setBaixaTitulo(null)} onSuccess={() => { setBaixaTitulo(null); fetchTitulos(); }} showAlert={showAlert} />}
       {showLancamento && <LancamentoManualModal tipo={tipo} onClose={() => setShowLancamento(false)} onSuccess={() => { setShowLancamento(false); fetchTitulos(); }} showAlert={showAlert} />}
       {editTitulo && <EditarTituloModal titulo={editTitulo} onClose={() => setEditTitulo(null)} onSuccess={() => { setEditTitulo(null); fetchTitulos(); }} showAlert={showAlert} />}
       {boletoTitulo && <BoletoModal titulo={boletoTitulo} onClose={() => { setBoletoTitulo(null); fetchTitulos(); }} showAlert={showAlert} />}
+      {waTarget && <WaModal onClose={() => setWaTarget(null)} onSend={sendWaTitulo} sending={waSending} defaultPhone={(waTarget.titulo.telefone_entidade || '').replace(/\D/g,'')} />}
+      {showMassa && <CobrancaMassaModal onClose={() => setShowMassa(false)} emitente={emitente} di={di} df={df} showAlert={showAlert} />}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <StatCard label={tipo === 'R' ? "Contas a Receber" : "Contas a Pagar"} value={Number(totPendente).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} icon={DollarSign} color={tipo === 'R' ? 'blue' : 'red'} />
         <StatCard label={tipo === 'R' ? "Recebido no Período" : "Pago no Período"} value={Number(totPago).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} icon={CheckCircle} color="green" />
@@ -238,6 +474,11 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobranc
           <input type="date" value={df} onChange={e => setDf(e.target.value)} className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded-xl px-2 py-1.5 text-xs outline-none" />
           <button onClick={fetchTitulos} className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all">Atualizar</button>
           <button onClick={() => setShowLancamento(true)} className="flex items-center gap-1 px-3 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition-all"><Plus className="w-3 h-3" /> Novo Lançamento</button>
+          {tipo === 'R' && !!(emitente as any).integracaowhatsapp && (
+            <button onClick={() => setShowMassa(true)} className="flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-xs font-bold rounded-xl hover:bg-green-700 transition-all">
+              <MessageCircle className="w-3 h-3" /> Cobrança em Massa WA
+            </button>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <div className="relative">
@@ -316,6 +557,9 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobranc
                     )}
                     {cobrancaAtiva && tipo === 'R' && t.lancamento_id && t.parcela_total > 1 && t.boleto_status === 'registrado' && (
                       <button onClick={() => imprimirLote(t.lancamento_id)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-purple-600" title="Imprimir Lote"><ExternalLink className="w-3.5 h-3.5" /></button>
+                    )}
+                    {tipo === 'R' && t.status !== 'Pago' && !!(emitente as any).integracaowhatsapp && (
+                      <button onClick={() => setWaTarget({ titulo: t })} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-green-600 transition-colors" title="Cobrar via WhatsApp"><MessageCircle className="w-3.5 h-3.5" /></button>
                     )}
                     {t.status === 'Pago' && <button onClick={() => handleEstornar(t.id)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-amber-600" title="Estornar"><RotateCcw className="w-3.5 h-3.5" /></button>}
                     <button onClick={() => handleExcluir(t.id)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400" title="Excluir"><Trash2 className="w-3.5 h-3.5" /></button>

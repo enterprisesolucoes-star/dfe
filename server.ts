@@ -294,6 +294,12 @@ app.post('/api/whatsapp/send-document', waMiddleware, async (req: any, res) => {
 });
 // ─────────────────────────────────────────────────────────────────────────────
 
+app.post('/api/whatsapp/send-image', waMiddleware, async (req: any, res) => {
+  const { phone, base64, caption } = req.body;
+  if (!phone || !base64) return res.json({ success: false, message: 'phone e base64 obrigatórios' });
+  const ok = await WhatsApp.sendImage(req.wEmpresaId, phone, base64, caption || '');
+  res.json({ success: ok });
+});
 
 app.use(express.static(path.join(process.cwd(), "dist")));
 app.get("*", (req, res) => {
