@@ -84,7 +84,7 @@ const KPICard = ({ label, value, icon: Icon, color, trend, sub, onClick }: any) 
 
 interface DashboardTabProps {
   isFiscal: boolean;
-  onNavigate?: (tab: string) => void;
+  onNavigate?: (tab: string, opts?: { preset?: string }) => void;
 }
 
 export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
@@ -118,7 +118,7 @@ export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
   const { dtIni, dtFim } = calcularPeriodo(periodo, customIni, customFim);
 
   const fmtBRL = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  const goTo = (tab: string) => onNavigate && onNavigate(tab);
+  const goTo = (tab: string, opts?: { preset?: string }) => onNavigate && onNavigate(tab, opts);
 
   const fetchAll = async () => {
     try {
@@ -374,7 +374,7 @@ export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
           <h4 className="text-xs uppercase font-bold text-gray-400 dark:text-gray-500 mb-3 tracking-wider">Alertas Financeiros</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {kpis.contas_receber.vencidas.qtd > 0 && (
-              <div onClick={() => goTo('fin_receber')} className="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-2xl p-5 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all">
+              <div onClick={() => goTo('fin_receber', { preset: 'vencidas' })} className="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-2xl p-5 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all">
                 <div className="flex items-center gap-2 mb-2"><AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" /><p className="text-[10px] uppercase font-bold text-red-600 dark:text-red-400">A Receber — Vencidas</p></div>
                 <p className="text-2xl font-bold text-red-700 dark:text-red-300">{fmtBRL(kpis.contas_receber.vencidas.valor)}</p>
                 <p className="text-xs text-red-500 dark:text-red-400 mt-1">{kpis.contas_receber.vencidas.qtd} título(s) — clique para abrir</p>
@@ -388,7 +388,7 @@ export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
               </div>
             )}
             {kpis.contas_pagar.vencidas.qtd > 0 && (
-              <div onClick={() => goTo('fin_pagar')} className="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-2xl p-5 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all">
+              <div onClick={() => goTo('fin_pagar', { preset: 'vencidas' })} className="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-2xl p-5 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all">
                 <div className="flex items-center gap-2 mb-2"><AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" /><p className="text-[10px] uppercase font-bold text-red-600 dark:text-red-400">A Pagar — Vencidas</p></div>
                 <p className="text-2xl font-bold text-red-700 dark:text-red-300">{fmtBRL(kpis.contas_pagar.vencidas.valor)}</p>
                 <p className="text-xs text-red-500 dark:text-red-400 mt-1">{kpis.contas_pagar.vencidas.qtd} título(s) — clique para abrir</p>

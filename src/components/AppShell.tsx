@@ -606,11 +606,13 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
     }
   };
 
+  const finNavPreset = React.useRef<string | null>(null);
+
   const renderTab = () => {
     switch (activeTab) {
-      case 'dashboard': return <DashboardTab isFiscal={isFiscal} onNavigate={(t: any) => handleSetActiveTab(t)} />;
-      case 'fin_receber': return <FinanceiroView tipo="R" emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} cobrancaAtiva={cobrancaAtiva} />;
-      case 'fin_pagar': return <FinanceiroView tipo="P" emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} />;
+      case 'dashboard': return <DashboardTab isFiscal={isFiscal} onNavigate={(t: any, opts?: any) => { finNavPreset.current = opts?.preset ?? null; handleSetActiveTab(t); }} />;
+      case 'fin_receber': { const _p = finNavPreset.current; finNavPreset.current = null; return <FinanceiroView tipo="R" emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} cobrancaAtiva={cobrancaAtiva} initPreset={_p} />; }
+      case 'fin_pagar': { const _p = finNavPreset.current; finNavPreset.current = null; return <FinanceiroView tipo="P" emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} initPreset={_p} />; }
       case 'fin_caixa': return <CaixaView emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} />;
       case 'vendas_geral': return <GeralNfceTab showAlert={showAlert} showConfirm={showConfirm} showPrompt={showPrompt} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} onCancelar={handleCancelar} onRetryTef={handleRetryTef} onExcluir={handleExcluirVenda} emitente={emitente} setEmailSending={setEmailSendingOverlay} />;
       case 'vendas': return <VendasTab vendas={vendas} onCancelar={handleCancelar} onSincronizar={handleSincronizarContingencia} onRetryTef={handleRetryTef} onExcluir={handleExcluirVenda} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} emitente={emitente} />;
