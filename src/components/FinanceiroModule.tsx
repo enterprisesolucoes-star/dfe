@@ -474,9 +474,9 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobranc
           <input type="date" value={df} onChange={e => setDf(e.target.value)} className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded-xl px-2 py-1.5 text-xs outline-none" />
           <button onClick={fetchTitulos} className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all">Atualizar</button>
           <button onClick={() => setShowLancamento(true)} className="flex items-center gap-1 px-3 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition-all"><Plus className="w-3 h-3" /> Novo Lançamento</button>
-          {tipo === 'R' && !!(emitente as any).integracaowhatsapp && (
+          {tipo === 'R' && !!(emitente as any).integracaowhatsapp && titulos.some(t => t.status !== 'Pago') && (
             <button onClick={() => setShowMassa(true)} className="flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-xs font-bold rounded-xl hover:bg-green-700 transition-all">
-              <MessageCircle className="w-3 h-3" /> Cobrança em Massa WA
+              <MessageCircle className="w-3 h-3" /> Cobrança em Massa
             </button>
           )}
         </div>

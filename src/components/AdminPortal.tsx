@@ -1078,7 +1078,12 @@ const BackupPanel = ({ onClose, adminToken }: { onClose: () => void; adminToken:
   };
 
   const baixar = (nome: string) => {
-    window.open(`${window.location.origin}/api.php?action=backup_admin_download&adm_token=${adminToken}&arquivo=${encodeURIComponent(nome)}`, '_blank');
+    const a = document.createElement('a');
+    a.href = `${window.location.origin}/api.php?action=backup_admin_download&adm_token=${adminToken}&arquivo=${encodeURIComponent(nome)}`;
+    a.download = nome;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   return (
