@@ -1,22 +1,37 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DFe IA</title>
-    <script>if(localStorage.getItem('dfe_dark_mode')==='true')document.documentElement.classList.add('dark');</script>
-    <script type="module" crossorigin src="./assets/index-Cdoj0KXK.js"></script>
+    <title>DFe IA — Gestão Fiscal</title>
+    <meta name="description" content="ERP fiscal com emissão de NFe, NFCe, Orçamentos e Ordens de Serviço" />
+    <meta name="theme-color" content="#1a56db" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
+    <script>
+      // Dark mode imediato
+      if(localStorage.getItem('dfe_dark_mode')==='true') document.documentElement.classList.add('dark');
+      // Captura o evento de instalação PWA antes do React montar
+      window._deferredInstallPrompt = null;
+      window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        window._deferredInstallPrompt = e;
+        window.dispatchEvent(new CustomEvent('pwa-installable'));
+      });
+    </script>
+    <script type="module" crossorigin src="./assets/index-x5lFSev-.js"></script>
     <link rel="modulepreload" crossorigin href="./assets/vendor-react-jiy8XtIW.js">
-    <link rel="modulepreload" crossorigin href="./assets/vendor-lucide-CsCI6Z7f.js">
+    <link rel="modulepreload" crossorigin href="./assets/vendor-lucide-DSrmhAq8.js">
     <link rel="modulepreload" crossorigin href="./assets/vendor-charts-DCTGlyib.js">
     <link rel="modulepreload" crossorigin href="./assets/vendor-motion-Cq6MXQBu.js">
-    <link rel="modulepreload" crossorigin href="./assets/chunk-ui-Dvmqy3EE.js">
-    <link rel="modulepreload" crossorigin href="./assets/chunk-fiscal-CaYNSF14.js">
-    <link rel="modulepreload" crossorigin href="./assets/chunk-comercial-CxDNugdq.js">
-    <link rel="modulepreload" crossorigin href="./assets/chunk-financeiro-DG9bqS_T.js">
-    <link rel="modulepreload" crossorigin href="./assets/chunk-cadastros-v0CrXfHO.js">
-    <link rel="stylesheet" crossorigin href="./assets/index-8phvdun0.css">
-  </head>
+    <link rel="modulepreload" crossorigin href="./assets/chunk-ui-DoY86dLA.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-fiscal-CE0vHLMM.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-comercial-CeftKF8F.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-financeiro-BqcWLsxE.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-cadastros-D4P6RCfo.js">
+    <link rel="stylesheet" crossorigin href="./assets/index-BjKhOlru.css">
+  <script id="vite-plugin-pwa:register-sw" src="./registerSW.js"></script></head>
   <body>
     <div id="root"></div>
   </body>

@@ -649,8 +649,8 @@ export const ClienteModal = ({ cliente, onClose, onSave, showAlert, emitente }: 
             </div>
           </div>
         </div>
-        <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/30">
-          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl">Cancelar</button>
+        <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex gap-3 bg-gray-50 dark:bg-gray-900/30">
+          <button onClick={onClose} className="flex-1 py-3 bg-gray-700 dark:bg-gray-600 text-white text-sm font-semibold rounded-xl hover:bg-gray-600 dark:hover:bg-gray-500 transition-colors">Cancelar</button>
           <button onClick={() => {
             const end = form.endereco || {};
             if (!end.logradouro?.trim() || !end.numero?.trim() || !end.bairro?.trim() || !end.codigoMunicipio || !end.cep?.trim()) {
@@ -658,7 +658,7 @@ export const ClienteModal = ({ cliente, onClose, onSave, showAlert, emitente }: 
               return;
             }
             onSave(form);
-          }} className="px-8 py-2 bg-blue-600 text-white font-bold uppercase text-[11px] rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700">Salvar</button>
+          }} className="flex-1 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-md">Salvar</button>
         </div>
       </motion.div>
     </div>
@@ -1206,9 +1206,9 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
             </>
           )}
         </div>
-        <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/30">
-          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl">Cancelar</button>
-          <button onClick={() => onSave(form)} className="px-8 py-2 bg-blue-600 text-white font-bold uppercase text-[11px] rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700">Salvar</button>
+        <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex gap-3 bg-gray-50 dark:bg-gray-900/30">
+          <button onClick={onClose} className="flex-1 py-3 bg-gray-700 dark:bg-gray-600 text-white text-sm font-semibold rounded-xl hover:bg-gray-600 dark:hover:bg-gray-500 transition-colors">Cancelar</button>
+          <button onClick={() => onSave(form)} className="flex-1 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-md">Salvar</button>
         </div>
       </motion.div>
     </div>
@@ -1300,8 +1300,8 @@ export const FornecedorModal = ({ fornecedor, onClose, onSave, showAlert }: any)
             </div>
           </div>
         </div>
-        <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/30">
-          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl">Cancelar</button>
+        <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex gap-3 bg-gray-50 dark:bg-gray-900/30">
+          <button onClick={onClose} className="flex-1 py-3 bg-gray-700 dark:bg-gray-600 text-white text-sm font-semibold rounded-xl hover:bg-gray-600 dark:hover:bg-gray-500 transition-colors">Cancelar</button>
           <button onClick={() => {
             const end = form.endereco || {};
             if (!end.logradouro?.trim() || !end.numero?.trim() || !end.bairro?.trim() || !end.codigoMunicipio || !end.cep?.trim()) {
@@ -1309,7 +1309,7 @@ export const FornecedorModal = ({ fornecedor, onClose, onSave, showAlert }: any)
               return;
             }
             onSave(form);
-          }} className="px-8 py-2 bg-blue-600 text-white font-bold uppercase text-[11px] rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700">Salvar</button>
+          }} className="flex-1 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-md">Salvar</button>
         </div>
       </motion.div>
     </div>
@@ -1376,9 +1376,9 @@ export const TransportadorModal = ({ transportador, onClose, onSave }: any) => {
             </div>
           </div>
         </div>
-        <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/30">
-          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl">Cancelar</button>
-          <button onClick={() => onSave(form)} className="px-8 py-2 bg-blue-600 text-white font-bold uppercase text-[11px] rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700">Salvar</button>
+        <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex gap-3 bg-gray-50 dark:bg-gray-900/30">
+          <button onClick={onClose} className="flex-1 py-3 bg-gray-700 dark:bg-gray-600 text-white text-sm font-semibold rounded-xl hover:bg-gray-600 dark:hover:bg-gray-500 transition-colors">Cancelar</button>
+          <button onClick={() => onSave(form)} className="flex-1 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-md">Salvar</button>
         </div>
       </motion.div>
     </div>
@@ -1414,9 +1414,9 @@ export const MedidaModal = ({ medida, onClose, onSave }: any) => {
             </label>
           </div>
         </div>
-        <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/30">
-          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl">Cancelar</button>
-          <button onClick={() => onSave(form)} className="px-8 py-2 bg-blue-600 text-white font-bold uppercase text-[11px] rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700">Salvar</button>
+        <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex gap-3 bg-gray-50 dark:bg-gray-900/30">
+          <button onClick={onClose} className="flex-1 py-3 bg-gray-700 dark:bg-gray-600 text-white text-sm font-semibold rounded-xl hover:bg-gray-600 dark:hover:bg-gray-500 transition-colors">Cancelar</button>
+          <button onClick={() => onSave(form)} className="flex-1 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-md">Salvar</button>
         </div>
       </motion.div>
     </div>
@@ -1445,9 +1445,9 @@ export const BandeiraModal = ({ bandeira, onClose, onSave }: any) => {
           <Input label="Bandeira / Credenciadora" value={form.tband_opc || ''} onChange={(e: any) => set('tband_opc', e.target.value)} placeholder="Ex: Visa, Mastercard, Cielo..." />
           <MaskedInput label="CNPJ da Credenciadora" mask="cpfcnpj" value={form.cnpj_opc || ''} onChange={(e: any) => set('cnpj_opc', e.target.value)} placeholder="Ex: 00.000.000/0001-00" />
         </div>
-        <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/30">
-          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl">Cancelar</button>
-          <button onClick={() => onSave(form)} className="px-8 py-2 bg-blue-600 text-white font-bold uppercase text-[11px] rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700">Salvar</button>
+        <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex gap-3 bg-gray-50 dark:bg-gray-900/30">
+          <button onClick={onClose} className="flex-1 py-3 bg-gray-700 dark:bg-gray-600 text-white text-sm font-semibold rounded-xl hover:bg-gray-600 dark:hover:bg-gray-500 transition-colors">Cancelar</button>
+          <button onClick={() => onSave(form)} className="flex-1 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-md">Salvar</button>
         </div>
       </motion.div>
     </div>

@@ -577,8 +577,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
         const res = await fetch(`./api.php?action=${action}&id=${id}&email=${encodeURIComponent(email.trim())}`, { method: 'POST' });
         const d = await res.json();
         setEmailSendingOverlay(false);
-        if(d.success) showAlert("Sucesso", "E-mail enviado com sucesso!");
-        else showAlert("Erro", d.message || "Não foi possível enviar o e-mail");
+        if(!d.success) showAlert("Erro", d.message || "Não foi possível enviar o e-mail");
       } catch (e) {
         setEmailSendingOverlay(false);
         showAlert("Erro", "Falha de comunicação.");

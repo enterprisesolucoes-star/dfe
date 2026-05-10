@@ -132,8 +132,8 @@ const VendedoresTab = ({ showAlert, showConfirm }: { showAlert: (t: string, m: s
               </div>
             </div>
             <div className="flex gap-3 mt-5">
-              <button onClick={() => setShowModal(false)} className="flex-1 border border-gray-200 dark:border-gray-700 rounded-lg py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700">Cancelar</button>
-              <button onClick={handleSalvar} disabled={saving} className="flex-1 bg-blue-600 text-white rounded-lg py-2 text-sm hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2">
+              <button onClick={() => setShowModal(false)} className="flex-1 py-3 bg-gray-700 dark:bg-gray-600 text-white text-sm font-semibold rounded-xl hover:bg-gray-600 dark:hover:bg-gray-500 transition-colors">Cancelar</button>
+              <button onClick={handleSalvar} disabled={saving} className="flex-1 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-md disabled:opacity-50 flex items-center justify-center gap-2">
                 {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
                 {saving ? 'Salvando...' : 'Salvar'}
               </button>
