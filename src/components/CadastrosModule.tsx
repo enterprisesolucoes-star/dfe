@@ -130,11 +130,17 @@ export const ProdutosTab = ({ onEdit, onDelete, refreshTrigger }: { onEdit: (p: 
 export const ClientesTab = ({ clientes, onEdit, onDelete }: { clientes: Cliente[]; onEdit: (c: Cliente) => void; onDelete: (id: number) => void }) => {
   const [busca, setBusca] = useState('');
   const debouncedBusca = useDebounce(busca);
-  const filtrados = clientes.filter(c =>
-    (c.nome || '').toLowerCase().includes(debouncedBusca.toLowerCase()) ||
-    (c.documento || '').replace(/\D/g, '').includes(debouncedBusca.replace(/\D/g, '')) ||
-    (c.telefone || '').replace(/\D/g, '').includes(debouncedBusca.replace(/\D/g, ''))
-  );
+  const filtrados = clientes.filter(c => {
+    const q = debouncedBusca.trim();
+    if (!q) return true;
+    const qL = q.toLowerCase();
+    const qD = q.replace(/\D/g, '');
+    return (
+      (c.nome || '').toLowerCase().includes(qL) ||
+      (qD.length > 0 && (c.documento || '').replace(/\D/g, '').includes(qD)) ||
+      (qD.length > 0 && (c.telefone || '').replace(/\D/g, '').includes(qD))
+    );
+  });
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
       <div className="p-4 border-b border-gray-50 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/30">
@@ -183,11 +189,17 @@ export const ClientesTab = ({ clientes, onEdit, onDelete }: { clientes: Cliente[
 export const FornecedoresTab = ({ fornecedores, onEdit, onDelete }: { fornecedores: Fornecedor[]; onEdit: (f: Fornecedor) => void; onDelete: (id: number) => void }) => {
   const [busca, setBusca] = useState('');
   const debouncedBusca = useDebounce(busca);
-  const filtrados = fornecedores.filter(f =>
-    (f.nome || '').toLowerCase().includes(debouncedBusca.toLowerCase()) ||
-    (f.documento || '').replace(/\D/g, '').includes(debouncedBusca.replace(/\D/g, '')) ||
-    (f.telefone || '').replace(/\D/g, '').includes(debouncedBusca.replace(/\D/g, ''))
-  );
+  const filtrados = fornecedores.filter(f => {
+    const q = debouncedBusca.trim();
+    if (!q) return true;
+    const qL = q.toLowerCase();
+    const qD = q.replace(/\D/g, '');
+    return (
+      (f.nome || '').toLowerCase().includes(qL) ||
+      (qD.length > 0 && (f.documento || '').replace(/\D/g, '').includes(qD)) ||
+      (qD.length > 0 && (f.telefone || '').replace(/\D/g, '').includes(qD))
+    );
+  });
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
       <div className="p-4 border-b border-gray-50 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/30">
