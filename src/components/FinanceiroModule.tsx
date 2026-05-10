@@ -28,6 +28,7 @@ const WaModal = ({ onClose, onSend, sending, defaultPhone = '' }: { onClose: () 
 
 const CobrancaMassaModal = ({ onClose, emitente, di, df, showAlert }: { onClose: () => void; emitente: any; di: string; df: string; showAlert: any }) => {
   const [clientes, setClientes] = React.useState<any[]>([]);
+  const [selecionados, setSelecionados] = React.useState<Set<number>>(new Set());
   const [loading, setLoading] = React.useState(true);
   const [enviando, setEnviando] = React.useState(false);
   const [progresso, setProgresso] = React.useState<{atual: number; total: number; nome: string}>({ atual: 0, total: 0, nome: '' });
@@ -40,12 +41,27 @@ const CobrancaMassaModal = ({ onClose, emitente, di, df, showAlert }: { onClose:
       try {
         const r = await fetch(`./api.php?action=fin_cobrar_agrupado&di=${di}&df=${df}`);
         const d = await r.json();
-        setClientes(Array.isArray(d) ? d : []);
+        const lista = Array.isArray(d) ? d : [];
+        setClientes(lista);
+        setSelecionados(new Set(lista.map((c: any) => Number(c.cliente_id))));
       } catch { setClientes([]); }
       setLoading(false);
     };
     fetchAgrupado();
   }, [di, df]);
+
+  const toggleCliente = (id: number) => {
+    setSelecionados(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleTodos = () => {
+    const aptos = clientes.map(c => Number(c.cliente_id));
+    setSelecionados(selecionados.size === aptos.length ? new Set() : new Set(aptos));
+  };
 
   const gerarMensagem = (idx: number, nome: string, valor: string, descricao: string): string => {
     const msgs = [
@@ -56,23 +72,23 @@ const CobrancaMassaModal = ({ onClose, emitente, di, df, showAlert }: { onClose:
     return msgs[idx % 3];
   };
 
+  const paraEnviar = clientes.filter(c => selecionados.has(Number(c.cliente_id)) && c.telefone && c.telefone.replace(/\D/g,'').length >= 10);
+
   const iniciarEnvio = async () => {
-    const comTelefone = clientes.filter(c => c.telefone && c.telefone.replace(/\D/g,'').length >= 10);
-    if (comTelefone.length === 0) { showAlert('Atenção', 'Nenhum cliente com telefone cadastrado.'); return; }
+    if (paraEnviar.length === 0) { showAlert('Atenção', 'Nenhum cliente selecionado com telefone cadastrado.'); return; }
     setEnviando(true);
     setErros([]);
-    setProgresso({ atual: 0, total: comTelefone.length, nome: '' });
+    setProgresso({ atual: 0, total: paraEnviar.length, nome: '' });
 
-    for (let i = 0; i < comTelefone.length; i++) {
-      const c = comTelefone[i];
+    for (let i = 0; i < paraEnviar.length; i++) {
+      const c = paraEnviar[i];
       const valorFmt = Number(c.total_aberto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
       const phone = c.telefone.replace(/\D/g,'');
-      setProgresso({ atual: i + 1, total: comTelefone.length, nome: c.nome });
+      setProgresso({ atual: i + 1, total: paraEnviar.length, nome: c.nome });
 
       const chavepix = (emitente as any).chavepix || '';
       const texto = gerarMensagem(i, c.nome, valorFmt, 'nossos serviços');
 
-      // Enviar texto
       try {
         await fetch('/api/whatsapp/send-text', {
           method: 'POST',
@@ -81,7 +97,6 @@ const CobrancaMassaModal = ({ onClose, emitente, di, df, showAlert }: { onClose:
         });
       } catch { setErros(p => [...p, `Falha texto: ${c.nome}`]); }
 
-      // Gerar e enviar QR Code PIX se chavepix configurado
       if (chavepix && Number(c.total_aberto) > 0) {
         try {
           const { gerarPixQrCodeBase64 } = await import('../utils/pixQrCode');
@@ -94,8 +109,7 @@ const CobrancaMassaModal = ({ onClose, emitente, di, df, showAlert }: { onClose:
         } catch { setErros(p => [...p, `Falha QR: ${c.nome}`]); }
       }
 
-      // Intervalo entre mensagens (3-6 segundos) para evitar bloqueio
-      if (i < comTelefone.length - 1) {
+      if (i < paraEnviar.length - 1) {
         await new Promise(r => setTimeout(r, 3000 + Math.random() * 3000));
       }
     }
@@ -103,7 +117,8 @@ const CobrancaMassaModal = ({ onClose, emitente, di, df, showAlert }: { onClose:
     setEnviando(false);
   };
 
-  const semTelefone = clientes.filter(c => !c.telefone || c.telefone.replace(/\D/g,'').length < 10);
+  const todosChecked = clientes.length > 0 && selecionados.size === clientes.length;
+  const algunsChecked = selecionados.size > 0 && selecionados.size < clientes.length;
 
   return (
     <div className="fixed inset-0 bg-black/60 z-[9990] flex items-center justify-center p-4">
@@ -152,6 +167,9 @@ const CobrancaMassaModal = ({ onClose, emitente, di, df, showAlert }: { onClose:
                     <table className="w-full text-xs">
                       <thead className="bg-gray-50 dark:bg-gray-900">
                         <tr>
+                          <th className="px-3 py-2.5 text-center w-8">
+                            <input type="checkbox" checked={todosChecked} ref={el => { if (el) el.indeterminate = algunsChecked; }} onChange={toggleTodos} className="w-4 h-4 accent-green-600 cursor-pointer" />
+                          </th>
                           <th className="px-4 py-2.5 text-left font-bold text-gray-500 dark:text-gray-400 uppercase">Cliente</th>
                           <th className="px-4 py-2.5 text-left font-bold text-gray-500 dark:text-gray-400 uppercase">Documento</th>
                           <th className="px-4 py-2.5 text-right font-bold text-gray-500 dark:text-gray-400 uppercase">Total Aberto</th>
@@ -159,23 +177,28 @@ const CobrancaMassaModal = ({ onClose, emitente, di, df, showAlert }: { onClose:
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
-                        {clientes.map((c, i) => (
-                          <tr key={i} className={`${!c.telefone || c.telefone.replace(/\D/g,'').length < 10 ? 'opacity-50' : ''}`}>
-                            <td className="px-4 py-2.5 font-semibold text-gray-700 dark:text-gray-200">{c.nome || 'Sem nome'}</td>
-                            <td className="px-4 py-2.5 text-gray-500 dark:text-gray-400">{c.documento || '—'}</td>
-                            <td className="px-4 py-2.5 text-right font-bold text-blue-600 dark:text-blue-400">{Number(c.total_aberto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-                            <td className="px-4 py-2.5 text-center">
-                              {c.telefone && c.telefone.replace(/\D/g,'').length >= 10
-                                ? <span className="text-green-500">✓ {c.telefone}</span>
-                                : <span className="text-red-400">Sem telefone</span>}
-                            </td>
-                          </tr>
-                        ))}
+                        {clientes.map((c) => {
+                          const id = Number(c.cliente_id);
+                          const checked = selecionados.has(id);
+                          return (
+                            <tr key={id} onClick={() => toggleCliente(id)} className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors">
+                              <td className="px-3 py-2.5 text-center">
+                                <input type="checkbox" checked={checked} onChange={() => toggleCliente(id)} onClick={e => e.stopPropagation()} className="w-4 h-4 accent-green-600 cursor-pointer" />
+                              </td>
+                              <td className="px-4 py-2.5 font-semibold text-gray-700 dark:text-gray-200">{c.nome || 'Sem nome'}</td>
+                              <td className="px-4 py-2.5 text-gray-500 dark:text-gray-400">{c.documento || '—'}</td>
+                              <td className="px-4 py-2.5 text-right font-bold text-blue-600 dark:text-blue-400">{Number(c.total_aberto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                              <td className="px-4 py-2.5 text-center">
+                                <span className="text-green-500">✓ {c.telefone}</span>
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
-                  {semTelefone.length > 0 && (
-                    <p className="text-xs text-amber-600 dark:text-amber-400">⚠ {semTelefone.length} cliente(s) sem telefone serão ignorados.</p>
+                  {selecionados.size === 0 && (
+                    <p className="text-xs text-amber-600 dark:text-amber-400">⚠ Nenhum cliente selecionado.</p>
                   )}
                 </div>
               )}
@@ -186,8 +209,8 @@ const CobrancaMassaModal = ({ onClose, emitente, di, df, showAlert }: { onClose:
         {!concluido && !enviando && clientes.length > 0 && (
           <div className="p-6 border-t border-gray-100 dark:border-gray-700 flex gap-3">
             <button onClick={onClose} className="flex-1 py-3 bg-gray-700 dark:bg-gray-600 text-white text-sm font-semibold rounded-xl hover:bg-gray-600 dark:hover:bg-gray-500 transition-colors">Cancelar</button>
-            <button onClick={iniciarEnvio} disabled={clientes.filter(c => c.telefone && c.telefone.replace(/\D/g,'').length >= 10).length === 0} className="flex-1 py-3 bg-green-600 text-white text-sm font-semibold rounded-xl hover:bg-green-700 transition-colors shadow-md disabled:opacity-50 flex items-center justify-center gap-2">
-              <Send className="w-4 h-4" /> Iniciar Envio ({clientes.filter(c => c.telefone && c.telefone.replace(/\D/g,'').length >= 10).length} clientes)
+            <button onClick={iniciarEnvio} disabled={paraEnviar.length === 0} className="flex-1 py-3 bg-green-600 text-white text-sm font-semibold rounded-xl hover:bg-green-700 transition-colors shadow-md disabled:opacity-50 flex items-center justify-center gap-2">
+              <Send className="w-4 h-4" /> Iniciar Envio ({paraEnviar.length} cliente{paraEnviar.length !== 1 ? 's' : ''})
             </button>
           </div>
         )}
