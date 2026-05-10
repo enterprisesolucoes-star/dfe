@@ -101,7 +101,7 @@ export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
   const [kpis, setKpis] = useState<any>({
     orcamentos_pendentes: { qtd: 0, valor: 0 },
     taxa_conversao: { percentual: 0, aprovados: 0, total: 0, trend: 0 },
-    os_andamento: { qtd: 0 },
+    os_andamento: { qtd: 0, valor: 0 },
     os_concluidas_periodo: { qtd: 0, trend: 0 },
     ticket_medio: { orcamento: 0, os: 0, medio: 0, trend: 0 },
     top_clientes: [], top_produtos: [],
@@ -351,6 +351,7 @@ export const DashboardTab = ({ isFiscal, onNavigate }: DashboardTabProps) => {
             onClick={() => goTo('orcamentos')} />
           <KPICard label="OS em Andamento"
             value={kpis.os_andamento.qtd}
+            sub={fmtBRL(kpis.os_andamento.valor)}
             icon={Wrench} color="blue"
             onClick={() => goTo('ordens_servico')} />
           <KPICard label="Taxa de Conversão"

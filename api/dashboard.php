@@ -193,7 +193,7 @@ switch ($action) {
                 ? round(((int)$orcAnt['aprovados'] / (int)$orcAnt['total']) * 100, 1) : 0;
 
             // 3) OS em andamento (snapshot)
-            $osAnd = $pdo->query("SELECT COUNT(*) qtd
+            $osAnd = $pdo->query("SELECT COUNT(*) qtd, COALESCE(SUM(valor_total),0) valor
                 FROM ordens_servico
                 WHERE status IN ('Aberta','Em Andamento') {$empFilter}")->fetch(PDO::FETCH_ASSOC);
 
@@ -296,7 +296,7 @@ echo json_encode([
                     'percentual' => $taxaConv, 'aprovados' => (int)$orcAtual['aprovados'], 'total' => (int)$orcAtual['total'],
                     'trend' => round($taxaConv - $taxaConvAnt, 1),
                 ],
-                'os_andamento' => ['qtd' => (int)$osAnd['qtd']],
+                'os_andamento' => ['qtd' => (int)$osAnd['qtd'], 'valor' => (float)$osAnd['valor']],
                 'os_concluidas_periodo' => [
                     'qtd' => (int)$osAtual['qtd'],
                     'trend' => $trend((int)$osAtual['qtd'], (int)$osAnt2['qtd']),
@@ -328,7 +328,7 @@ echo json_encode([
                 'success' => false, 'message' => $e->getMessage(),
                 'orcamentos_pendentes' => ['qtd' => 0, 'valor' => 0],
                 'taxa_conversao' => ['percentual' => 0, 'aprovados' => 0, 'total' => 0, 'trend' => 0],
-                'os_andamento' => ['qtd' => 0],
+                'os_andamento' => ['qtd' => 0, 'valor' => 0],
                 'os_concluidas_periodo' => ['qtd' => 0, 'trend' => 0],
                 'ticket_medio' => ['orcamento' => 0, 'os' => 0, 'medio' => 0, 'trend' => 0],
                 'top_clientes' => [], 'top_produtos' => [],
