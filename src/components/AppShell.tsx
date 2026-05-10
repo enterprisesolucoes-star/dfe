@@ -610,7 +610,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       case 'fin_pagar': return <FinanceiroView tipo="P" emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} />;
       case 'fin_caixa': return <CaixaView emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} />;
       case 'vendas_geral': return <GeralNfceTab showAlert={showAlert} showConfirm={showConfirm} showPrompt={showPrompt} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} onCancelar={handleCancelar} onRetryTef={handleRetryTef} onExcluir={handleExcluirVenda} emitente={emitente} />;
-      case 'vendas': return <VendasTab vendas={vendas} onCancelar={handleCancelar} onSincronizar={handleSincronizarContingencia} onRetryTef={handleRetryTef} onExcluir={handleExcluirVenda} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} />;
+      case 'vendas': return <VendasTab vendas={vendas} onCancelar={handleCancelar} onSincronizar={handleSincronizarContingencia} onRetryTef={handleRetryTef} onExcluir={handleExcluirVenda} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} emitente={emitente} />;
       case 'produtos': return (
         <ProdutosTab
           onEdit={(p) => { setEditingProduto(p); setIsProdutoModalOpen(true); }}
@@ -961,7 +961,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
                 onClick={() => { setEditingProduto(null); setIsProdutoModalOpen(true); }}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors"
               >
-                <Plus className="w-4 h-4" />
+                <Package className="w-4 h-4" />
                 Novo Produto
               </button>
             )}
@@ -970,7 +970,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
                 onClick={() => { setEditingCliente(null); setIsClienteModalOpen(true); }}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors"
               >
-                <Plus className="w-4 h-4" />
+                <UserPlus className="w-4 h-4" />
                 Novo Cliente
               </button>
             )}
@@ -979,7 +979,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
                 onClick={() => { setEditingFornecedor(null); setIsFornecedorModalOpen(true); }}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors"
               >
-                <Plus className="w-4 h-4" />
+                <Building2 className="w-4 h-4" />
                 Novo Fornecedor
               </button>
             )}
@@ -989,7 +989,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
                 onClick={() => { setEditingTransportador(null); setIsTransportadorModalOpen(true); }}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors"
               >
-                <Plus className="w-4 h-4" />
+                <Truck className="w-4 h-4" />
                 Novo Transportador
               </button>
             )}
@@ -998,7 +998,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
                 onClick={() => { setEditingMedida(null); setIsMedidaModalOpen(true); }}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors"
               >
-                <Plus className="w-4 h-4" />
+                <Ruler className="w-4 h-4" />
                 Nova Medida
               </button>
             )}
@@ -1007,7 +1007,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
                 onClick={() => { setEditingBandeira(null); setIsBandeiraModalOpen(true); }}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors"
               >
-                <Plus className="w-4 h-4" />
+                <CreditCard className="w-4 h-4" />
                 Nova Bandeira
               </button>
             )}

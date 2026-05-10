@@ -140,7 +140,8 @@ switch ($action) {
                 'usuario_dfe' => 'usuario_dfe',
                 'codigo_municipio' => 'codigo_municipio',
                 'ambiente' => 'ambiente',
-                'tem_tef' => 'tem_tef'
+                'tem_tef' => 'tem_tef',
+                'integracaowhatsapp' => 'integracaowhatsapp'
             ];
 
             foreach ($map as $db => $fr) {

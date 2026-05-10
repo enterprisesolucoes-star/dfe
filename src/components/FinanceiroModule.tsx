@@ -233,16 +233,16 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobranc
           ))}
           <span className="text-gray-300 dark:text-gray-600 text-xs">|</span>
           <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase">De:</span>
-          <input type="date" value={di} onChange={e => setDi(e.target.value)} className="border border-gray-200 dark:border-gray-700 rounded-xl px-2 py-1.5 text-xs outline-none" />
+          <input type="date" value={di} onChange={e => setDi(e.target.value)} className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded-xl px-2 py-1.5 text-xs outline-none" />
           <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase">Até:</span>
-          <input type="date" value={df} onChange={e => setDf(e.target.value)} className="border border-gray-200 dark:border-gray-700 rounded-xl px-2 py-1.5 text-xs outline-none" />
+          <input type="date" value={df} onChange={e => setDf(e.target.value)} className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded-xl px-2 py-1.5 text-xs outline-none" />
           <button onClick={fetchTitulos} className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all">Atualizar</button>
           <button onClick={() => setShowLancamento(true)} className="flex items-center gap-1 px-3 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition-all"><Plus className="w-3 h-3" /> Novo Lançamento</button>
         </div>
         <div className="flex items-center gap-2">
           <div className="relative">
             <Search className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input type="text" placeholder={`Buscar ${tipo === 'P' ? 'fornecedor' : 'cliente'}...`} value={busca} onChange={e => setBusca(e.target.value)} onKeyDown={e => e.key === 'Enter' && fetchTitulos()} className="border border-gray-200 dark:border-gray-700 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none w-48" />
+            <input type="text" placeholder={`Buscar ${tipo === 'P' ? 'fornecedor' : 'cliente'}...`} value={busca} onChange={e => setBusca(e.target.value)} onKeyDown={e => e.key === 'Enter' && fetchTitulos()} className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded-xl pl-8 pr-3 py-1.5 text-xs outline-none w-48" />
           </div>
         </div>
       </div>
@@ -405,7 +405,7 @@ export const EditarTituloModal = ({ titulo, onClose, onSuccess, showAlert }: any
         </div>
         <div className="p-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex gap-3">
           <button onClick={onClose} className="flex-1 py-2.5 text-gray-500 dark:text-gray-400 font-bold uppercase text-xs border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">Cancelar</button>
-          <button onClick={handleSalvar} disabled={saving} className={`flex-1 py-2.5 ${corBtn} disabled:bg-gray-300 text-white font-bold uppercase text-xs rounded-xl`}>
+          <button onClick={handleSalvar} disabled={saving} className={`flex-1 py-2.5 ${corBtn} disabled:bg-gray-300 dark:disabled:bg-gray-600 text-white font-bold uppercase text-xs rounded-xl`}>
             {saving ? 'Salvando...' : 'Salvar'}
           </button>
         </div>
@@ -555,7 +555,7 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
               Depois
             </button>
             <button onClick={handleGerarBoletos} disabled={gerandoBoletos}
-              className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 text-white font-bold uppercase text-xs rounded-xl flex items-center justify-center gap-2">
+              className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 text-white font-bold uppercase text-xs rounded-xl flex items-center justify-center gap-2">
               {gerandoBoletos
                 ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Gerando...</>
                 : <><FileText className="w-3.5 h-3.5" /> Gerar e Imprimir Todos</>}
@@ -728,7 +728,7 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
           </button>
           <button onClick={handleSalvar}
             disabled={saving || diferenca > 0 || !descricao.trim() || valorNum <= 0 || (isBoleto && tipo === 'R' && !clienteId)}
-            className={`flex-1 py-2.5 ${corBtn} disabled:bg-gray-300 text-white font-bold uppercase text-xs rounded-xl flex items-center justify-center gap-2`}>
+            className={`flex-1 py-2.5 ${corBtn} disabled:bg-gray-300 dark:disabled:bg-gray-600 text-white font-bold uppercase text-xs rounded-xl flex items-center justify-center gap-2`}>
             {saving
               ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Salvando...</>
               : isBoleto
@@ -903,9 +903,9 @@ export const CaixaView = ({ emitente, showAlert, showConfirm }: { emitente: any,
       <div className="flex flex-wrap items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 gap-4">
         <div className="flex items-center gap-2">
           <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase">De:</span>
-          <input type="date" value={di} onChange={e => setDi(e.target.value)} className="border border-gray-200 dark:border-gray-700 rounded-xl px-2 py-1.5 text-xs outline-none" />
+          <input type="date" value={di} onChange={e => setDi(e.target.value)} className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded-xl px-2 py-1.5 text-xs outline-none" />
           <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase">Até:</span>
-          <input type="date" value={df} onChange={e => setDf(e.target.value)} className="border border-gray-200 dark:border-gray-700 rounded-xl px-2 py-1.5 text-xs outline-none" />
+          <input type="date" value={df} onChange={e => setDf(e.target.value)} className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded-xl px-2 py-1.5 text-xs outline-none" />
           <button onClick={fetchMovimentos} className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all">Atualizar</button>
         </div>
         <button onClick={() => setShowModal(true)} className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition-all">

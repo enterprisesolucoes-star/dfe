@@ -129,7 +129,16 @@ const OrcamentosTab = ({
     });
   };
 
-  const handlePrint = (id: number) => window.open(`./api.php?action=orcamento_pdf&id=${id}`, '_blank');
+  const handlePrint = async (id: number) => {
+    try {
+      const res = await fetch(`./api.php?action=orcamento_pdf&id=${id}`);
+      if (!res.ok) { showAlert('Erro', 'Não foi possível gerar o PDF.'); return; }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      setTimeout(() => URL.revokeObjectURL(url), 30000);
+    } catch { showAlert('Erro', 'Falha ao gerar PDF.'); }
+  };
 
   const handleBusca = (termo: string) => {
     setBuscaProd(termo); setSelectedProd(null); setVUnit('');
@@ -570,7 +579,7 @@ const OrcamentosTab = ({
                       <button title="Editar" onClick={() => openForm(orc)} className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400 transition-colors"><Edit className="w-4 h-4" /></button>
                       <button title="Imprimir PDF" onClick={() => handlePrint(orc.id!)} className="p-1.5 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300 transition-colors"><Printer className="w-4 h-4" /></button>
                       <button title="Enviar por e-mail" onClick={() => { setEmailOrc(orc); setEmailDest(orc.cliente_email || ''); setShowEmail(true); }} className="p-1.5 hover:bg-purple-50 rounded-lg text-purple-600 transition-colors"><Mail className="w-4 h-4" /></button>
-                      <button title="Enviar WhatsApp" onClick={() => { const num = String(orc.numero ?? '').padStart(4,'0'); const val = 'R$ ' + Number(orc.valor_total).toLocaleString('pt-BR',{minimumFractionDigits:2}); setWaTarget({ id: orc.id!, action: 'orcamento_pdf', filename: `orcamento_${num}.pdf`, caption: `Orcamento No ${num} - ${orc.cliente_nome || 'Cliente'} - ${val}`, phone: (orc.cliente_telefone || '').replace(/\D/g,'') }); }} className="p-1.5 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-lg text-green-600 dark:text-green-400 transition-colors"><MessageCircle className="w-4 h-4" /></button>
+                      {!!(emitente as any).integracaowhatsapp && <button title="Enviar WhatsApp" onClick={() => { const num = String(orc.numero ?? '').padStart(4,'0'); const val = 'R$ ' + Number(orc.valor_total).toLocaleString('pt-BR',{minimumFractionDigits:2}); setWaTarget({ id: orc.id!, action: 'orcamento_pdf', filename: `orcamento_${num}.pdf`, caption: `Orcamento No ${num} - ${orc.cliente_nome || 'Cliente'} - ${val}`, phone: (orc.cliente_telefone || '').replace(/\D/g,'') }); }} className="p-1.5 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-lg text-green-600 dark:text-green-400 transition-colors"><MessageCircle className="w-4 h-4" /></button>}
                       {isFiscal && <button title="Exportar para NFC-e" onClick={() => handleExportarNFCe(orc)} className="p-1.5 hover:bg-orange-50 rounded-lg text-orange-600 dark:text-orange-400 transition-colors"><ArrowRight className="w-4 h-4" /></button>}
                       <button title="Excluir" onClick={() => handleExcluir(orc.id!)} className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg text-red-500 dark:text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
                     </div>
@@ -581,6 +590,15 @@ const OrcamentosTab = ({
           </table>
         </div>
       </div>
+      {emailSending && (
+        <div className="fixed inset-0 bg-black/60 z-[9999] flex items-center justify-center">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl px-8 py-6 flex flex-col items-center gap-3 shadow-2xl">
+            <div className="w-8 h-8 border-3 border-purple-600 border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">Enviando e-mail...</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">Por favor aguarde</p>
+          </div>
+        </div>
+      )}
       {showEmail && emailOrc && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[200]">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm p-6">

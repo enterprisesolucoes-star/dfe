@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import {
-  Plus, Search, Edit, Trash2, X, Upload, RefreshCw
+  Plus, Search, Edit, Trash2, X, Upload, RefreshCw, Check
 } from 'lucide-react';
 import { Input, MaskedInput, useDebounce, Pagination } from './UIComponents';
 import { Produto, Cliente, Fornecedor, Transportador, Bandeira, Medida } from '../types/nfce';
@@ -650,7 +650,7 @@ export const ClienteModal = ({ cliente, onClose, onSave, showAlert, emitente }: 
           </div>
         </div>
         <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/30">
-          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl">Cancelar</button>
+          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl flex items-center gap-1.5"><X className="w-3.5 h-3.5" />Cancelar</button>
           <button onClick={() => {
             const end = form.endereco || {};
             if (!end.logradouro?.trim() || !end.numero?.trim() || !end.bairro?.trim() || !end.codigoMunicipio || !end.cep?.trim()) {
@@ -658,7 +658,7 @@ export const ClienteModal = ({ cliente, onClose, onSave, showAlert, emitente }: 
               return;
             }
             onSave(form);
-          }} className="px-8 py-2 bg-blue-600 text-white font-bold uppercase text-[11px] rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700">Salvar</button>
+          }} className="px-8 py-2 bg-blue-600 text-white font-bold uppercase text-[11px] rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700 flex items-center gap-1.5"><Check className="w-3.5 h-3.5" />Salvar</button>
         </div>
       </motion.div>
     </div>
@@ -1207,10 +1207,8 @@ export const ProdutoModal = ({ produto, onClose, onSave, showAlert, usuarioDfe }
           )}
         </div>
         <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/30">
-          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl">Cancelar</button>
-          <button onClick={() => onSave(form)} className="px-8 py-2 bg-blue-600 text-white font-bold uppercase text-[11px] rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700">
-            {produto ? 'Salvar' : 'Cadastrar'}
-          </button>
+          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl flex items-center gap-1.5"><X className="w-3.5 h-3.5" />Cancelar</button>
+          <button onClick={() => onSave(form)} className="px-8 py-2 bg-blue-600 text-white font-bold uppercase text-[11px] rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700 flex items-center gap-1.5"><Check className="w-3.5 h-3.5" />Salvar</button>
         </div>
       </motion.div>
     </div>
@@ -1303,7 +1301,7 @@ export const FornecedorModal = ({ fornecedor, onClose, onSave, showAlert }: any)
           </div>
         </div>
         <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/30">
-          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl">Cancelar</button>
+          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl flex items-center gap-1.5"><X className="w-3.5 h-3.5" />Cancelar</button>
           <button onClick={() => {
             const end = form.endereco || {};
             if (!end.logradouro?.trim() || !end.numero?.trim() || !end.bairro?.trim() || !end.codigoMunicipio || !end.cep?.trim()) {
@@ -1311,7 +1309,7 @@ export const FornecedorModal = ({ fornecedor, onClose, onSave, showAlert }: any)
               return;
             }
             onSave(form);
-          }} className="px-8 py-2 bg-blue-600 text-white font-bold uppercase text-[11px] rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700">Salvar</button>
+          }} className="px-8 py-2 bg-blue-600 text-white font-bold uppercase text-[11px] rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700 flex items-center gap-1.5"><Check className="w-3.5 h-3.5" />Salvar</button>
         </div>
       </motion.div>
     </div>
@@ -1379,8 +1377,8 @@ export const TransportadorModal = ({ transportador, onClose, onSave }: any) => {
           </div>
         </div>
         <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/30">
-          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl">Cancelar</button>
-          <button onClick={() => onSave(form)} className="px-8 py-2 bg-blue-600 text-white font-bold uppercase text-[11px] rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700">Salvar</button>
+          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl flex items-center gap-1.5"><X className="w-3.5 h-3.5" />Cancelar</button>
+          <button onClick={() => onSave(form)} className="px-8 py-2 bg-blue-600 text-white font-bold uppercase text-[11px] rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700 flex items-center gap-1.5"><Check className="w-3.5 h-3.5" />Salvar</button>
         </div>
       </motion.div>
     </div>
@@ -1417,8 +1415,8 @@ export const MedidaModal = ({ medida, onClose, onSave }: any) => {
           </div>
         </div>
         <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/30">
-          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl">Cancelar</button>
-          <button onClick={() => onSave(form)} className="px-8 py-2 bg-blue-600 text-white font-bold uppercase text-[11px] rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700">Salvar</button>
+          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl flex items-center gap-1.5"><X className="w-3.5 h-3.5" />Cancelar</button>
+          <button onClick={() => onSave(form)} className="px-8 py-2 bg-blue-600 text-white font-bold uppercase text-[11px] rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700 flex items-center gap-1.5"><Check className="w-3.5 h-3.5" />Salvar</button>
         </div>
       </motion.div>
     </div>
@@ -1448,8 +1446,8 @@ export const BandeiraModal = ({ bandeira, onClose, onSave }: any) => {
           <MaskedInput label="CNPJ da Credenciadora" mask="cpfcnpj" value={form.cnpj_opc || ''} onChange={(e: any) => set('cnpj_opc', e.target.value)} placeholder="Ex: 00.000.000/0001-00" />
         </div>
         <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/30">
-          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl">Cancelar</button>
-          <button onClick={() => onSave(form)} className="px-8 py-2 bg-blue-600 text-white font-bold uppercase text-[11px] rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700">Salvar</button>
+          <button onClick={onClose} className="px-6 py-2 text-gray-500 dark:text-gray-400 font-bold uppercase text-[11px] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl flex items-center gap-1.5"><X className="w-3.5 h-3.5" />Cancelar</button>
+          <button onClick={() => onSave(form)} className="px-8 py-2 bg-blue-600 text-white font-bold uppercase text-[11px] rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700 flex items-center gap-1.5"><Check className="w-3.5 h-3.5" />Salvar</button>
         </div>
       </motion.div>
     </div>
