@@ -678,6 +678,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       case 'dfe_nfe': return (
         <NfeDashboardTab
           nfeList={nfeList}
+          emitente={emitente}
           showAlert={showAlert}
           showPrompt={showPrompt}
           onNovaNfe={() => setIsNfeModalOpen(true)}
