@@ -695,7 +695,7 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
         .then(d => setClientes(Array.isArray(d.clientes) ? d.clientes : Array.isArray(d) ? d : []))
         .catch(() => {});
     }
-  }, [isBoleto, tipo]);
+  }, [precisaCliente, tipo]);
 
   const valorNum = Number(String(valorTotal).replace(',', '.')) || 0;
 

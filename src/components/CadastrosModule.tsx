@@ -531,13 +531,19 @@ const NcmImportModal = ({ defaultUf, onClose }: { defaultUf: string; onClose: ()
 export const ClienteModal = ({ cliente, onClose, onSave, showAlert, emitente }: any) => {
   const defUf     = emitente?.uf || emitente?.endereco?.uf || 'GO';
   const defCodMun = emitente?.codigoMunicipio || emitente?.endereco?.codigoMunicipio || '';
-  const defMun    = emitente?.endereco?.municipio || '';
+  const defMun    = emitente?.municipio || emitente?.endereco?.municipio || '';
   const [form, setForm] = useState<any>(cliente || {
     nome: '', documento: '', email: '', telefone: '', ie: '', indIEDest: '9',
     regimeTributario: '1', entidadeGovernamental: '0',
     endereco: { logradouro: '', numero: '', complemento: '', bairro: '', municipio: defMun, codigoMunicipio: defCodMun, uf: defUf, cep: '' }
   });
   const { municipios, loading: loadingMun, carregar } = useMunicipios(form.endereco?.uf);
+  useEffect(() => {
+    if (form.endereco?.codigoMunicipio && !form.endereco?.municipio && municipios.length > 0) {
+      const m = municipios.find((x: any) => String(x.id) === String(form.endereco.codigoMunicipio));
+      if (m) setForm((f: any) => ({ ...f, endereco: { ...f.endereco, municipio: m.nome } }));
+    }
+  }, [municipios]);
   const docDigits = (form.documento || '').replace(/\D/g, '');
   const isPF = docDigits.length > 0 && docDigits.length <= 11;
   const setDocumento = (val: string) => {
