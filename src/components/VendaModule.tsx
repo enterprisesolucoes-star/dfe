@@ -312,6 +312,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
   const [pagamentos, setPagamentos] = useState<any[]>([]);
   const [buscaProduto, setBuscaProduto] = useState('');
   const [produtosFiltrados, setProdutosFiltrados] = useState<Produto[]>([]);
+  const [dropIdx, setDropIdx] = useState(-1);
   const [selectedProduto, setSelectedProduto] = useState<string>('');
   const [valorAtual, setValorAtual] = useState<number>(0);
   const [quantidade, setQuantidade] = useState<number>(1);
@@ -773,7 +774,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Buscar Produto</label>
                   <input ref={buscaProdutoInputRef} type="text" value={buscaProduto} placeholder="Por código, código de barras ou nome..." className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
                     onChange={(e) => {
-                      const t = e.target.value; setBuscaProduto(t); setSelectedProduto('');
+                      const t = e.target.value; setBuscaProduto(t); setSelectedProduto(''); setDropIdx(-1);
                       if (t.length < 1) { setProdutosFiltrados([]); return; }
                       const qtyMatch = t.match(/^(\d+)[*xX]\s*(.*)/);
                       const termo = qtyMatch ? qtyMatch[2] : t;
@@ -785,11 +786,14 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
                       if (f.length === 1) { setSelectedProduto(String(f[0].id)); setBuscaProduto(f[0].descricao); setValorAtual(f[0].valorUnitario); setProdutosFiltrados([]); setTimeout(() => inputQtdRef.current?.focus(), 10); }
                     }}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
+                      if (e.key === 'ArrowDown') { e.preventDefault(); setDropIdx(i => Math.min(i + 1, produtosFiltrados.length - 1)); }
+                      else if (e.key === 'ArrowUp') { e.preventDefault(); setDropIdx(i => Math.max(i - 1, -1)); }
+                      else if (e.key === 'Escape') { setProdutosFiltrados([]); setDropIdx(-1); }
+                      else if (e.key === 'Enter') {
                         if (selectedProduto) { setTimeout(() => inputQtdRef.current?.focus(), 10); }
                         else if (produtosFiltrados.length > 0) {
-                          const p = produtosFiltrados[0];
-                          setSelectedProduto(String(p.id)); setBuscaProduto(p.descricao); setValorAtual(p.valorUnitario); setProdutosFiltrados([]);
+                          const p = produtosFiltrados[dropIdx >= 0 ? dropIdx : 0];
+                          setSelectedProduto(String(p.id)); setBuscaProduto(p.descricao); setValorAtual(p.valorUnitario); setProdutosFiltrados([]); setDropIdx(-1);
                           setTimeout(() => inputQtdRef.current?.focus(), 10);
                         }
                       }
@@ -797,8 +801,8 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
                   />
                   {produtosFiltrados.length > 0 && (
                     <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-[200] max-h-60 overflow-auto">
-                      {produtosFiltrados.map(p => (
-                        <button key={p.id} onClick={() => { setSelectedProduto(String(p.id)); setBuscaProduto(p.descricao); setValorAtual(p.valorUnitario); setProdutosFiltrados([]); setTimeout(() => inputQtdRef.current?.focus(), 10); }} className="w-full text-left px-4 py-2 flex justify-between hover:bg-blue-50 dark:hover:bg-blue-900/30">
+                      {produtosFiltrados.map((p, idx) => (
+                        <button key={p.id} onClick={() => { setSelectedProduto(String(p.id)); setBuscaProduto(p.descricao); setValorAtual(p.valorUnitario); setProdutosFiltrados([]); setDropIdx(-1); setTimeout(() => inputQtdRef.current?.focus(), 10); }} className={`w-full text-left px-4 py-2 flex justify-between ${dropIdx === idx ? 'bg-blue-100 dark:bg-blue-900/40' : 'hover:bg-blue-50 dark:hover:bg-blue-900/30'}`}>
                           <div><p className="font-medium text-sm">{p.descricao}</p><p className="text-[10px] text-gray-400 dark:text-gray-500">{p.codigoInterno}</p></div>
                           <span className="text-sm font-bold text-blue-600 dark:text-blue-400">R$ {brl(p.valorUnitario)}</span>
                         </button>

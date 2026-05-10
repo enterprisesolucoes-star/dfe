@@ -139,6 +139,7 @@ const NfeDashboard: React.FC<Props> = ({
   const [buscaProduto, setBuscaProduto] = useState('');
   const [dropCliente, setDropCliente] = useState(false);
   const [dropProduto, setDropProduto] = useState(false);
+  const [dropIdx, setDropIdx] = useState(-1);
 
   // Edição manual de impostos
   const [editingItemIdx, setEditingItemIdx] = useState<number | null>(null);
@@ -503,7 +504,7 @@ const NfeDashboard: React.FC<Props> = ({
   ).slice(0, 10);
 
   const produtosFiltrados = produtos.filter(p =>
-    !buscaProduto || (p.descricao || '').toLowerCase().includes(buscaProduto.toLowerCase()) || (p.codigoInterno || '').includes(buscaProduto)
+    !buscaProduto || (p.descricao || '').toLowerCase().includes(buscaProduto.toLowerCase()) || (p.codigoInterno || '').includes(buscaProduto) || (p.codigoBarras || '').includes(buscaProduto)
   ).slice(0, 10);
 
   return (
@@ -764,17 +765,23 @@ const NfeDashboard: React.FC<Props> = ({
                   <input
                     ref={refBuscaProduto}
                     value={buscaProduto}
-                    onChange={e => { setBuscaProduto(e.target.value); setDropProduto(true); } }
+                    onChange={e => { setBuscaProduto(e.target.value); setDropProduto(true); setDropIdx(-1); } }
                     onFocus={() => setDropProduto(true)}
                     onBlur={() => setTimeout(() => setDropProduto(false), 150)}
-                    placeholder="Buscar produto..."
+                    onKeyDown={(e) => {
+                      if (e.key === 'ArrowDown') { e.preventDefault(); setDropIdx(i => Math.min(i + 1, produtosFiltrados.length - 1)); }
+                      else if (e.key === 'ArrowUp') { e.preventDefault(); setDropIdx(i => Math.max(i - 1, -1)); }
+                      else if (e.key === 'Escape') { setDropProduto(false); setDropIdx(-1); }
+                      else if (e.key === 'Enter' && produtosFiltrados.length > 0) { e.preventDefault(); adicionarProduto(produtosFiltrados[dropIdx >= 0 ? dropIdx : 0]); setDropIdx(-1); }
+                    }}
+                    placeholder="Localizar por código, código de barras ou nome..."
                     className="w-full pl-11 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl text-base outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 shadow-sm transition-all"
                   />
                   {dropProduto && produtosFiltrados.length > 0 && (
                     <div className="absolute z-20 top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl max-h-60 overflow-y-auto">
-                      {produtosFiltrados.map(p => (
-                        <button key={p.id} onClick={() => adicionarProduto(p)}
-                          className="w-full text-left px-4 py-3 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors border-b border-gray-50 dark:border-gray-700 last:border-0 flex justify-between items-center">
+                      {produtosFiltrados.map((p, idx) => (
+                        <button key={p.id} onClick={() => { adicionarProduto(p); setDropIdx(-1); }}
+                          className={`w-full text-left px-4 py-3 transition-colors border-b border-gray-50 dark:border-gray-700 last:border-0 flex justify-between items-center ${dropIdx === idx ? 'bg-blue-100 dark:bg-blue-900/40' : 'hover:bg-blue-50 dark:hover:bg-blue-900/30'}`}>
                           <div>
                             <p className="font-semibold text-gray-700 dark:text-gray-200 text-sm">{p.descricao}</p>
                             <p className="text-gray-400 dark:text-gray-500 text-[11px] font-medium">{p.codigoInterno} · NCM {p.ncm} · <span className={p.estoque && p.estoque > 0 ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"}>Estoque: {p.estoque ?? 0}</span></p>
