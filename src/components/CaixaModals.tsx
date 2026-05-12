@@ -146,7 +146,18 @@ const FecharCaixaModal = ({ caixaId, showConfirm, onClose, onFechado }: { caixaI
         <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex gap-3">
           <button onClick={onClose} className="flex-1 px-4 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">Sair</button>
           <button
-            onClick={() => window.open(`./api.php?action=relatorio_caixa_pdf&caixaId=${caixaId}`, '_blank', 'noopener,noreferrer')}
+            onClick={async () => {
+              try {
+                const res = await fetch(`./api.php?action=relatorio_caixa_pdf&caixaId=${caixaId}`);
+                if (!res.ok) throw new Error('Erro ao gerar PDF');
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.target = '_blank'; a.rel = 'noopener';
+                document.body.appendChild(a); a.click();
+                setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
+              } catch(e) { alert('Erro ao gerar relatório: ' + e); }
+            }}
             disabled={loading}
             className="px-4 py-2 text-sm border border-blue-200 dark:border-blue-700 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 disabled:opacity-50"
           >

@@ -10,7 +10,6 @@ class ComposerStaticInit897d09971b8c4476bfb4196b1e4d5da9
         'P' => 
         array (
             'Psr\\Log\\' => 8,
-            'PHPMailer\\PHPMailer\\' => 20,
         ),
         'N' => 
         array (
@@ -22,6 +21,10 @@ class ComposerStaticInit897d09971b8c4476bfb4196b1e4d5da9
         'J' => 
         array (
             'JsonSchema\\' => 11,
+        ),
+        'F' => 
+        array (
+            'Fpdf\\' => 5,
         ),
         'C' => 
         array (
@@ -38,10 +41,6 @@ class ComposerStaticInit897d09971b8c4476bfb4196b1e4d5da9
         'Psr\\Log\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/log/src',
-        ),
-        'PHPMailer\\PHPMailer\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
         ),
         'NFePHP\\NFe\\' => 
         array (
@@ -63,6 +62,10 @@ class ComposerStaticInit897d09971b8c4476bfb4196b1e4d5da9
         array (
             0 => __DIR__ . '/..' . '/justinrainbow/json-schema/src/JsonSchema',
         ),
+        'Fpdf\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/fpdf/fpdf/src/Fpdf',
+        ),
         'Com\\Tecnick\\Color\\' => 
         array (
             0 => __DIR__ . '/..' . '/tecnickcom/tc-lib-color/src',
@@ -79,6 +82,7 @@ class ComposerStaticInit897d09971b8c4476bfb4196b1e4d5da9
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'FPDF' => __DIR__ . '/..' . '/setasign/fpdf/fpdf.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

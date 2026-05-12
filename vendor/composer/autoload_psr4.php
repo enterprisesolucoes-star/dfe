@@ -7,12 +7,12 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Psr\\Log\\' => array($vendorDir . '/psr/log/src'),
-    'PHPMailer\\PHPMailer\\' => array($vendorDir . '/phpmailer/phpmailer/src'),
     'NFePHP\\NFe\\' => array($vendorDir . '/nfephp-org/sped-nfe/src'),
     'NFePHP\\Gtin\\' => array($vendorDir . '/nfephp-org/sped-gtin/src'),
     'NFePHP\\DA\\' => array($vendorDir . '/nfephp-org/sped-da/src'),
     'NFePHP\\Common\\' => array($vendorDir . '/nfephp-org/sped-common/src'),
     'JsonSchema\\' => array($vendorDir . '/justinrainbow/json-schema/src/JsonSchema'),
+    'Fpdf\\' => array($vendorDir . '/fpdf/fpdf/src/Fpdf'),
     'Com\\Tecnick\\Color\\' => array($vendorDir . '/tecnickcom/tc-lib-color/src'),
     'Com\\Tecnick\\Barcode\\' => array($vendorDir . '/tecnickcom/tc-lib-barcode/src'),
     'App\\' => array($baseDir . '/src'),
