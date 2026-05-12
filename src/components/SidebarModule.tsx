@@ -184,7 +184,7 @@ export const Sidebar = ({
   const financeiroActive = ['fin_receber', 'fin_pagar', 'fin_caixa', 'cobranca_boletos', 'cobranca_historico'].includes(activeTab);
   const nfeActive = ['dfe_nfe', 'dfe_nfe_geral'].includes(activeTab);
   const nfceActive = ['vendas', 'vendas_geral'].includes(activeTab);
-  const cadastrosActive = ['ncm', 'usuarios', 'medidas', 'bandeiras', 'transportadores', 'vendedores',
+  const cadastrosActive = ['ncm', 'usuarios', 'medidas', 'transportadores', 'vendedores',
     'cobranca_config', 'config_integracao', 'dfe_config', 'dfe_nfe_dados', 'dfe_nfce_dados', 'dfe_provedor'].includes(activeTab);
 
   return (
@@ -293,7 +293,7 @@ export const Sidebar = ({
         >
           <SubItem id="ncm" label="NCM/IBPT" icon={Hash} activeTab={activeTab} onClick={handleSetActiveTab} />
           <SubItem id="medidas" label="Medidas" icon={Ruler} activeTab={activeTab} onClick={handleSetActiveTab} />
-          {isFiscal && <SubItem id="bandeiras" label="Bandeiras" icon={CreditCard} activeTab={activeTab} onClick={handleSetActiveTab} />}
+  
           <SubItem id="transportadores" label="Transportadores" icon={Truck} activeTab={activeTab} onClick={handleSetActiveTab} />
           <SubItem id="vendedores" label="Vendedores" icon={UserCircle} activeTab={activeTab} onClick={handleSetActiveTab} />
           <SubItem id="cobranca_config" label="Cobrança" icon={Landmark} activeTab={activeTab} onClick={handleSetActiveTab} />

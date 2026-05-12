@@ -10,7 +10,6 @@ import { motion } from 'motion/react';
 interface Produto  { id: number; descricao: string; valorUnitario: number; codigoInterno?: string; codigoBarras?: string; estoque?: number; unidadeComercial?: string; }
 interface Cliente  { id: number; nome: string; documento?: string; endereco?: { logradouro?: string; numero?: string; bairro?: string; municipio?: string; uf?: string; cep?: string; }; }
 interface Vendedor { id: number; nome: string; percentual_comissao: number; ativo: number; }
-interface Bandeira { id: number; tband_opc: string; tpag?: string; }
 interface PedidoItem { produtoId: number; descricao: string; unidade: string; quantidade: number; valorUnitario: number; desconto: number; valorTotal: number; }
 interface PedidoPagamento { formaPagamento: string; valorPagamento: number; vencimentos?: { numero: number; vencimento: string; valor: number }[]; bandeira?: string; autorizacao?: string; }
 interface PedidoLista { id: number; numero: number; data_emissao: string; status: string; valor_total: number; cliente_nome?: string; vendedor_nome?: string; }
@@ -26,6 +25,23 @@ const FORMAS_CAIXA   = ['01','03','04','17','10','11'];
 const FORMAS_RECEBER = ['02','05','15','99'];
 const brl    = (v: number) => Number(v)?.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0,00';
 const round2 = (v: number) => Math.round(v * 100) / 100;
+
+
+const BANDEIRAS_CARTAO = [
+  { id: 1,  tpag: '03', tband: '02', tband_opc: 'Mastercard',       cnpj: '05577343000137' },
+  { id: 2,  tpag: '03', tband: '01', tband_opc: 'Visa Crédito',     cnpj: '31551765000143' },
+  { id: 3,  tpag: '03', tband: '03', tband_opc: 'Amex',             cnpj: '60419645000195' },
+  { id: 4,  tpag: '03', tband: '06', tband_opc: 'Elo Crédito',      cnpj: '09227084000175' },
+  { id: 5,  tpag: '03', tband: '07', tband_opc: 'Hipercard',        cnpj: '03012230000169' },
+  { id: 6,  tpag: '03', tband: '05', tband_opc: 'Diners',           cnpj: '33479023000180' },
+  { id: 7,  tpag: '03', tband: '09', tband_opc: 'Cabal Crédito',    cnpj: '03766873000106' },
+  { id: 8,  tpag: '03', tband: '99', tband_opc: 'Outro Crédito',    cnpj: '' },
+  { id: 9,  tpag: '04', tband: '02', tband_opc: 'Mastercard Déb.',  cnpj: '05577343000137' },
+  { id: 10, tpag: '04', tband: '01', tband_opc: 'Visa Débito',      cnpj: '31551765000143' },
+  { id: 11, tpag: '04', tband: '06', tband_opc: 'Elo Débito',       cnpj: '09227084000175' },
+  { id: 12, tpag: '04', tband: '09', tband_opc: 'Cabal Débito',     cnpj: '03766873000106' },
+  { id: 13, tpag: '04', tband: '99', tband_opc: 'Outro Débito',     cnpj: '' },
+];
 
 export const PedidoTab = ({ produtos, clientes, vendedores, emitente, showAlert, showConfirm, showPrompt, session }: {
   produtos: Produto[]; clientes: Cliente[]; vendedores: Vendedor[];
@@ -66,7 +82,7 @@ export const PedidoTab = ({ produtos, clientes, vendedores, emitente, showAlert,
   const [valorSeguro, setValorSeguro]   = useState(0);
   const [valorOutras, setValorOutras]   = useState(0);
   const [pagamentos, setPagamentos]         = useState<PedidoPagamento[]>([]);
-  const [bandeiras, setBandeiras]           = useState<Bandeira[]>([]);
+
   const [parcelamentoIdx, setParcelamentoIdx] = useState<number | null>(null);
 
   const refBuscaProduto = useRef<HTMLInputElement>(null);
@@ -89,7 +105,7 @@ export const PedidoTab = ({ produtos, clientes, vendedores, emitente, showAlert,
 
   useEffect(() => { carregarPedidos(); }, [dtInicio, dtFim]);
   useEffect(() => {
-    fetch('./api.php?action=bandeiras').then(r => r.json()).then(d => { if (Array.isArray(d)) setBandeiras(d); });
+
   }, []);
 
   const clientesFiltrados = clientes.filter(c =>
@@ -801,7 +817,7 @@ ${observacao?`<div style="border:1px solid #ddd;border-radius:4px;padding:10px;m
                       <div className="w-36"><label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Bandeira</label>
                         <select value={pag.bandeira||''} onChange={e => atualizarPagamento(idx,'bandeira',e.target.value)} className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-2 text-xs bg-white dark:bg-gray-800 outline-none">
                           <option value="">Selecione...</option>
-                          {bandeiras.map(b => <option key={b.id} value={b.tpag||String(b.id)}>{b.tband_opc}</option>)}
+                          {BANDEIRAS_CARTAO.map(b => <option key={b.id} value={b.tband}>{b.tband_opc}</option>)}
                         </select>
                       </div>
                       <div className="w-28"><label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Autorização</label>

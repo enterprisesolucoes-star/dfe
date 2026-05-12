@@ -319,7 +319,6 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
   const [valorDesconto, setValorDesconto] = useState<number>(0);
   const [formaPagamentoInput, setFormaPagamentoInput] = useState<string>('01');
   const [valorPagamentoInput, setValorPagamentoInput] = useState<number>(0);
-  const [bandeiras, setBandeiras] = useState<any[]>([]);
   const [bandeiraSelecionada, setBandeiraSelecionada] = useState('');
   const [autorizacaoInput, setAutorizacaoInput] = useState('');
   const [modalAutManual, setModalAutManual] = useState<{ operadora: string; codigo: string; resolve: ((v: { operadora: string; codigo: string } | null) => void) } | null>(null);
@@ -340,7 +339,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
   const buscaProdutoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    fetch('./api.php?action=bandeiras').then(r => r.json()).then(d => { if (Array.isArray(d)) setBandeiras(d); else setBandeiras([]); }).catch(() => setBandeiras([]));
+
   }, []);
 
   useEffect(() => {
@@ -405,8 +404,8 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
       setShowParcelamento(true);
       return;
     }
-    const b = bandeiras.find(x => String(x.id) === bandeiraSelecionada);
-    let tBand = b?.tpag || '99';
+    const b = BANDEIRAS_CARTAO.find(x => String(x.id) === bandeiraSelecionada);
+    let tBand = b?.tband || '99';
     let cAut = autorizacaoInput;
     let tpIntegra = isTefRequired ? '1' : '2';
 
@@ -725,7 +724,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
                   onChange={e => setModalAutManual(prev => prev ? { ...prev, operadora: e.target.value } : null)}
                 >
                   <option value="">Selecione...</option>
-                  {bandeiras.map(b => <option key={b.id} value={b.tpag || b.id}>{b.tband_opc}</option>)}
+                  {BANDEIRAS_CARTAO.map(b => <option key={b.id} value={b.tband}>{b.tband_opc}</option>)}
                 </select>
               </div>
               <div>
@@ -859,7 +858,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
                   {!isTefRequired && ['03', '04'].includes(formaPagamentoInput) && (
                     <div className="flex gap-2">
                        <select value={bandeiraSelecionada} onChange={e => setBandeiraSelecionada(e.target.value)} className="flex-1 bg-white dark:bg-gray-800 border p-1 rounded text-xs">
-                         <option value="">Bandeira...</option>{bandeiras.map(b => <option key={b.id} value={b.id}>{b.tband_opc}</option>)}
+                         <option value="">Bandeira...</option>{BANDEIRAS_CARTAO.filter(b => b.tpag === formaPagamentoInput).map(b => <option key={b.id} value={String(b.id)}>{b.tband_opc}</option>)}
                        </select>
                        <input value={autorizacaoInput} onChange={e => setAutorizacaoInput(e.target.value)} placeholder="Aut." className="w-16 border rounded p-1 text-xs" />
                     </div>

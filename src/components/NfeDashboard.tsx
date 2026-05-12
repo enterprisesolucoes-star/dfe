@@ -180,8 +180,7 @@ const NfeDashboard: React.FC<Props> = ({
   type NfeTefState = { pagamentosIds: number[]; currentIndex: number; vendaId: number; numero: number };
   const [nfeTefState, setNfeTefState] = useState<NfeTefState | null>(null);
   const [modalAutManual, setModalAutManual] = useState<{ operadora: string; codigo: string; resolve: ((v: { operadora: string; codigo: string } | null) => void) } | null>(null);
-  const [bandeiras, setBandeiras] = useState<any[]>([]);
-  useEffect(() => { fetch('./api.php?action=bandeiras').then(r => r.json()).then(d => { if (Array.isArray(d)) setBandeiras(d); }).catch(() => {}); }, []);
+
 
   const handleDownloadXml = (base64: string, filename: string) => {
     const link = document.createElement('a');
@@ -1385,7 +1384,7 @@ const NfeDashboard: React.FC<Props> = ({
                 onChange={e => setModalAutManual(prev => prev ? { ...prev, operadora: e.target.value } : null)}
               >
                 <option value="">Selecione...</option>
-                {bandeiras.map((b: any) => <option key={b.id} value={b.tpag || b.id}>{b.tband_opc}</option>)}
+                {BANDEIRAS_CARTAO.map((b: any) => <option key={b.id} value={b.tband}>{b.tband_opc}</option>)}
               </select>
             </div>
             <div>
