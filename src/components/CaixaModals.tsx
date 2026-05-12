@@ -146,17 +146,48 @@ const FecharCaixaModal = ({ caixaId, showConfirm, onClose, onFechado }: { caixaI
         <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex gap-3">
           <button onClick={onClose} className="flex-1 px-4 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">Sair</button>
           <button
-            onClick={async () => {
-              try {
-                const res = await fetch(`./api.php?action=relatorio_caixa_pdf&caixaId=${caixaId}`);
-                if (!res.ok) throw new Error('Erro ao gerar PDF');
-                const blob = await res.blob();
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url; a.target = '_blank'; a.rel = 'noopener';
-                document.body.appendChild(a); a.click();
-                setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
-              } catch(e) { alert('Erro ao gerar relatório: ' + e); }
+            onClick={() => {
+              if (!relatorio) return;
+              const formaLabel: Record<string,string> = {'01':'Dinheiro','02':'Cheque','03':'Cartão Crédito','04':'Cartão Débito','05':'Cred. Loja','10':'Vale Alim.','11':'Vale Ref.','12':'Vale Pres.','13':'Vale Comb.','15':'Boleto','17':'PIX','90':'Sem Pgto','99':'Outros'};
+              const fmt = (v: number) => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+              const fmtDt = (d: string) => d ? new Date(d).toLocaleString('pt-BR') : '-';
+              const vendas = relatorio.vendas ?? [];
+              const pags = relatorio.pagamentos ?? [];
+              const caixa = relatorio.caixa ?? {};
+              const totalVendasImp = vendas.filter((v:any)=>['Autorizada','Contingencia'].includes(v.status)).reduce((a:number,v:any)=>a+parseFloat(v.valor_total),0);
+              const linhas = vendas.map((v:any)=>`<tr><td>#${v.numero}</td><td style="text-align:right">${fmt(parseFloat(v.valor_total))}</td><td>${v.status}</td></tr>`).join('');
+              const pagLinhas = pags.map((p:any)=>`<tr><td>${formaLabel[p.forma_pagamento]??p.forma_pagamento}</td><td style="text-align:right">${fmt(parseFloat(p.total))}</td></tr>`).join('');
+              const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Fechamento de Caixa</title>
+                <style>
+                  * { margin:0; padding:0; box-sizing:border-box; }
+                  body { font-family: 'Courier New', monospace; font-size: 11px; width: 80mm; padding: 4mm; }
+                  h2 { font-size: 12px; text-align: center; margin-bottom: 4px; }
+                  p { text-align: center; font-size: 10px; margin-bottom: 2px; }
+                  hr { border: none; border-top: 1px dashed #000; margin: 4px 0; }
+                  table { width: 100%; border-collapse: collapse; margin: 4px 0; }
+                  td { padding: 2px 1px; font-size: 10px; }
+                  .total { font-size: 13px; font-weight: bold; text-align: center; margin: 6px 0; }
+                  .label { font-size: 9px; text-align: center; text-transform: uppercase; }
+                  @media print { body { width: 80mm; } @page { size: 80mm auto; margin: 0; } }
+                </style></head><body>
+                <h2>${caixa.nome_usuario ?? 'CAIXA'}</h2>
+                <p>Abertura: ${fmtDt(caixa.data_abertura)}</p>
+                <p>Fechamento: ${fmtDt(caixa.data_fechamento ?? new Date().toISOString())}</p>
+                <p>Troco Inicial: ${fmt(parseFloat(caixa.troco_inicial??0))}</p>
+                <hr/>
+                <div class="label">Total de Vendas</div>
+                <div class="total">${fmt(totalVendasImp)}</div>
+                <hr/>
+                <div class="label">Por Forma de Pagamento</div>
+                <table>${pagLinhas}</table>
+                <hr/>
+                <div class="label">Vendas Realizadas</div>
+                <table><tr><th style="text-align:left">Nº</th><th style="text-align:right">Total</th><th>Status</th></tr>${linhas}</table>
+                <hr/>
+                <p style="margin-top:6px">*** FIM DO RELATÓRIO ***</p>
+              </body></html>`;
+              const w = window.open('','_blank','width=400,height=600');
+              if (w) { w.document.write(html); w.document.close(); setTimeout(()=>w.print(),500); }
             }}
             disabled={loading}
             className="px-4 py-2 text-sm border border-blue-200 dark:border-blue-700 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 disabled:opacity-50"

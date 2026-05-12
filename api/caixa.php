@@ -87,6 +87,7 @@ switch ($action) {
         break;
 
     case 'relatorio_caixa_pdf':
+        error_log('relatorio_caixa_pdf iniciado caixaId='.($_GET['caixaId']??0));
         $caixaId = (int)($_GET['caixaId'] ?? 0);
         if (!$caixaId) { http_response_code(400); echo 'caixaId invalido'; exit; }
 
