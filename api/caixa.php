@@ -33,6 +33,13 @@ switch ($action) {
         echo json_encode(['success' => true, 'caixaId' => (int)$pdo->lastInsertId()]);
         break;
 
+    case 'caixa_atual':
+        $usuarioId = (int)($_GET['usuarioId'] ?? 0);
+        $cx = $pdo->prepare("SELECT * FROM caixas WHERE usuario_id = ? AND status = 'aberto' ORDER BY id DESC LIMIT 1");
+        $cx->execute([$usuarioId]);
+        echo json_encode($cx->fetch() ?: null);
+        break;
+
     case 'fechar_caixa':
         $data = json_decode(file_get_contents('php://input'), true);
         $caixaId = (int)($data['caixaId'] ?? 0);
