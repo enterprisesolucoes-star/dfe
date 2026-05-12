@@ -32,7 +32,11 @@ export default function App() {
     }
   }, []);
 
-  const handleLogin = (s: Session) => {
+  const handleLogin = async (s: Session) => {
+    try {
+      const cx = await fetch(`./api.php?action=caixa_atual&usuarioId=${s.usuarioId}`).then(r => r.json());
+      s = { ...s, caixaId: cx?.id ?? null };
+    } catch {}
     localStorage.setItem('dfe_session', JSON.stringify(s));
     setSession(s);
   };
