@@ -113,10 +113,22 @@ const PainelEnvio = ({ clientes, mensagem, onVoltar, emitente }: {
   clientes: Cliente[]; mensagem: string; onVoltar: () => void; emitente: any;
 }) => {
   const [texto, setTexto] = useState(mensagem);
+  const [imagem, setImagem] = useState<{ base64: string; name: string } | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [progresso, setProgresso] = useState<Progresso>(null);
   const [erros, setErros] = useState<string[]>([]);
   const [concluido, setConcluido] = useState(false);
+
+  const handleImagem = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = (reader.result as string).split(',')[1];
+      setImagem({ base64, name: file.name });
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleEnviar = async () => {
     if (!texto.trim()) return;
@@ -131,11 +143,19 @@ const PainelEnvio = ({ clientes, mensagem, onVoltar, emitente }: {
         .replace('{nome_completo}', c.nome)
         .replace('{empresa}', emitente?.razaoSocial || 'nossa empresa');
       try {
-        await fetch('/api/whatsapp/send-text', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone, text: msg })
-        });
+        if (imagem) {
+          await fetch('/api/whatsapp/send-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone, base64: imagem.base64, caption: msg })
+          });
+        } else {
+          await fetch('/api/whatsapp/send-text', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone, text: msg })
+          });
+        }
       } catch { setErros(p => [...p, `Falha: ${c.nome}`]); }
       if (i < comTel.length - 1) await delay(3000 + Math.random() * 3000);
     }
@@ -164,6 +184,19 @@ const PainelEnvio = ({ clientes, mensagem, onVoltar, emitente }: {
         <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">Use {'{nome}'} para o primeiro nome, {'{nome_completo}'} para nome completo, {'{empresa}'} para a empresa</p>
         <textarea rows={5} value={texto} onChange={e => setTexto(e.target.value)}
           className="w-full border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm bg-white dark:bg-gray-800 outline-none focus:ring-2 focus:ring-blue-500/20 resize-none" />
+      </div>
+      <div>
+        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Imagem (opcional)</label>
+        <div className="flex items-center gap-3">
+          <label className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl cursor-pointer hover:border-blue-500 transition-colors text-sm text-gray-500 dark:text-gray-400">
+            📎 {imagem ? imagem.name : 'Selecionar imagem'}
+            <input type="file" accept="image/*" onChange={handleImagem} className="hidden" />
+          </label>
+          {imagem && (
+            <button onClick={() => setImagem(null)} className="text-xs text-red-500 hover:text-red-700">Remover</button>
+          )}
+        </div>
+        {imagem && <p className="text-xs text-green-600 dark:text-green-400 mt-1">✓ Imagem selecionada — será enviada junto com a mensagem</p>}
       </div>
       <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 text-sm text-blue-700 dark:text-blue-300">
         <p><strong>{clientes.filter(c => c.telefone).length}</strong> clientes com telefone serão notificados</p>
