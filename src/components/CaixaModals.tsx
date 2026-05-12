@@ -155,8 +155,8 @@ const FecharCaixaModal = ({ caixaId, showConfirm, onClose, onFechado }: { caixaI
               const pags = relatorio.pagamentos ?? [];
               const caixa = relatorio.caixa ?? {};
               const totalVendasImp = vendas.filter((v:any)=>['Autorizada','Contingencia'].includes(v.status)).reduce((a:number,v:any)=>a+parseFloat(v.valor_total),0);
-              const linhas = vendas.map((v:any)=>`<tr><td>#${v.numero}</td><td style="text-align:right">${fmt(parseFloat(v.valor_total))}</td><td>${v.status}</td></tr>`).join('');
-              const pagLinhas = pags.map((p:any)=>`<tr><td>${formaLabel[p.forma_pagamento]??p.forma_pagamento}</td><td style="text-align:right">${fmt(parseFloat(p.total))}</td></tr>`).join('');
+              const linhas = vendas.map((v:any)=>`<tr><td style="width:18%">#${v.numero}</td><td style="width:42%">${v.status}</td><td style="width:40%;text-align:right;white-space:nowrap">${fmt(parseFloat(v.valor_total))}</td></tr>`).join('');
+              const pagLinhas = pags.map((p:any)=>`<tr><td style="width:60%">${formaLabel[p.forma_pagamento]??p.forma_pagamento}</td><td style="width:40%;text-align:right;white-space:nowrap">${fmt(parseFloat(p.total))}</td></tr>`).join('');
               const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Fechamento de Caixa</title>
                 <style>
                   * { margin:0; padding:0; box-sizing:border-box; }
@@ -176,13 +176,13 @@ const FecharCaixaModal = ({ caixaId, showConfirm, onClose, onFechado }: { caixaI
                 <p>Troco Inicial: ${fmt(parseFloat(caixa.troco_inicial??0))}</p>
                 <hr/>
                 <div class="label">Total de Vendas</div>
-                <div class="total">${fmt(totalVendasImp)}</div>
+                <table><tr><td style="width:60%;text-align:left"><b>TOTAL</b></td><td style="width:40%;text-align:right;white-space:nowrap"><b>${fmt(totalVendasImp)}</b></td></tr></table>
                 <hr/>
                 <div class="label">Por Forma de Pagamento</div>
                 <table>${pagLinhas}</table>
                 <hr/>
                 <div class="label">Vendas Realizadas</div>
-                <table><tr><th style="text-align:left">Nº</th><th style="text-align:right">Total</th><th>Status</th></tr>${linhas}</table>
+                <table><tr><th style="width:18%;text-align:left">Nº</th><th style="width:42%;text-align:left">Status</th><th style="width:40%;text-align:right">Total</th></tr>${linhas}</table>
                 <hr/>
                 <p style="margin-top:6px">*** FIM DO RELATÓRIO ***</p>
               </body></html>`;
