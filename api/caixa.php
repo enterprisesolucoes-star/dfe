@@ -21,22 +21,22 @@ switch ($action) {
         $nomeUsr = $data['nomeUsuario'] ?? '';
         $trocoInicial = (float)($data['trocoInicial'] ?? 0);
         // Verifica se já tem caixa aberto para este usuário
-        $cxAberto = $pdo->prepare("SELECT id FROM caixas WHERE usuario_id = ? AND status = 'aberto'");
-        $cxAberto->execute([$usuarioId]);
+        $cxAberto = $pdo->prepare("SELECT id FROM caixas WHERE usuario_id = ? AND empresa_id = ? AND status = 'aberto'");
+        $cxAberto->execute([$usuarioId, $empresaId]);
         if ($cx = $cxAberto->fetch()) {
             echo json_encode(['success' => true, 'caixaId' => $cx['id'], 'message' => 'Caixa já aberto.']);
             break;
         }
         $dtBr = new \DateTime('now', new \DateTimeZone('America/Sao_Paulo'));
-        $pdo->prepare("INSERT INTO caixas (usuario_id, nome_usuario, data_abertura, troco_inicial, status) VALUES (?,?,?,?,'aberto')")
-            ->execute([$usuarioId, $nomeUsr, $dtBr->format('Y-m-d H:i:s'), $trocoInicial]);
+        $pdo->prepare("INSERT INTO caixas (usuario_id, empresa_id, nome_usuario, data_abertura, troco_inicial, status) VALUES (?,?,?,?,?,'aberto')")
+            ->execute([$usuarioId, $empresaId, $nomeUsr, $dtBr->format('Y-m-d H:i:s'), $trocoInicial]);
         echo json_encode(['success' => true, 'caixaId' => (int)$pdo->lastInsertId()]);
         break;
 
     case 'caixa_atual':
         $usuarioId = (int)($_GET['usuarioId'] ?? 0);
-        $cx = $pdo->prepare("SELECT * FROM caixas WHERE usuario_id = ? AND status = 'aberto' ORDER BY id DESC LIMIT 1");
-        $cx->execute([$usuarioId]);
+        $cx = $pdo->prepare("SELECT * FROM caixas WHERE usuario_id = ? AND empresa_id = ? AND status = 'aberto' ORDER BY id DESC LIMIT 1");
+        $cx->execute([$usuarioId, $empresaId]);
         echo json_encode($cx->fetch() ?: null);
         break;
 
@@ -77,8 +77,8 @@ switch ($action) {
 
     case 'caixa_atual':
         $usuarioId = (int)($_GET['usuarioId'] ?? 0);
-        $cx = $pdo->prepare("SELECT * FROM caixas WHERE usuario_id = ? AND status = 'aberto' ORDER BY id DESC LIMIT 1");
-        $cx->execute([$usuarioId]);
+        $cx = $pdo->prepare("SELECT * FROM caixas WHERE usuario_id = ? AND empresa_id = ? AND status = 'aberto' ORDER BY id DESC LIMIT 1");
+        $cx->execute([$usuarioId, $empresaId]);
         $cx = $cx->fetch();
         echo json_encode($cx ?: null);
         break;
