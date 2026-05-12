@@ -341,6 +341,25 @@ const ConfigTab = ({ emitente, onUpdate, onSave, showAlert, usuarioDfe }: { emit
               </div>
             </div>
 
+            {(emitente.crt === '3') && (
+              <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
+                <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-3 flex items-center gap-2">
+                  <DollarSign className="w-4 h-4 text-blue-600 dark:text-blue-400" /> Fiscal — ICMS
+                </h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Input label="Alíquota padrão de ICMS (%)" type="number" step="0.01"
+                      value={emitente.aliquota_icms_padrao ?? 0}
+                      onChange={(e: any) => handleChange('aliquota_icms_padrao', parseFloat(e.target.value) || 0)}
+                      placeholder="Ex: 12.00" />
+                    <p className="text-[10px] text-blue-600 dark:text-blue-400 mt-1 uppercase font-bold">
+                      Usada automaticamente na emissão quando o produto tem alíquota ICMS zerada
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
               <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
                 <DollarSign className="w-4 h-4 text-blue-600 dark:text-blue-400" /> Financeiro — Juros e Multa

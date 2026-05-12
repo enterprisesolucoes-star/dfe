@@ -259,6 +259,18 @@ switch ($action) {
         try { $pdo->query("SELECT chavepix FROM empresas LIMIT 1"); } catch (PDOException $e) {
             $pdo->exec("ALTER TABLE empresas ADD COLUMN chavepix VARCHAR(140) DEFAULT NULL");
         }
+        try { $pdo->query("SELECT aliquota_icms_padrao FROM empresas LIMIT 1"); } catch (PDOException $e) {
+            $pdo->exec("ALTER TABLE empresas ADD COLUMN aliquota_icms_padrao DECIMAL(5,2) NOT NULL DEFAULT 0.00");
+        }
+        try { $pdo->query("SELECT api_dfe FROM empresas LIMIT 1"); } catch (PDOException $e) {
+            $pdo->exec("ALTER TABLE empresas ADD COLUMN api_dfe ENUM('sped-nfe','unimake') DEFAULT NULL");
+        }
+        try { $pdo->query("SELECT aliquota_icms_padrao FROM empresas LIMIT 1"); } catch (PDOException $e) {
+            $pdo->exec("ALTER TABLE empresas ADD COLUMN aliquota_icms_padrao DECIMAL(5,2) NOT NULL DEFAULT 0.00");
+        }
+        try { $pdo->query("SELECT api_dfe FROM empresas LIMIT 1"); } catch (PDOException $e) {
+            $pdo->exec("ALTER TABLE empresas ADD COLUMN api_dfe ENUM('sped-nfe','unimake') DEFAULT NULL");
+        }
 
         if ($empresaId) {
             $stmt = $pdo->prepare("SELECT * FROM empresas WHERE id = ?");

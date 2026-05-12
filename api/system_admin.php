@@ -142,7 +142,8 @@ switch ($action) {
                 'ambiente' => 'ambiente',
                 'tem_tef' => 'tem_tef',
                 'integracaowhatsapp' => 'integracaowhatsapp',
-                'chavepix' => 'chavepix'
+                'chavepix' => 'chavepix',
+                'api_dfe' => 'api_dfe'
             ];
 
             foreach ($map as $db => $fr) {
@@ -194,9 +195,9 @@ switch ($action) {
         $data = json_decode(file_get_contents('php://input'), true);
         
         $fields_map = [
-            'razao_social', 'nome_fantasia', 'cnpj', 'crt', 'email', 'telefone', 'cep', 
-            'logradouro', 'numero', 'bairro', 'municipio', 'uf', 'status', 'usuario_dfe', 
-            'codigo_municipio', 'ambiente', 'tem_tef', 'integracaowhatsapp', 'chavepix'
+            'razao_social', 'nome_fantasia', 'cnpj', 'crt', 'email', 'telefone', 'cep',
+            'logradouro', 'numero', 'bairro', 'municipio', 'uf', 'status', 'usuario_dfe',
+            'codigo_municipio', 'ambiente', 'tem_tef', 'integracaowhatsapp', 'chavepix', 'api_dfe'
         ];
         // Campos com nomes diferentes entre frontend e banco
         $special = [
@@ -230,6 +231,9 @@ switch ($action) {
             $sql = "UPDATE empresas SET " . implode(', ', $sets) . " WHERE id = ?";
             $values[] = $data['id'];
             $pdo->prepare($sql)->execute($values);
+            if (isset($data['usuario_dfe']) && (int)$data['usuario_dfe'] === 0) {
+                $pdo->prepare("UPDATE empresas SET api_dfe = NULL WHERE id = ?")->execute([$data['id']]);
+            }
             echo json_encode(['success' => true]);
         } else {
             // Lógica de Insert simplificada para colunas existentes
