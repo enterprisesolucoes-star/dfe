@@ -47,21 +47,23 @@ switch ($action) {
         break;
 
     case 'verificar_caixa_dia':
-        // Verifica se há caixa aberto de dia anterior (bloqueio de venda)
-        $usuarioId = (int)($_GET['usuarioId'] ?? 0);
-        $cx = $pdo->prepare("SELECT id, data_abertura FROM caixas WHERE usuario_id = ? AND status = 'aberto' ORDER BY id DESC LIMIT 1");
-        $cx->execute([$usuarioId]);
-        $cxRow = $cx->fetch();
-        if ($cxRow) {
-            $dtBr = new \DateTime('now', new \DateTimeZone('America/Sao_Paulo'));
-            $dataHoje = $dtBr->format('Y-m-d');
-            $dataAbertura = substr($cxRow['data_abertura'], 0, 10);
-            if ($dataAbertura < $dataHoje) {
-                echo json_encode(['bloqueado' => true, 'data_abertura' => $dataAbertura, 'caixaId' => $cxRow['id']]);
+        try {
+            $cxStmt = $pdo->prepare("SELECT c.id, c.data_abertura, c.nome_usuario FROM caixas c JOIN usuarios u ON u.id = c.usuario_id WHERE u.empresa_id = ? AND c.status = 'aberto' ORDER BY c.id DESC LIMIT 1");
+            $cxStmt->execute([$empresaId]);
+            $cxRow = $cxStmt->fetch();
+            if ($cxRow) {
+                $dtBr = new \DateTime('now', new \DateTimeZone('America/Sao_Paulo'));
+                $dataHoje = $dtBr->format('Y-m-d');
+                $dataAbertura = substr($cxRow['data_abertura'], 0, 10);
+                if ($dataAbertura < $dataHoje) {
+                    echo json_encode(['bloqueado' => true, 'data_abertura' => $dataAbertura, 'caixaId' => $cxRow['id'], 'nome_usuario' => $cxRow['nome_usuario']]);
+                } else {
+                    echo json_encode(['bloqueado' => false]);
+                }
             } else {
                 echo json_encode(['bloqueado' => false]);
             }
-        } else {
+        } catch (Exception $e) {
             echo json_encode(['bloqueado' => false]);
         }
         break;

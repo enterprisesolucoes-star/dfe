@@ -50,6 +50,7 @@ const FecharCaixaModal = ({ caixaId, showConfirm, onClose, onFechado }: { caixaI
   const [relatorio, setRelatorio] = useState<any>(null);
   const [loading, setLoading]     = useState(true);
   const [fechando, setFechando]   = useState(false);
+  const [confirmando, setConfirmando] = useState(false);
 
   const formaLabel: Record<string, string> = {
     '01': 'Dinheiro', '02': 'Cheque', '03': 'Cartão Crédito', '04': 'Cartão Débito',
@@ -144,10 +145,44 @@ const FecharCaixaModal = ({ caixaId, showConfirm, onClose, onFechado }: { caixaI
         </div>
         <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex gap-3">
           <button onClick={onClose} className="flex-1 px-4 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">Sair</button>
-          <button onClick={handleFechar} disabled={fechando || loading} className="flex-1 px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50">
-            {fechando ? 'Fechando...' : 'Confirmar Fechamento'}
+          <button
+            onClick={() => window.open(`./api.php?action=relatorio_caixa_pdf&caixaId=${caixaId}`, '_blank', 'noopener,noreferrer')}
+            disabled={loading}
+            className="px-4 py-2 text-sm border border-blue-200 dark:border-blue-700 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 disabled:opacity-50"
+          >
+            🖨️ Imprimir
+          </button>
+          <button onClick={() => setConfirmando(true)} disabled={fechando || loading} className="flex-1 px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50">
+            {fechando ? 'Fechando...' : 'Fechar Caixa'}
           </button>
         </div>
+
+        {confirmando && (
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[300]">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-red-100 dark:bg-red-900/40 rounded-xl flex items-center justify-center">
+                  <DollarSign className="w-5 h-5 text-red-600 dark:text-red-400" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-800 dark:text-gray-100">Confirmar Fechamento</h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Esta ação não pode ser desfeita</p>
+                </div>
+              </div>
+              <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 mb-4 text-sm text-gray-700 dark:text-gray-200">
+                <p>Total de vendas: <strong>{totalVendas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{relatorio?.vendas?.filter((v: any) => ['Autorizada','Contingencia'].includes(v.status)).length ?? 0} vendas autorizadas</p>
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-5">Deseja realmente fechar o caixa agora?</p>
+              <div className="flex gap-3">
+                <button onClick={() => setConfirmando(false)} className="flex-1 px-4 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">Cancelar</button>
+                <button onClick={() => { setConfirmando(false); handleFechar(); }} className="flex-1 px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 font-semibold">
+                  Confirmar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
