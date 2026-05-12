@@ -76,8 +76,8 @@ export const ProdutosTab = ({ onEdit, onDelete, refreshTrigger }: { onEdit: (p: 
 
   const filtrados = produtos;
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
-      <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-0 z-20 rounded-t-2xl">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col" style={{height: 'calc(100vh - 140px)'}}>
+      <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-t-2xl flex-shrink-0">
         <div className="flex items-center gap-2">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
@@ -86,9 +86,9 @@ export const ProdutosTab = ({ onEdit, onDelete, refreshTrigger }: { onEdit: (p: 
           <button onClick={() => fetchProdutos(page)} className="px-3 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all flex items-center gap-1"><RefreshCw className="w-3.5 h-3.5" /> Atualizar</button>
         </div>
       </div>
-      <div className="overflow-x-auto">
+      <div className="flex-1 overflow-auto">
         <table className="w-full text-left">
-          <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
+          <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700 sticky top-0 z-10">
             <tr>
               <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Código</th>
               <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Descrição</th>
@@ -142,16 +142,16 @@ export const ClientesTab = ({ clientes, onEdit, onDelete }: { clientes: Cliente[
     );
   });
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
-      <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-0 z-20 rounded-t-2xl">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col" style={{height: 'calc(100vh - 140px)'}}>
+      <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-t-2xl flex-shrink-0">
         <div className="relative max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
           <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Localizar por nome, documento ou celular..." className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none" />
         </div>
       </div>
-      <div className="overflow-x-auto">
+      <div className="flex-1 overflow-auto">
         <table className="w-full text-left">
-          <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
+          <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700 sticky top-0 z-10">
             <tr>
               <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Cliente</th>
               <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Telefone</th>
@@ -201,16 +201,16 @@ export const FornecedoresTab = ({ fornecedores, onEdit, onDelete }: { fornecedor
     );
   });
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
-      <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-0 z-20 rounded-t-2xl">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col" style={{height: 'calc(100vh - 140px)'}}>
+      <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-t-2xl flex-shrink-0">
         <div className="relative max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
           <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Localizar por nome, documento ou celular..." className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none" />
         </div>
       </div>
-      <div className="overflow-x-auto">
+      <div className="flex-1 overflow-auto">
         <table className="w-full text-left">
-          <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
+          <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700 sticky top-0 z-10">
             <tr>
               <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Fornecedor</th>
               <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Telefone</th>
@@ -250,16 +250,16 @@ export const TransportadoresTab = ({ transportadores, onEdit, onDelete }: { tran
   const debouncedBusca = useDebounce(busca);
   const filtrados = transportadores.filter(t => (t.nome || '').toLowerCase().includes(debouncedBusca.toLowerCase()) || (t.documento || '').includes(debouncedBusca));
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
-      <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-0 z-20 rounded-t-2xl">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col" style={{height: 'calc(100vh - 140px)'}}>
+      <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-t-2xl flex-shrink-0">
         <div className="relative max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
           <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Filtrar transportadores..." className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none" />
         </div>
       </div>
-      <div className="overflow-x-auto">
+      <div className="flex-1 overflow-auto">
         <table className="w-full text-left">
-          <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
+          <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700 sticky top-0 z-10">
             <tr>
               <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Transportador</th>
               <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">IE</th>
@@ -305,7 +305,7 @@ export const BandeirasTab = ({ bandeiras, onEdit, onDelete }: { bandeiras: Bande
   <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
     <div className="overflow-x-auto">
       <table className="w-full text-left">
-        <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
+        <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700 sticky top-0 z-10">
           <tr>
             <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Forma de Pagamento</th>
             <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Bandeira / Credenciadora</th>
@@ -340,7 +340,7 @@ export const MedidasTab = ({ medidas, onEdit, onDelete }: { medidas: Medida[]; o
   <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
     <div className="overflow-x-auto">
       <table className="w-full text-left">
-        <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
+        <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700 sticky top-0 z-10">
           <tr>
             <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Código</th>
             <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Descrição</th>
@@ -433,7 +433,7 @@ export const NcmTab = ({ ufEmpresa }: { ufEmpresa?: string }) => {
       )}
       <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
         <table className="w-full text-left text-sm">
-          <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
+          <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700 sticky top-0 z-10">
             <tr>
               <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">NCM</th>
               <th className="px-4 py-3 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase">Descrição</th>
