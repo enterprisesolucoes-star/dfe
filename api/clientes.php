@@ -70,21 +70,21 @@ switch ($action) {
         $data = json_decode(file_get_contents('php://input'), true);
         $end = $data['endereco'] ?? [];
         if (isset($data['id']) && $data['id'] > 0) {
-            $stmt = $pdo->prepare("UPDATE clientes SET nome=?, documento=?, email=?, telefone=?, logradouro=?, numero=?, complemento=?, bairro=?, municipio=?, codigo_municipio=?, uf=?, cep=?, regime_tributario=?, entidade_governamental=?, ie=?, indIEDest=? WHERE id=?" . ($empresaId ? " AND empresa_id=?" : ""));
+            $stmt = $pdo->prepare("UPDATE clientes SET nome=?, documento=?, email=?, telefone=?, data_nascimento=?, logradouro=?, numero=?, complemento=?, bairro=?, municipio=?, codigo_municipio=?, uf=?, cep=?, regime_tributario=?, entidade_governamental=?, ie=?, indIEDest=? WHERE id=?" . ($empresaId ? " AND empresa_id=?" : ""));
             $docLimpo = preg_replace('/\D/', '', $data['document'] ?? $data['documento'] ?? '');
             $telLimpo = preg_replace('/\D/', '', $data['telefone'] ?? '');
             $cepLimpo = preg_replace('/\D/', '', $end['cep'] ?? '');
             $ieLimpo  = preg_replace('/[.\-\/\s]/', '', $data['ie'] ?? '');
-            $params = [$data['nome'], $docLimpo, $data['email'] ?? '', $telLimpo, $end['logradouro'] ?? '', $end['numero'] ?? '', $end['complemento'] ?? '', $end['bairro'] ?? '', $end['municipio'] ?? '', $end['codigoMunicipio'] ?? '', $end['uf'] ?? '', $cepLimpo, $data['regimeTributario'] ?? '1', $data['entidadeGovernamental'] ?? '0', $ieLimpo ?: null, $data['indIEDest'] ?? '9', $data['id']];
+            $params = [$data['nome'], $docLimpo, $data['email'] ?? '', $telLimpo, !empty($data['data_nascimento']) ? $data['data_nascimento'] : null, $end['logradouro'] ?? '', $end['numero'] ?? '', $end['complemento'] ?? '', $end['bairro'] ?? '', $end['municipio'] ?? '', $end['codigoMunicipio'] ?? '', $end['uf'] ?? '', $cepLimpo, $data['regimeTributario'] ?? '1', $data['entidadeGovernamental'] ?? '0', $ieLimpo ?: null, $data['indIEDest'] ?? '9', $data['id']];
             if ($empresaId) $params[] = $empresaId;
             $stmt->execute($params);
         } else {
-            $stmt = $pdo->prepare("INSERT INTO clientes (empresa_id, nome, documento, email, telefone, logradouro, numero, complemento, bairro, municipio, codigo_municipio, uf, cep, regime_tributario, entidade_governamental, ie, indIEDest, ativo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)");
+            $stmt = $pdo->prepare("INSERT INTO clientes (empresa_id, nome, documento, email, telefone, data_nascimento, logradouro, numero, complemento, bairro, municipio, codigo_municipio, uf, cep, regime_tributario, entidade_governamental, ie, indIEDest, ativo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)");
             $docLimpo2 = preg_replace('/\D/', '', $data['documento'] ?? '');
             $telLimpo2 = preg_replace('/\D/', '', $data['telefone'] ?? '');
             $cepLimpo2 = preg_replace('/\D/', '', $end['cep'] ?? '');
             $ieLimpo2  = preg_replace('/[.\-\/\s]/', '', $data['ie'] ?? '');
-            $stmt->execute([$empresaId ?: null, $data['nome'], $docLimpo2, $data['email'] ?? '', $telLimpo2, $end['logradouro'] ?? '', $end['numero'] ?? '', $end['complemento'] ?? '', $end['bairro'] ?? '', $end['municipio'] ?? '', $end['codigoMunicipio'] ?? '', $end['uf'] ?? '', $cepLimpo2, $data['regimeTributario'] ?? '1', $data['entidadeGovernamental'] ?? '0', $ieLimpo2 ?: null, $data['indIEDest'] ?? '9']);
+            $stmt->execute([$empresaId ?: null, $data['nome'], $docLimpo2, $data['email'] ?? '', $telLimpo2, !empty($data['data_nascimento']) ? $data['data_nascimento'] : null, $end['logradouro'] ?? '', $end['numero'] ?? '', $end['complemento'] ?? '', $end['bairro'] ?? '', $end['municipio'] ?? '', $end['codigoMunicipio'] ?? '', $end['uf'] ?? '', $cepLimpo2, $data['regimeTributario'] ?? '1', $data['entidadeGovernamental'] ?? '0', $ieLimpo2 ?: null, $data['indIEDest'] ?? '9']);
         }
         echo json_encode(['success' => true]);
         break;

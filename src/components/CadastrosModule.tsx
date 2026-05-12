@@ -76,8 +76,8 @@ export const ProdutosTab = ({ onEdit, onDelete, refreshTrigger }: { onEdit: (p: 
 
   const filtrados = produtos;
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
-      <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-0 z-20 shadow-sm">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+      <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-0 z-20 rounded-t-2xl">
         <div className="flex items-center gap-2">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
@@ -142,8 +142,8 @@ export const ClientesTab = ({ clientes, onEdit, onDelete }: { clientes: Cliente[
     );
   });
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
-      <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-0 z-20 shadow-sm">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+      <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-0 z-20 rounded-t-2xl">
         <div className="relative max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
           <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Localizar por nome, documento ou celular..." className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none" />
@@ -201,8 +201,8 @@ export const FornecedoresTab = ({ fornecedores, onEdit, onDelete }: { fornecedor
     );
   });
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
-      <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-0 z-20 shadow-sm">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+      <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-0 z-20 rounded-t-2xl">
         <div className="relative max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
           <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Localizar por nome, documento ou celular..." className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none" />
@@ -250,8 +250,8 @@ export const TransportadoresTab = ({ transportadores, onEdit, onDelete }: { tran
   const debouncedBusca = useDebounce(busca);
   const filtrados = transportadores.filter(t => (t.nome || '').toLowerCase().includes(debouncedBusca.toLowerCase()) || (t.documento || '').includes(debouncedBusca));
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
-      <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-0 z-20 shadow-sm">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+      <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-0 z-20 rounded-t-2xl">
         <div className="relative max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
           <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Filtrar transportadores..." className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none" />
@@ -533,7 +533,7 @@ export const ClienteModal = ({ cliente, onClose, onSave, showAlert, emitente }: 
   const defCodMun = emitente?.codigoMunicipio || emitente?.endereco?.codigoMunicipio || '';
   const defMun    = emitente?.municipio || emitente?.endereco?.municipio || '';
   const [form, setForm] = useState<any>(cliente || {
-    nome: '', documento: '', email: '', telefone: '', ie: '', indIEDest: '9',
+    nome: '', documento: '', email: '', telefone: '', data_nascimento: '', ie: '', indIEDest: '9',
     regimeTributario: '1', entidadeGovernamental: '0',
     endereco: { logradouro: '', numero: '', complemento: '', bairro: '', municipio: defMun, codigoMunicipio: defCodMun, uf: defUf, cep: '' }
   });
@@ -599,6 +599,7 @@ export const ClienteModal = ({ cliente, onClose, onSave, showAlert, emitente }: 
           <div className="grid grid-cols-2 gap-4">
             <Input label="Email" type="email" value={form.email || ''} onChange={(e: any) => setForm({ ...form, email: e.target.value })} />
             <Input label="Telefone" value={form.telefone || ''} onChange={(e: any) => setForm({ ...form, telefone: e.target.value })} />
+            {isPF && <Input label="Data de Nascimento" type="date" value={form.data_nascimento || ''} onChange={(e: any) => setForm({ ...form, data_nascimento: e.target.value })} />}
           </div>
           <div className="grid grid-cols-2 gap-4">
             <Input label="Inscrição Estadual" disabled={isPF} value={form.ie || ''} onChange={(e: any) => setIe(e.target.value)} />

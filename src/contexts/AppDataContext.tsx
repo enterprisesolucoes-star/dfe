@@ -71,6 +71,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
         ...c, id: Number(c.id), regimeTributario: c.regime_tributario || '1',
         entidadeGovernamental: c.entidade_governamental || '0', ie: c.ie || '',
         indIEDest: c.indIEDest || c.indiedest || '9',
+        data_nascimento: c.data_nascimento || '',
         endereco: {
           logradouro: c.logradouro, numero: c.numero, complemento: c.complemento,
           bairro: c.bairro, municipio: c.municipio, codigoMunicipio: c.codigo_municipio, uf: c.uf, cep: c.cep
