@@ -32,8 +32,8 @@ export default function App() {
     }
   }, []);
 
-  const handleLogin = (s: Session, lembrar: boolean) => {
-    if (lembrar) localStorage.setItem('dfe_session', JSON.stringify(s));
+  const handleLogin = (s: Session) => {
+    localStorage.setItem('dfe_session', JSON.stringify(s));
     setSession(s);
   };
 
