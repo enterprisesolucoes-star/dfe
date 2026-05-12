@@ -143,6 +143,7 @@ const NfeDashboard: React.FC<Props> = ({
   const refBuscaProduto = React.useRef<HTMLInputElement>(null);
   const refBuscaCliente = React.useRef<HTMLInputElement>(null);
   const [clienteSel, setClienteSel] = useState<Cliente | null>(null);
+  const [dropIdxCliente, setDropIdxCliente] = useState<number | null>(null);
   const [indIEDest, setIndIEDest] = useState<'1' | '2' | '9'>('9');
   const [ieDest, setIeDest] = useState('');
   const [itens, setItens] = useState<NfeItem[]>([]);
@@ -196,7 +197,6 @@ const NfeDashboard: React.FC<Props> = ({
   // TEF (SMARTPOS) — para NF-e: ativa se SMARTPOS estiver configurado, independente do estado
   type NfeTefState = { pagamentosIds: number[]; currentIndex: number; vendaId: number; numero: number };
   const [nfeTefState, setNfeTefState] = useState<NfeTefState | null>(null);
-  const [modalAutManual, setModalAutManual] = useState<{ operadora: string; codigo: string; resolve: ((v: { operadora: string; codigo: string } | null) => void) } | null>(null);
 
 
   const handleDownloadXml = (base64: string, filename: string) => {
@@ -431,21 +431,12 @@ const NfeDashboard: React.FC<Props> = ({
           setEmitindo(false);
           return;
         } else {
-          // Sem TEF: cartão exige autorização manual, PIX finaliza direto
-          const temCartao = pagamentos.some(p => ['03', '04'].includes(p.formaPagamento));
-          if (temCartao) {
-            setEmitindo(false);
-            const autManual = await new Promise<{ operadora: string; codigo: string } | null>(resolve => {
-              setModalAutManual({ operadora: '', codigo: '', resolve });
-            });
-            if (!autManual) return;
-            setEmitindo(true);
-            body.pagamentos = body.pagamentos.map((p: any) =>
-              ['03', '04'].includes(p.formaPagamento)
-                ? { ...p, tpIntegra: '2', cAut: autManual.codigo }
-                : p
-            );
-          }
+          // Sem TEF: usa bandeira e autorização já preenchidas no select inline
+          body.pagamentos = body.pagamentos.map((p: any) =>
+            ['03', '04'].includes(p.formaPagamento)
+              ? { ...p, tpIntegra: '2' }
+              : p
+          );
           // PIX: sem card no XML
           body.pagamentos = body.pagamentos.map((p: any) =>
             p.formaPagamento === '17'
@@ -610,26 +601,37 @@ const NfeDashboard: React.FC<Props> = ({
       {/* Tabs Navigation */}
       <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 py-2">
         <div className="flex flex-wrap items-center gap-2 p-1 bg-gray-100 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-700">
-          {[
-            { id: 'identificacao', label: '1. Identificação', icon: User },
-            { id: 'produtos',      label: '2. Produtos',      icon: Package },
-            { id: 'transporte',    label: '3. Transporte',    icon: Truck },
-            { id: 'pagamento',     label: '4. Pagamento',     icon: CreditCard },
-            { id: 'emitir',        label: '5. Emitir NFe',    icon: Send },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveSubTab(tab.id as any)}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
-                activeSubTab === tab.id 
-                  ? 'bg-blue-600 text-white shadow-md' 
-                  : 'text-gray-500 dark:text-gray-400 hover:bg-white hover:text-blue-600 dark:hover:text-blue-400'
-              }`}
-            >
-              <tab.icon className="w-4 h-4" />
-              {tab.label}
-            </button>
-          ))}
+          {(() => {
+            const temCliente = !!clienteSel;
+            const temProdutos = itens.length > 0;
+            const temPagamento = pagamentos.length > 0 && Math.abs(totalPago - totalNF) < 0.01;
+            const tabs = [
+              { id: 'identificacao', label: '1. Identificação', icon: User,        ok: true },
+              { id: 'produtos',      label: '2. Produtos',      icon: Package,     ok: temCliente },
+              { id: 'transporte',    label: '3. Transporte',    icon: Truck,       ok: temCliente && temProdutos },
+              { id: 'pagamento',     label: '4. Pagamento',     icon: CreditCard,  ok: temCliente && temProdutos },
+              { id: 'emitir',        label: '5. Emitir NFe',    icon: Send,        ok: temCliente && temProdutos && temPagamento },
+            ];
+            return tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => tab.ok && setActiveSubTab(tab.id as any)}
+                disabled={!tab.ok}
+                title={!tab.ok ? (tab.id === 'produtos' ? 'Selecione o cliente primeiro' : tab.id === 'emitir' ? 'Preencha identificação, produtos e pagamento' : 'Preencha as etapas anteriores') : ''}
+                className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
+                  activeSubTab === tab.id
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : !tab.ok
+                    ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                    : 'text-gray-500 dark:text-gray-400 hover:bg-white hover:text-blue-600 dark:hover:text-blue-400'
+                }`}
+              >
+                <tab.icon className="w-4 h-4" />
+                {tab.label}
+                {tab.ok && tab.id !== 'identificacao' && tab.id !== activeSubTab && <span className="w-1.5 h-1.5 rounded-full bg-green-500 ml-1" />}
+              </button>
+            ));
+          })()}
         </div>
       </div>
 
@@ -649,6 +651,15 @@ const NfeDashboard: React.FC<Props> = ({
                   onChange={e => { setBuscaCliente(e.target.value); setDropCliente(true); }}
                   onFocus={() => setDropCliente(true)}
                   onBlur={() => setTimeout(() => setDropCliente(false), 150)}
+                  onKeyDown={(e) => {
+                    if (!dropCliente || clientesFiltrados.length === 0) return;
+                    if (e.key === 'ArrowDown') { e.preventDefault(); setDropIdxCliente(i => Math.min((i ?? -1) + 1, clientesFiltrados.length - 1)); }
+                    else if (e.key === 'ArrowUp') { e.preventDefault(); setDropIdxCliente(i => Math.max((i ?? 0) - 1, 0)); }
+                    else if (e.key === 'Enter' && dropIdxCliente !== null && dropIdxCliente >= 0) {
+                      const cl = clientesFiltrados[dropIdxCliente];
+                      if (cl) { setClienteSel(cl); setBuscaCliente(cl.nome); setDropCliente(false); setDropIdxCliente(null); }
+                    }
+                  }}
                   placeholder="Buscar por nome ou CPF/CNPJ..."
                   className="w-full pl-11 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none shadow-sm"
                 />
@@ -673,7 +684,7 @@ const NfeDashboard: React.FC<Props> = ({
                           setForm(f => ({ ...f, consumidorFinal: '1' }));
                         }
                       }}
-                        className="w-full text-left px-4 py-3 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors border-b border-gray-50 dark:border-gray-700 last:border-0">
+                        className={`w-full text-left px-4 py-3 transition-colors border-b border-gray-50 dark:border-gray-700 last:border-0 ${dropIdxCliente === clientesFiltrados.indexOf(c) ? 'bg-blue-100 dark:bg-blue-900/40' : 'hover:bg-blue-50 dark:hover:bg-blue-900/30'}`}>
                         <p className="font-semibold text-gray-700 dark:text-gray-200 text-sm">{c.nome}</p>
                         <p className="text-gray-400 dark:text-gray-500 text-xs">{c.documento} · {c.endereco?.municipio}/{c.endereco?.uf}</p>
                       </button>
@@ -1394,61 +1405,7 @@ const NfeDashboard: React.FC<Props> = ({
       />
     )}
 
-    {/* ── TEF Modal (SMARTPOS) ───────────────────────────────────────────── */}
-    {modalAutManual && (
-      <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000]">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 w-full max-w-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
-              <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">Pagamento com Cartão</h3>
-              <p className="text-xs text-gray-400 dark:text-gray-500">Informe os dados da transação</p>
-            </div>
-          </div>
-          <p className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded-lg px-3 py-2 mb-5 mt-2">
-            Integração TEF não ativa. Registre os dados manualmente conforme exigido pela legislação fiscal.
-          </p>
-          <div className="space-y-4">
-            <div>
-              <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Operadora / Bandeira</label>
-              <select
-                className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"
-                value={modalAutManual.operadora}
-                onChange={e => setModalAutManual(prev => prev ? { ...prev, operadora: e.target.value } : null)}
-              >
-                <option value="">Selecione...</option>
-                {BANDEIRAS_CARTAO.map((b: any) => <option key={b.id} value={b.tband}>{b.tband_opc}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Código de Autorização</label>
-              <input
-                type="text"
-                className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500 font-mono tracking-widest"
-                placeholder="Ex: 123456"
-                value={modalAutManual.codigo}
-                onChange={e => setModalAutManual(prev => prev ? { ...prev, codigo: e.target.value } : null)}
-                autoFocus
-              />
-            </div>
-          </div>
-          <div className="flex gap-3 mt-6">
-            <button onClick={() => { modalAutManual.resolve(null); setModalAutManual(null); }} className="flex-1 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700">Cancelar</button>
-            <button
-              onClick={() => {
-                if (!modalAutManual.codigo.trim()) { alert('Informe o código de autorização.'); return; }
-                const val = { operadora: modalAutManual.operadora, codigo: modalAutManual.codigo };
-                modalAutManual.resolve(val);
-                setModalAutManual(null);
-              }}
-              className="flex-1 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 shadow"
-            >Confirmar</button>
-          </div>
-        </div>
-      </div>
-    )}
+
     {nfeTefState && (
       <NfeTefModal
         pagamentoId={nfeTefState.pagamentosIds[nfeTefState.currentIndex]}
