@@ -53,16 +53,7 @@ const ESTADOS_BR = [
 
 export const GlobalMessageModal = ({ type, title, message, inputValue, onClose, onConfirm }: any) => {
   const [val, setVal] = useState(inputValue || '');
-  useEffect(() => {
-    if (session?.usuarioId) {
-      fetch(`./api.php?action=verificar_caixa_dia&usuarioId=${session.usuarioId}`)
-        .then(r => r.json())
-        .then(d => setCaixaDiaAnterior(d))
-        .catch(() => {});
-    }
-  }, [session?.usuarioId]);
-
-    useEffect(() => { setVal(inputValue || ''); }, [inputValue]);
+  useEffect(() => { setVal(inputValue || ''); }, [inputValue]);
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[1000] p-4">
@@ -348,6 +339,15 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
   const [valorPagamentoInput, setValorPagamentoInput] = useState<number>(0);
   const [bandeiraSelecionada, setBandeiraSelecionada] = useState('');
   const [caixaDiaAnterior, setCaixaDiaAnterior] = useState<{bloqueado: boolean, data_abertura?: string, caixaId?: number} | null>(null);
+
+  useEffect(() => {
+    if (session?.usuarioId) {
+      fetch(`./api.php?action=verificar_caixa_dia&usuarioId=${session.usuarioId}`)
+        .then(r => r.json())
+        .then(d => setCaixaDiaAnterior(d))
+        .catch(() => {});
+    }
+  }, [session?.usuarioId]);
   const [autorizacaoInput, setAutorizacaoInput] = useState('');
   const [isEmitting, setIsEmitting] = useState(false);
   const [tefState, setTefState] = useState<{ pagamentosIds: number[]; currentIndex: number; vendaId: number; numero: number } | null>(null);
