@@ -6,7 +6,7 @@ import {
   ArrowDownCircle, History, FileText, Send, QrCode, Package,
   Users, Store, ShoppingCart, ClipboardList, Wrench, FolderOpen, BarChart2,
   Hash, Ruler, CreditCard, Truck, ShieldCheck, Building, Settings, LogOut,
-  Zap, UserCircle, TrendingUp, Landmark, Archive, PanelLeftClose, PanelLeftOpen
+  Zap, UserCircle, TrendingUp, Landmark, Archive, PanelLeftClose, PanelLeftOpen, Megaphone
 } from 'lucide-react';
 
 const COLLAPSED_KEY = 'sidebar_collapsed';
@@ -239,6 +239,7 @@ export const Sidebar = ({
             <SubItem id="cobranca_historico" label="Arquivos" icon={Archive} activeTab={activeTab} onClick={handleSetActiveTab} />
           </>}
         </SidebarGroup>
+        <SubItem id="marketing" label="Marketing" icon={Megaphone} activeTab={activeTab} onClick={handleSetActiveTab} />
 
         {isFiscal && (
           <SidebarGroup

@@ -280,7 +280,7 @@ $action = $_GET['action'] ?? '';
 
 $modules = [
     'produtos' => 'produtos', 'salvar_produto' => 'produtos', 'excluir_produto' => 'produtos', 'check_duplicado_produto' => 'produtos',
-    'clientes' => 'clientes', 'salvar_cliente' => 'clientes', 'excluir_cliente' => 'clientes', 'check_duplicado_cliente' => 'clientes',
+    'clientes' => 'clientes', 'marketing_aniversariantes' => 'clientes', 'marketing_inativos' => 'clientes', 'salvar_cliente' => 'clientes', 'excluir_cliente' => 'clientes', 'check_duplicado_cliente' => 'clientes',
     'fornecedores' => 'fornecedores', 'salvar_fornecedor' => 'fornecedores', 'excluir_fornecedor' => 'fornecedores', 'check_duplicado_fornecedor' => 'fornecedores',
     'transportadores' => 'transportadores', 'salvar_transportador' => 'transportadores', 'excluir_transportador' => 'transportadores',
     'empresa' => 'empresa', 'salvar_empresa' => 'empresa', 'logo_base64' => 'empresa', 'upload_logo_empresa' => 'empresa', 'plugnotas_sincronizar' => 'empresa', 'bandeiras' => 'empresa', 'salvar_bandeira' => 'empresa', 'excluir_bandeira' => 'empresa',

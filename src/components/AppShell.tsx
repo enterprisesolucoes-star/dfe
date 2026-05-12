@@ -23,6 +23,7 @@ import { VendedoresTab } from './VendedoresModule';
 import { UsuariosTab } from './UsuariosModule';
 import InstallPrompt from './InstallPrompt';
 import { ReformaTributariaTab } from './ReformaTributariaModule';
+import { MarketingModule, FogosAniversario } from './MarketingModule';
 import { EmpresaPage, IntegracaoPage, DfeConfigPage } from './EmpresaModule';
 import { OrcamentosTab } from './OrcamentosModule';
 import { SefazConsultModal } from './SefazConsultModal';
@@ -131,7 +132,7 @@ const AppShell: React.FC<{ session: Session; onLogout: () => void; onUpdateSessi
   const isFiscal = usuarioDfeAtual !== 0 && usuarioDfeAtual !== 4;
 
 // Se empresa não está configurada, força aba de configurações e bloqueia as demais
-const [activeTab, setActiveTab] = useState<'dashboard' | 'vendas' | 'vendas_geral' | 'produtos' | 'clientes' | 'fornecedores' | 'compras' | 'orcamentos' | 'transportadores' | 'config' | 'ncm' | 'usuarios' | 'medidas' | 'bandeiras' | 'dfe_nfe' | 'dfe_nfe_geral' | 'dfe_nfe_parametros' | 'dfe_nfce_parametros' | 'reforma_tributaria' | 'config_empresa' | 'config_email' | 'config_smartpos' | 'config_integracao' | 'dfe_nfe_dados' | 'dfe_nfce_dados' | 'dfe_provedor' | 'empresa' | 'dfe_config' | 'fin_receber' | 'fin_pagar' | 'fin_caixa' | 'relatorios_tef' | 'vendedores' | 'comissoes' | 'pedidos' | 'cobranca_config' | 'cobranca_boletos' | 'cobranca_historico'>(
+const [activeTab, setActiveTab] = useState<'dashboard' | 'vendas' | 'vendas_geral' | 'produtos' | 'clientes' | 'fornecedores' | 'compras' | 'orcamentos' | 'transportadores' | 'config' | 'ncm' | 'usuarios' | 'medidas' | 'bandeiras' | 'dfe_nfe' | 'dfe_nfe_geral' | 'dfe_nfe_parametros' | 'dfe_nfce_parametros' | 'reforma_tributaria' | 'config_empresa' | 'config_email' | 'config_smartpos' | 'config_integracao' | 'dfe_nfe_dados' | 'dfe_nfce_dados' | 'dfe_provedor' | 'empresa' | 'dfe_config' | 'fin_receber' | 'fin_pagar' | 'fin_caixa' | 'relatorios_tef' | 'vendedores' | 'comissoes' | 'pedidos' | 'cobranca_config' | 'cobranca_boletos' | 'cobranca_historico' | 'marketing'>(
   session.empresaConfigurada ? 'dashboard' : 'empresa'
 );
 const empresaBloqueada = !session.empresaConfigurada;
@@ -160,6 +161,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       .catch(() => {});
   }, []);
   const [showCaixaModal, setShowCaixaModal] = useState(false);
+  const [fogosAniversario, setFogosAniversario] = useState<string[]>([]);
   const [showFecharCaixaModal, setShowFecharCaixaModal] = useState(false);
   const {
     produtos, clientes, fornecedores, vendedores, transportadores, medidas, bandeiras,
@@ -218,6 +220,23 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
   const closeGlobalModal = () => setGlobalModal(prev => ({ ...prev, isOpen: false }));
   
   const fetchEmpresa = async () => {
+    // Verificar aniversariantes do dia (apenas uma vez por dia)
+    const hoje = new Date().toDateString();
+    const jaViu = sessionStorage.getItem('fogos_aniversario');
+    if (jaViu !== hoje) {
+      fetch(`./api.php?action=marketing_aniversariantes&mes=${new Date().getMonth()+1}`)
+        .then(r => r.json())
+        .then((data: any[]) => {
+          if (Array.isArray(data)) {
+            const diaHoje = new Date().getDate();
+            const aniv = data.filter((c: any) => new Date(c.data_nascimento + 'T12:00:00').getDate() === diaHoje);
+            if (aniv.length > 0) {
+              setFogosAniversario(aniv.map((c: any) => c.nome));
+              sessionStorage.setItem('fogos_aniversario', hoje);
+            }
+          }
+        }).catch(() => {});
+    }
     try {
       const response = await fetch('./api.php?action=empresa');
       const data = await response.json();
@@ -614,6 +633,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       case 'fin_receber': { const _p = finNavPreset.current; finNavPreset.current = null; return <FinanceiroView tipo="R" emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} cobrancaAtiva={cobrancaAtiva} initPreset={_p} />; }
       case 'fin_pagar': { const _p = finNavPreset.current; finNavPreset.current = null; return <FinanceiroView tipo="P" emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} initPreset={_p} />; }
       case 'fin_caixa': return <CaixaView emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} />;
+      case 'marketing': return <MarketingModule emitente={emitente} showAlert={showAlert} />;
       case 'vendas_geral': return <GeralNfceTab showAlert={showAlert} showConfirm={showConfirm} showPrompt={showPrompt} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} onCancelar={handleCancelar} onRetryTef={handleRetryTef} onExcluir={handleExcluirVenda} emitente={emitente} setEmailSending={setEmailSendingOverlay} />;
       case 'vendas': return <VendasTab vendas={vendas} onCancelar={handleCancelar} onSincronizar={handleSincronizarContingencia} onRetryTef={handleRetryTef} onExcluir={handleExcluirVenda} onEmailDoc={handleEmailDoc} onDevolucao={handleDevolucao} emitente={emitente} />;
       case 'produtos': return (
@@ -930,7 +950,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
         )}
         <header className="bg-white dark:bg-gray-800 h-16 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-8">
           <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 capitalize">
-            {{ dashboard: 'Dashboard', fin_receber: 'Financeiro - Contas à Receber', fin_pagar: 'Financeiro - Contas à Pagar', fin_caixa: 'Financeiro - Movimento de Caixa', vendas: 'DFe - NFCe - Emissão', vendas_geral: 'DFe - NFCe - Geral', produtos: 'Produtos', clientes: 'Clientes', fornecedores: 'Fornecedores', compras: 'Compras', orcamentos: 'Orçamentos', ordens_servico: 'Ordem de Serviços', relatorios_tef: 'Relatórios do Sistema', config: 'Empresa', config_empresa: 'Empresa', config_email: 'Empresa', config_smartpos: 'Empresa', config_integracao: 'Integração', ncm: 'NCM / Tabela IBPT', usuarios: 'Usuários', vendedores: 'Vendedores', comissoes: 'Comissões', pedidos: 'Pedidos', cobranca_config: 'Cobrança - Configuração', cobranca_boletos: 'Cobrança - Boletos', cobranca_historico: 'Cobrança - Histórico', medidas: 'Medidas', bandeiras: 'Bandeiras de Cartão', dfe_nfe: 'DFe - NFe - Emissão', dfe_nfe_geral: 'DFe - NFe - Geral', dfe_nfce_parametros: 'DFe - NFCe - Parâmetros', dfe_nfe_parametros: 'DFe - NFe - Parâmetros', dfe_nfe_dados: 'DFe Configurações', dfe_nfce_dados: 'DFe Configurações', dfe_provedor: 'DFe Configurações', reforma_tributaria: 'Reforma Tributária', transportadores: 'Transportadores', empresa: 'Empresa', dfe_config: 'DFe Configurações' }[activeTab]}
+            {{ dashboard: 'Dashboard', fin_receber: 'Financeiro - Contas à Receber', fin_pagar: 'Financeiro - Contas à Pagar', fin_caixa: 'Financeiro - Movimento de Caixa', vendas: 'DFe - NFCe - Emissão', vendas_geral: 'DFe - NFCe - Geral', produtos: 'Produtos', clientes: 'Clientes', fornecedores: 'Fornecedores', compras: 'Compras', orcamentos: 'Orçamentos', ordens_servico: 'Ordem de Serviços', relatorios_tef: 'Relatórios do Sistema', config: 'Empresa', config_empresa: 'Empresa', config_email: 'Empresa', config_smartpos: 'Empresa', config_integracao: 'Integração', ncm: 'NCM / Tabela IBPT', usuarios: 'Usuários', vendedores: 'Vendedores', marketing: 'Marketing Sazonal', comissoes: 'Comissões', pedidos: 'Pedidos', cobranca_config: 'Cobrança - Configuração', cobranca_boletos: 'Cobrança - Boletos', cobranca_historico: 'Cobrança - Histórico', medidas: 'Medidas', bandeiras: 'Bandeiras de Cartão', dfe_nfe: 'DFe - NFe - Emissão', dfe_nfe_geral: 'DFe - NFe - Geral', dfe_nfce_parametros: 'DFe - NFCe - Parâmetros', dfe_nfe_parametros: 'DFe - NFe - Parâmetros', dfe_nfe_dados: 'DFe Configurações', dfe_nfce_dados: 'DFe Configurações', dfe_provedor: 'DFe Configurações', reforma_tributaria: 'Reforma Tributária', transportadores: 'Transportadores', empresa: 'Empresa', dfe_config: 'DFe Configurações' }[activeTab]}
           </h2>
           <div className="flex items-center gap-4">
             {activeTab === 'dfe_nfe' && (
@@ -1198,6 +1218,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
         />
       )}
 
+      {fogosAniversario.length > 0 && <FogosAniversario nomes={fogosAniversario} onClose={() => setFogosAniversario([])} />}
       <CommandPalette open={cmdOpen} onClose={() => setCmdOpen(false)} onNavigate={handleSetActiveTab} isFiscal={isFiscal} />
 
       {/* Global Alert/Confirm Modal */}

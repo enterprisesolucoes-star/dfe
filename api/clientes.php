@@ -100,3 +100,19 @@ switch ($action) {
         break;
 
 }
+
+    case 'marketing_aniversariantes':
+        $mes = (int)($_GET['mes'] ?? date('n'));
+        $stmt = $pdo->prepare("SELECT id, nome, telefone, data_nascimento FROM clientes WHERE ativo=1 AND empresa_id=? AND MONTH(data_nascimento)=? ORDER BY DAY(data_nascimento) ASC, nome ASC");
+        $stmt->execute([$empresaId, $mes]);
+        echo json_encode($stmt->fetchAll());
+        break;
+
+    case 'marketing_inativos':
+        $periodo = $_GET['periodo'] ?? '6m';
+        $meses = match($periodo) { '3m'=>3, '6m'=>6, '1a'=>12, '1amais'=>13, default=>6 };
+        $dt = date('Y-m-d', strtotime("-{$meses} months"));
+        $stmt = $pdo->prepare("SELECT c.id, c.nome, c.telefone, MAX(v.data_emissao) as ultima_compra FROM clientes c LEFT JOIN vendas v ON v.cliente_id=c.id AND v.status IN ('Autorizada','Contingencia') WHERE c.ativo=1 AND c.empresa_id=? GROUP BY c.id HAVING ultima_compra IS NULL OR DATE(ultima_compra) <= ? ORDER BY ultima_compra ASC, c.nome ASC LIMIT 500");
+        $stmt->execute([$empresaId, $dt]);
+        echo json_encode($stmt->fetchAll());
+        break;
