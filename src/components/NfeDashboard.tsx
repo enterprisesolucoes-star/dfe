@@ -8,9 +8,26 @@ import {
   CalendarDays
 } from 'lucide-react';
 import {
+
   Produto, Cliente, Transportador, Emitente, Medida,
   Nfe, NfeItem, NfeTransporte, NfePagamento, NfeVolume
 } from '../types/nfce';
+const BANDEIRAS_CARTAO = [
+  { id: 1,  tpag: '03', tband: '02', tband_opc: 'Mastercard',       cnpj: '05577343000137' },
+  { id: 2,  tpag: '03', tband: '01', tband_opc: 'Visa Crédito',     cnpj: '31551765000143' },
+  { id: 3,  tpag: '03', tband: '03', tband_opc: 'Amex',             cnpj: '60419645000195' },
+  { id: 4,  tpag: '03', tband: '06', tband_opc: 'Elo Crédito',      cnpj: '09227084000175' },
+  { id: 5,  tpag: '03', tband: '07', tband_opc: 'Hipercard',        cnpj: '03012230000169' },
+  { id: 6,  tpag: '03', tband: '05', tband_opc: 'Diners',           cnpj: '33479023000180' },
+  { id: 7,  tpag: '03', tband: '09', tband_opc: 'Cabal Crédito',    cnpj: '03766873000106' },
+  { id: 8,  tpag: '03', tband: '99', tband_opc: 'Outro Crédito',    cnpj: '' },
+  { id: 9,  tpag: '04', tband: '02', tband_opc: 'Mastercard Déb.',  cnpj: '05577343000137' },
+  { id: 10, tpag: '04', tband: '01', tband_opc: 'Visa Débito',      cnpj: '31551765000143' },
+  { id: 11, tpag: '04', tband: '06', tband_opc: 'Elo Débito',       cnpj: '09227084000175' },
+  { id: 12, tpag: '04', tband: '09', tband_opc: 'Cabal Débito',     cnpj: '03766873000106' },
+  { id: 13, tpag: '04', tband: '99', tband_opc: 'Outro Débito',     cnpj: '' },
+];
+
 
 // ─── Tipos locais ────────────────────────────────────────────────────────────
 
@@ -1280,6 +1297,24 @@ const NfeDashboard: React.FC<Props> = ({
                           className={`mt-5 p-2 rounded-xl transition-all active:scale-95 ${pag.vencimentos?.length ? 'bg-blue-600 text-white shadow-md shadow-blue-100' : 'text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 border border-transparent hover:border-blue-100'}`}>
                           <CalendarDays className="w-4 h-4" />
                         </button>
+                      )}
+                      {['03', '04'].includes(pag.formaPagamento) && !emitente.temTef && (
+                        <>
+                          <div className="w-44">
+                            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Bandeira</label>
+                            <select value={pag.tBand || ''} onChange={e => atualizarPagamento(idx, 'tBand', e.target.value)}
+                              className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 outline-none focus:ring-2 focus:ring-blue-500/20">
+                              <option value="">Selecione...</option>
+                              {BANDEIRAS_CARTAO.filter(b => b.tpag === pag.formaPagamento).map(b => <option key={b.id} value={b.tband}>{b.tband_opc}</option>)}
+                            </select>
+                          </div>
+                          <div className="w-36">
+                            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Autorização</label>
+                            <input value={pag.cAut || ''} onChange={e => atualizarPagamento(idx, 'cAut', e.target.value)}
+                              placeholder="Cód. autorização"
+                              className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 outline-none focus:ring-2 focus:ring-blue-500/20" />
+                          </div>
+                        </>
                       )}
                       <button onClick={() => removerPagamento(idx)} className="mt-5 p-2 text-gray-400 dark:text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg">
                         <Trash2 className="w-4 h-4" />
