@@ -410,14 +410,9 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
     let tpIntegra = isTefRequired ? '1' : '2';
 
     if (['03', '04'].includes(formaPagamentoInput) && !emitente.temTef) {
-      // Cartão sem TEF ativo: abre modal para operadora e código de autorização manual
-      const autManual = await new Promise<{ operadora: string; codigo: string } | null>(resolve => {
-        setModalAutManual({ operadora: '', codigo: '', resolve });
-      });
-      if (!autManual) return;
-      tBand = autManual.operadora || '99';
-      cAut = autManual.codigo;
+      // Cartão sem TEF: usa bandeira selecionada no select inline
       tpIntegra = '2';
+      // tBand e cAut já foram definidos acima pelo select inline
     }
 
     const novos = [...pagamentos, { formaPagamento: formaPagamentoInput, valorPagamento: valorPagamentoInput, tBand, cAut, tpIntegra }];
