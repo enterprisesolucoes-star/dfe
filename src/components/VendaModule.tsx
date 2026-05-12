@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
+
   Plus, 
   Trash2, 
   Send, 
@@ -18,6 +19,23 @@ import {
 import { motion } from 'motion/react';
 import { Produto, Cliente, Venda as Nfce, Emitente, Session } from '../types/nfce';
 import { Input } from './UIComponents';
+
+const BANDEIRAS_CARTAO = [
+  { id: 1,  tpag: '03', tband: '02', tband_opc: 'Mastercard',       cnpj: '05577343000137' },
+  { id: 2,  tpag: '03', tband: '01', tband_opc: 'Visa Crédito',     cnpj: '31551765000143' },
+  { id: 3,  tpag: '03', tband: '03', tband_opc: 'Amex',             cnpj: '60419645000195' },
+  { id: 4,  tpag: '03', tband: '06', tband_opc: 'Elo Crédito',      cnpj: '09227084000175' },
+  { id: 5,  tpag: '03', tband: '07', tband_opc: 'Hipercard',        cnpj: '03012230000169' },
+  { id: 6,  tpag: '03', tband: '05', tband_opc: 'Diners',           cnpj: '33479023000180' },
+  { id: 7,  tpag: '03', tband: '09', tband_opc: 'Cabal Crédito',    cnpj: '03766873000106' },
+  { id: 8,  tpag: '03', tband: '99', tband_opc: 'Outro Crédito',    cnpj: '' },
+  { id: 9,  tpag: '04', tband: '02', tband_opc: 'Mastercard Déb.',  cnpj: '05577343000137' },
+  { id: 10, tpag: '04', tband: '01', tband_opc: 'Visa Débito',      cnpj: '31551765000143' },
+  { id: 11, tpag: '04', tband: '06', tband_opc: 'Elo Débito',       cnpj: '09227084000175' },
+  { id: 12, tpag: '04', tband: '09', tband_opc: 'Cabal Débito',     cnpj: '03766873000106' },
+  { id: 13, tpag: '04', tband: '99', tband_opc: 'Outro Débito',     cnpj: '' },
+];
+
 
 const brl = (val: number) => val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
