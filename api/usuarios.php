@@ -80,7 +80,7 @@ switch ($action) {
                 $cxQ->execute([$usr['id']]);
                 $cxRow = $cxQ->fetch();
                 if ($cxRow) $caixaAberto = (int)$cxRow['id'];
-            } catch (Exception $e) {}
+            } catch (Exception $e) { error_log('caixaAberto erro: '.$e->getMessage()); }
             echo json_encode([
                 'success'             => true,
                 'usuarioId'           => $usr['id'],

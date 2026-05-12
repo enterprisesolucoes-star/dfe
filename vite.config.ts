@@ -27,7 +27,7 @@ export default defineConfig(({ mode }) => {
               options: { cacheName: 'google-fonts-cache', expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 } },
             },
             {
-              urlPattern: /\/api\.php.*/i,
+              urlPattern: /\/api\.php(?!.*action=login).*/i,
               handler: 'NetworkFirst',
               options: { cacheName: 'api-cache', expiration: { maxEntries: 50, maxAgeSeconds: 60 * 5 } },
             },
