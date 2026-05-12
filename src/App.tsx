@@ -13,6 +13,24 @@ export type Session = {
   usuarioDfe: number;
 };
 
+// Interceptor global — injeta empresa_id e usuario_id em todo fetch
+const _originalFetch = window.fetch;
+(window as any).fetch = function(input: RequestInfo | URL, init?: RequestInit) {
+  try {
+    const session = JSON.parse(sessionStorage.getItem('dfe_session') || '{}');
+    if (session.empresaId || session.usuarioId) {
+      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : (input as Request).url;
+      if (url.includes('api.php') || url.includes('/api/')) {
+        const headers = new Headers((init?.headers as HeadersInit) || {});
+        if (session.empresaId) headers.set('X-Empresa-ID', String(session.empresaId));
+        if (session.usuarioId) headers.set('X-Usuario-ID', String(session.usuarioId));
+        return _originalFetch(input, { ...init, headers });
+      }
+    }
+  } catch {}
+  return _originalFetch(input, init);
+};
+
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
 
