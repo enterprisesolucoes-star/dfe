@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import type { Session } from '../App';
 import FormAlert from './FormAlert';
 import { X, DollarSign } from 'lucide-react';
+const brl = (v: number) => Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 const AbrirCaixaModal = ({ session, onClose, onAberto }: { session: Session; onClose: () => void; onAberto: (caixaId: number) => void }) => {
   const [troco, setTroco]     = useState('0,00');
