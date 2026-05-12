@@ -24,6 +24,14 @@ import { UsuariosTab } from './UsuariosModule';
 import InstallPrompt from './InstallPrompt';
 import { ReformaTributariaTab } from './ReformaTributariaModule';
 import { MarketingModule, FogosAniversario } from './MarketingModule';
+
+export const apiFetch = (url: string, options?: RequestInit) => {
+  const session = JSON.parse(sessionStorage.getItem('dfe_session') || '{}');
+  const headers: Record<string, string> = { ...(options?.headers as Record<string, string> || {}) };
+  if (session.empresaId) headers['X-Empresa-ID'] = String(session.empresaId);
+  if (session.usuarioId) headers['X-Usuario-ID'] = String(session.usuarioId);
+  return fetch(url, { ...options, headers });
+};
 import { EmpresaPage, IntegracaoPage, DfeConfigPage } from './EmpresaModule';
 import { OrcamentosTab } from './OrcamentosModule';
 import { SefazConsultModal } from './SefazConsultModal';

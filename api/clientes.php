@@ -27,7 +27,7 @@ switch ($action) {
         }
         if ($empresaId) {
             $busca  = trim($_GET['busca'] ?? '');
-            $limit  = min(200, max(20, (int)($_GET['limit'] ?? 50)));
+            $limit  = min(1000, max(20, (int)($_GET['limit'] ?? 500)));
             $page   = max(1, (int)($_GET['page'] ?? 1));
             $offset = ($page - 1) * $limit;
             $where  = "ativo=1 AND empresa_id=?";
@@ -47,7 +47,7 @@ switch ($action) {
             if ($busca !== '') {
                 $stmt = $pdo->prepare("SELECT * FROM clientes WHERE $where ORDER BY nome ASC LIMIT $limit");
             } else {
-                $stmt = $pdo->prepare("SELECT * FROM clientes WHERE $where ORDER BY nome ASC LIMIT 500");
+                $stmt = $pdo->prepare("SELECT * FROM clientes WHERE $where ORDER BY nome ASC LIMIT $limit");
             }
             $stmt->execute($params);
         } else {

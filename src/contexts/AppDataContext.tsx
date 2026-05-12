@@ -1,4 +1,12 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
+
+const apiFetch = (url: string, options?: RequestInit) => {
+  const session = JSON.parse(sessionStorage.getItem('dfe_session') || '{}');
+  const headers: Record<string, string> = { ...(options?.headers as Record<string, string> || {}) };
+  if (session.empresaId) headers['X-Empresa-ID'] = String(session.empresaId);
+  if (session.usuarioId) headers['X-Usuario-ID'] = String(session.usuarioId);
+  return fetch(url, { ...options, headers });
+};
 import { Produto, Cliente, Fornecedor, Transportador, Medida, Bandeira } from '../types/nfce';
 
 export type Vendedor = { id?: number; nome: string; documento?: string; telefone?: string; email?: string; percentual_comissao?: number; ativo?: number };
@@ -88,14 +96,14 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
 
   const fetchVendedores = useCallback(async () => {
     try {
-      const data = await fetch('./api.php?action=listar_vendedores').then(r => r.json());
+      const data = await apiFetch('./api.php?action=listar_vendedores').then(r => r.json());
       if (Array.isArray(data)) setVendedores(data);
     } catch { /* silent */ }
   }, []);
 
   const fetchTransportadores = useCallback(async () => {
     try {
-      const data = await fetch('./api.php?action=transportadores').then(r => r.json());
+      const data = await apiFetch('./api.php?action=transportadores').then(r => r.json());
       if (Array.isArray(data)) setTransportadores(data.map((t: any) => ({
         ...t, id: Number(t.id),
         endereco: {
@@ -108,7 +116,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
 
   const fetchMedidas = useCallback(async () => {
     try {
-      const data = await fetch('./api.php?action=medidas').then(r => r.json());
+      const data = await apiFetch('./api.php?action=medidas').then(r => r.json());
       if (Array.isArray(data)) setMedidas(data.map((m: any) => ({
         ...m, id: Number(m.id), fator: Number(m.fator), pesavel: Number(m.pesavel) === 1
       })));
