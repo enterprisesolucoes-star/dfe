@@ -73,6 +73,14 @@ switch ($action) {
             if (function_exists('registrarAuditoria')) {
                 registrarAuditoria($pdo, (int)($usr['empresa_id'] ?? 0), (int)$usr['id'], $usr['nome'], 'login_sucesso', 'usuario', $usr['id'], 'Login realizado com sucesso');
             }
+            // Verificar caixa aberto
+            $caixaAberto = null;
+            try {
+                $cxQ = $pdo->prepare("SELECT id FROM caixas WHERE usuario_id = ? AND status = 'aberto' ORDER BY id DESC LIMIT 1");
+                $cxQ->execute([$usr['id']]);
+                $cxRow = $cxQ->fetch();
+                if ($cxRow) $caixaAberto = (int)$cxRow['id'];
+            } catch (Exception $e) {}
             echo json_encode([
                 'success'             => true,
                 'usuarioId'           => $usr['id'],
@@ -80,7 +88,8 @@ switch ($action) {
                 'perfil'              => $usr['perfil'],
                 'empresaId'           => (int)($usr['empresa_id'] ?? 0),
                 'empresaConfigurada'  => $empresaConfigurada,
-                'usuarioDfe'          => (int)($empresaData['usuario_dfe'] ?? 2)
+                'usuarioDfe'          => (int)($empresaData['usuario_dfe'] ?? 2),
+                'caixaId'             => $caixaAberto
             ]);
         } else {
             // Auditoria — tentativa de login falha

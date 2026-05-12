@@ -27,7 +27,7 @@ const LoginScreen = ({ onLogin }: { onLogin: (s: Session, lembrar: boolean) => v
           usuarioId: data.usuarioId,
           nome: data.nome,
           perfil: data.perfil,
-          caixaId: null,
+          caixaId: data.caixaId ?? null,
           empresaId: data.empresaId ?? 0,
           empresaConfigurada: data.empresaConfigurada ?? true,
           usuarioDfe: data.usuarioDfe ?? 2
