@@ -69,14 +69,17 @@ const FecharCaixaModal = ({ caixaId, showConfirm, onClose, onFechado }: { caixaI
         body: JSON.stringify({ caixaId }),
       });
       const data = await res.json();
-      
       if (data.success) {
-        window.open(`relatorio_caixa.php?caixaId=${caixaId}&print=1`, '_blank', 'noopener,noreferrer');
+        onFechado();
+        setTimeout(() => {
+          window.open(`relatorio_caixa.php?caixaId=${caixaId}&print=1`, '_blank', 'noopener,noreferrer');
+        }, 300);
+      } else {
+        setFechando(false);
       }
-      onFechado();
     } catch (e) {
       console.error(e);
-      onFechado();
+      setFechando(false);
     }
   };
 

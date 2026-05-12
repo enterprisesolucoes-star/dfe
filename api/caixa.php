@@ -46,6 +46,26 @@ switch ($action) {
         echo json_encode(['success' => true, 'totalVendas' => $totalVendas]);
         break;
 
+    case 'verificar_caixa_dia':
+        // Verifica se há caixa aberto de dia anterior (bloqueio de venda)
+        $usuarioId = (int)($_GET['usuarioId'] ?? 0);
+        $cx = $pdo->prepare("SELECT id, data_abertura FROM caixas WHERE usuario_id = ? AND status = 'aberto' ORDER BY id DESC LIMIT 1");
+        $cx->execute([$usuarioId]);
+        $cxRow = $cx->fetch();
+        if ($cxRow) {
+            $dtBr = new \DateTime('now', new \DateTimeZone('America/Sao_Paulo'));
+            $dataHoje = $dtBr->format('Y-m-d');
+            $dataAbertura = substr($cxRow['data_abertura'], 0, 10);
+            if ($dataAbertura < $dataHoje) {
+                echo json_encode(['bloqueado' => true, 'data_abertura' => $dataAbertura, 'caixaId' => $cxRow['id']]);
+            } else {
+                echo json_encode(['bloqueado' => false]);
+            }
+        } else {
+            echo json_encode(['bloqueado' => false]);
+        }
+        break;
+
     case 'caixa_atual':
         $usuarioId = (int)($_GET['usuarioId'] ?? 0);
         $cx = $pdo->prepare("SELECT * FROM caixas WHERE usuario_id = ? AND status = 'aberto' ORDER BY id DESC LIMIT 1");

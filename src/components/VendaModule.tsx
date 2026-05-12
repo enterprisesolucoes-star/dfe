@@ -53,7 +53,16 @@ const ESTADOS_BR = [
 
 export const GlobalMessageModal = ({ type, title, message, inputValue, onClose, onConfirm }: any) => {
   const [val, setVal] = useState(inputValue || '');
-  useEffect(() => { setVal(inputValue || ''); }, [inputValue]);
+  useEffect(() => {
+    if (session?.usuarioId) {
+      fetch(`./api.php?action=verificar_caixa_dia&usuarioId=${session.usuarioId}`)
+        .then(r => r.json())
+        .then(d => setCaixaDiaAnterior(d))
+        .catch(() => {});
+    }
+  }, [session?.usuarioId]);
+
+    useEffect(() => { setVal(inputValue || ''); }, [inputValue]);
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[1000] p-4">
@@ -338,6 +347,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
   const [formaPagamentoInput, setFormaPagamentoInput] = useState<string>('01');
   const [valorPagamentoInput, setValorPagamentoInput] = useState<number>(0);
   const [bandeiraSelecionada, setBandeiraSelecionada] = useState('');
+  const [caixaDiaAnterior, setCaixaDiaAnterior] = useState<{bloqueado: boolean, data_abertura?: string, caixaId?: number} | null>(null);
   const [autorizacaoInput, setAutorizacaoInput] = useState('');
   const [isEmitting, setIsEmitting] = useState(false);
   const [tefState, setTefState] = useState<{ pagamentosIds: number[]; currentIndex: number; vendaId: number; numero: number } | null>(null);
@@ -716,7 +726,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
             <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 flex-1">Nova NFC-e #{proximoNumero}</h3>
             {destinatario && <span className="text-xs bg-indigo-100 text-indigo-700 dark:text-indigo-300 px-2 py-1 rounded-lg flex items-center gap-1">{destinatario.nome} <button onClick={() => setDestinatario(null)}>✕</button></span>}
             <button onClick={() => setShowIdentificar(true)} className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium flex items-center gap-2 shadow-md hover:bg-indigo-700"><UserCheck className="w-4 h-4" /> Identificar</button>
-            <button onClick={handleFinalizar} disabled={isEmitting || itens.length === 0 || totalPago < totalDevido} className={`px-5 py-2 rounded-xl text-sm font-medium flex items-center gap-2 ${isEmitting || totalPago < totalDevido ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500' : 'bg-green-600 text-white hover:bg-green-700 shadow-md'}`}>{isEmitting ? 'Transmitindo...' : <><Send className="w-4 h-4" /> Emitir NFC-e</>}</button>
+            <button onClick={handleFinalizar} disabled={isEmitting || itens.length === 0 || totalPago < totalDevido || !!caixaDiaAnterior?.bloqueado} className={`px-5 py-2 rounded-xl text-sm font-medium flex items-center gap-2 ${isEmitting || totalPago < totalDevido ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500' : 'bg-green-600 text-white hover:bg-green-700 shadow-md'}`}>{isEmitting ? 'Transmitindo...' : <><Send className="w-4 h-4" /> Emitir NFC-e</>}</button>
             <button onClick={onClose} className="text-gray-400 dark:text-gray-500 hover:text-gray-600">✕</button>
           </div>
           <div className="flex-1 overflow-hidden p-3 sm:p-5 grid grid-cols-1 lg:grid-cols-5 gap-4">
@@ -800,6 +810,11 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
             </div>
             <div className="lg:col-span-2 bg-gray-50 dark:bg-gray-900 rounded-2xl p-5 flex flex-col overflow-y-auto">
               <h4 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-6">Resumo</h4>
+              {caixaDiaAnterior?.bloqueado && (
+                <div className="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 text-xs text-red-700 dark:text-red-300 font-semibold">
+                  ⚠️ Caixa aberto em {caixaDiaAnterior.data_abertura?.split('-').reverse().join('/')} não foi fechado. Feche o caixa antes de realizar novas vendas.
+                </div>
+              )}
               <div className="space-y-4 flex-1">
                 <div className="flex justify-between text-gray-500 dark:text-gray-400"><span>Subtotal</span><span>R$ {brl(subtotal)}</span></div>
                 <div className="flex justify-between items-center text-gray-500 dark:text-gray-400"><span>Desconto</span><input type="text" value={valorDesconto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} onChange={e => setValorDesconto(Number(e.target.value.replace(/\D/g, '')) / 100)} className="w-24 text-right bg-transparent border-b border-gray-300 dark:border-gray-600 font-bold text-red-500 dark:text-red-400 outline-none focus:border-blue-500" /></div>
