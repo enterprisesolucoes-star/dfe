@@ -496,6 +496,18 @@ const AdminPortal = () => {
                         <option value={3}>Contingência Automática</option>
                         <option value={4}>DFe BLOQUEADO</option>
                       </select>
+                      {Number(form.usuario_dfe ?? 2) > 0 && Number(form.usuario_dfe ?? 2) !== 4 && (
+                        <div className="mt-3">
+                          <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">API DFe *</label>
+                          <select value={form.api_dfe || ''} onChange={e => set('api_dfe', e.target.value)}
+                            className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            <option value="">Selecione o provedor...</option>
+                            <option value="sped-nfe">Sped-NFe</option>
+                            <option value="unimake">Unimake</option>
+                          </select>
+                          <p className="text-[10px] text-blue-500 mt-1 uppercase font-bold">Provedor de transmissão dos documentos fiscais</p>
+                        </div>
+                      )}
                     </div>
                     <div>
                       <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Status</label>
