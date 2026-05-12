@@ -873,7 +873,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
                        <select value={bandeiraSelecionada} onChange={e => setBandeiraSelecionada(e.target.value)} className="flex-1 bg-white dark:bg-gray-800 border p-1 rounded text-xs">
                          <option value="">Bandeira...</option>{BANDEIRAS_CARTAO.filter(b => b.tpag === formaPagamentoInput).map(b => <option key={b.id} value={String(b.id)}>{b.tband_opc}</option>)}
                        </select>
-                       <input value={autorizacaoInput} onChange={e => setAutorizacaoInput(e.target.value)} placeholder="Aut." className="w-16 border rounded p-1 text-xs" />
+                       <input value={autorizacaoInput} onChange={e => setAutorizacaoInput(e.target.value)} placeholder="Autorização" className="w-32 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-2 text-xs bg-white dark:bg-gray-800" />
                     </div>
                   )}
                   <div className="flex gap-2">
@@ -881,7 +881,11 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
                     <button onClick={addPagamento} className="w-10 h-10 bg-green-500 text-white rounded-lg hover:bg-green-600 font-bold">+</button>
                   </div>
                   <div className="space-y-1">
-                    {pagamentos.map((p, i) => <div key={i} className="flex justify-between bg-white dark:bg-gray-800 p-2 rounded border text-sm"><span>{p.formaPagamento === '01' ? 'Dinheiro' : p.formaPagamento === '17' ? 'PIX' : 'Cartão'}</span><div className="flex gap-2"><b>R$ {brl(p.valorPagamento)}</b><button onClick={() => removePagamento(i)} className="text-red-500 dark:text-red-400">✕</button></div></div>)}
+                    {pagamentos.map((p, i) => {
+                      const banda = BANDEIRAS_CARTAO.find(b => b.tband === p.tBand);
+                      const label = p.formaPagamento === '01' ? 'Dinheiro' : p.formaPagamento === '17' ? 'PIX' : p.formaPagamento === '03' ? `Crédito${banda ? ' · ' + banda.tband_opc : ''}` : p.formaPagamento === '04' ? `Débito${banda ? ' · ' + banda.tband_opc : ''}` : 'Cartão';
+                      return <div key={i} className="flex justify-between bg-white dark:bg-gray-800 p-2 rounded border text-sm"><span>{label}</span><div className="flex gap-2"><b>R$ {brl(p.valorPagamento)}</b><button onClick={() => removePagamento(i)} className="text-red-500 dark:text-red-400">✕</button></div></div>;
+                    })}
                   </div>
                 </div>
               </div>
