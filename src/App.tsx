@@ -19,7 +19,16 @@ export default function App() {
   useEffect(() => {
     const saved = localStorage.getItem('dfe_session');
     if (saved) {
-      try { setSession(JSON.parse(saved)); } catch {}
+      try {
+        const s = JSON.parse(saved);
+        // Sempre buscar caixaId atualizado da API
+        fetch(`./api.php?action=caixa_atual&usuarioId=${s.usuarioId}`)
+          .then(r => r.json())
+          .then(cx => {
+            setSession({ ...s, caixaId: cx?.id ?? null });
+          })
+          .catch(() => setSession(s));
+      } catch {}
     }
   }, []);
 
