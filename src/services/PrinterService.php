@@ -54,9 +54,14 @@ class PrinterService
     {
         try {
             $danfe = new Danfe($xmlAutorizado, 'P', 'A4', $this->logoPath);
-            // Algumas versões usam a propriedade abaixo para não imprimir o email nas informacoes complementares
+            // Não imprimir email do destinatário nas informações complementares
             if (property_exists($danfe, 'printEmail')) {
                 $danfe->printEmail = false;
+            }
+            if (method_exists($danfe, 'setExibirEmailDestinatario')) {
+                $danfe->setExibirEmailDestinatario(false);
+            } elseif (property_exists($danfe, 'exibirEmailDestinatario')) {
+                $danfe->exibirEmailDestinatario = false;
             }
             if (property_exists($danfe, 'mododebug')) {
                 $danfe->mododebug = false;
