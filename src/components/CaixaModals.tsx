@@ -46,7 +46,7 @@ const AbrirCaixaModal = ({ session, onClose, onAberto }: { session: Session; onC
 };
 
 // â€ â‚¬â€ â‚¬ Fechar Caixa â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬â€ â‚¬
-const FecharCaixaModal = ({ caixaId, showConfirm, onClose, onFechado }: { caixaId: number; showConfirm: any; onClose: () => void; onFechado: () => void }) => {
+const FecharCaixaModal = ({ caixaId, showConfirm, onClose, onFechado, onLogout }: { caixaId: number; showConfirm: any; onClose: () => void; onFechado: () => void; onLogout?: () => void }) => {
   const [relatorio, setRelatorio] = useState<any>(null);
   const [loading, setLoading]     = useState(true);
   const [fechando, setFechando]   = useState(false);
@@ -73,6 +73,7 @@ const FecharCaixaModal = ({ caixaId, showConfirm, onClose, onFechado }: { caixaI
       const data = await res.json();
       if (data.success) {
         onFechado();
+        if (onLogout) setTimeout(onLogout, 800);
         setTimeout(() => {
           window.open(`relatorio_caixa.php?caixaId=${caixaId}&print=1`, '_blank', 'noopener,noreferrer');
         }, 300);

@@ -1193,6 +1193,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           caixaId={session.caixaId}
           showConfirm={showConfirm}
           onClose={() => setShowFecharCaixaModal(false)}
+          onLogout={onLogout}
           onFechado={() => { setShowFecharCaixaModal(false); onUpdateSession({ ...session, caixaId: null }); }}
         />
       )}
