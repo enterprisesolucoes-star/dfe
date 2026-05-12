@@ -34,10 +34,12 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
   const [bandeiras, setBandeiras]             = useState<Bandeira[]>([]);
   const [produtosRefreshKey, setProdutosRefreshKey] = useState(0);
 
-  const fetchProdutos = useCallback(async () => {
+  const fetchProdutos = useCallback(async (busca = '') => {
     try {
-      const data = await fetch('./api.php?action=produtos').then(r => r.json());
-      if (Array.isArray(data)) setProdutos(data.map((p: any) => ({
+      const url = busca ? `./api.php?action=produtos&busca=${encodeURIComponent(busca)}&limit=80` : './api.php?action=produtos&limit=200';
+      const data = await fetch(url).then(r => r.json());
+      const arr = Array.isArray(data) ? data : (data.data ?? []);
+      if (Array.isArray(arr)) setProdutos(arr.map((p: any) => ({
         ...p, id: Number(p.id), valorUnitario: Number(p.valor_unitario),
         codigoInterno: p.codigo_interno, codigoBarras: p.codigo_barras || '',
         unidadeComercial: p.unidade_comercial, icmsAliquota: Number(p.icms_aliquota ?? 0),
@@ -52,10 +54,12 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
     } catch { /* silent */ }
   }, []);
 
-  const fetchClientes = useCallback(async () => {
+  const fetchClientes = useCallback(async (busca = '') => {
     try {
-      const data = await fetch('./api.php?action=clientes').then(r => r.json());
-      if (Array.isArray(data)) setClientes(data.map((c: any) => ({
+      const url = busca ? `./api.php?action=clientes&busca=${encodeURIComponent(busca)}&limit=80` : './api.php?action=clientes&limit=300';
+      const data = await fetch(url).then(r => r.json());
+      const arr = Array.isArray(data) ? data : (data.data ?? []);
+      if (Array.isArray(arr)) setClientes(arr.map((c: any) => ({
         ...c, id: Number(c.id), regimeTributario: c.regime_tributario || '1',
         entidadeGovernamental: c.entidade_governamental || '0', ie: c.ie || '',
         indIEDest: c.indIEDest || c.indiedest || '9',
@@ -67,10 +71,12 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
     } catch { /* silent */ }
   }, []);
 
-  const fetchFornecedores = useCallback(async () => {
+  const fetchFornecedores = useCallback(async (busca = '') => {
     try {
-      const data = await fetch('./api.php?action=fornecedores').then(r => r.json());
-      if (Array.isArray(data)) setFornecedores(data.map((f: any) => ({
+      const url = busca ? `./api.php?action=fornecedores&busca=${encodeURIComponent(busca)}&limit=80` : './api.php?action=fornecedores&limit=300';
+      const data = await fetch(url).then(r => r.json());
+      const arr = Array.isArray(data) ? data : (data.data ?? []);
+      if (Array.isArray(arr)) setFornecedores(arr.map((f: any) => ({
         ...f, id: Number(f.id),
         endereco: {
           logradouro: f.logradouro, numero: f.numero, complemento: f.complemento,

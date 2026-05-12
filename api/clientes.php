@@ -26,8 +26,30 @@ switch ($action) {
             $pdo->prepare("UPDATE clientes SET empresa_id=? WHERE empresa_id IS NULL")->execute([$empRef]);
         }
         if ($empresaId) {
-            $stmt = $pdo->prepare("SELECT * FROM clientes WHERE ativo=1 AND empresa_id=? ORDER BY nome ASC");
-            $stmt->execute([$empresaId]);
+            $busca  = trim($_GET['busca'] ?? '');
+            $limit  = min(200, max(20, (int)($_GET['limit'] ?? 50)));
+            $page   = max(1, (int)($_GET['page'] ?? 1));
+            $offset = ($page - 1) * $limit;
+            $where  = "ativo=1 AND empresa_id=?";
+            $params = [$empresaId];
+            if ($busca !== '') {
+                $where .= " AND (nome LIKE ? OR documento LIKE ? OR telefone LIKE ?)";
+                $params[] = "%$busca%"; $params[] = "%$busca%"; $params[] = "%$busca%";
+            }
+            if (isset($_GET['page'])) {
+                $total = (int)$pdo->prepare("SELECT COUNT(*) FROM clientes WHERE $where")->execute($params) ? $pdo->query("SELECT FOUND_ROWS()")->fetchColumn() : 0;
+                $cnt = $pdo->prepare("SELECT COUNT(*) FROM clientes WHERE $where"); $cnt->execute($params); $total = (int)$cnt->fetchColumn();
+                $stmt = $pdo->prepare("SELECT * FROM clientes WHERE $where ORDER BY nome ASC LIMIT $limit OFFSET $offset");
+                $stmt->execute($params);
+                echo json_encode(['data' => $stmt->fetchAll(), 'total' => $total, 'page' => $page, 'pages' => (int)ceil($total/$limit)]);
+                break;
+            }
+            if ($busca !== '') {
+                $stmt = $pdo->prepare("SELECT * FROM clientes WHERE $where ORDER BY nome ASC LIMIT $limit");
+            } else {
+                $stmt = $pdo->prepare("SELECT * FROM clientes WHERE $where ORDER BY nome ASC LIMIT 500");
+            }
+            $stmt->execute($params);
         } else {
             echo json_encode([]); exit; // empresa_id obrigatório
         }

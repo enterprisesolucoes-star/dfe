@@ -17,7 +17,7 @@ export default function App() {
   const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem('dfe_session');
+    const saved = sessionStorage.getItem('dfe_session');
     if (saved) {
       try {
         const s = JSON.parse(saved);
@@ -37,12 +37,12 @@ export default function App() {
       const cx = await fetch(`./api.php?action=caixa_atual&usuarioId=${s.usuarioId}`).then(r => r.json());
       s = { ...s, caixaId: cx?.id ?? null };
     } catch {}
-    localStorage.setItem('dfe_session', JSON.stringify(s));
+    sessionStorage.setItem('dfe_session', JSON.stringify(s));
     setSession(s);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('dfe_session');
+    sessionStorage.removeItem('dfe_session');
     setSession(null);
   };
 
@@ -52,7 +52,7 @@ export default function App() {
         (e.ctrlKey && e.key === 'F5') ||
         (e.ctrlKey && e.shiftKey && (e.key === 'R' || e.key === 'r'));
       if (isHardRefresh) {
-        localStorage.removeItem('dfe_session');
+        sessionStorage.removeItem('dfe_session');
       }
     };
     window.addEventListener('keydown', onKey);
@@ -61,8 +61,8 @@ export default function App() {
 
   const handleUpdateSession = (s: Session) => {
     setSession(s);
-    if (localStorage.getItem('dfe_session')) {
-      localStorage.setItem('dfe_session', JSON.stringify(s));
+    if (sessionStorage.getItem('dfe_session')) {
+      sessionStorage.setItem('dfe_session', JSON.stringify(s));
     }
   };
 

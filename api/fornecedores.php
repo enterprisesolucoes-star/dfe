@@ -32,7 +32,16 @@ switch ($action) {
             $pdo->prepare("UPDATE fornecedores SET empresa_id=? WHERE empresa_id IS NULL")->execute([$empRef]);
         }
         if ($empresaId) {
-            $stmt = $pdo->prepare("SELECT * FROM fornecedores WHERE ativo=1 AND empresa_id=? ORDER BY nome ASC");
+            $busca  = trim($_GET['busca'] ?? '');
+            $limit  = min(200, max(20, (int)($_GET['limit'] ?? 50)));
+            $where  = "ativo=1 AND empresa_id=?";
+            $params = [$empresaId];
+            if ($busca !== '') {
+                $where .= " AND (nome LIKE ? OR documento LIKE ?)";
+                $params[] = "%$busca%"; $params[] = "%$busca%";
+            }
+            $stmt = $pdo->prepare("SELECT * FROM fornecedores WHERE $where ORDER BY nome ASC LIMIT $limit");
+            $stmt->execute($params);
             $stmt->execute([$empresaId]);
         } else {
             echo json_encode([]); exit; // empresa_id obrigatório
