@@ -432,14 +432,10 @@ const NfeDashboard: React.FC<Props> = ({
           return;
         } else {
           // Sem TEF: usa bandeira e autorização já preenchidas no select inline
-          body.pagamentos = body.pagamentos.map((p: any) =>
+          body.venda.pagamentos = body.venda.pagamentos.map((p: any) =>
             ['03', '04'].includes(p.formaPagamento)
-              ? { ...p, tpIntegra: '2' }
-              : p
-          );
-          // PIX: sem card no XML
-          body.pagamentos = body.pagamentos.map((p: any) =>
-            p.formaPagamento === '17'
+              ? { ...p, tpIntegra: '2', tBand: p.tBand || '99', cAut: p.cAut || '' }
+              : p.formaPagamento === '17'
               ? { ...p, tpIntegra: '2', tBand: null, cAut: null }
               : p
           );
