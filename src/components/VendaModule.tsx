@@ -868,7 +868,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
                   <select value={formaPagamentoInput} onChange={e => setFormaPagamentoInput(e.target.value)} className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm outline-none">
                     <option value="01">Dinheiro</option><option value="17">PIX</option><option value="03">Cartão Crédito</option><option value="04">Cartão Débito</option><option value="05" disabled={!destinatario?.isCadastrado}>Crédito Loja</option>
                   </select>
-                  {!isTefRequired && ['03', '04'].includes(formaPagamentoInput) && (
+                  {!emitente.temTef && ['03', '04'].includes(formaPagamentoInput) && (
                     <div className="flex gap-2">
                        <select value={bandeiraSelecionada} onChange={e => setBandeiraSelecionada(e.target.value)} className="flex-1 bg-white dark:bg-gray-800 border p-1 rounded text-xs">
                          <option value="">Bandeira...</option>{BANDEIRAS_CARTAO.filter(b => b.tpag === formaPagamentoInput).map(b => <option key={b.id} value={String(b.id)}>{b.tband_opc}</option>)}
