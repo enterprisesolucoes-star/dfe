@@ -99,7 +99,6 @@ switch ($action) {
         echo json_encode(['success' => true]);
         break;
 
-}
 
     case 'marketing_aniversariantes':
         $mes = (int)($_GET['mes'] ?? date('n'));
@@ -116,3 +115,4 @@ switch ($action) {
         $stmt->execute([$empresaId, $dt]);
         echo json_encode($stmt->fetchAll());
         break;
+}
