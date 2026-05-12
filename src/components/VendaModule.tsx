@@ -339,7 +339,6 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
   const [valorPagamentoInput, setValorPagamentoInput] = useState<number>(0);
   const [bandeiraSelecionada, setBandeiraSelecionada] = useState('');
   const [autorizacaoInput, setAutorizacaoInput] = useState('');
-  const [modalAutManual, setModalAutManual] = useState<{ operadora: string; codigo: string; resolve: ((v: { operadora: string; codigo: string } | null) => void) } | null>(null);
   const [isEmitting, setIsEmitting] = useState(false);
   const [tefState, setTefState] = useState<{ pagamentosIds: number[]; currentIndex: number; vendaId: number; numero: number } | null>(null);
   const [showIdentificar, setShowIdentificar] = useState(false);
@@ -428,9 +427,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
     let tpIntegra = isTefRequired ? '1' : '2';
 
     if (['03', '04'].includes(formaPagamentoInput) && !emitente.temTef) {
-      // Cartão sem TEF: usa bandeira selecionada no select inline
       tpIntegra = '2';
-      // tBand e cAut já foram definidos acima pelo select inline
     }
 
     const novos = [...pagamentos, { formaPagamento: formaPagamentoInput, valorPagamento: valorPagamentoInput, tBand, cAut, tpIntegra }];
@@ -708,63 +705,6 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
                   setParcelasCredito([]);
                 }}
                 className="flex-1 px-4 py-2 rounded-xl bg-purple-600 text-white text-sm font-bold hover:bg-purple-700 shadow"
-              >Confirmar</button>
-            </div>
-          </div>
-        </div>
-      )}
-      {modalAutManual && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000]">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 w-full max-w-sm">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
-                <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">Pagamento com Cartão</h3>
-                <p className="text-xs text-gray-400 dark:text-gray-500">Informe os dados da transação</p>
-              </div>
-            </div>
-            <p className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded-lg px-3 py-2 mb-5 mt-2">
-              Integração TEF não ativa. Registre os dados manualmente conforme exigido pela legislação fiscal.
-            </p>
-            <div className="space-y-4">
-              <div>
-                <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Operadora / Bandeira</label>
-                <select
-                  className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"
-                  value={modalAutManual.operadora}
-                  onChange={e => setModalAutManual(prev => prev ? { ...prev, operadora: e.target.value } : null)}
-                >
-                  <option value="">Selecione...</option>
-                  {BANDEIRAS_CARTAO.map(b => <option key={b.id} value={b.tband}>{b.tband_opc}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Código de Autorização</label>
-                <input
-                  type="text"
-                  className="mt-1 w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500 font-mono tracking-widest"
-                  placeholder="Ex: 123456"
-                  value={modalAutManual.codigo}
-                  onChange={e => setModalAutManual(prev => prev ? { ...prev, codigo: e.target.value } : null)}
-                  autoFocus
-                />
-              </div>
-            </div>
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => { modalAutManual.resolve(null); setModalAutManual(null); }}
-                className="flex-1 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700"
-              >Cancelar</button>
-              <button
-                onClick={() => {
-                  if (!modalAutManual.codigo.trim()) { alert('Informe o código de autorização.'); return; }
-                  const val = { operadora: modalAutManual.operadora, codigo: modalAutManual.codigo };
-                  modalAutManual.resolve(val);
-                  setModalAutManual(null);
-                }}
-                className="flex-1 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 shadow"
               >Confirmar</button>
             </div>
           </div>
