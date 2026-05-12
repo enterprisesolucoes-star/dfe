@@ -127,20 +127,24 @@ export const ProdutosTab = ({ onEdit, onDelete, refreshTrigger }: { onEdit: (p: 
 };
 
 // ── Listagem: Clientes ────────────────────────────────────────────────────────
-export const ClientesTab = ({ clientes, onEdit, onDelete }: { clientes: Cliente[]; onEdit: (c: Cliente) => void; onDelete: (id: number) => void }) => {
+export const ClientesTab = ({ clientes: _clientesIgnore, onEdit, onDelete }: { clientes: Cliente[]; onEdit: (c: Cliente) => void; onDelete: (id: number) => void }) => {
+  const [clientes, setClientes] = useState<Cliente[]>([]);
   const [busca, setBusca] = useState('');
   const debouncedBusca = useDebounce(busca);
-  const filtrados = clientes.filter(c => {
-    const q = debouncedBusca.trim();
-    if (!q) return true;
-    const qL = q.toLowerCase();
-    const qD = q.replace(/\D/g, '');
-    return (
-      (c.nome || '').toLowerCase().includes(qL) ||
-      (qD.length > 0 && (c.documento || '').replace(/\D/g, '').includes(qD)) ||
-      (qD.length > 0 && (c.telefone || '').replace(/\D/g, '').includes(qD))
-    );
-  });
+  useEffect(() => {
+    const params = new URLSearchParams({ action: 'clientes', limit: '100' });
+    if (debouncedBusca) params.set('busca', debouncedBusca);
+    fetch(`./api.php?${params}`)
+      .then(r => r.json())
+      .then(data => {
+        const arr = Array.isArray(data) ? data : (data.data ?? []);
+        setClientes(arr.map((c: any) => ({
+          ...c, id: Number(c.id),
+          endereco: { logradouro: c.logradouro, numero: c.numero, complemento: c.complemento, bairro: c.bairro, municipio: c.municipio, codigoMunicipio: c.codigo_municipio, uf: c.uf, cep: c.cep }
+        })));
+      }).catch(() => {});
+  }, [debouncedBusca]);
+  const filtrados = clientes;
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col" style={{height: 'calc(100vh - 140px)'}}>
       <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-t-2xl flex-shrink-0">
@@ -186,20 +190,24 @@ export const ClientesTab = ({ clientes, onEdit, onDelete }: { clientes: Cliente[
 };
 
 // ── Listagem: Fornecedores ────────────────────────────────────────────────────
-export const FornecedoresTab = ({ fornecedores, onEdit, onDelete }: { fornecedores: Fornecedor[]; onEdit: (f: Fornecedor) => void; onDelete: (id: number) => void }) => {
+export const FornecedoresTab = ({ fornecedores: _fornIgnore, onEdit, onDelete }: { fornecedores: Fornecedor[]; onEdit: (f: Fornecedor) => void; onDelete: (id: number) => void }) => {
+  const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
   const [busca, setBusca] = useState('');
   const debouncedBusca = useDebounce(busca);
-  const filtrados = fornecedores.filter(f => {
-    const q = debouncedBusca.trim();
-    if (!q) return true;
-    const qL = q.toLowerCase();
-    const qD = q.replace(/\D/g, '');
-    return (
-      (f.nome || '').toLowerCase().includes(qL) ||
-      (qD.length > 0 && (f.documento || '').replace(/\D/g, '').includes(qD)) ||
-      (qD.length > 0 && (f.telefone || '').replace(/\D/g, '').includes(qD))
-    );
-  });
+  useEffect(() => {
+    const params = new URLSearchParams({ action: 'fornecedores', limit: '100' });
+    if (debouncedBusca) params.set('busca', debouncedBusca);
+    fetch(`./api.php?${params}`)
+      .then(r => r.json())
+      .then(data => {
+        const arr = Array.isArray(data) ? data : (data.data ?? []);
+        setFornecedores(arr.map((f: any) => ({
+          ...f, id: Number(f.id),
+          endereco: { logradouro: f.logradouro, numero: f.numero, complemento: f.complemento, bairro: f.bairro, municipio: f.municipio, codigoMunicipio: f.codigo_municipio, uf: f.uf, cep: f.cep }
+        })));
+      }).catch(() => {});
+  }, [debouncedBusca]);
+  const filtrados = fornecedores;
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col" style={{height: 'calc(100vh - 140px)'}}>
       <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-t-2xl flex-shrink-0">
