@@ -325,6 +325,20 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
   const [itens, setItens] = useState<{ produtoId: number, quantidade: number, valorUnitario: number, percentualTributosNacional: number, percentualTributosEstadual: number }[]>([]);
   const [pagamentos, setPagamentos] = useState<any[]>([]);
   const [buscaProduto, setBuscaProduto] = useState('');
+  const { produtos: produtosCtx, fetchProdutos } = useAppData();
+  useEffect(() => {
+    if (buscaProduto.length >= 2) {
+      const tl = buscaProduto.toLowerCase();
+      const f = produtosCtx.filter(p =>
+        p.descricao.toLowerCase().includes(tl) ||
+        (p.codigoInterno||'').includes(buscaProduto) ||
+        (p.codigoBarras||'').includes(buscaProduto)
+      ).slice(0, 10);
+      setProdutosFiltrados(f);
+    } else if (buscaProduto.length === 0) {
+      setProdutosFiltrados([]);
+    }
+  }, [produtosCtx]);
   const [termoBusca, setTermoBusca] = useState('');
   useEffect(() => {
     if (termoBusca.length >= 1) {
@@ -748,7 +762,6 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
                       if (qtyMatch) { const q = parseInt(qtyMatch[1], 10); if (q > 0) setQuantidade(q); }
                       if (termo.length < 1) { setProdutosFiltrados([]); return; }
                       const tl = termo.toLowerCase();
-                      setTermoBusca(termo);
                       clearTimeout((window as any)._produtoVendaTimer);
                       (window as any)._produtoVendaTimer = setTimeout(() => fetchProdutos(termo), 400);
                     }}
