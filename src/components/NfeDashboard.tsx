@@ -509,19 +509,7 @@ const NfeDashboard: React.FC<Props> = ({
 
   const clientesFiltrados = clientes.slice(0, 10);
 
-  const [produtosFiltrados, setProdutosFiltrados] = React.useState<typeof produtos>([]);
-  React.useEffect(() => {
-    if (buscaProduto.length >= 2) {
-      const tl = buscaProduto.toLowerCase();
-      setProdutosFiltrados(produtos.filter(p =>
-        (p.descricao||'').toLowerCase().includes(tl) ||
-        (p.codigoInterno||'').includes(buscaProduto) ||
-        (p.codigoBarras||'').includes(buscaProduto)
-      ).slice(0, 10));
-    } else {
-      setProdutosFiltrados([]);
-    }
-  }, [produtos, buscaProduto]);
+  const produtosFiltrados = buscaProduto.length >= 2 ? produtos.filter(p => (p.descricao||'').toLowerCase().includes(buscaProduto.toLowerCase()) || (p.codigoInterno||'').includes(buscaProduto) || (p.codigoBarras||'').includes(buscaProduto)).slice(0, 10) : [];
 
   return (
     <>
