@@ -408,7 +408,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
         e.preventDefault();
         setShowPedidoModal(true);
       }
-      if (e.key === 'F7') {
+      if (e.key === 'F9') {
         e.preventDefault();
         // Só executa se tiver itens
         if (itens.length === 0) return;
