@@ -309,7 +309,7 @@ const OrcamentosTab = ({
                       type="text"
                       placeholder="Localizar por nome, documento ou celular..."
                       value={buscaCliente}
-                      onChange={e => { setBuscaCliente(e.target.value); setDropCliente(true); }}
+                      onChange={e => { const v = e.target.value; setBuscaCliente(v); setDropCliente(true); clearTimeout((window as any)._clienteTimer); if (v.length === 0) { fetchClientes(''); } else if (v.length >= 2) { (window as any)._clienteTimer = setTimeout(() => fetchClientes(v), 500); } }}
                       onFocus={() => setDropCliente(true)}
                       onBlur={() => setTimeout(() => setDropCliente(false), 150)}
                       className={ic}
@@ -321,7 +321,7 @@ const OrcamentosTab = ({
                     )}
                     {dropCliente && (
                       <div className="absolute z-20 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-56 overflow-y-auto">
-                        {clientes.filter(c => !buscaCliente || (c.nome || '').toLowerCase().includes(buscaCliente.toLowerCase()) || (c.documento || '').includes(buscaCliente)).slice(0, 10).map(c => (
+                        {clientes.slice(0, 10).map(c => (
                           <div key={c.id} onMouseDown={() => { handleClienteCadastrado(String(c.id)); setBuscaCliente(''); setDropCliente(false); }}
                             className="px-3 py-2 cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/30">
                             <div className="font-medium text-sm text-gray-800 dark:text-gray-100">{c.nome}</div>
@@ -331,7 +331,7 @@ const OrcamentosTab = ({
                             </div>
                           </div>
                         ))}
-                        {clientes.filter(c => !buscaCliente || (c.nome || '').toLowerCase().includes(buscaCliente.toLowerCase()) || (c.documento || '').includes(buscaCliente)).length === 0 && (
+                        {clientes.length === 0 && (
                           <div className="px-3 py-2 text-sm text-gray-400 dark:text-gray-500">Nenhum cliente encontrado.</div>
                         )}
                       </div>
@@ -844,7 +844,7 @@ const OrcamentoModal = ({
                   type="text"
                   placeholder="Buscar por nome ou documento..."
                   value={buscaCliente}
-                  onChange={e => { setBuscaCliente(e.target.value); setDropCliente(true); }}
+                  onChange={e => { const v = e.target.value; setBuscaCliente(v); setDropCliente(true); clearTimeout((window as any)._clienteTimer); if (v.length === 0) { fetchClientes(''); } else if (v.length >= 2) { (window as any)._clienteTimer = setTimeout(() => fetchClientes(v), 500); } }}
                   onFocus={() => setDropCliente(true)}
                   onBlur={() => setTimeout(() => setDropCliente(false), 150)}
                   className={selClass}
@@ -856,7 +856,7 @@ const OrcamentoModal = ({
                 )}
                 {dropCliente && (
                   <div className="absolute z-20 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-56 overflow-y-auto">
-                    {clientes.filter(c => !buscaCliente || (c.nome || '').toLowerCase().includes(buscaCliente.toLowerCase()) || (c.documento || '').includes(buscaCliente)).slice(0, 10).map(c => (
+                    {clientes.slice(0, 10).map(c => (
                       <div key={c.id} onMouseDown={() => { handleClienteCadastrado(String(c.id)); setBuscaCliente(''); setDropCliente(false); }}
                         className="px-3 py-2 cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/30">
                         <div className="font-medium text-sm text-gray-800 dark:text-gray-100">{c.nome}</div>
@@ -866,7 +866,7 @@ const OrcamentoModal = ({
                         </div>
                       </div>
                     ))}
-                    {clientes.filter(c => !buscaCliente || (c.nome || '').toLowerCase().includes(buscaCliente.toLowerCase()) || (c.documento || '').includes(buscaCliente)).length === 0 && (
+                    {clientes.length === 0 && (
                       <div className="px-3 py-2 text-sm text-gray-400 dark:text-gray-500">Nenhum cliente encontrado.</div>
                     )}
                   </div>

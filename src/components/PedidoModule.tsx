@@ -108,9 +108,7 @@ export const PedidoTab = ({ produtos, clientes, vendedores, emitente, showAlert,
 
   }, []);
 
-  const clientesFiltrados = clientes.filter(c =>
-    !buscaCliente || c.nome?.toLowerCase().includes(buscaCliente.toLowerCase()) || c.documento?.includes(buscaCliente)
-  ).slice(0, 10);
+  const clientesFiltrados = clientes.slice(0, 10);
   const produtosFiltrados = produtos.filter(p =>
     buscaProduto.length > 0 && (
       p.descricao.toLowerCase().includes(buscaProduto.toLowerCase()) ||
@@ -637,7 +635,7 @@ ${observacao?`<div style="border:1px solid #ddd;border-radius:4px;padding:10px;m
             <div className="relative mb-4">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
               <input ref={refBuscaCliente} value={buscaCliente}
-                onChange={e => { setBuscaCliente(e.target.value); setDropCliente(true); }}
+                onChange={e => { const v = e.target.value; setBuscaCliente(v); setDropCliente(true); clearTimeout((window as any)._clienteTimer); if (v.length === 0) { fetchClientes(''); } else if (v.length >= 2) { (window as any)._clienteTimer = setTimeout(() => fetchClientes(v), 500); } }}
                 onFocus={() => setDropCliente(true)}
                 onBlur={() => setTimeout(() => setDropCliente(false), 150)}
                 placeholder="Buscar cliente por nome ou CPF/CNPJ..."
