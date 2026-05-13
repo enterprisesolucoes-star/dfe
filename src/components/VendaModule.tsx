@@ -127,10 +127,7 @@ export const IdentificarModal = ({ onClose, onConfirm }: { onClose: () => void; 
     } catch { setMunicipios([]); } finally { setLoadingMun(false); }
   };
 
-  const filtrados = clientes.filter((c: any) =>
-    c.nome?.toLowerCase().includes(busca.toLowerCase()) ||
-    c.documento?.includes(busca)
-  );
+  const filtrados = clientes.slice(0, 10);
 
   const selecionarCadastrado = (c: Cliente) => onConfirm({
     nome: c.nome, documento: c.documento ?? '',
@@ -163,7 +160,7 @@ export const IdentificarModal = ({ onClose, onConfirm }: { onClose: () => void; 
             <div className="space-y-3">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
-                <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar por nome ou CPF/CNPJ..." className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                <input type="text" value={busca} onChange={e => { const v = e.target.value; setBusca(v); clearTimeout((window as any)._clienteTimer); if (v.length === 0) fetchClientes(''); else if (v.length >= 2) { (window as any)._clienteTimer = setTimeout(() => fetchClientes(v), 400); } }} placeholder="Buscar por nome ou CPF/CNPJ..." className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
               </div>
               <div className="space-y-1 max-h-72 overflow-auto">
                 {filtrados.length === 0 ? (
