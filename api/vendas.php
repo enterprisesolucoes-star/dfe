@@ -331,7 +331,7 @@ switch ($action) {
                 $stmt = $pdo->prepare("UPDATE vendas SET status = ?, protocolo = ?, chave_acesso = ?, xml_autorizado = ? WHERE id = ?");
                 $stmt->execute([$statusSalvar, $resultado->protocolo, $chaveAcesso, $resultado->xml_assinado, $vendaId]);
                 // COMMIT IMEDIATO — protege autorizacao contra rollback
-                if ($pdo->inTransaction()) { $pdo->commit(); $pdo->beginTransaction(); }
+                if ($pdo->inTransaction()) { $pdo->commit(); }
 
                 // Geração automática de comissão ao autorizar NFCe
                 if (in_array($statusSalvar, ['Autorizada', 'Contingencia'])) {
@@ -356,6 +356,7 @@ switch ($action) {
                 // A NFCe já foi autorizada na SEFAZ, não pode desfazer o registro local
                 $pdo->commit();
                 $pdo->beginTransaction();
+                try {
 
                 // Baixa de estoque para cada item da venda
                 try { $pdo->query("SELECT estoque FROM produtos LIMIT 1"); } catch (PDOException $e2) {
@@ -400,7 +401,11 @@ switch ($action) {
                     }
                 }
 
-                $pdo->commit();
+                if ($pdo->inTransaction()) $pdo->commit();
+                } catch (\Throwable $ePos) {
+                    if ($pdo->inTransaction()) $pdo->rollBack();
+                    error_log('[NFCe pos-commit] ' . $ePos->getMessage());
+                }
 
                 echo json_encode([
                     'success' => true,
