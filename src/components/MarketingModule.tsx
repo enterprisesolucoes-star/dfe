@@ -56,28 +56,37 @@ export const FogosAniversario = ({ nomes, onClose }: { nomes: string[]; onClose:
 
 // ─── Seleção de clientes ───────────────────────────────────────────────────
 const ListaSelecao = ({ clientes, onChange }: { clientes: Cliente[]; onChange: (ids: number[]) => void }) => {
-  const [selecionados, setSelecionados] = useState<Set<number>>(new Set(clientes.filter(c => c.selecionado).map(c => c.id)));
+  const [selecionados, setSelecionados] = useState<Set<number>>(() => new Set(clientes.filter(c => c.selecionado).map(c => c.id)));
   const [letraFiltro, setLetraFiltro] = useState('');
   const LETRAS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   const clientesFiltrados = letraFiltro ? clientes.filter(c => (c.nome || '').trim().toUpperCase().startsWith(letraFiltro)) : clientes;
 
+  const updateSel = (next: Set<number>) => {
+    setSelecionados(next);
+    onChange(Array.from(next));
+  };
+
   const toggle = (id: number) => {
-    setSelecionados(prev => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      onChange(Array.from(next));
-      return next;
-    });
+    const next = new Set(selecionados);
+    next.has(id) ? next.delete(id) : next.add(id);
+    updateSel(next);
   };
 
   const toggleAll = () => {
     if (selecionados.size === clientes.length) {
-      setSelecionados(new Set());
-      onChange([]);
+      updateSel(new Set());
     } else {
-      const all = new Set(clientes.map(c => c.id));
-      setSelecionados(all);
-      onChange(Array.from(all));
+      updateSel(new Set(clientes.map(c => c.id)));
+    }
+  };
+
+  const selecionarLetra = (l: string) => {
+    const nova = letraFiltro === l ? '' : l;
+    setLetraFiltro(nova);
+    if (nova) {
+      const ids = clientes.filter(c => (c.nome || '').trim().toUpperCase().startsWith(nova)).map(c => c.id);
+      const next = new Set([...Array.from(selecionados), ...ids]);
+      updateSel(next);
     }
   };
 
@@ -94,15 +103,7 @@ const ListaSelecao = ({ clientes, onChange }: { clientes: Cliente[]; onChange: (
         </div>
         <div className="flex flex-wrap gap-1">
           {LETRAS.map(l => (
-            <button key={l} onClick={() => {
-              const novaLetra = letraFiltro === l ? '' : l;
-              setLetraFiltro(novaLetra);
-              if (novaLetra) {
-                const ids = clientes.filter(c => (c.nome || '').trim().toUpperCase().startsWith(novaLetra)).map(c => c.id);
-                setSelecionados(prev => new Set([...Array.from(prev), ...ids]));
-                onChange(Array.from(new Set([...Array.from(selecionados), ...ids])));
-              }
-            }}
+            <button key={l} onClick={() => selecionarLetra(l)}
               className={`w-6 h-6 text-[10px] font-bold rounded transition-colors ${letraFiltro === l ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-100'}`}>
               {l}
             </button>
@@ -110,12 +111,14 @@ const ListaSelecao = ({ clientes, onChange }: { clientes: Cliente[]; onChange: (
         </div>
       </div>
       <div className="max-h-64 overflow-y-auto divide-y divide-gray-50 dark:divide-gray-700">
-        {clientesFiltrados.map(c => (
+        {clientesFiltrados.length === 0 ? (
+          <p className="text-center py-8 text-gray-400 dark:text-gray-500 text-sm italic">Nenhum cliente com esta letra</p>
+        ) : clientesFiltrados.map(c => (
           <label key={c.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer">
             <input type="checkbox" checked={selecionados.has(c.id)} onChange={() => toggle(c.id)} className="w-4 h-4 rounded" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">{c.nome}</p>
-              <p className="text-xs text-gray-400 dark:text-gray-500">{c.telefone || 'Sem telefone'}
+              <p className="text-xs text-gray-400 dark:text-gray-500">{c.telefone}
                 {c.data_nascimento && ` · 🎂 ${new Date(c.data_nascimento + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}`}
                 {c.ultima_compra && ` · Última compra: ${new Date(c.ultima_compra).toLocaleDateString('pt-BR')}`}
               </p>
