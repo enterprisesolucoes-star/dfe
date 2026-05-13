@@ -545,7 +545,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
       pagamentos: pagsPayload
     };
     try {
-      const response = await fetch('./api.php?action=emitir', { method: 'POST', body: JSON.stringify({ venda: payload, emitente }) });
+      const response = await fetch('./api.php?action=emitir', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ venda: payload, emitente }) });
       const result = await response.json();
       if (result.success) {
         onSave({ id: result.id, numero: result.numero || proximoNumero, status: result.status } as any);
