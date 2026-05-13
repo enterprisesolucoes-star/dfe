@@ -646,10 +646,11 @@ const NfeDashboard: React.FC<Props> = ({
                 <input
                   ref={refBuscaCliente}
                   value={buscaCliente}
-                  onChange={e => { const v = e.target.value; setBuscaCliente(v); setDropCliente(true); if (v.length >= 2) fetchClientes(v); else if (v.length === 0) fetchClientes(''); }}
+                  onChange={e => { const v = e.target.value; setBuscaCliente(v); setDropCliente(true); if (v.length === 0) { fetchClientes(''); } }}
                   onFocus={() => setDropCliente(true)}
                   onBlur={() => setTimeout(() => setDropCliente(false), 150)}
                   onKeyDown={(e) => {
+                    if (e.key === 'Enter' && clientesFiltrados.length === 0) { e.preventDefault(); fetchClientes(buscaCliente); setDropCliente(true); return; }
                     if (!dropCliente || clientesFiltrados.length === 0) return;
                     if (e.key === 'ArrowDown') { e.preventDefault(); setDropIdxCliente(i => Math.min((i ?? -1) + 1, clientesFiltrados.length - 1)); }
                     else if (e.key === 'ArrowUp') { e.preventDefault(); setDropIdxCliente(i => Math.max((i ?? 0) - 1, 0)); }
