@@ -251,6 +251,96 @@ app.all("/api.php", async (req, res) => {
   }
 });
 
+
+// ── WhatsApp / Evolution API ─────────────────────────────────────────────────
+const waMiddleware = (req: any, res: any, next: any) => {
+  const cookie = req.headers.cookie || '';
+  const m = cookie.match(/empresa_id=(\d+)/);
+  req.wEmpresaId = m ? parseInt(m[1]) : 0;
+  if (!req.wEmpresaId) return res.status(401).json({ success: false, message: 'Não autenticado.' });
+  if (!process.env.EVOLUTION_API_URL) return res.status(503).json({ success: false, message: 'Evolution API não configurada no servidor.' });
+  next();
+};
+
+const evolutionFetch = async (path: string, method = 'GET', body?: any) => {
+  const baseUrl = (process.env.EVOLUTION_API_URL || '').replace(/\/$/, '');
+  const apiKey = process.env.EVOLUTION_API_KEY || '';
+  const res = await fetch(`${baseUrl}${path}`, {
+    method,
+    headers: { 'Content-Type': 'application/json', 'apikey': apiKey },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  return res.json();
+};
+
+const getInstanceName = (empresaId: number) => `empresa_${empresaId}`;
+
+app.get('/api/whatsapp/status', waMiddleware, async (req: any, res) => {
+  try {
+    const instance = getInstanceName(req.wEmpresaId);
+    const data = await evolutionFetch(`/instance/connectionState/${instance}`);
+    const state = data?.instance?.state || data?.state || 'unknown';
+    res.json({ success: true, status: state === 'open' ? 'open' : 'close', state });
+  } catch (e: any) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+app.get('/api/whatsapp/qrcode', waMiddleware, async (req: any, res) => {
+  try {
+    const instance = getInstanceName(req.wEmpresaId);
+    // Criar instância se não existir
+    try { await evolutionFetch(`/instance/create`, 'POST', { instanceName: instance, qrcode: true, integration: 'WHATSAPP-BAILEYS' }); } catch {}
+    const data = await evolutionFetch(`/instance/connect/${instance}`);
+    res.json({ success: true, qrcode: data?.base64 || data?.qrcode?.base64 || null, status: data?.instance?.state || 'connecting' });
+  } catch (e: any) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+app.post('/api/whatsapp/send-text', waMiddleware, async (req: any, res) => {
+  const { phone, text } = req.body;
+  if (!phone || !text) return res.status(400).json({ success: false, message: 'phone e text obrigatórios.' });
+  try {
+    const instance = getInstanceName(req.wEmpresaId);
+    const number = phone.replace(/\D/g, '');
+    await evolutionFetch(`/message/sendText/${instance}`, 'POST', { number, text });
+    res.json({ success: true });
+  } catch (e: any) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+app.post('/api/whatsapp/send-document', waMiddleware, async (req: any, res) => {
+  const { phone, action, id, filename, caption } = req.body;
+  if (!phone || !action || !id) return res.status(400).json({ success: false, message: 'Parâmetros inválidos.' });
+  try {
+    const nodeFetch = (await import('node-fetch')).default;
+    const internalToken = process.env.INTERNAL_API_TOKEN || '';
+    const pdfRes = await nodeFetch(`http://172.17.0.1:8080/api.php?action=${action}&id=${encodeURIComponent(id)}`, {
+      headers: { 'X-Internal-Token': internalToken, 'X-Empresa-Id': String(req.wEmpresaId) }
+    });
+    if (!pdfRes.ok) return res.status(502).json({ success: false, message: 'Falha ao buscar PDF.' });
+    const buf = await pdfRes.buffer();
+    const base64 = buf.toString('base64');
+    const instance = getInstanceName(req.wEmpresaId);
+    const number = phone.replace(/\D/g, '');
+    await evolutionFetch(`/message/sendMedia/${instance}`, 'POST', {
+      number, mediatype: 'document', mimetype: 'application/pdf',
+      caption: caption || '', media: base64, fileName: filename || 'documento.pdf'
+    });
+    res.json({ success: true });
+  } catch (e: any) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+app.post('/api/whatsapp/send-image', waMiddleware, async (req: any, res) => {
+  const { phone, base64, caption } = req.body;
+  if (!phone || !base64) return res.json({ success: false, message: 'phone e base64 obrigatórios' });
+  try {
+    const instance = getInstanceName(req.wEmpresaId);
+    const number = phone.replace(/\D/g, '');
+    await evolutionFetch(`/message/sendMedia/${instance}`, 'POST', {
+      number, mediatype: 'image', mimetype: 'image/jpeg', caption: caption || '', media: base64
+    });
+    res.json({ success: true });
+  } catch (e: any) { res.status(500).json({ success: false, message: e.message }); }
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
 app.use(express.static(path.join(process.cwd(), "dist")));
 app.get("*", (req, res) => {
   const hasExt = req.path.indexOf(".") !== -1;

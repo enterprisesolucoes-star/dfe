@@ -2,8 +2,6 @@
 require_once __DIR__ . '/comissoes_helper.php';
 use App\Services\NfeService;
 use App\Services\NfceService;
-require_once __DIR__ . '/../src/services/NfceService.php';
-require_once __DIR__ . '/../src/services/NfeService.php';
 
 /**
  * API NF-e Modelo 55 - Versão Restaurada e Estabilizada

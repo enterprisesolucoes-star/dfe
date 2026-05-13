@@ -354,8 +354,7 @@ switch ($action) {
 
                 // COMMIT IMEDIATO da autorização — protege contra rollback se integração financeira falhar
                 // A NFCe já foi autorizada na SEFAZ, não pode desfazer o registro local
-                $pdo->commit();
-                $pdo->beginTransaction();
+                if ($pdo->inTransaction()) $pdo->commit();
                 try {
 
                 // Baixa de estoque para cada item da venda
@@ -403,7 +402,6 @@ switch ($action) {
 
                 if ($pdo->inTransaction()) $pdo->commit();
                 } catch (\Throwable $ePos) {
-                    if ($pdo->inTransaction()) $pdo->rollBack();
                     error_log('[NFCe pos-commit] ' . $ePos->getMessage());
                 }
 

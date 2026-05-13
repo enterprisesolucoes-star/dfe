@@ -303,6 +303,22 @@ const AdminPortal = () => {
           <button onClick={() => setShowBackup(true)} className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 font-bold transition-colors">
             <HardDrive className="w-4 h-4" /> Backup
           </button>
+          <button onClick={async () => {
+            try {
+              const r = await fetch('/api/whatsapp/status', {credentials:'include'});
+              const d = await r.json();
+              if (d.status === 'open') { alert('WhatsApp já conectado!'); return; }
+              // Reconectar
+              const r2 = await fetch('/api/whatsapp/qrcode', {credentials:'include'});
+              const d2 = await r2.json();
+              if (d2.qrcode) {
+                const w = window.open('', '_blank', 'width=400,height=500');
+                if (w) { w.document.write(`<html><body style="display:flex;align-items:center;justify-content:center;background:#000"><img src="${d2.qrcode}" style="width:300px"/></body></html>`); }
+              } else { alert('Escaneie o QR Code no sistema'); }
+            } catch { alert('Erro ao reconectar WhatsApp'); }
+          }} className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 font-bold transition-colors">
+            <RefreshCw className="w-4 h-4" /> WhatsApp
+          </button>
           <button onClick={handleLogout} className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 font-bold transition-colors">
             <LogOut className="w-4 h-4" /> Sair
           </button>

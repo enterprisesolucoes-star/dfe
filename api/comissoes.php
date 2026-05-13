@@ -179,7 +179,7 @@ if ($action === 'resumo_vendedores') {
 // RELATÓRIO PDF — GERAL e RECIBO POR VENDEDOR
 // ─────────────────────────────────────────
 
-require_once __DIR__ . '/../lib/fpdf.php';
+if (!class_exists('FPDF')) { require_once __DIR__ . '/../lib/fpdf.php'; }
 
 function _u(string $s): string {
     return mb_convert_encoding($s, 'ISO-8859-1', 'UTF-8');
