@@ -19,6 +19,8 @@ export default defineConfig(({ mode }) => {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
           skipWaiting: true,
           clientsClaim: true,
+          skipWaiting: true,
+          clientsClaim: true,
           navigateFallbackDenylist: [/api\.php/],
           runtimeCaching: [
             {
