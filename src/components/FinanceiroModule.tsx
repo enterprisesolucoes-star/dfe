@@ -1,4 +1,6 @@
 import { SkeletonTable, EmptyState, Pagination } from './UIComponents';
+import { ClienteSearchInput } from './ClienteSearchInput';
+import { useAppData } from '../contexts/AppDataContext';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { DollarSign, CheckCircle, Trash2, Search, TrendingUp, TrendingDown, Plus, RotateCcw, Edit2, FileText, Loader2, Copy, ExternalLink, MessageCircle, Send } from 'lucide-react';
@@ -896,37 +898,11 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
               <label className="block text-[10px] font-bold text-indigo-500 uppercase mb-1">
                 Cliente <span className="text-red-500 dark:text-red-400">*</span> (obrigatório para Boleto/Crédito Loja)
               </label>
-              {clienteSelecionado ? (
-                <div className="flex items-center gap-2 px-3 py-2 border border-indigo-300 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl">
-                  <span className="flex-1 text-sm font-bold text-indigo-800">
-                    {clienteSelecionado.nome || clienteSelecionado.razao_social}
-                    <span className="ml-2 text-xs font-normal text-indigo-500">{clienteSelecionado.cpf_cnpj || ''}</span>
-                  </span>
-                  <button onClick={() => { setClienteId(''); setClienteBusca(''); }}
-                    className="text-indigo-400 hover:text-red-500 text-lg leading-none">×</button>
-                </div>
-              ) : (
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
-                  <input type="text" value={clienteBusca}
-                    onChange={e => { setClienteBusca(e.target.value); setShowDropCliente(true); }}
-                    onFocus={() => setShowDropCliente(true)}
-                    onBlur={() => setTimeout(() => setShowDropCliente(false), 200)}
-                    placeholder="Digite nome ou CPF/CNPJ do cliente..."
-                    className="w-full pl-9 pr-3 py-2 border border-indigo-200 rounded-xl text-sm focus:border-indigo-400 outline-none" />
-                  {showDropCliente && clientesFiltrados.length > 0 && (
-                    <div className="absolute z-50 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg max-h-48 overflow-y-auto">
-                      {clientesFiltrados.slice(0, 10).map(c => (
-                        <button key={c.id} onMouseDown={() => { setClienteId(String(c.id)); setClienteBusca(''); setShowDropCliente(false); }}
-                          className="w-full text-left px-4 py-2.5 hover:bg-indigo-50 border-b border-gray-50 dark:border-gray-700 last:border-0">
-                          <p className="text-xs font-bold text-gray-800 dark:text-gray-100">{c.nome || c.razao_social}</p>
-                          <p className="text-[10px] text-gray-400 dark:text-gray-500">{c.documento || 'Sem documento'}</p>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
+              <ClienteSearchInput
+                value={clienteSelecionadoObj}
+                onChange={c => { setClienteSelecionadoObj(c); setClienteId(c ? String(c.id) : ''); }}
+                placeholder="Digite nome ou CPF/CNPJ do cliente..."
+              />
             </div>
           )}
 
