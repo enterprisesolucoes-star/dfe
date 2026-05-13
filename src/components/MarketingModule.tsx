@@ -57,6 +57,9 @@ export const FogosAniversario = ({ nomes, onClose }: { nomes: string[]; onClose:
 // ─── Seleção de clientes ───────────────────────────────────────────────────
 const ListaSelecao = ({ clientes, onChange }: { clientes: Cliente[]; onChange: (ids: number[]) => void }) => {
   const [selecionados, setSelecionados] = useState<Set<number>>(new Set(clientes.filter(c => c.selecionado).map(c => c.id)));
+  const [letraFiltro, setLetraFiltro] = useState('');
+  const LETRAS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  const clientesFiltrados = letraFiltro ? clientes.filter(c => c.nome.toUpperCase().startsWith(letraFiltro)) : clientes;
 
   const toggle = (id: number) => {
     setSelecionados(prev => {
@@ -80,15 +83,26 @@ const ListaSelecao = ({ clientes, onChange }: { clientes: Cliente[]; onChange: (
 
   return (
     <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
-      <div className="bg-gray-50 dark:bg-gray-900 px-4 py-2 flex items-center gap-3 border-b border-gray-200 dark:border-gray-700">
-        <input type="checkbox" checked={selecionados.size === clientes.length && clientes.length > 0}
-          onChange={toggleAll} className="w-4 h-4 rounded" />
-        <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">
-          {selecionados.size} de {clientes.length} selecionados
-        </span>
+      <div className="bg-gray-50 dark:bg-gray-900 px-3 py-2 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center gap-3 mb-2">
+          <input type="checkbox" checked={selecionados.size === clientes.length && clientes.length > 0}
+            onChange={toggleAll} className="w-4 h-4 rounded" />
+          <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">
+            {selecionados.size} de {clientes.length} selecionados
+          </span>
+          {letraFiltro && <button onClick={() => setLetraFiltro('')} className="text-xs text-blue-500 hover:text-blue-700">✕ Limpar filtro</button>}
+        </div>
+        <div className="flex flex-wrap gap-1">
+          {LETRAS.map(l => (
+            <button key={l} onClick={() => setLetraFiltro(letraFiltro === l ? '' : l)}
+              className={`w-6 h-6 text-[10px] font-bold rounded transition-colors ${letraFiltro === l ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-100'}`}>
+              {l}
+            </button>
+          ))}
+        </div>
       </div>
       <div className="max-h-64 overflow-y-auto divide-y divide-gray-50 dark:divide-gray-700">
-        {clientes.map(c => (
+        {clientesFiltrados.map(c => (
           <label key={c.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer">
             <input type="checkbox" checked={selecionados.has(c.id)} onChange={() => toggle(c.id)} className="w-4 h-4 rounded" />
             <div className="flex-1 min-w-0">
@@ -246,7 +260,7 @@ export const MarketingModule = ({ emitente, showAlert }: { emitente: any; showAl
       const data = await res.json();
       if (Array.isArray(data)) {
         // Marcar aniversariantes do dia como selecionados
-        const lista = data.map((c: any) => ({
+        const lista = data.filter((c: any) => c.telefone).map((c: any) => ({
           ...c,
           selecionado: new Date(c.data_nascimento + 'T12:00:00').getDate() === dia
         }));
@@ -265,8 +279,9 @@ export const MarketingModule = ({ emitente, showAlert }: { emitente: any; showAl
       const res = await fetch(`./api.php?action=marketing_inativos&periodo=${inativosPeriodo}`);
       const data = await res.json();
       if (Array.isArray(data)) {
-        setClientes(data.map((c: any) => ({ ...c, selecionado: true })));
-        setSelecionados(data.map((c: any) => c.id));
+        const inativos = data.filter((c: any) => c.telefone);
+        setClientes(inativos.map((c: any) => ({ ...c, selecionado: true })));
+        setSelecionados(inativos.map((c: any) => c.id));
         setMensagemPadrao(`Olá, {nome}! 😊\n\nSentimos sua falta por aqui! Faz um tempinho que não te vemos na {empresa}.\n\nQue tal dar uma passada? Temos novidades esperando por você! 🛍️\n\nAté logo,\n{empresa}`);
         setAba('inativos');
       }
@@ -280,7 +295,7 @@ export const MarketingModule = ({ emitente, showAlert }: { emitente: any; showAl
       const res = await fetch('./api.php?action=clientes&limit=500');
       const data = await res.json();
       const arr = Array.isArray(data) ? data : (data.data ?? []);
-      setClientes(arr.map((c: any) => ({ ...c, selecionado: false })));
+      setClientes(arr.filter((c: any) => c.telefone).map((c: any) => ({ ...c, selecionado: false })));
       setSelecionados([]);
       setMensagemPadrao(`Olá, {nome}! 👋\n\nTemos uma promoção especial para você na {empresa}!\n\n🔥 Aproveite nossas ofertas exclusivas!\n\nAté logo,\n{empresa}`);
       setAba('promocao');
