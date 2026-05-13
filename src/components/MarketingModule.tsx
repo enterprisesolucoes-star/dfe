@@ -59,7 +59,7 @@ const ListaSelecao = ({ clientes, onChange }: { clientes: Cliente[]; onChange: (
   const [selecionados, setSelecionados] = useState<Set<number>>(new Set(clientes.filter(c => c.selecionado).map(c => c.id)));
   const [letraFiltro, setLetraFiltro] = useState('');
   const LETRAS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-  const clientesFiltrados = letraFiltro ? clientes.filter(c => c.nome.toUpperCase().startsWith(letraFiltro)) : clientes;
+  const clientesFiltrados = letraFiltro ? clientes.filter(c => c.nome.trim().toUpperCase().replace(/[^A-Z]/g,'')[0] === letraFiltro) : clientes;
 
   const toggle = (id: number) => {
     setSelecionados(prev => {
@@ -94,7 +94,15 @@ const ListaSelecao = ({ clientes, onChange }: { clientes: Cliente[]; onChange: (
         </div>
         <div className="flex flex-wrap gap-1">
           {LETRAS.map(l => (
-            <button key={l} onClick={() => setLetraFiltro(letraFiltro === l ? '' : l)}
+            <button key={l} onClick={() => {
+              const novaLetra = letraFiltro === l ? '' : l;
+              setLetraFiltro(novaLetra);
+              if (novaLetra) {
+                const ids = clientes.filter(c => c.nome.trim().toUpperCase().replace(/[^A-Z]/g,'')[0] === novaLetra).map(c => c.id);
+                setSelecionados(prev => new Set([...Array.from(prev), ...ids]));
+                onChange(Array.from(new Set([...Array.from(selecionados), ...ids])));
+              }
+            }}
               className={`w-6 h-6 text-[10px] font-bold rounded transition-colors ${letraFiltro === l ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-100'}`}>
               {l}
             </button>
