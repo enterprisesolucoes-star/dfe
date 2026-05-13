@@ -107,15 +107,13 @@ export const GlobalMessageModal = ({ type, title, message, inputValue, onClose, 
 export const IdentificarModal = ({ onClose, onConfirm }: { onClose: () => void; onConfirm: (dest: any) => void }) => {
   const [aba, setAba]               = useState<'buscar' | 'manual'>('buscar');
   const [busca, setBusca]           = useState('');
-  const [clientes, setClientes]     = useState<Cliente[]>([]);
+  const { clientes, fetchClientes } = useAppData();
   const [municipios, setMunicipios] = useState<{ id: number; nome: string }[]>([]);
   const [loadingMun, setLoadingMun] = useState(false);
   const [form, setForm]             = useState<any>({ nome: '', documento: '', uf: 'GO', municipio: '', codigoMunicipio: '', logradouro: '', numero: '', bairro: '', cep: '' });
   const selClass = 'w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500';
 
-  useEffect(() => {
-    fetch('./api.php?action=clientes&limit=50').then(r => r.json()).then(d => setClientes(Array.isArray(d) ? d : (d.data ?? [])));
-  }, []);
+  useEffect(() => { fetchClientes(''); }, []);
   useEffect(() => { fetchMunicipios(form.uf); }, []);
 
   const fetchMunicipios = async (uf: string) => {
