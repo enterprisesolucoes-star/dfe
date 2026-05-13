@@ -765,7 +765,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
               <div className="flex gap-4 items-end">
                 <div className="flex-1 relative">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Buscar Produto</label>
-                  <input ref={buscaProdutoInputRef} type="text" value={buscaProduto} placeholder="Por código, código de barras ou nome..." className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800"
+                  <input ref={buscaProdutoInputRef} autoFocus type="text" value={buscaProduto} placeholder="Por código, código de barras ou nome..." className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800"
                     onChange={(e) => {
                       const t = e.target.value; setBuscaProduto(t); setSelectedProduto(''); setDropIdx(-1);
                       if (t.length < 1) { setProdutosFiltrados([]); return; }
