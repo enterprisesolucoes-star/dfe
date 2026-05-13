@@ -330,11 +330,13 @@ switch ($action) {
                 $chaveAcesso = (string)($resultado->chave_acesso ?? '');
                 $stmt = $pdo->prepare("UPDATE vendas SET status = ?, protocolo = ?, chave_acesso = ?, xml_autorizado = ? WHERE id = ?");
                 $stmt->execute([$statusSalvar, $resultado->protocolo, $chaveAcesso, $resultado->xml_assinado, $vendaId]);
+                // COMMIT IMEDIATO — protege autorizacao contra rollback
+                if ($pdo->inTransaction()) { $pdo->commit(); $pdo->beginTransaction(); }
 
                 // Geração automática de comissão ao autorizar NFCe
                 if (in_array($statusSalvar, ['Autorizada', 'Contingencia'])) {
-                    require_once __DIR__ . '/comissoes.php';
-                    gerarComissao($pdo, 'venda', $vendaId, $empresaId ?: 0, 0);
+                    try { require_once __DIR__ . "/comissoes.php";
+                    gerarComissao($pdo, "venda", $vendaId, $empresaId ?: 0, 0); } catch (\Throwable $e) { error_log("[NFCe] comissao: " . $e->getMessage()); }
                 }
                 // Auditoria — emissão de NFC-e
                 if (function_exists('registrarAuditoria')) {
@@ -463,8 +465,7 @@ switch ($action) {
             $vendaId = $pdo->lastInsertId();
 
             // Geração automática de comissão para Pedido (empresa sem fiscal)
-            require_once __DIR__ . '/comissoes.php';
-            gerarComissao($pdo, 'venda', (int)$vendaId, $empresaId ?: 0, 0);
+            try { require_once __DIR__ . '/comissoes.php'; gerarComissao($pdo, 'venda', (int)$vendaId, $empresaId ?: 0, 0); } catch (\Throwable $e) { error_log('[NFCe] comissao: ' . $e->getMessage()); }
             // Inserir itens
             foreach (($venda['itens'] ?? []) as $item) {
                 $pdo->prepare("INSERT INTO vendas_itens (venda_id, produto_id, quantidade, valor_unitario, valor_total) VALUES (?,?,?,?,?)")
@@ -757,11 +758,13 @@ switch ($action) {
                 $chaveAcesso  = (string)($resultado->chave_acesso ?? '');
                 $stmt = $pdo->prepare("UPDATE vendas SET status = ?, protocolo = ?, chave_acesso = ?, xml_autorizado = ? WHERE id = ?");
                 $stmt->execute([$statusSalvar, $resultado->protocolo, $chaveAcesso, $resultado->xml_assinado, $vendaId]);
+                // COMMIT IMEDIATO — protege autorizacao contra rollback
+                if ($pdo->inTransaction()) { $pdo->commit(); $pdo->beginTransaction(); }
 
                 // Geração automática de comissão ao autorizar NFCe
                 if (in_array($statusSalvar, ['Autorizada', 'Contingencia'])) {
-                    require_once __DIR__ . '/comissoes.php';
-                    gerarComissao($pdo, 'venda', $vendaId, $empresaId ?: 0, 0);
+                    try { require_once __DIR__ . "/comissoes.php";
+                    gerarComissao($pdo, "venda", $vendaId, $empresaId ?: 0, 0); } catch (\Throwable $e) { error_log("[NFCe] comissao: " . $e->getMessage()); }
                 }
 
                 $stmt = $pdo->prepare("UPDATE empresas SET numero_nfce = ? WHERE id = ?");
