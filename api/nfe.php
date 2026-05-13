@@ -1183,3 +1183,27 @@ switch ($action) {
         break;
 
 }
+
+    case 'sefaz_status_nfce':
+        try {
+            $empresaDb = $pdo->query("SELECT * FROM empresas WHERE id = $empresaId")->fetch();
+            if (!$empresaDb) { echo json_encode(['success' => false, 'xMotivo' => 'Empresa não encontrada']); break; }
+            $service = new NfceService($empresaDb, $empresaDb['certificado_pfx'], $empresaDb['certificado_senha']);
+            $result = $service->statusServico();
+            echo json_encode(['success' => $result->success, 'cStat' => $result->cStat, 'xMotivo' => $result->xMotivo]);
+        } catch (\Throwable $e) {
+            echo json_encode(['success' => false, 'cStat' => '999', 'xMotivo' => $e->getMessage()]);
+        }
+        break;
+
+    case 'sefaz_status_nfe':
+        try {
+            $empresaDb = $pdo->query("SELECT * FROM empresas WHERE id = $empresaId")->fetch();
+            if (!$empresaDb) { echo json_encode(['success' => false, 'xMotivo' => 'Empresa não encontrada']); break; }
+            $service = new NfeService($empresaDb, $empresaDb['certificado_pfx'], $empresaDb['certificado_senha']);
+            $result = $service->statusServico();
+            echo json_encode(['success' => $result->success, 'cStat' => $result->cStat, 'xMotivo' => $result->xMotivo]);
+        } catch (\Throwable $e) {
+            echo json_encode(['success' => false, 'cStat' => '999', 'xMotivo' => $e->getMessage()]);
+        }
+        break;
