@@ -64,7 +64,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
 
   const fetchClientes = useCallback(async (busca = '') => {
     try {
-      const url = busca ? `./api.php?action=clientes&busca=${encodeURIComponent(busca)}&limit=80` : './api.php?action=clientes&limit=300';
+      const url = `./api.php?action=clientes&busca=${encodeURIComponent(busca)}&limit=50`;
       const data = await fetch(url).then(r => r.json());
       const arr = Array.isArray(data) ? data : (data.data ?? []);
       if (Array.isArray(arr)) setClientes(arr.map((c: any) => ({

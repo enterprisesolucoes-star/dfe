@@ -8,7 +8,8 @@
         "nfephp-org/sped-da": "^1.1",
         "nfephp-org/sped-common": "^5.0",
         "fpdf/fpdf": "^1.86",
-        "setasign/fpdf": "^1.8"
+        "setasign/fpdf": "^1.8",
+        "phpmailer/phpmailer": "^7.0"
     },
     "autoload": {
         "psr-4": {

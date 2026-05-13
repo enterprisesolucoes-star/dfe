@@ -350,11 +350,6 @@ switch ($action) {
                 $stmt = $pdo->prepare("UPDATE empresas SET numero_nfce = ? WHERE id = ?");
                 $stmt->execute([$venda['numero'], $empresaDb['id']]);
 
-                // COMMIT IMEDIATO da autorização — protege contra rollback se integração financeira falhar
-                // A NFCe já foi autorizada na SEFAZ, não pode desfazer o registro local
-                $pdo->commit();
-                $pdo->beginTransaction();
-
                 // Baixa de estoque para cada item da venda
                 try { $pdo->query("SELECT estoque FROM produtos LIMIT 1"); } catch (PDOException $e2) {
                     $pdo->exec("ALTER TABLE produtos ADD COLUMN estoque DECIMAL(10,3) DEFAULT 0");
@@ -430,7 +425,6 @@ switch ($action) {
                 notificarRejeicaoSefaz($empresaDb, $venda, $resultado->mensagem_erro, $resultado->xml_assinado);
             }
         } catch (\Throwable $e) {
-            file_put_contents("/var/www/dfe/nfce_errors.log", date("Y-m-d H:i:s") . " | EMITIR NFCE ERROR | numero=" . ($venda["numero"] ?? "N/A") . " | msg=" . $e->getMessage() . " | file=" . $e->getFile() . ":" . $e->getLine() . " | trace=" . $e->getTraceAsString() . "\n\n", FILE_APPEND);
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();
             }

@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Psr\\Log\\' => array($vendorDir . '/psr/log/src'),
+    'PHPMailer\\PHPMailer\\' => array($vendorDir . '/phpmailer/phpmailer/src'),
     'NFePHP\\NFe\\' => array($vendorDir . '/nfephp-org/sped-nfe/src'),
     'NFePHP\\Gtin\\' => array($vendorDir . '/nfephp-org/sped-gtin/src'),
     'NFePHP\\DA\\' => array($vendorDir . '/nfephp-org/sped-da/src'),

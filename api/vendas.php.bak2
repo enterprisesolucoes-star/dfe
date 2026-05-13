@@ -430,7 +430,6 @@ switch ($action) {
                 notificarRejeicaoSefaz($empresaDb, $venda, $resultado->mensagem_erro, $resultado->xml_assinado);
             }
         } catch (\Throwable $e) {
-            file_put_contents("/var/www/dfe/nfce_errors.log", date("Y-m-d H:i:s") . " | EMITIR NFCE ERROR | numero=" . ($venda["numero"] ?? "N/A") . " | msg=" . $e->getMessage() . " | file=" . $e->getFile() . ":" . $e->getLine() . " | trace=" . $e->getTraceAsString() . "\n\n", FILE_APPEND);
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();
             }

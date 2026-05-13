@@ -10,6 +10,7 @@ class ComposerStaticInit897d09971b8c4476bfb4196b1e4d5da9
         'P' => 
         array (
             'Psr\\Log\\' => 8,
+            'PHPMailer\\PHPMailer\\' => 20,
         ),
         'N' => 
         array (
@@ -41,6 +42,10 @@ class ComposerStaticInit897d09971b8c4476bfb4196b1e4d5da9
         'Psr\\Log\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/log/src',
+        ),
+        'PHPMailer\\PHPMailer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
         ),
         'NFePHP\\NFe\\' => 
         array (

@@ -34,6 +34,7 @@ const BANDEIRAS_CARTAO = [
 interface Props {
   emitente: Emitente;
   clientes: Cliente[];
+  fetchClientes: (busca?: string) => Promise<void>;
   produtos: Produto[];
   transportadores: Transportador[];
   medidas: Medida[];
@@ -132,7 +133,7 @@ const BrDecimalInput: React.FC<{
 // ─── Componente principal ────────────────────────────────────────────────────
 
 const NfeDashboard: React.FC<Props> = ({
-  emitente, clientes, produtos, transportadores,
+  emitente, clientes, produtos, transportadores, fetchClientes,
   showAlert, onEmitted
 }) => {
   // Controle de Abas
@@ -505,9 +506,7 @@ const NfeDashboard: React.FC<Props> = ({
 
   // ── Helpers de filtro ────────────────────────────────────────────────────
 
-  const clientesFiltrados = clientes.filter(c =>
-    !buscaCliente || (c.nome || '').toLowerCase().includes(buscaCliente.toLowerCase()) || (c.documento || '').includes(buscaCliente)
-  ).slice(0, 10);
+  const clientesFiltrados = clientes.slice(0, 10);
 
   const produtosFiltrados = produtos.filter(p =>
     !buscaProduto || (p.descricao || '').toLowerCase().includes(buscaProduto.toLowerCase()) || (p.codigoInterno || '').includes(buscaProduto) || (p.codigoBarras || '').includes(buscaProduto)
@@ -647,7 +646,7 @@ const NfeDashboard: React.FC<Props> = ({
                 <input
                   ref={refBuscaCliente}
                   value={buscaCliente}
-                  onChange={e => { setBuscaCliente(e.target.value); setDropCliente(true); }}
+                  onChange={e => { const v = e.target.value; setBuscaCliente(v); setDropCliente(true); if (v.length >= 2) fetchClientes(v); else if (v.length === 0) fetchClientes(''); }}
                   onFocus={() => setDropCliente(true)}
                   onBlur={() => setTimeout(() => setDropCliente(false), 150)}
                   onKeyDown={(e) => {
