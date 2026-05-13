@@ -27,7 +27,7 @@ switch ($action) {
         }
         if ($empresaId) {
             $busca  = trim($_GET['busca'] ?? '');
-            $limit  = min(1000, max(20, (int)($_GET['limit'] ?? 500)));
+            $limit  = min(5000, max(20, (int)($_GET['limit'] ?? 500)));
             $page   = max(1, (int)($_GET['page'] ?? 1));
             $offset = ($page - 1) * $limit;
             $where  = "ativo=1 AND empresa_id=?";

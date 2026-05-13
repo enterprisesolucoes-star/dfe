@@ -303,7 +303,7 @@ export const MarketingModule = ({ emitente, showAlert }: { emitente: any; showAl
   const carregarTodosClientes = async () => {
     setLoading(true);
     try {
-      const res = await fetch('./api.php?action=clientes&limit=500');
+      const res = await fetch('./api.php?action=clientes&limit=2000');
       const data = await res.json();
       const arr = Array.isArray(data) ? data : (data.data ?? []);
       setClientes(arr.filter((c: any) => c.telefone).map((c: any) => ({ ...c, selecionado: false })));
