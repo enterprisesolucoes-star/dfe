@@ -899,8 +899,8 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
                 Cliente <span className="text-red-500 dark:text-red-400">*</span> (obrigatório para Boleto/Crédito Loja)
               </label>
               <ClienteSearchInput
-                value={clienteSelecionadoObj}
-                onChange={c => { setClienteSelecionadoObj(c); setClienteId(c ? String(c.id) : ''); }}
+                value={clienteSelecionado || null}
+                onChange={cl => setClienteId(cl ? String(cl.id) : '')}
                 placeholder="Digite nome ou CPF/CNPJ do cliente..."
               />
             </div>

@@ -114,7 +114,7 @@ export const IdentificarModal = ({ onClose, onConfirm }: { onClose: () => void; 
   const selClass = 'w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500';
 
   useEffect(() => {
-    fetchClientes('');
+    fetch('./api.php?action=clientes&limit=50').then(r => r.json()).then(d => setClientes(Array.isArray(d) ? d : (d.data ?? [])));
   }, []);
   useEffect(() => { fetchMunicipios(form.uf); }, []);
 
