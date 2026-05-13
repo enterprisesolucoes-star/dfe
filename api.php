@@ -265,7 +265,7 @@ function notificarRejeicaoSefaz($empresa, $venda, $erro, $xml = '') {
     } catch (\Exception $e) {}
 }
 
-// Validar X-Internal-Token — bloqueia chamadas que bypassa o proxy Node.js
+// Validar X-Internal-Token
 $_internalToken = getenv('INTERNAL_API_TOKEN') ?: '';
 if ($_internalToken !== '') {
     $_reqToken = $_SERVER['HTTP_X_INTERNAL_TOKEN'] ?? '';

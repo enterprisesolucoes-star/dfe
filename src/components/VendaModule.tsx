@@ -401,17 +401,29 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
     if (initialDestinatario) setDestinatario(initialDestinatario);
   }, []);
 
-  // Listener F8: finalizar como pedido (sem emitir NFC-e)
+  // Listener F7: dinheiro + emitir NFCe / F8: finalizar como pedido
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'F8') {
         e.preventDefault();
         setShowPedidoModal(true);
       }
+      if (e.key === 'F7') {
+        e.preventDefault();
+        // Só executa se tiver itens
+        if (itens.length === 0) return;
+        // Limpar pagamentos e lançar total como dinheiro
+        const total = Math.max(0, itens.reduce((acc, item) => acc + (item.quantidade * item.valorUnitario), 0) - valorDesconto);
+        setPagamentos([{ formaPagamento: '01', valorPagamento: total, parcelas: [] }]);
+        // Aguardar state atualizar e emitir
+        setTimeout(() => {
+          handleFinalizar();
+        }, 100);
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [itens, valorDesconto, destinatario]);
 
   const isTefRequired = emitente.tef_required_states?.split(',').map(s => s.trim().toUpperCase()).includes(emitente.uf?.trim().toUpperCase());
   const subtotal = itens.reduce((acc, item) => acc + (item.quantidade * item.valorUnitario), 0);

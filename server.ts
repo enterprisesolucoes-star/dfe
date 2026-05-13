@@ -45,7 +45,7 @@ app.use((req, res, next) => {
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Content-Security-Policy', "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https:; img-src 'self' data: blob: https:; connect-src 'self' https://dfe.esolucoesia.com https://servicodados.ibge.gov.br https://api.supertef.com.br https://viacep.com.br; font-src 'self' data: https:;");
+  res.setHeader('Content-Security-Policy', "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https:; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://dfe.esolucoesia.com https://servicodados.ibge.gov.br https://api.supertef.com.br https://viacep.com.br https://fonts.googleapis.com https://fonts.gstatic.com; font-src 'self' data: https://fonts.gstatic.com;");
   res.removeHeader('X-Powered-By');
   next();
 });
@@ -223,11 +223,15 @@ app.all("/api.php", async (req, res) => {
       'User-Agent': req.headers['user-agent'] || 'unknown'
     };
     if (hasBody) proxyHeaders['Content-Type'] = 'application/json';
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
     const response = await fetch(url, {
       method: hasBody ? "POST" : "GET",
       headers: proxyHeaders,
-      body: hasBody ? JSON.stringify(parsedBody) : undefined
-    });
+      body: hasBody ? JSON.stringify(parsedBody) : undefined,
+      signal: controller.signal
+    } as any);
+    clearTimeout(timeoutId);
     const contentType = response.headers.get('content-type') || '';
     if (contentType.includes('application/pdf') || contentType.includes('application/octet')) {
       const buf = await response.buffer();
@@ -236,6 +240,10 @@ app.all("/api.php", async (req, res) => {
       res.send(buf);
     } else {
       const text = await response.text();
+      if (!text || text.trim() === '') {
+        res.status(502).json({ success: false, error: 'Resposta vazia do servidor PHP' });
+        return;
+      }
       try { res.json(JSON.parse(text)); } catch { res.send(text); }
     }
   } catch(e: any) {
