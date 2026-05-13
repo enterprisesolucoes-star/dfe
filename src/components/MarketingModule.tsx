@@ -59,7 +59,7 @@ const ListaSelecao = ({ clientes, onChange }: { clientes: Cliente[]; onChange: (
   const [selecionados, setSelecionados] = useState<Set<number>>(new Set(clientes.filter(c => c.selecionado).map(c => c.id)));
   const [letraFiltro, setLetraFiltro] = useState('');
   const LETRAS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-  const clientesFiltrados = letraFiltro ? clientes.filter(c => c.nome.trim().toUpperCase().replace(/[^A-Z]/g,'')[0] === letraFiltro) : clientes;
+  const clientesFiltrados = letraFiltro ? clientes.filter(c => (c.nome || '').trim().toUpperCase().startsWith(letraFiltro)) : clientes;
 
   const toggle = (id: number) => {
     setSelecionados(prev => {
@@ -98,7 +98,7 @@ const ListaSelecao = ({ clientes, onChange }: { clientes: Cliente[]; onChange: (
               const novaLetra = letraFiltro === l ? '' : l;
               setLetraFiltro(novaLetra);
               if (novaLetra) {
-                const ids = clientes.filter(c => c.nome.trim().toUpperCase().replace(/[^A-Z]/g,'')[0] === novaLetra).map(c => c.id);
+                const ids = clientes.filter(c => (c.nome || '').trim().toUpperCase().startsWith(novaLetra)).map(c => c.id);
                 setSelecionados(prev => new Set([...Array.from(prev), ...ids]));
                 onChange(Array.from(new Set([...Array.from(selecionados), ...ids])));
               }
