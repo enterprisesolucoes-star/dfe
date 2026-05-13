@@ -161,13 +161,19 @@ export const OrdemServicoTab = ({
     } catch { showAlert('Erro', 'Falha ao gerar PDF.'); }
   };
 
+  const [termoProd, setTermoProd] = React.useState('');
+  React.useEffect(() => {
+    if (!termoProd) { setProdFiltrados([]); return; }
+    setProdFiltrados(produtos.slice(0, 10));
+    if (produtos.length === 1) selecionarProduto(produtos[0]);
+  }, [produtos]);
   const handleBusca = (termo: string) => {
     setBuscaProd(termo); setSelectedProd(null); setVUnit('');
+    setTermoProd(termo);
     if (!termo) { setProdFiltrados([]); setSearchIdx(-1); return; }
-    const lo = termo.toLowerCase();
-    fetchProdutos(termo); const fil = produtos.slice(0, 10);
-    setProdFiltrados(fil); setSearchIdx(-1);
-    if (fil.length === 1) selecionarProduto(fil[0]);
+    clearTimeout((window as any)._produtoTimer2);
+    (window as any)._produtoTimer2 = setTimeout(() => fetchProdutos(termo), 400);
+    setSearchIdx(-1);
   };
 
   const selecionarProduto = (p: Produto) => {

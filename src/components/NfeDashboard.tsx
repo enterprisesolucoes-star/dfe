@@ -509,7 +509,11 @@ const NfeDashboard: React.FC<Props> = ({
 
   const clientesFiltrados = clientes.slice(0, 10);
 
-  const produtosFiltrados = produtos.slice(0, 10);
+  const [produtosFiltrados, setProdutosFiltrados] = React.useState<typeof produtos>([]);
+  React.useEffect(() => {
+    if (buscaProduto.length >= 2) setProdutosFiltrados(produtos.slice(0, 10));
+    else setProdutosFiltrados([]);
+  }, [produtos, buscaProduto]);
 
   return (
     <>
