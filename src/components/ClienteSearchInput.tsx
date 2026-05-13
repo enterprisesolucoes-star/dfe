@@ -61,7 +61,7 @@ export const ClienteSearchInput: React.FC<Props> = ({
           onFocus={() => { setShowDrop(true); if (!busca) fetchClientes(''); }}
           onBlur={() => setTimeout(() => setShowDrop(false), 200)}
           placeholder={placeholder}
-          className="w-full pl-9 pr-3 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:border-indigo-400 outline-none focus:ring-2 focus:ring-indigo-500/20"
+          className="w-full pl-9 pr-3 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800 focus:border-indigo-400 outline-none focus:ring-2 focus:ring-indigo-500/20"
         />
         {showDrop && clientes.length > 0 && (
           <div className="absolute z-50 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl max-h-52 overflow-y-auto">

@@ -733,6 +733,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
         <OrcamentosTab
           clientes={clientes}
           fetchClientes={fetchClientes}
+          fetchProdutos={fetchProdutos}
           produtos={produtos}
           vendedores={vendedores}
           emitente={emitente}
@@ -751,6 +752,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
         <OrdemServicoTab
           clientes={clientes}
           fetchClientes={fetchClientes}
+          fetchProdutos={fetchProdutos}
           produtos={produtos}
           vendedores={vendedores}
           emitente={emitente}
@@ -1106,6 +1108,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
                   emitente={emitente}
                   clientes={clientes}
                   fetchClientes={fetchClientes}
+                  fetchProdutos={fetchProdutos}
                   produtos={produtos}
                   transportadores={transportadores}
                   medidas={medidas}

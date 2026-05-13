@@ -35,6 +35,7 @@ interface Props {
   emitente: Emitente;
   clientes: Cliente[];
   fetchClientes: (busca?: string) => Promise<void>;
+  fetchProdutos: (busca?: string) => Promise<void>;
   produtos: Produto[];
   transportadores: Transportador[];
   medidas: Medida[];
@@ -133,7 +134,7 @@ const BrDecimalInput: React.FC<{
 // ─── Componente principal ────────────────────────────────────────────────────
 
 const NfeDashboard: React.FC<Props> = ({
-  emitente, clientes, produtos, transportadores, fetchClientes,
+  emitente, clientes, produtos, transportadores, fetchClientes, fetchProdutos,
   showAlert, onEmitted
 }) => {
   // Controle de Abas
@@ -508,9 +509,7 @@ const NfeDashboard: React.FC<Props> = ({
 
   const clientesFiltrados = clientes.slice(0, 10);
 
-  const produtosFiltrados = produtos.filter(p =>
-    !buscaProduto || (p.descricao || '').toLowerCase().includes(buscaProduto.toLowerCase()) || (p.codigoInterno || '').includes(buscaProduto) || (p.codigoBarras || '').includes(buscaProduto)
-  ).slice(0, 10);
+  const produtosFiltrados = produtos.slice(0, 10);
 
   return (
     <>
@@ -791,7 +790,7 @@ const NfeDashboard: React.FC<Props> = ({
                   <input
                     ref={refBuscaProduto}
                     value={buscaProduto}
-                    onChange={e => { setBuscaProduto(e.target.value); setDropProduto(true); setDropIdx(-1); } }
+                    onChange={e => { const v = e.target.value; setBuscaProduto(v); setDropProduto(true); setDropIdx(-1); clearTimeout((window as any)._produtoTimer); if (v.length === 0) fetchProdutos(''); else if (v.length >= 2) { (window as any)._produtoTimer = setTimeout(() => fetchProdutos(v), 400); } }}
                     onFocus={() => setDropProduto(true)}
                     onBlur={() => setTimeout(() => setDropProduto(false), 150)}
                     onKeyDown={(e) => {
