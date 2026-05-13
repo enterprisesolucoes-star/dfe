@@ -684,7 +684,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       case 'ncm':       return <NcmTab ufEmpresa={emitente.uf} />;
       case 'usuarios':  return <UsuariosTab session={session} showAlert={showAlert} showConfirm={showConfirm} />;
       case 'vendedores': return <VendedoresTab showAlert={showAlert} showConfirm={showConfirm} />;
-      case 'pedidos': return <PedidoTab produtos={produtos} clientes={clientes} vendedores={vendedores} emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} showPrompt={showPrompt} session={session} />;
+      case 'pedidos': return <PedidoTab produtos={produtos} clientes={clientes} fetchClientes={fetchClientes} vendedores={vendedores} emitente={emitente} showAlert={showAlert} showConfirm={showConfirm} showPrompt={showPrompt} session={session} />;
       case 'comissoes': return <ComissoesTab showAlert={showAlert} showConfirm={showConfirm} />;
       case 'cobranca_config': return <CobrancaConfigTab showAlert={showAlert} />;
       case 'cobranca_boletos': return <CobrancaBoletosTab showAlert={showAlert} showConfirm={showConfirm} />;

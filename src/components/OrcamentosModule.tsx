@@ -43,9 +43,10 @@ const WaModal = ({ onClose, onSend, sending, defaultPhone = '' }: { onClose: () 
   );
 };
 const OrcamentosTab = ({
-  clientes, produtos, vendedores, emitente, showAlert, showConfirm, isFiscal, onExportarNFCe
+  clientes, fetchClientes, produtos, vendedores, emitente, showAlert, showConfirm, isFiscal, onExportarNFCe
 }: {
   clientes: Cliente[];
+  fetchClientes: (busca?: string) => Promise<void>;
   produtos: Produto[];
   vendedores: Vendedor[];
   emitente: Emitente;

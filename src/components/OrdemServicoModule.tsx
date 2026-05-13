@@ -53,9 +53,10 @@ const STATUS_OS_COLORS: Record<string, string> = {
 };
 
 export const OrdemServicoTab = ({
-  clientes, produtos, vendedores, emitente, showAlert, showConfirm
+  clientes, fetchClientes, produtos, vendedores, emitente, showAlert, showConfirm
 }: {
   clientes: Cliente[];
+  fetchClientes: (busca?: string) => Promise<void>;
   produtos: Produto[];
   vendedores: Vendedor[];
   emitente: Emitente;

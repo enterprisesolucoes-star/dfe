@@ -43,8 +43,8 @@ const BANDEIRAS_CARTAO = [
   { id: 13, tpag: '04', tband: '99', tband_opc: 'Outro Débito',     cnpj: '' },
 ];
 
-export const PedidoTab = ({ produtos, clientes, vendedores, emitente, showAlert, showConfirm, showPrompt, session }: {
-  produtos: Produto[]; clientes: Cliente[]; vendedores: Vendedor[];
+export const PedidoTab = ({ produtos, clientes, fetchClientes, vendedores, emitente, showAlert, showConfirm, showPrompt, session }: {
+  produtos: Produto[]; clientes: Cliente[]; fetchClientes: (busca?: string) => Promise<void>; vendedores: Vendedor[];
   emitente: any; showAlert: (t: string, m: string) => void;
   showConfirm: (t: string, m: string, cb: () => void) => void;
   showPrompt: (t: string, m: string, cb: (v: string) => void, init?: string) => void;

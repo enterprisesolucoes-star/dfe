@@ -126,7 +126,7 @@ export const IdentificarModal = ({ onClose, onConfirm }: { onClose: () => void; 
     } catch { setMunicipios([]); } finally { setLoadingMun(false); }
   };
 
-  const filtrados = clientes.filter(c =>
+  const filtrados = clientes.filter((c: any) =>
     c.nome?.toLowerCase().includes(busca.toLowerCase()) ||
     c.documento?.includes(busca)
   );
