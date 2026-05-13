@@ -34,7 +34,7 @@ export const ClienteSearchInput: React.FC<Props> = ({
 
   if (value) {
     return (
-      <div className="flex items-center gap-2 px-3 py-2 border border-indigo-300 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl">
+      <div className="flex items-center gap-2 px-3 py-2 border border-indigo-300 dark:border-indigo-700 bg-indigo-50 dark:bg-gray-700 rounded-xl">
         <span className="flex-1 text-sm font-bold text-indigo-800 dark:text-indigo-200">
           {value.nome}
           {value.documento && <span className="ml-2 text-xs font-normal text-indigo-500"> · {value.documento}</span>}
