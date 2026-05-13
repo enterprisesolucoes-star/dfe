@@ -794,9 +794,11 @@ const DfeConfigPage = ({
                   </div>
                 </div>
                 <div className="col-span-2 pt-2">
-                  <button onClick={onSave} className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm">
-                    Salvar NFC-e
-                  </button>
+                  <div className="flex gap-3 mb-2">
+                    <button onClick={async () => { const el = document.getElementById('sefaz-status-nfce'); if(el){el.textContent='Consultando...';el.className='text-xs text-yellow-500';} try { const r = await fetch('./api.php?action=sefaz_status_nfce').then(x=>x.json()); if(el){el.textContent=r.success?`✅ Online — ${r.xMotivo}`:`❌ Indisponível — ${r.xMotivo}`;el.className=r.success?'text-xs text-green-500 font-medium':'text-xs text-red-500 font-medium';} } catch{ if(el){el.textContent='❌ Erro ao consultar';el.className='text-xs text-red-500';} } }} className="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 py-3 rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">🔍 Status SEFAZ</button>
+                    <button onClick={onSave} className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm">Salvar NFC-e</button>
+                  </div>
+                  <span id="sefaz-status-nfce" className="text-xs text-gray-400"></span>
                 </div>
               </div>
             </div>
