@@ -43,10 +43,11 @@ const WaModal = ({ onClose, onSend, sending, defaultPhone = '' }: { onClose: () 
   );
 };
 const OrcamentosTab = ({
-  clientes, fetchClientes, produtos, vendedores, emitente, showAlert, showConfirm, isFiscal, onExportarNFCe
+  clientes, fetchClientes, fetchProdutos, produtos, vendedores, emitente, showAlert, showConfirm, isFiscal, onExportarNFCe
 }: {
   clientes: Cliente[];
   fetchClientes: (busca?: string) => Promise<void>;
+  fetchProdutos: (busca?: string) => Promise<void>;
   produtos: Produto[];
   vendedores: Vendedor[];
   emitente: Emitente;
@@ -145,7 +146,7 @@ const OrcamentosTab = ({
     setBuscaProd(termo); setSelectedProd(null); setVUnit('');
     if (!termo) { setProdFiltrados([]); setSearchIdx(-1); return; }
     const lo = termo.toLowerCase();
-    const fil = produtos.filter(p => p.descricao.toLowerCase().includes(lo) || (p.codigoInterno || '').toLowerCase().includes(lo) || (p.codigoBarras || '').includes(termo));
+    fetchProdutos(termo); const fil = produtos.slice(0, 10);
     setProdFiltrados(fil); setSearchIdx(-1);
     if (fil.length === 1) selecionarProduto(fil[0]);
   };

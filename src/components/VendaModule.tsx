@@ -107,7 +107,7 @@ export const GlobalMessageModal = ({ type, title, message, inputValue, onClose, 
 export const IdentificarModal = ({ onClose, onConfirm }: { onClose: () => void; onConfirm: (dest: any) => void }) => {
   const [aba, setAba]               = useState<'buscar' | 'manual'>('buscar');
   const [busca, setBusca]           = useState('');
-  const { clientes, fetchClientes } = useAppData();
+  const { clientes, fetchClientes, produtos: produtosCtx, fetchProdutos } = useAppData();
   const [municipios, setMunicipios] = useState<{ id: number; nome: string }[]>([]);
   const [loadingMun, setLoadingMun] = useState(false);
   const [form, setForm]             = useState<any>({ nome: '', documento: '', uf: 'GO', municipio: '', codigoMunicipio: '', logradouro: '', numero: '', bairro: '', cep: '' });
@@ -730,7 +730,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
               <div className="flex gap-4 items-end">
                 <div className="flex-1 relative">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Buscar Produto</label>
-                  <input ref={buscaProdutoInputRef} type="text" value={buscaProduto} placeholder="Por código, código de barras ou nome..." className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+                  <input ref={buscaProdutoInputRef} type="text" value={buscaProduto} placeholder="Por código, código de barras ou nome..." className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800"
                     onChange={(e) => {
                       const t = e.target.value; setBuscaProduto(t); setSelectedProduto(''); setDropIdx(-1);
                       if (t.length < 1) { setProdutosFiltrados([]); return; }
@@ -739,7 +739,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
                       if (qtyMatch) { const q = parseInt(qtyMatch[1], 10); if (q > 0) setQuantidade(q); }
                       if (termo.length < 1) { setProdutosFiltrados([]); return; }
                       const tl = termo.toLowerCase();
-                      const f = produtos.filter(p => p.descricao.toLowerCase().includes(tl) || (p.codigoInterno || '').includes(termo) || (p.codigoBarras || '').includes(termo));
+                      fetchProdutos(buscaProduto); const f = produtosCtx.slice(0, 10);
                       setProdutosFiltrados(f);
                       if (f.length === 1) { setSelectedProduto(String(f[0].id)); setBuscaProduto(f[0].descricao); setValorAtual(f[0].valorUnitario); setProdutosFiltrados([]); setTimeout(() => inputQtdRef.current?.focus(), 10); }
                     }}
