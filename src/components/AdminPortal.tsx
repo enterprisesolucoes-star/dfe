@@ -307,16 +307,20 @@ const AdminPortal = () => {
             try {
               const r = await fetch('/api/whatsapp/status', {credentials:'include'});
               const d = await r.json();
-              if (d.status === 'open') { alert('WhatsApp já conectado!'); return; }
-              const r2 = await fetch('/api/whatsapp/qrcode', {credentials:'include'});
-              const d2 = await r2.json();
-              if (d2.qrcode) {
-                const w = window.open('', '_blank', 'width=400,height=500');
-                if (w) { w.document.write(`<html><body style="display:flex;align-items:center;justify-content:center;background:#000"><img src="${d2.qrcode}" style="width:300px"/></body></html>`); }
-              } else { alert('Instância criada. Aguarde o QR Code.'); }
-            } catch { alert('Erro ao reconectar WhatsApp'); }
+              if (r.status === 503) {
+                alert('❌ Evolution API indisponível no servidor.\nVerifique se o serviço está rodando.');
+                return;
+              }
+              if (d.success && d.status === 'open') {
+                alert('✅ Evolution API OK — WhatsApp conectado!');
+              } else {
+                alert(`⚠️ Evolution API acessível, mas WhatsApp desconectado.\nStatus: ${d.state || 'desconhecido'}\nAcesse Configurações → Integração para reconectar.`);
+              }
+            } catch (e: any) {
+              alert('❌ Erro ao verificar Evolution API: ' + e.message);
+            }
           }} className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 font-bold transition-colors">
-            <RefreshCw className="w-4 h-4" /> WhatsApp
+            <RefreshCw className="w-4 h-4" /> Evolution API
           </button>
           
           <button onClick={handleLogout} className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 font-bold transition-colors">
