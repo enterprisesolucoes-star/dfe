@@ -325,6 +325,15 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
   const [itens, setItens] = useState<{ produtoId: number, quantidade: number, valorUnitario: number, percentualTributosNacional: number, percentualTributosEstadual: number }[]>([]);
   const [pagamentos, setPagamentos] = useState<any[]>([]);
   const [buscaProduto, setBuscaProduto] = useState('');
+  const [termoBusca, setTermoBusca] = useState('');
+  useEffect(() => {
+    if (termoBusca.length >= 1) {
+      const tl = termoBusca.toLowerCase();
+      const f = produtosCtx.filter(p => p.descricao.toLowerCase().includes(tl) || (p.codigoInterno||'').includes(termoBusca) || (p.codigoBarras||'').includes(termoBusca)).slice(0, 10);
+      setProdutosFiltrados(f);
+      if (f.length === 1) { setSelectedProduto(String(f[0].id)); setBuscaProduto(f[0].descricao); setValorAtual(f[0].valorUnitario); setProdutosFiltrados([]); setTimeout(() => inputQtdRef.current?.focus(), 10); }
+    }
+  }, [produtosCtx]);
   const [produtosFiltrados, setProdutosFiltrados] = useState<Produto[]>([]);
   const [dropIdx, setDropIdx] = useState(-1);
   const [selectedProduto, setSelectedProduto] = useState<string>('');
@@ -739,9 +748,9 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
                       if (qtyMatch) { const q = parseInt(qtyMatch[1], 10); if (q > 0) setQuantidade(q); }
                       if (termo.length < 1) { setProdutosFiltrados([]); return; }
                       const tl = termo.toLowerCase();
-                      fetchProdutos(buscaProduto); const f = produtosCtx.slice(0, 10);
-                      setProdutosFiltrados(f);
-                      if (f.length === 1) { setSelectedProduto(String(f[0].id)); setBuscaProduto(f[0].descricao); setValorAtual(f[0].valorUnitario); setProdutosFiltrados([]); setTimeout(() => inputQtdRef.current?.focus(), 10); }
+                      setTermoBusca(termo);
+                      clearTimeout((window as any)._produtoVendaTimer);
+                      (window as any)._produtoVendaTimer = setTimeout(() => fetchProdutos(termo), 400);
                     }}
                     onKeyDown={(e) => {
                       if (e.key === 'ArrowDown') { e.preventDefault(); setDropIdx(i => Math.min(i + 1, produtosFiltrados.length - 1)); }
