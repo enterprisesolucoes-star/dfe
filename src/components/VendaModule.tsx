@@ -502,7 +502,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
         showAlert("Erro", data.message || "Erro ao salvar pedido.");
         setShowPedidoModal(false);
       }
-    } catch { showAlert("Erro", "Erro de conexão."); setShowPedidoModal(false); }
+    } catch (err: any) { showAlert("Erro", err?.message || "Erro de conexão."); setShowPedidoModal(false); }
   };
 
   const handleFinalizar = async () => {
@@ -551,7 +551,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
         onSave({ id: result.id, numero: result.numero || proximoNumero, status: result.status } as any);
         showConfirm("NFC-e Autorizada!", "Deseja imprimir o DANFE?", () => window.open(`./api.php?action=danfe&id=${result.id}`, '_blank'));
       } else showAlert("Erro na Emissão", result.message);
-    } catch { showAlert("Erro", "Erro de conexão."); } finally { setIsEmitting(false); }
+    } catch (err: any) { showAlert("Erro", err?.message || "Erro de conexão."); } finally { setIsEmitting(false); }
   };
 
   const handleTefComplete = async (vId: number) => {
