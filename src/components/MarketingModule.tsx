@@ -138,7 +138,8 @@ const PainelEnvio = ({ clientes, mensagem, onVoltar, emitente }: {
       const c = comTel[i];
       const phone = c.telefone.replace(/\D/g, '');
       setProgresso({ atual: i + 1, total: comTel.length, nome: c.nome });
-      const primeiroNome = c.nome.split(' ')[0];
+      const primeiroNome = (c.nome || '').split(' ')[0];
+      console.log('cliente:', c.nome, 'primeiro:', primeiroNome);
       const nomeEmpresa = emitente?.razaoSocial || emitente?.nome || 'nossa empresa';
       const msg = texto
         .replace(/\{nome\}/g, primeiroNome)
