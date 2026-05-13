@@ -138,10 +138,12 @@ const PainelEnvio = ({ clientes, mensagem, onVoltar, emitente }: {
       const c = comTel[i];
       const phone = c.telefone.replace(/\D/g, '');
       setProgresso({ atual: i + 1, total: comTel.length, nome: c.nome });
+      const primeiroNome = c.nome.split(' ')[0];
+      const nomeEmpresa = emitente?.razaoSocial || emitente?.nome || 'nossa empresa';
       const msg = texto
-        .replace('{nome}', c.nome.split(' ')[0])
-        .replace('{nome_completo}', c.nome)
-        .replace('{empresa}', emitente?.razaoSocial || 'nossa empresa');
+        .replace(/\{nome\}/g, primeiroNome)
+        .replace(/\{nome_completo\}/g, c.nome)
+        .replace(/\{empresa\}/g, nomeEmpresa);
       try {
         if (imagem) {
           await fetch('/api/whatsapp/send-image', {
