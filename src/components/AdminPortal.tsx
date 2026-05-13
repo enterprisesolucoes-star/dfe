@@ -303,25 +303,7 @@ const AdminPortal = () => {
           <button onClick={() => setShowBackup(true)} className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 font-bold transition-colors">
             <HardDrive className="w-4 h-4" /> Backup
           </button>
-          <button onClick={async () => {
-            try {
-              const r = await fetch('/api/whatsapp/status', {credentials:'include'});
-              const d = await r.json();
-              if (r.status === 503) {
-                alert('❌ Evolution API indisponível no servidor.\nVerifique se o serviço está rodando.');
-                return;
-              }
-              if (d.success && d.status === 'open') {
-                alert('✅ Evolution API OK — WhatsApp conectado!');
-              } else {
-                alert(`⚠️ Evolution API acessível, mas WhatsApp desconectado.\nStatus: ${d.state || 'desconhecido'}\nAcesse Configurações → Integração para reconectar.`);
-              }
-            } catch (e: any) {
-              alert('❌ Erro ao verificar Evolution API: ' + e.message);
-            }
-          }} className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 font-bold transition-colors">
-            <RefreshCw className="w-4 h-4" /> Evolution API
-          </button>
+          
           
           <button onClick={handleLogout} className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 font-bold transition-colors">
             <LogOut className="w-4 h-4" /> Sair
