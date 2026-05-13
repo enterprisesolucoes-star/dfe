@@ -732,6 +732,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       case 'orcamentos': return (
         <OrcamentosTab
           clientes={clientes}
+          fetchClientes={fetchClientes}
           produtos={produtos}
           vendedores={vendedores}
           emitente={emitente}
@@ -749,6 +750,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       case 'ordens_servico': return (
         <OrdemServicoTab
           clientes={clientes}
+          fetchClientes={fetchClientes}
           produtos={produtos}
           vendedores={vendedores}
           emitente={emitente}
@@ -1103,6 +1105,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
                 <NfeDashboard
                   emitente={emitente}
                   clientes={clientes}
+                  fetchClientes={fetchClientes}
                   produtos={produtos}
                   transportadores={transportadores}
                   medidas={medidas}
