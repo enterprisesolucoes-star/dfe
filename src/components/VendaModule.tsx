@@ -385,7 +385,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
   const buscaProdutoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setTimeout(() => buscaProdutoInputRef.current?.focus(), 150);
+    setTimeout(() => { buscaProdutoInputRef.current?.focus(); buscaProdutoInputRef.current?.click(); }, 500);
   }, []);
 
   useEffect(() => {
