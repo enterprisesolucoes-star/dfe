@@ -284,7 +284,6 @@ export const ImportXmlModal = ({
     });
   };
 
-  const [dropIdx, setDropIdx] = useState<number>(-1);
   const [vinculandoIdx, setVinculandoIdx] = useState<number | null>(null);
   const [buscaProd, setBuscaProd] = useState('');
   
