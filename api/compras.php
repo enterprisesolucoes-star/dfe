@@ -160,8 +160,28 @@ switch ($action) {
                     'matching_cod' => $match['codigo_interno'] ?? '', 'valor_venda_atual' => (float)($match['valor_unitario'] ?? 0)
                 ];
             }
+            // Extrair chave de acesso
+            $chaveNFe = '';
+            $infNFeId = (string)($nfe->attributes()['Id'] ?? '');
+            if ($infNFeId) $chaveNFe = preg_replace('/[^0-9]/', '', $infNFeId);
+            $notaData['chave'] = $chaveNFe;
+            $notaData['xml_base64'] = base64_encode($xmlString);
             echo json_encode(['success' => true, 'nota' => $notaData, 'itens' => $produtosXml]);
         } catch (Exception $e) { echo json_encode(['success' => false, 'message' => $e->getMessage()]); }
+        break;
+
+    case 'danfe_upload':
+        try {
+            $xmlB64 = $_POST['xml_base64'] ?? '';
+            if (!$xmlB64) throw new Exception('XML não informado.');
+            $xmlStr = base64_decode($xmlB64);
+            $empresa = $pdo->prepare("SELECT * FROM empresas WHERE id = ?");
+            $empresa->execute([$empresaId]);
+            $config = $empresa->fetch();
+            header('Content-Type: application/pdf');
+            header('Content-Disposition: inline; filename="danfe.pdf"');
+            echo (new \App\Services\PrinterService($config, $config['logo_url'] ?? ''))->imprimirNfe($xmlStr);
+        } catch (Exception $e) { http_response_code(500); echo $e->getMessage(); }
         break;
 
     case 'dist_dfe':

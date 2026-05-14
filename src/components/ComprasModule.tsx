@@ -294,7 +294,15 @@ export const ImportXmlModal = ({
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => { const ch = xmlData.nota.chave; if(ch) window.open(`./api.php?action=dist_danfe&chave=${ch}`, "_blank"); else alert("Chave de acesso não disponível"); }} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors"><FileText className="w-4 h-4" /> Imprimir DANFE</button>
+            <button onClick={async () => {
+              const xmlB64 = xmlData.nota.xml_base64;
+              if (!xmlB64) { alert("XML não disponível para impressão."); return; }
+              const form = document.createElement('form');
+              form.method = 'POST'; form.action = './api.php?action=danfe_upload'; form.target = '_blank';
+              const inp = document.createElement('input'); inp.type = 'hidden'; inp.name = 'xml_base64'; inp.value = xmlB64;
+              form.appendChild(inp);
+              document.body.appendChild(form); form.submit(); document.body.removeChild(form);
+            }} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors"><FileText className="w-4 h-4" /> Imprimir DANFE</button>
             <button onClick={onClose} className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"><X className="w-5 h-5 text-gray-400 dark:text-gray-500" /></button>
           </div>
         </div>
