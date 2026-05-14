@@ -1082,6 +1082,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
         <VendaModal
           produtos={produtos}
           emitente={emitente}
+          vendedores={vendedores}
           onClose={() => { setIsVendaModalOpen(false); setVendaPreload(null); }}
           onSave={handleNovaVenda}
           proximoNumero={vendas.length > 0 ? Math.max(...vendas.map(v => v.numero)) + 1 : 1}

@@ -310,9 +310,10 @@ export const TefModal = ({ pagamentoId, vendaId, numero, uniqueid: initialUnique
   );
 };
 
-export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero, showAlert, showConfirm, session, initialItens, initialDestinatario }: {
+export const VendaModal = ({ produtos, emitente, vendedores = [], onClose, onSave, proximoNumero, showAlert, showConfirm, session, initialItens, initialDestinatario }: {
   produtos: Produto[],
   emitente: Emitente,
+  vendedores?: any[],
   onClose: () => void,
   onSave: (venda: Nfce) => void,
   proximoNumero: number,
