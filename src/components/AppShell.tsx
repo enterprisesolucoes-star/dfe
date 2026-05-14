@@ -1,3 +1,4 @@
+import { useFormBehavior } from '../hooks/useFormBehavior';
 import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, BarChart, Bar } from 'recharts';
 import { ComprasTab, ImportXmlModal, CompraModal } from './ComprasModule';
@@ -140,7 +141,8 @@ const AppShell: React.FC<{ session: Session; onLogout: () => void; onUpdateSessi
   const isFiscal = usuarioDfeAtual !== 0 && usuarioDfeAtual !== 4;
 
 // Se empresa não está configurada, força aba de configurações e bloqueia as demais
-const [activeTab, setActiveTab] = useState<'dashboard' | 'vendas' | 'vendas_geral' | 'produtos' | 'clientes' | 'fornecedores' | 'compras' | 'orcamentos' | 'transportadores' | 'config' | 'ncm' | 'usuarios' | 'medidas' | 'bandeiras' | 'dfe_nfe' | 'dfe_nfe_geral' | 'dfe_nfe_parametros' | 'dfe_nfce_parametros' | 'reforma_tributaria' | 'config_empresa' | 'config_email' | 'config_smartpos' | 'config_integracao' | 'dfe_nfe_dados' | 'dfe_nfce_dados' | 'dfe_provedor' | 'empresa' | 'dfe_config' | 'fin_receber' | 'fin_pagar' | 'fin_caixa' | 'relatorios_tef' | 'vendedores' | 'comissoes' | 'pedidos' | 'cobranca_config' | 'cobranca_boletos' | 'cobranca_historico' | 'marketing'>(
+useFormBehavior();
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'vendas' | 'vendas_geral' | 'produtos' | 'clientes' | 'fornecedores' | 'compras' | 'orcamentos' | 'transportadores' | 'config' | 'ncm' | 'usuarios' | 'medidas' | 'bandeiras' | 'dfe_nfe' | 'dfe_nfe_geral' | 'dfe_nfe_parametros' | 'dfe_nfce_parametros' | 'reforma_tributaria' | 'config_empresa' | 'config_email' | 'config_smartpos' | 'config_integracao' | 'dfe_nfe_dados' | 'dfe_nfce_dados' | 'dfe_provedor' | 'empresa' | 'dfe_config' | 'fin_receber' | 'fin_pagar' | 'fin_caixa' | 'relatorios_tef' | 'vendedores' | 'comissoes' | 'pedidos' | 'cobranca_config' | 'cobranca_boletos' | 'cobranca_historico' | 'marketing'>(
   session.empresaConfigurada ? 'dashboard' : 'empresa'
 );
 const empresaBloqueada = !session.empresaConfigurada;
