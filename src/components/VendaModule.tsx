@@ -368,6 +368,9 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
     }
   }, [session?.usuarioId]);
   const [autorizacaoInput, setAutorizacaoInput] = useState('');
+  const [vendedorIdSel, setVendedorIdSel] = React.useState<number>(() => {
+    try { return parseInt(localStorage.getItem('dfe_ultimo_vendedor') || '0') || 0; } catch { return 0; }
+  });
   const [isEmitting, setIsEmitting] = useState(false);
   const [tefState, setTefState] = useState<{ pagamentosIds: number[]; currentIndex: number; vendaId: number; numero: number } | null>(null);
   const [showIdentificar, setShowIdentificar] = useState(false);
@@ -500,6 +503,7 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
     }
     try {
       const payload = {
+        vendedorId: vendedorIdSel || undefined,
         valorTotal: totalDevido, valorDesconto, valorTroco: troco,
         usuarioId: session?.usuarioId, caixaId: session?.caixaId, destinatario,
         itens: itens.map((it, idx) => ({ id: idx + 1, produtoId: it.produtoId, quantidade: it.quantidade, valorUnitario: it.valorUnitario, valorTotal: it.quantidade * it.valorUnitario })),
@@ -820,7 +824,10 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                       {itens.length === 0
-                        ? <tr><td colSpan={5} className="py-16 text-center text-gray-300 dark:text-gray-600 font-bold uppercase tracking-widest text-lg">Caixa Livre</td></tr>
+                        ? <tr><td colSpan={5} className="py-16 text-center">
+                              <div className="text-4xl font-black uppercase tracking-widest text-green-500 dark:text-green-400 opacity-60">Caixa Livre</div>
+                              {emitente?.logomarca && <img src={emitente.logomarca} alt="Logo" className="mx-auto mt-6 max-h-24 object-contain opacity-40" />}
+                            </td></tr>
                         : itens.map((it, i) => {
                             const p = produtos.find(x => x.id === it.produtoId);
                             return (
@@ -849,6 +856,15 @@ export const VendaModal = ({ produtos, emitente, onClose, onSave, proximoNumero,
                 <div className="flex justify-between text-gray-500 dark:text-gray-400"><span>Subtotal</span><span>R$ {brl(subtotal)}</span></div>
                 <div className="flex justify-between items-center text-gray-500 dark:text-gray-400"><span>Desconto</span><input type="text" value={valorDesconto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} onChange={e => setValorDesconto(Number(e.target.value.replace(/\D/g, '')) / 100)} className="w-24 text-right bg-transparent border-b border-gray-300 dark:border-gray-600 font-bold text-red-500 dark:text-red-400 outline-none focus:border-blue-500" /></div>
                 <div className="pt-4 border-t border-gray-100 dark:border-gray-700 space-y-3">
+                  {vendedores && vendedores.length > 0 && (
+                    <div className="mb-2">
+                      <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase">Vendedor</label>
+                      <select value={vendedorIdSel} onChange={e => { const v = Number(e.target.value); setVendedorIdSel(v); try { localStorage.setItem('dfe_ultimo_vendedor', String(v)); } catch {} }} className="w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm outline-none">
+                        <option value={0}>— Sem vendedor —</option>
+                        {vendedores.map((v: any) => <option key={v.id} value={v.id}>{v.nome}</option>)}
+                      </select>
+                    </div>
+                  )}
                   <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase">Pagamentos</label>
                   <select value={formaPagamentoInput} onChange={e => setFormaPagamentoInput(e.target.value)} className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm outline-none">
                     <option value="01">Dinheiro</option><option value="17">PIX</option><option value="03">Cartão Crédito</option><option value="04">Cartão Débito</option><option value="05" disabled={!destinatario?.isCadastrado}>Crédito Loja</option>
