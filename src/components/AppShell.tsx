@@ -401,6 +401,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
 
   // Garante clientes carregados ao abrir modais que precisam de busca
   useEffect(() => { if (isNfeModalOpen) { fetchClientes(); fetchProdutos(); } }, [isNfeModalOpen]);
+  useEffect(() => { if (isVendaModalOpen) { fetchVendedores(); } }, [isVendaModalOpen]);
 
   const handleNovaVenda = (novaVenda: Nfce) => {
     fetchVendas();
