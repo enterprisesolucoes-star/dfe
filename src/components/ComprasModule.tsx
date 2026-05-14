@@ -104,47 +104,53 @@ export const ComprasTab = ({
       </div>
 
       {vinculandoIdx !== null && (
-          <div className="p-3 bg-blue-50 dark:bg-blue-900/30 border-b-2 border-blue-300 dark:border-blue-700 shadow-lg" style={{position:"sticky",top:0,zIndex:100}}>
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <Search className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                <span className="text-xs font-bold text-blue-700 dark:text-blue-300">Vincular: <span className="font-normal italic">{itens[vinculandoIdx]?.nome_xml}</span></span>
+          <div className="fixed inset-0 z-[200] flex items-start justify-center pt-20 px-4" onClick={e => { if(e.target === e.currentTarget){ setVinculandoIdx(null); setBuscaProd(''); }}}>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 w-full max-w-xl">
+              <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Search className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-bold text-gray-800 dark:text-gray-100">Vincular produto ao item:</span>
+                </div>
+                <button onClick={() => { setVinculandoIdx(null); setBuscaProd(''); }} className="text-gray-400 hover:text-red-500">✕</button>
               </div>
-              <button onClick={() => { setVinculandoIdx(null); setBuscaProd(''); }} className="text-gray-400 hover:text-red-500">✕</button>
-            </div>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input autoFocus type="text" value={buscaProd}
-                onChange={e => setBuscaProd(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'ArrowDown') { e.preventDefault(); setDropIdx(i => Math.min(i+1, prodsFiltrados.length-1)); }
-                  else if (e.key === 'ArrowUp') { e.preventDefault(); setDropIdx(i => Math.max(i-1, 0)); }
-                  else if (e.key === 'Enter' && prodsFiltrados[dropIdx]) { selecionarProduto(prodsFiltrados[dropIdx]); }
-                  else if (e.key === 'Escape') { setVinculandoIdx(null); setBuscaProd(''); }
-                }}
-                placeholder="Buscar por nome, código ou EAN..."
-                className="w-full pl-10 pr-4 py-2 border border-blue-200 dark:border-blue-700 rounded-xl text-sm bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500/20 outline-none"
-              />
-              {prodsFiltrados.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 max-h-60 overflow-y-auto">
+              <div className="p-3 bg-gray-50 dark:bg-gray-900 border-b border-gray-100 dark:border-gray-700">
+                <p className="text-xs italic text-gray-500 dark:text-gray-400 truncate">"{itens[vinculandoIdx]?.nome_xml}"</p>
+              </div>
+              <div className="p-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input autoFocus type="text" value={buscaProd}
+                    onChange={e => setBuscaProd(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'ArrowDown') { e.preventDefault(); setDropIdx(i => Math.min(i+1, prodsFiltrados.length-1)); }
+                      else if (e.key === 'ArrowUp') { e.preventDefault(); setDropIdx(i => Math.max(i-1, 0)); }
+                      else if (e.key === 'Enter' && prodsFiltrados[dropIdx]) { selecionarProduto(prodsFiltrados[dropIdx]); setDropIdx(-1); }
+                      else if (e.key === 'Escape') { setVinculandoIdx(null); setBuscaProd(''); }
+                    }}
+                    placeholder="Buscar por nome, código ou EAN..."
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500/20 outline-none"
+                  />
+                </div>
+                <div className="mt-2 max-h-64 overflow-y-auto rounded-xl border border-gray-100 dark:border-gray-700">
                   {prodsFiltrados.map((p, idx) => (
-                    <button key={p.id} onClick={() => selecionarProduto(p)}
-                      className={`w-full text-left px-4 py-2.5 border-b border-gray-50 dark:border-gray-700 last:border-0 flex justify-between items-center ${dropIdx === idx ? 'bg-blue-100 dark:bg-blue-900/40' : 'hover:bg-blue-50 dark:hover:bg-blue-900/30'}`}>
+                    <button key={p.id} onClick={() => { selecionarProduto(p); setDropIdx(-1); }}
+                      className={`w-full text-left px-4 py-3 border-b border-gray-50 dark:border-gray-700 last:border-0 flex justify-between items-center transition-colors ${dropIdx === idx ? 'bg-blue-50 dark:bg-blue-900/40' : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'}`}>
                       <div>
                         <p className="font-semibold text-gray-800 dark:text-gray-100 text-sm">{p.descricao}</p>
-                        <p className="text-[10px] text-gray-400">{p.codigoInterno} · {p.codigoBarras || '-'}</p>
+                        <p className="text-[11px] text-gray-400 dark:text-gray-500">{p.codigoInterno} · {p.codigoBarras || '-'}</p>
                       </div>
-                      <span className="text-xs font-bold text-blue-600">R$ {Number(p.valorUnitario).toFixed(2)}</span>
+                      <span className="text-sm font-bold text-blue-600 dark:text-blue-400 ml-4 shrink-0">R$ {Number(p.valorUnitario).toFixed(2)}</span>
                     </button>
                   ))}
+                  {buscaProd.length >= 2 && prodsFiltrados.length === 0 && (
+                    <p className="text-center py-6 text-gray-400 italic text-sm">Nenhum produto encontrado.</p>
+                  )}
+                  {!buscaProd && <p className="text-center py-6 text-gray-400 italic text-sm">Digite para buscar...</p>}
                 </div>
-              )}
-              {buscaProd.length >= 2 && prodsFiltrados.length === 0 && (
-                <p className="text-xs text-gray-400 italic mt-1">Nenhum produto encontrado.</p>
-              )}
+              </div>
             </div>
           </div>
-        )
+        )}
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
         <table className="w-full text-left text-sm">
           <thead className="bg-gray-50 dark:bg-gray-900 border-b border-gray-100 dark:border-gray-700">
