@@ -374,7 +374,7 @@ export const VendaModal = ({ produtos, emitente, vendedores = [], onClose, onSav
   });
   const [vendedoresLocal, setVendedoresLocal] = React.useState<any[]>(vendedores || []);
   React.useEffect(() => {
-    fetch('./api.php?action=listar_vendedores').then(r => r.json()).then(d => { if (Array.isArray(d) && d.length > 0) setVendedoresLocal(d); }).catch(() => {});
+    fetch('./api.php?action=listar_vendedores', {credentials:'include'}).then(r => r.json()).then(d => { if (Array.isArray(d) && d.length > 0) setVendedoresLocal(d); }).catch(() => {});
   }, []);
   const [isEmitting, setIsEmitting] = useState(false);
   const [tefState, setTefState] = useState<{ pagamentosIds: number[]; currentIndex: number; vendaId: number; numero: number } | null>(null);
