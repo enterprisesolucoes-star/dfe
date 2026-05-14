@@ -269,15 +269,21 @@ export const ImportXmlModal = ({
     setItens(novos);
   };
 
-  const prodsFiltrados = produtos.filter(p => 
-    p.descricao.toLowerCase().includes(buscaProd.toLowerCase()) || 
-    p.codigoInterno.toLowerCase().includes(buscaProd.toLowerCase()) || 
+  const prodsFiltrados = produtos.filter(p =>
+    !buscaProd || p.descricao.toLowerCase().includes(buscaProd.toLowerCase()) ||
+    (p.codigoInterno || '').toLowerCase().includes(buscaProd.toLowerCase()) ||
     (p.codigoBarras || '').includes(buscaProd)
-  ).slice(0, 5);
+  ).slice(0, 10);
+  React.useEffect(() => {
+    if (buscaProd.length >= 2) {
+      clearTimeout((window as any)._comprasTimer);
+      (window as any)._comprasTimer = setTimeout(() => fetchProdutos(buscaProd), 400);
+    }
+  }, [buscaProd]);
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-[98vw] overflow-hidden flex flex-col h-[97vh] shadow-2xl border border-gray-100 dark:border-gray-700">
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-none sm:rounded-2xl w-full h-full sm:max-w-[98vw] overflow-hidden flex flex-col sm:h-[97vh] shadow-2xl border border-gray-100 dark:border-gray-700">
         <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex justify-between items-center">
           <div>
             <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
@@ -547,7 +553,13 @@ export const CompraModal = ({
     (p.descricao || '').toLowerCase().includes(buscaProd.toLowerCase()) ||
     (p.codigoInterno || '').toLowerCase().includes(buscaProd.toLowerCase()) ||
     (p.codigoBarras || '').includes(buscaProd)
-  ).slice(0, 8) : [];
+  ).slice(0, 10) : [];
+  React.useEffect(() => {
+    if (buscaProd.length >= 2) {
+      clearTimeout((window as any)._comprasTimer2);
+      (window as any)._comprasTimer2 = setTimeout(() => fetchProdutos(buscaProd), 400);
+    }
+  }, [buscaProd]);
 
   const tabs: { id: Tab; label: string; icon: any }[] = [
     { id: 'identificacao', label: '1. Identificação', icon: User },
