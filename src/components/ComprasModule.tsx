@@ -359,45 +359,37 @@ export const ImportXmlModal = ({
         </div>
 
         {vinculandoIdx !== null && (
-          <div className="absolute inset-0 bg-white dark:bg-gray-800/95 flex items-center justify-center p-12 z-[110] backdrop-blur-sm">
-            <div className="w-full max-w-lg bg-white dark:bg-gray-800 shadow-2xl border border-gray-100 dark:border-gray-700 rounded-3xl p-8">
-              <h4 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-6 flex items-center gap-2">
-                <Search className="w-6 h-6 text-blue-600 dark:text-blue-400" /> Localizar Produto
-              </h4>
-              <p className="text-xs text-gray-400 dark:text-gray-500 uppercase font-black mb-2">Item do XML:</p>
-              <p className="text-sm font-semibold text-gray-700 dark:text-gray-200 bg-gray-50 dark:bg-gray-900 p-4 rounded-xl border border-gray-100 dark:border-gray-700 mb-6 italic">
-                "{itens[vinculandoIdx].nome_xml}"
-              </p>
-              
-              <div className="relative mb-6">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
-                <input 
-                  autoFocus
-                  type="text" 
-                  value={buscaProd} 
-                  onChange={e => setBuscaProd(e.target.value)} 
-                  placeholder="Pesquise por nome, código ou EAN..." 
-                  className="w-full pl-12 pr-4 py-4 border border-gray-200 dark:border-gray-700 rounded-2xl text-base focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
-                />
+          <div className="border-t border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Search className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <span className="text-sm font-bold text-blue-700 dark:text-blue-300">Vincular: <span className="font-normal italic">{itens[vinculandoIdx]?.nome_xml}</span></span>
               </div>
-
-              <div className="space-y-2 mb-8">
-                {prodsFiltrados.map(p => (
-                  <button key={p.id} onClick={() => selecionarProduto(p)} className="w-full text-left p-4 rounded-2xl border border-gray-100 dark:border-gray-700 hover:border-blue-200 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all flex justify-between items-center group">
-                    <div>
-                      <p className="font-bold text-gray-800 dark:text-gray-100 group-hover:text-blue-700">{p.descricao}</p>
-                      <p className="text-[10px] text-gray-400 dark:text-gray-500">Cód: {p.codigoInterno} • Barra: {p.codigoBarras || '-'}</p>
-                    </div>
-                    <ArrowRight className="w-5 h-5 text-gray-300 dark:text-gray-600 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
-                  </button>
-                ))}
-                {prodsFiltrados.length === 0 && buscaProd.length >= 2 && (
-                  <p className="text-center py-8 text-gray-400 dark:text-gray-500 italic">Nenhum produto encontrado...</p>
-                )}
-                {!buscaProd && <p className="text-center py-4 text-gray-400 dark:text-gray-500 italic text-sm">Digite para buscar...</p>}
-              </div>
-
-              <button onClick={() => setVinculandoIdx(null)} className="w-full py-4 text-gray-500 dark:text-gray-400 font-bold uppercase text-xs tracking-widest hover:bg-gray-50 dark:hover:bg-gray-700 rounded-2xl transition-all">Cancelar</button>
+              <button onClick={() => { setVinculandoIdx(null); setBuscaProd(''); }} className="text-gray-400 hover:text-red-500 text-lg">✕</button>
+            </div>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input autoFocus type="text" value={buscaProd} onChange={e => setBuscaProd(e.target.value)}
+                placeholder="Buscar por nome, código ou EAN..."
+                className="w-full pl-10 pr-4 py-2.5 border border-blue-200 dark:border-blue-700 rounded-xl text-sm bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500/20 outline-none"
+              />
+              {prodsFiltrados.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 max-h-48 overflow-y-auto">
+                  {prodsFiltrados.map(p => (
+                    <button key={p.id} onClick={() => selecionarProduto(p)}
+                      className="w-full text-left px-4 py-2.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 border-b border-gray-50 dark:border-gray-700 last:border-0 flex justify-between items-center">
+                      <div>
+                        <p className="font-semibold text-gray-800 dark:text-gray-100 text-sm">{p.descricao}</p>
+                        <p className="text-[10px] text-gray-400">{p.codigoInterno} · {p.codigoBarras || '-'}</p>
+                      </div>
+                      <span className="text-xs font-bold text-blue-600">R$ {Number(p.valorUnitario).toFixed(2)}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+              {buscaProd.length >= 2 && prodsFiltrados.length === 0 && (
+                <p className="text-sm text-gray-400 italic mt-2">Nenhum produto encontrado.</p>
+              )}
             </div>
           </div>
         )}
