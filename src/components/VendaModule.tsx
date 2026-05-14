@@ -372,6 +372,10 @@ export const VendaModal = ({ produtos, emitente, vendedores = [], onClose, onSav
   const [vendedorIdSel, setVendedorIdSel] = React.useState<number>(() => {
     try { return parseInt(localStorage.getItem('dfe_ultimo_vendedor') || '0') || 0; } catch { return 0; }
   });
+  const [vendedoresLocal, setVendedoresLocal] = React.useState<any[]>(vendedores || []);
+  React.useEffect(() => {
+    fetch('./api.php?action=listar_vendedores').then(r => r.json()).then(d => { if (Array.isArray(d) && d.length > 0) setVendedoresLocal(d); }).catch(() => {});
+  }, []);
   const [isEmitting, setIsEmitting] = useState(false);
   const [tefState, setTefState] = useState<{ pagamentosIds: number[]; currentIndex: number; vendaId: number; numero: number } | null>(null);
   const [showIdentificar, setShowIdentificar] = useState(false);
@@ -857,12 +861,12 @@ export const VendaModal = ({ produtos, emitente, vendedores = [], onClose, onSav
                 <div className="flex justify-between text-gray-500 dark:text-gray-400"><span>Subtotal</span><span>R$ {brl(subtotal)}</span></div>
                 <div className="flex justify-between items-center text-gray-500 dark:text-gray-400"><span>Desconto</span><input type="text" value={valorDesconto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} onChange={e => setValorDesconto(Number(e.target.value.replace(/\D/g, '')) / 100)} className="w-24 text-right bg-transparent border-b border-gray-300 dark:border-gray-600 font-bold text-red-500 dark:text-red-400 outline-none focus:border-blue-500" /></div>
                 <div className="pt-4 border-t border-gray-100 dark:border-gray-700 space-y-3">
-                  {vendedores && vendedores.length > 0 && (
+                  {vendedoresLocal.length > 0 && (
                     <div className="mb-2">
                       <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase">Vendedor</label>
                       <select value={vendedorIdSel} onChange={e => { const v = Number(e.target.value); setVendedorIdSel(v); try { localStorage.setItem('dfe_ultimo_vendedor', String(v)); } catch {} }} className="w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm outline-none">
                         <option value={0}>— Sem vendedor —</option>
-                        {vendedores.map((v: any) => <option key={v.id} value={v.id}>{v.nome}</option>)}
+                        {vendedoresLocal.map((v: any) => <option key={v.id} value={v.id}>{v.nome}</option>)}
                       </select>
                     </div>
                   )}
