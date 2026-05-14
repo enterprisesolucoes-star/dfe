@@ -297,11 +297,16 @@ export const ImportXmlModal = ({
             <button onClick={async () => {
               const xmlB64 = xmlData.nota.xml_base64;
               if (!xmlB64) { alert("XML não disponível para impressão."); return; }
-              const form = document.createElement('form');
-              form.method = 'POST'; form.action = './api.php?action=danfe_upload'; form.target = '_blank';
-              const inp = document.createElement('input'); inp.type = 'hidden'; inp.name = 'xml_base64'; inp.value = xmlB64;
-              form.appendChild(inp);
-              document.body.appendChild(form); form.submit(); document.body.removeChild(form);
+              try {
+                const r = await fetch('./api.php?action=danfe_upload', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ xml_base64: xmlB64 })
+                });
+                const blob = await r.blob();
+                const url = URL.createObjectURL(blob);
+                window.open(url, '_blank');
+              } catch(e) { alert('Erro ao gerar DANFE'); }
             }} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors"><FileText className="w-4 h-4" /> Imprimir DANFE</button>
             <button onClick={onClose} className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"><X className="w-5 h-5 text-gray-400 dark:text-gray-500" /></button>
           </div>

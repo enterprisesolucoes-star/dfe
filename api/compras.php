@@ -172,7 +172,8 @@ switch ($action) {
 
     case 'danfe_upload':
         try {
-            $xmlB64 = $_POST['xml_base64'] ?? '';
+            $bodyJson = json_decode(file_get_contents('php://input'), true);
+            $xmlB64 = $_POST['xml_base64'] ?? $bodyJson['xml_base64'] ?? '';
             if (!$xmlB64) throw new Exception('XML não informado.');
             $xmlStr = base64_decode($xmlB64);
             $empresa = $pdo->prepare("SELECT * FROM empresas WHERE id = ?");
