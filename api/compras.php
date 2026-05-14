@@ -240,7 +240,7 @@ switch ($action) {
             $ultimoNsu = (string)$xmlResp->ultNSU;
             $maxNsu = (string)($xmlResp->maxNSU ?? '0');
             $xmlResp->registerXPathNamespace('n', 'http://www.portalfiscal.inf.br/nfe');
-            $docsZip = $xmlResp->xpath('//docZip');
+            $docsZip = $xmlResp->xpath('//docZip') ?: $xmlResp->xpath('//*[local-name()="docZip"]');
 
             if ($docsZip) {
                 foreach ($docsZip as $docZip) {

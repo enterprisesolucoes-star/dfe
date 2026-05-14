@@ -277,7 +277,7 @@ export const ImportXmlModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-6xl overflow-hidden flex flex-col max-h-[95vh] shadow-2xl border border-gray-100 dark:border-gray-700">
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-[98vw] overflow-hidden flex flex-col h-[97vh] shadow-2xl border border-gray-100 dark:border-gray-700">
         <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex justify-between items-center">
           <div>
             <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
@@ -311,7 +311,7 @@ export const ImportXmlModal = ({
             <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
               {itens.map((it, idx) => (
                 <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                  <td className="px-4 py-3 border-r border-gray-50 dark:border-gray-700 italic text-gray-600 dark:text-gray-300 max-w-[250px]">
+                  <td className="px-4 py-3 border-r border-gray-50 dark:border-gray-700 italic text-gray-600 dark:text-gray-300 w-1/4">
                     <p className="font-bold text-gray-700 dark:text-gray-200">{it.nome_xml}</p>
                     <p className="text-[10px] text-gray-400 dark:text-gray-500">Cód: {it.codigo_xml} • EAN: {it.barras_xml}</p>
                   </td>

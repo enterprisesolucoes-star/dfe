@@ -232,6 +232,32 @@ app.all("/api.php", async (req, res) => {
       signal: controller.signal
     } as any);
     clearTimeout(timeoutId);
+    const reqContentType = req.headers['content-type'] || '';
+    
+    // Para multipart/form-data, fazer proxy direto sem parsear o body
+    if (reqContentType.includes('multipart/form-data')) {
+      const nodeFetch2 = (await import('node-fetch')).default;
+      const rawBody = await new Promise<Buffer>((resolve, reject) => {
+        const chunks: Buffer[] = [];
+        req.on('data', (chunk: Buffer) => chunks.push(chunk));
+        req.on('end', () => resolve(Buffer.concat(chunks)));
+        req.on('error', reject);
+      });
+      const proxyHeaders2: any = {
+        'Content-Type': reqContentType,
+        'X-Real-IP': realIp,
+        'X-Forwarded-For': realIp,
+        'X-Usuario-Id': String(usuarioId),
+        'X-Usuario-Nome': encodeURIComponent(usuarioNome),
+        'X-Empresa-Id': String(empresaId),
+        'X-Internal-Token': internalToken,
+      };
+      const resp2 = await nodeFetch2(url, { method: 'POST', headers: proxyHeaders2, body: rawBody } as any);
+      const text2 = await resp2.text();
+      try { res.json(JSON.parse(text2)); } catch { res.send(text2); }
+      return;
+    }
+    
     const contentType = response.headers.get('content-type') || '';
     if (contentType.includes('application/pdf') || contentType.includes('application/octet')) {
       const buf = await response.buffer();
