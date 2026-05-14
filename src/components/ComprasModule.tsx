@@ -420,7 +420,6 @@ export const ImportXmlModal = ({
           </table>
         </div>
 
-        }
 
         <div className="p-6 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex justify-between items-center">
           <div className="flex gap-8">
