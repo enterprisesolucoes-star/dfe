@@ -294,7 +294,7 @@ export const ImportXmlModal = ({
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => window.open(`./api.php?action=danfe_xml&chave=${xmlData.nota.chave}`, "_blank")} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors"><FileText className="w-4 h-4" /> Imprimir DANFE</button>
+            <button onClick={() => { const ch = xmlData.nota.chave; if(ch) window.open(`./api.php?action=dist_danfe&chave=${ch}`, "_blank"); else alert("Chave de acesso não disponível"); }} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors"><FileText className="w-4 h-4" /> Imprimir DANFE</button>
             <button onClick={onClose} className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"><X className="w-5 h-5 text-gray-400 dark:text-gray-500" /></button>
           </div>
         </div>
