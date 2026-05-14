@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Plus, Search, Pencil, Upload, FileText, CheckCircle, AlertCircle,
   Trash2, Eye, Edit, Package, ShoppingCart, ArrowRight, X,
@@ -274,7 +274,7 @@ export const ImportXmlModal = ({
     (p.codigoInterno || '').toLowerCase().includes(buscaProd.toLowerCase()) ||
     (p.codigoBarras || '').includes(buscaProd)
   ).slice(0, 10);
-  React.useEffect(() => {
+  useEffect(() => {
     if (buscaProd.length >= 2) {
       clearTimeout((window as any)._comprasTimer);
       (window as any)._comprasTimer = setTimeout(() => fetchProdutos(buscaProd), 400);
@@ -558,7 +558,7 @@ export const CompraModal = ({
     (p.codigoInterno || '').toLowerCase().includes(buscaProd.toLowerCase()) ||
     (p.codigoBarras || '').includes(buscaProd)
   ).slice(0, 10) : [];
-  React.useEffect(() => {
+  useEffect(() => {
     if (buscaProd.length >= 2) {
       clearTimeout((window as any)._comprasTimer2);
       (window as any)._comprasTimer2 = setTimeout(() => fetchProdutos(buscaProd), 400);
