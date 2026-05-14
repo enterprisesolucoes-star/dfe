@@ -308,7 +308,7 @@ $modules = [
     'abrir_caixa' => 'caixa', 'fechar_caixa' => 'caixa', 'caixa_atual' => 'caixa', 'relatorio_caixa' => 'caixa', 'relatorio_caixa_pdf' => 'caixa',
     'medidas' => 'medidas', 'salvar_medida' => 'medidas', 'excluir_medida' => 'medidas',
     'listar_compras' => 'compras', 'salvar_compra' => 'compras', 'excluir_compra' => 'compras', 'detalhar_compra' => 'compras', 'importar_xml' => 'compras',
-    'dist_dfe' => 'compras', 'dist_download' => 'compras', 'dist_listar_locais' => 'compras', 'dist_manifestar' => 'compras', 'dist_danfe' => 'compras',
+    'dist_dfe' => 'compras', 'danfe_upload' => 'compras', 'dist_download' => 'compras', 'dist_listar_locais' => 'compras', 'dist_manifestar' => 'compras', 'dist_danfe' => 'compras',
     'rtc_importar' => 'rtc', 'rtc_consultar_ncm' => 'rtc', 'rtc_cst_classtrib' => 'rtc', 'rtc_ccredpres' => 'rtc',
     'rtc_atualizar_online' => 'rtc', 'rtc_aliquotas_listar' => 'rtc', 'rtc_aliquota_salvar' => 'rtc', 'rtc_aliquota_excluir' => 'rtc',
     'check_vendor' => 'check_vendor',
