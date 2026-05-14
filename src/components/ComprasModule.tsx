@@ -236,6 +236,7 @@ export const ImportXmlModal = ({
     });
   };
 
+  const [dropIdx, setDropIdx] = useState<number>(-1);
   const [vinculandoIdx, setVinculandoIdx] = useState<number | null>(null);
   const [buscaProd, setBuscaProd] = useState('');
   
@@ -284,7 +285,7 @@ export const ImportXmlModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]">
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 w-full h-full overflow-hidden flex flex-col shadow-2xl">
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 w-full h-full overflow-hidden flex flex-col shadow-2xl" style={{position:"relative"}}>
         <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex justify-between items-center">
           <div>
             <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
@@ -373,7 +374,7 @@ export const ImportXmlModal = ({
         </div>
 
         {vinculandoIdx !== null && (
-          <div className="border-b border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20 p-3 order-first">
+          <div className="p-3 bg-blue-50 dark:bg-blue-900/30 border-b-2 border-blue-300 dark:border-blue-700 shadow-lg" style={{position:"sticky",top:0,zIndex:100}}>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Search className="w-4 h-4 text-blue-600 dark:text-blue-400" />
