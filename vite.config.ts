@@ -19,8 +19,10 @@ export default defineConfig(({ mode }) => {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
           skipWaiting: true,
           clientsClaim: true,
+          selfDestroying: true,
           skipWaiting: true,
           clientsClaim: true,
+          selfDestroying: true,
           navigateFallbackDenylist: [/api\.php/],
           runtimeCaching: [
             {
