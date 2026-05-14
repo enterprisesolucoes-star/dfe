@@ -282,8 +282,8 @@ export const ImportXmlModal = ({
   }, [buscaProd]);
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-none sm:rounded-2xl w-full h-full sm:max-w-[98vw] overflow-hidden flex flex-col sm:h-[97vh] shadow-2xl border border-gray-100 dark:border-gray-700">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]">
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 w-full h-full overflow-hidden flex flex-col shadow-2xl">
         <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex justify-between items-center">
           <div>
             <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
@@ -293,7 +293,10 @@ export const ImportXmlModal = ({
               NF #{xmlData.nota.numero} • {xmlData.nota.emitente.nome} ({xmlData.nota.emitente.cnpj})
             </p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"><X className="w-5 h-5 text-gray-400 dark:text-gray-500" /></button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => window.open(`./api.php?action=danfe_xml&chave=${xmlData.nota.chave}`, "_blank")} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors"><FileText className="w-4 h-4" /> Imprimir DANFE</button>
+            <button onClick={onClose} className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"><X className="w-5 h-5 text-gray-400 dark:text-gray-500" /></button>
+          </div>
         </div>
 
         {!xmlData.nota.cnpj_valido && (
@@ -388,9 +391,10 @@ export const ImportXmlModal = ({
                     <ArrowRight className="w-5 h-5 text-gray-300 dark:text-gray-600 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
                   </button>
                 ))}
-                {buscaProd && prodsFiltrados.length === 0 && (
+                {prodsFiltrados.length === 0 && buscaProd.length >= 2 && (
                   <p className="text-center py-8 text-gray-400 dark:text-gray-500 italic">Nenhum produto encontrado...</p>
                 )}
+                {!buscaProd && <p className="text-center py-4 text-gray-400 dark:text-gray-500 italic text-sm">Digite para buscar...</p>}
               </div>
 
               <button onClick={() => setVinculandoIdx(null)} className="w-full py-4 text-gray-500 dark:text-gray-400 font-bold uppercase text-xs tracking-widest hover:bg-gray-50 dark:hover:bg-gray-700 rounded-2xl transition-all">Cancelar</button>
