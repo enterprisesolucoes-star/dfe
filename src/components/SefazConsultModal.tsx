@@ -87,7 +87,7 @@ const SefazConsultModal = ({ onClose, onImportXml, showAlert, emitente, onUpdate
   const handleManifestar = async (chave: string) => {
     setLoading(true);
     try {
-      const res = await fetch(`./api.php?action=dist_manifestar&chave=${chave}&tipo=210210`);
+      const res = await fetch(`./api.php?action=dist_manifestar&chave=${chave}&tipo=210210`, {credentials:'include'});
       const data = await res.json();
       if (data.success) {
         showAlert('Sucesso', 'Ciência da Operação registrada com sucesso.');
@@ -203,10 +203,7 @@ const SefazConsultModal = ({ onClose, onImportXml, showAlert, emitente, onUpdate
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-center gap-1.5">
-                      {/* Imprimir  —  sempre visível */}
-                      <button onClick={() => handlePrintDanfe(doc.chave)} title="Imprimir DANFE" className="p-1.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white transition-all flex-shrink-0">
-                        <Printer className="w-3.5 h-3.5" />
-                      </button>
+
                       {/* Ciência  —  espaço reservado para manter alinhamento */}
                       {Number(doc.manifesto) === 0 ? (
                         <button onClick={() => handleManifestar(doc.chave)} title="Dar Ciência" className="p-1.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-600 hover:text-white transition-all flex-shrink-0">
@@ -361,10 +358,7 @@ export { SefazConsultModal };
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-center gap-1.5">
-                      {/* Imprimir  —  sempre visível */}
-                      <button onClick={() => handlePrintDanfe(doc.chave)} title="Imprimir DANFE" className="p-1.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white transition-all flex-shrink-0">
-                        <Printer className="w-3.5 h-3.5" />
-                      </button>
+
                       {/* Ciência  —  espaço reservado para manter alinhamento */}
                       {Number(doc.manifesto) === 0 ? (
                         <button onClick={() => handleManifestar(doc.chave)} title="Dar Ciência" className="p-1.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-600 hover:text-white transition-all flex-shrink-0">
