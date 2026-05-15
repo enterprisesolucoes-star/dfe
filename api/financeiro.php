@@ -425,7 +425,7 @@ switch ($action) {
 
             // 2. Atualizar título para Pago
             $stmtUp = $pdo->prepare("UPDATE financeiro SET status = 'Pago', valor_pago = ?, data_baixa = ? WHERE id = ? AND empresa_id = ?");
-            $stmtUp->execute([$data['valor_pago'], $data['data_pagamento'], $data['id']]);
+            $stmtUp->execute([$data['valor_pago'], $data['data_pagamento'], $data['id'], $empresaId]);
 
             // 3. Gerar movimento no Caixa
             $tipoM = $titulo['tipo'] === 'R' ? 'C' : 'D';
