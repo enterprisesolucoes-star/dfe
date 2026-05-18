@@ -763,6 +763,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           emitente={emitente}
           showAlert={showAlert}
           showConfirm={showConfirm}
+          otica={true}
           onNovaOsOtica={() => handleSetActiveTab('os_otica')}
         />
       ) : (

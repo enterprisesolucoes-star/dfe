@@ -53,7 +53,7 @@ const STATUS_OS_COLORS: Record<string, string> = {
 };
 
 export const OrdemServicoTab = ({
-  clientes, fetchClientes, fetchProdutos, produtos, vendedores, emitente, showAlert, showConfirm, onNovaOsOtica
+  clientes, fetchClientes, fetchProdutos, produtos, vendedores, emitente, showAlert, showConfirm, onNovaOsOtica, otica
 }: {
   clientes: Cliente[];
   fetchClientes: (busca?: string) => Promise<void>;
@@ -61,6 +61,7 @@ export const OrdemServicoTab = ({
   produtos: Produto[];
   vendedores: Vendedor[];
   onNovaOsOtica?: () => void;
+  otica?: boolean;
   emitente: Emitente;
   showAlert: (t: string, m: string) => void;
   showConfirm: (t: string, m: string, fn: () => void) => void;
@@ -118,7 +119,7 @@ export const OrdemServicoTab = ({
   const fetchOrdens = async (p = osPage) => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ action: 'listar_os', data_inicio: di, data_fim: df, page: String(p), limit: '50' });
+      const params = new URLSearchParams({ action: otica ? 'listar_os_otica' : 'listar_os', data_inicio: di, data_fim: df, page: String(p), limit: '50' });
       if (debouncedBusca) params.set('busca', debouncedBusca);
       const res = await fetch(`./api.php?${params}`);
       const data = await res.json();
@@ -146,14 +147,14 @@ export const OrdemServicoTab = ({
 
   const handleExcluir = (id: number) => {
     showConfirm('Excluir OS', 'Confirma exclusão desta ordem de serviço?', async () => {
-      await fetch(`./api.php?action=excluir_os&id=${id}`);
+      await fetch(`./api.php?action=${otica?'excluir_os_otica':'excluir_os'}&id=${id}`, otica ? {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})} : {});
       fetchOrdens();
     });
   };
 
   const handlePrint = async (id: number) => {
     try {
-      const res = await fetch(`./api.php?action=os_pdf&id=${id}`);
+      const res = await fetch(`./api.php?action=${otica?'os_otica_pdf':'os_pdf'}&id=${id}`);
       if (!res.ok) { showAlert('Erro', 'Não foi possível gerar o PDF.'); return; }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -599,7 +600,7 @@ export const OrdemServicoTab = ({
                   <td className="px-4 py-3 text-gray-700 dark:text-gray-200 max-w-[180px] truncate">{os.cliente_nome || <span className="text-gray-400 dark:text-gray-500 italic">Sem cliente</span>}</td>
                   <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{fmtDt(os.data_criacao)}</td>
                   <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{fmtDt(os.previsao)}</td>
-                  <td className="px-4 py-3 text-right font-semibold text-blue-600 dark:text-blue-400">{fmtVal(os.valor_total)}</td>
+                  <td className="px-4 py-3 text-right font-semibold text-blue-600 dark:text-blue-400">{fmtVal(otica ? ((os as any).total||0) : os.valor_total)}</td>
                   <td className="px-4 py-3"><span className={`text-xs px-2 py-1 rounded-full font-medium ${STATUS_OS_COLORS[os.status] ?? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>{os.status}</span></td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-center gap-1">
