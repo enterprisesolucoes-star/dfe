@@ -2,7 +2,7 @@ import { SkeletonTable, EmptyState, Pagination } from './UIComponents';
 import { ClienteSearchInput } from './ClienteSearchInput';
 import { useAppData } from '../contexts/AppDataContext';
 import React, { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { DollarSign, CheckCircle, Trash2, Search, TrendingUp, TrendingDown, Plus, RotateCcw, Edit2, FileText, Loader2, Copy, ExternalLink, MessageCircle, Send } from 'lucide-react';
 import { StatCard, Input } from './UIComponents';
 

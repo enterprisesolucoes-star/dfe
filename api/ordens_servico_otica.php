@@ -22,11 +22,11 @@ switch ($action) {
       $pdo->beginTransaction();
       if($id>0){
         $pdo->prepare("UPDATE ordens_servico_otica SET cliente_id=?,cliente_nome=?,cliente_doc=?,cliente_fone=?,vendedor_id=?,status=?,previsao=?,observacoes=?,total=?,updated_at=NOW() WHERE id=? AND empresa_id=?")
-          ->execute([$d['cliente_id']?:null,$d['cliente_nome']??'',$d['cliente_doc']??'',$d['cliente_fone']??'',$d['vendedor_id']?:null,$d['status']??'Rascunho',$d['previsao']?:null,$d['observacoes']??'',(float)($d['valor_total']??$d['total']??0),$id,$empresa_id]);
+          ->execute([$d['cliente_id']?:null,$d['cliente_nome']??'',$d['cliente_doc']??$d['cliente_documento']??'',$d['cliente_fone']??$d['cliente_telefone']??'',$d['vendedor_id']?:null,$d['status']??'Rascunho',$d['previsao']?:null,$d['observacoes']??$d['observacao']??'',(float)($d['valor_total']??$d['total']??0),$id,$empresa_id]);
       } else {
         $max=$pdo->prepare("SELECT COALESCE(MAX(numero),0)+1 FROM ordens_servico_otica WHERE empresa_id=?"); $max->execute([$empresa_id]); $num=(int)$max->fetchColumn();
         $pdo->prepare("INSERT INTO ordens_servico_otica (empresa_id,numero,cliente_id,cliente_nome,cliente_doc,cliente_fone,vendedor_id,status,previsao,observacoes,total) VALUES (?,?,?,?,?,?,?,?,?,?,?)")
-          ->execute([$empresa_id,$num,$d['cliente_id']?:null,$d['cliente_nome']??'',$d['cliente_doc']??'',$d['cliente_fone']??'',$d['vendedor_id']?:null,$d['status']??'Rascunho',$d['previsao']?:null,$d['observacoes']??'',(float)($d['valor_total']??$d['total']??0)]);
+          ->execute([$empresa_id,$num,$d['cliente_id']?:null,$d['cliente_nome']??'',$d['cliente_doc']??$d['cliente_documento']??'',$d['cliente_fone']??$d['cliente_telefone']??'',$d['vendedor_id']?:null,$d['status']??'Rascunho',$d['previsao']?:null,$d['observacoes']??$d['observacao']??'',(float)($d['valor_total']??$d['total']??0)]);
         $id=(int)$pdo->lastInsertId();
       }
       $pdo->prepare("DELETE FROM ordens_servico_otica_itens WHERE os_id=?")->execute([$id]);
