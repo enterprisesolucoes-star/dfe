@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Search, Edit2, Trash2, X, ChevronDown, User, CheckCircle, Save, Send, Package, RefreshCw, Glasses, Wrench } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, X, ChevronDown, User, CheckCircle, Save, Send, Package, RefreshCw, Glasses, Wrench, MessageCircle } from 'lucide-react';
 import { Cliente, Produto } from '../types/nfce';
 import type { Vendedor } from '../contexts/AppDataContext';
 
 interface ItemOS { id?:number; tipo:'produto'|'servico'; produto_id?:number; descricao:string; unidade:string; quantidade:number; valor_unitario:number; valor_total:number; }
 interface Receita { longe_od_esferico?:string; longe_od_cilindrico?:string; longe_od_eixo?:string; longe_od_dnp?:string; longe_od_altura?:string; longe_oe_esferico?:string; longe_oe_cilindrico?:string; longe_oe_eixo?:string; longe_oe_dnp?:string; longe_oe_altura?:string; perto_od_esferico?:string; perto_od_cilindrico?:string; perto_od_eixo?:string; perto_od_dnp?:string; perto_od_altura?:string; perto_od_adicao?:string; perto_oe_esferico?:string; perto_oe_cilindrico?:string; perto_oe_eixo?:string; perto_oe_dnp?:string; perto_oe_altura?:string; perto_oe_adicao?:string; d_maior?:string; horizontal?:string; vertical?:string; ponte?:string; tipo_armacao?:string; laboratorio?:string; observacoes?:string; }
 interface OS { id?:number; numero?:number; cliente_id?:string; cliente_nome?:string; cliente_doc?:string; cliente_fone?:string; vendedor_id?:string; status:string; previsao?:string; observacoes?:string; itens:ItemOS[]; receita?:Receita; total?:number; }
-interface Props { clientes:Cliente[]; produtos:Produto[]; vendedores?:Vendedor[]; emitente:any; showAlert:(t:string,m:string)=>void; showConfirm:(t:string,m:string,cb:()=>void)=>void; fetchClientes?:(q:string)=>Promise<void>; onAfterSave?:()=>void; }
+interface Props { clientes:Cliente[]; produtos:Produto[]; vendedores?:Vendedor[]; emitente:any; showAlert:(t:string,m:string)=>void; showConfirm:(t:string,m:string,cb:()=>void)=>void; fetchClientes?:(q:string)=>Promise<void>; fetchProdutosOtica?:(q:string)=>Promise<void>; onAfterSave?:()=>void; }
 
 const brl = (v:number) => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const fmtDate = (s?:string) => s ? new Date(s+'T00:00:00').toLocaleDateString('pt-BR') : '';
@@ -61,7 +61,7 @@ const ModalFinalizar = ({os,onClose,showAlert}:{os:OS;onClose:(r:boolean)=>void;
   );
 };
 
-export const OrdemServicoOticaTab = ({clientes,produtos,vendedores=[],emitente,showAlert,showConfirm,fetchClientes,onAfterSave}:Props) => {
+export const OrdemServicoOticaTab = ({clientes,produtos,vendedores=[],emitente,showAlert,showConfirm,fetchClientes,fetchProdutosOtica,onAfterSave}:Props) => {
   const [viewMode,setViewMode] = useState<'list'|'form'>('list');
   const [lista,setLista] = useState<OS[]>([]);
   const [loading,setLoading] = useState(false);
@@ -85,6 +85,51 @@ export const OrdemServicoOticaTab = ({clientes,produtos,vendedores=[],emitente,s
   const [modoCli,setModoCli] = useState<'cadastrado'|'manual'>('cadastrado');
   const [modalFin,setModalFin] = useState<OS|null>(null);
   const dropRef = useRef<HTMLDivElement>(null);
+  const [clienteDebito,setClienteDebito] = useState<{total:number;qtd:number}|null>(null);
+  const [loadingDebito,setLoadingDebito] = useState(false);
+  const [showWaModal,setShowWaModal] = useState(false);
+  const [waPhone,setWaPhone] = useState('');
+  const [waMensagem,setWaMensagem] = useState('');
+  const [waSending,setWaSending] = useState(false);
+  const fetchDebito = async (clienteId:string) => {
+    setLoadingDebito(true); setClienteDebito(null);
+    try {
+      const r=await fetch(`./api.php?action=debitos_cliente&cliente_id=${clienteId}`);
+      const d=await r.json();
+      if(d&&Number(d.total)>0) setClienteDebito({total:Number(d.total),qtd:Number(d.qtd)});
+      else setClienteDebito(null);
+    } catch{setClienteDebito(null);}
+    setLoadingDebito(false);
+  };
+  const abrirWaModal = () => {
+    const phone=(form.cliente_fone||'').replace(/\D/g,'');
+    const empresa=emitente?.razaoSocial||emitente?.nomeFantasia||'Nossa empresa';
+    const nome=(form.cliente_nome||'').split(' ')[0];
+    const totalOS=form.itens.reduce((s,i)=>s+i.valor_total,0);
+    setWaPhone(phone);
+    setWaMensagem(`Olá ${nome}, tudo bem? 😊
+
+Somos da *${empresa}* e gostaríamos de informar sobre sua Ordem de Serviço.
+
+`+(form.observacoes?`📋 *Serviço:* ${form.observacoes}
+`:'')+( form.previsao?`📅 *Previsão:* ${new Date(form.previsao+'T12:00:00').toLocaleDateString('pt-BR')}
+`:'')+`💰 *Valor:* ${brl(totalOS)}
+
+Qualquer dúvida, estamos à disposição!`);
+    setShowWaModal(true);
+  };
+  const enviarWa = async () => {
+    if(!waPhone||waPhone.length<10||!waMensagem.trim()) return;
+    setWaSending(true);
+    try {
+      const r=await fetch('/api/whatsapp/send-text',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:waPhone,text:waMensagem})});
+      const d=await r.json();
+      if(d.success){setShowWaModal(false);showAlert('WhatsApp','Mensagem enviada! ✅');setWaSending(false);return;}
+    } catch{}
+    setWaSending(false);
+    window.open(`https://wa.me/55${waPhone}?text=${encodeURIComponent(waMensagem)}`,'_blank');
+    setShowWaModal(false);
+  };
 
   const fetchLista = async () => {
     setLoading(true);
@@ -101,7 +146,7 @@ export const OrdemServicoOticaTab = ({clientes,produtos,vendedores=[],emitente,s
   const abrirForm = (os?:OS) => { setForm(os?{...os,receita:os.receita||{...REC0}}:F0()); setBuscaCli(os?.cliente_nome||''); setReceitaOpen(false); setViewMode('form'); window.scrollTo({top:0,behavior:'smooth'}); };
   const voltarLista = () => { setForm(F0()); setBuscaCli(''); setReceitaOpen(false); setViewMode('list'); };
 
-  const selCli = (id:string) => { const c=clientes.find(x=>String(x.id)===id); if(c){setForm(f=>({...f,cliente_id:String(c.id),cliente_nome:c.nome,cliente_doc:(c as any).documento||'',cliente_fone:(c as any).telefone||''}));setBuscaCli(c.nome);} setDropCli(false); };
+  const selCli = (id:string) => { const c=clientes.find(x=>String(x.id)===id); if(c){setForm(f=>({...f,cliente_id:String(c.id),cliente_nome:c.nome,cliente_doc:(c as any).documento||'',cliente_fone:(c as any).telefone||''}));setBuscaCli(c.nome);fetchDebito(String(c.id));} setDropCli(false); };
 
   const addItem = () => {
     if(tipoItem==='produto'&&!itemSel){showAlert('Atenção','Selecione um produto.');return;}
@@ -204,6 +249,37 @@ export const OrdemServicoOticaTab = ({clientes,produtos,vendedores=[],emitente,s
   // ── FORMULÁRIO ──
   return (
     <div className="flex flex-col gap-4 p-4">
+      {showWaModal&&(
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4" onClick={()=>setShowWaModal(false)}>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4" onClick={e=>e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-9 h-9 bg-green-100 dark:bg-green-900/40 rounded-full flex items-center justify-center"><MessageCircle size={18} className="text-green-600 dark:text-green-400"/></div>
+                <div><h3 className="font-semibold text-gray-800 dark:text-gray-100 text-sm">Enviar mensagem WhatsApp</h3><p className="text-xs text-gray-400">{form.cliente_nome}</p></div>
+              </div>
+              <button onClick={()=>setShowWaModal(false)} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"><X size={16} className="text-gray-400"/></button>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Telefone (com DDD)</label>
+              <input type="tel" value={waPhone} onChange={e=>setWaPhone(e.target.value.replace(/\D/g,''))} placeholder="11999999999" className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500"/>
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-semibold text-gray-600 dark:text-gray-300">Mensagem</label>
+                <span className="text-xs text-gray-400">{waMensagem.length} caracteres</span>
+              </div>
+              <textarea value={waMensagem} onChange={e=>setWaMensagem(e.target.value)} rows={7} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"/>
+              <p className="text-xs text-gray-400 mt-1">Use *texto* para negrito</p>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={()=>setShowWaModal(false)} className="flex-1 py-2.5 text-sm text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">Cancelar</button>
+              <button onClick={enviarWa} disabled={waSending||waPhone.length<10||!waMensagem.trim()} className="flex-1 py-2.5 text-sm font-semibold bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center justify-center gap-2">
+                {waSending?<RefreshCw size={14} className="animate-spin"/>:<MessageCircle size={14}/>}{waSending?'Enviando...':'Enviar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div className="flex items-center gap-3">
         <button onClick={voltarLista} className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 px-3 py-1.5 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
@@ -218,13 +294,13 @@ export const OrdemServicoOticaTab = ({clientes,produtos,vendedores=[],emitente,s
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
         <div className="flex items-center justify-between mb-3">
           <span className="text-sm font-semibold text-gray-700 dark:text-gray-200 flex items-center gap-2"><User size={14} className="text-blue-500"/>Cliente</span>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500">Manual</span>
-            <button onClick={()=>setModoCli(m=>m==='cadastrado'?'manual':'cadastrado')}
-              className={`relative w-10 h-5 rounded-full transition-colors duration-300 ${modoCli==='cadastrado'?'bg-blue-600':'bg-gray-300 dark:bg-gray-600'}`}>
-              <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-300 ${modoCli==='cadastrado'?'translate-x-5':'translate-x-0'}`}/>
-            </button>
-            <span className="text-xs text-gray-500">Cadastrado</span>
+          <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 p-0.5 rounded-lg">
+            {(['cadastrado','manual'] as const).map(m=>(
+              <button key={m} onClick={()=>{setModoCli(m);setClienteDebito(null);setBuscaCli('');}}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all duration-150 ${modoCli===m?'bg-blue-600 text-white shadow-sm':'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>
+                {m==='cadastrado'?'Cadastrado':'Manual'}
+              </button>
+            ))}
           </div>
         </div>
         {modoCli==='cadastrado'?(
@@ -245,8 +321,24 @@ export const OrdemServicoOticaTab = ({clientes,produtos,vendedores=[],emitente,s
               </div>
             )}
           </div>
-        ):(
-          <div className="grid grid-cols-2 gap-2">
+        )}
+        {modoCli==='cadastrado'&&form.cliente_id&&(
+          <div className="mt-2 space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs text-blue-600 dark:text-blue-400 pl-1">✓ {form.cliente_nome}{form.cliente_doc?` — ${form.cliente_doc}`:''}</p>
+              {form.cliente_fone&&(<button type="button" onClick={abrirWaModal} className="flex items-center gap-1.5 px-2.5 py-1 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded-lg transition-colors"><MessageCircle size={13}/>WhatsApp</button>)}
+            </div>
+            {loadingDebito&&<div className="flex items-center gap-1.5 text-xs text-gray-400 pl-1"><RefreshCw size={11} className="animate-spin"/>Verificando débitos...</div>}
+            {!loadingDebito&&clienteDebito&&clienteDebito.total>0&&(
+              <div className="flex items-center gap-3 px-3 py-2.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <span className="text-lg shrink-0">⚠️</span>
+                <div><p className="text-xs font-semibold text-red-700 dark:text-red-400">Cliente com débito em aberto</p><p className="text-xs text-red-600 dark:text-red-400">{clienteDebito.qtd} {clienteDebito.qtd===1?'título':'títulos'} · Total: <span className="font-bold">{brl(clienteDebito.total)}</span></p></div>
+              </div>
+            )}
+          </div>
+        )}
+        {modoCli==='manual'&&(
+          <div className="grid grid-cols-2 gap-2 mt-2">
             <input type="text" placeholder="Nome" value={form.cliente_nome||''} onChange={e=>setForm(f=>({...f,cliente_nome:e.target.value}))} className="col-span-2 px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none"/>
             <input type="text" placeholder="CPF/CNPJ" value={form.cliente_doc||''} onChange={e=>setForm(f=>({...f,cliente_doc:e.target.value}))} className="px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none"/>
             <input type="text" placeholder="Telefone" value={form.cliente_fone||''} onChange={e=>setForm(f=>({...f,cliente_fone:e.target.value}))} className="px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none"/>
@@ -354,18 +446,17 @@ export const OrdemServicoOticaTab = ({clientes,produtos,vendedores=[],emitente,s
             <div className="relative flex-1 min-w-48" ref={dropRef}>
               <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400"/>
               <input type="text" placeholder="Localizar por nome, código ou código de barras..." value={buscaItem}
-                onChange={e=>{setBuscaItem(e.target.value);setDropItem(true);}} onFocus={()=>setDropItem(true)}
+                onChange={e=>{const v=e.target.value;setBuscaItem(v);setItemSel(null);setDropItem(true);clearTimeout((window as any)._oticaProdTimer);if(v.length>=1)(window as any)._oticaProdTimer=setTimeout(()=>fetchProdutosOtica?.(v),300);else setDropItem(false);}} onFocus={()=>setDropItem(true)}
                 className="w-full pl-8 pr-3 py-2 text-xs border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none"/>
               {dropItem&&buscaItem.length>=1&&(
                 <div className="absolute z-30 left-0 right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl max-h-40 overflow-y-auto">
-                  {produtos.filter(p=>(p.nome||'').toLowerCase().includes(buscaItem.toLowerCase())||(p as any).codigo?.toLowerCase().includes(buscaItem.toLowerCase())||(p as any).codigo_barras?.includes(buscaItem)).slice(0,8).map(p=>(
-                    <div key={p.id} onMouseDown={()=>{setItemSel(p);setBuscaItem(p.nome);setItemVlr((p as any).preco_venda||0);setItemUnid((p as any).unidade||'UN');setDropItem(false);}}
-                      className="px-3 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer flex justify-between">
-                      <span>{p.nome}{(p as any).codigo&&<span className="text-gray-400 ml-2">#{(p as any).codigo}</span>}</span>
-                      {(p as any).preco_venda!=null&&<span className="text-green-500 font-medium">{brl((p as any).preco_venda)}</span>}
+                  {produtos.length>0?produtos.slice(0,10).map(p=>(
+                    <div key={p.id} onMouseDown={()=>{setItemSel(p);setBuscaItem((p as any).descricao||p.nome||'');setItemVlr(Number((p as any).valorUnitario||(p as any).preco_venda||0));setItemUnid((p as any).unidadeComercial||(p as any).unidade||'UN');setDropItem(false);}}
+                      className="px-3 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer flex justify-between gap-2">
+                      <div><span className="font-medium">{(p as any).descricao||p.nome}</span>{(p as any).codigoInterno&&<span className="text-gray-400 ml-2">#{(p as any).codigoInterno}</span>}</div>
+                      <span className="text-green-500 font-semibold whitespace-nowrap">{brl(Number((p as any).valorUnitario||(p as any).preco_venda||0))}</span>
                     </div>
-                  ))}
-                  {produtos.filter(p=>(p.nome||'').toLowerCase().includes(buscaItem.toLowerCase())).length===0&&<div className="px-3 py-2 text-xs text-gray-400">Nenhum produto.</div>}
+                  )):<div className="px-3 py-2 text-xs text-gray-400 text-center">Nenhum produto encontrado.</div>}
                 </div>
               )}
             </div>
