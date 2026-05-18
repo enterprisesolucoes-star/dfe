@@ -5,7 +5,7 @@ import type { Vendedor } from '../contexts/AppDataContext';
 
 interface ItemOS { id?:number; tipo:'produto'|'servico'; produto_id?:number; descricao:string; unidade:string; quantidade:number; valor_unitario:number; valor_total:number; }
 interface Receita { longe_od_esferico?:string; longe_od_cilindrico?:string; longe_od_eixo?:string; longe_od_dnp?:string; longe_od_altura?:string; longe_oe_esferico?:string; longe_oe_cilindrico?:string; longe_oe_eixo?:string; longe_oe_dnp?:string; longe_oe_altura?:string; perto_od_esferico?:string; perto_od_cilindrico?:string; perto_od_eixo?:string; perto_od_dnp?:string; perto_od_altura?:string; perto_od_adicao?:string; perto_oe_esferico?:string; perto_oe_cilindrico?:string; perto_oe_eixo?:string; perto_oe_dnp?:string; perto_oe_altura?:string; perto_oe_adicao?:string; d_maior?:string; horizontal?:string; vertical?:string; ponte?:string; tipo_armacao?:string; laboratorio?:string; observacoes?:string; }
-interface OS { id?:number; numero?:number; cliente_id?:string; cliente_nome?:string; cliente_doc?:string; cliente_fone?:string; vendedor_id?:string; status:string; previsao?:string; observacoes?:string; itens:ItemOS[]; receita?:Receita; total?:number; }
+interface OS { id?:number; numero?:number; cliente_id?:string; cliente_nome?:string; cliente_doc?:string; cliente_fone?:string; vendedor_id?:string; status:string; previsao?:string; observacoes?:string; itens:ItemOS[]; receita?:Receita; total?:number; desconto?:number; }
 interface Props { clientes:Cliente[]; produtos:Produto[]; vendedores?:Vendedor[]; emitente:any; showAlert:(t:string,m:string)=>void; showConfirm:(t:string,m:string,cb:()=>void)=>void; fetchClientes?:(q:string)=>Promise<void>; fetchProdutosOtica?:(q:string)=>Promise<void>; onAfterSave?:()=>void; abrirFormInicial?:boolean; }
 
 const brl = (v:number) => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
@@ -560,40 +560,52 @@ Qualquer dúvida, estamos à disposição!`);
 
       {/* Tabela Itens */}
       {form.itens.length>0?(
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800">
-          <table className="w-full text-xs">
-            <thead className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"><tr>
-              <th className="text-left px-3 py-2 text-gray-500 font-medium">Descrição</th>
-              <th className="text-center px-3 py-2 text-gray-500 font-medium w-16">Unid.</th>
-              <th className="text-center px-3 py-2 text-gray-500 font-medium w-16">Qtd</th>
-              <th className="text-right px-3 py-2 text-gray-500 font-medium w-24">Unit.</th>
-              <th className="text-right px-3 py-2 text-gray-500 font-medium w-24">Total</th>
-              <th className="w-8"></th>
-            </tr></thead>
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 dark:bg-gray-900 text-xs text-gray-500 dark:text-gray-400 uppercase border-b border-gray-100 dark:border-gray-700">
+              <tr>
+                <th className="px-3 py-2 text-left">Descrição</th>
+                <th className="px-3 py-2 text-center">Tipo</th>
+                <th className="px-3 py-2 text-center">Unid.</th>
+                <th className="px-3 py-2 text-right">Qtd</th>
+                <th className="px-3 py-2 text-right">Vlr Unit.</th>
+                <th className="px-3 py-2 text-right">Total</th>
+                <th className="px-3 py-2"/>
+              </tr>
+            </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
               {form.itens.map((it,i)=>(
-                <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-700/30">
-                  <td className="px-3 py-2 text-gray-700 dark:text-gray-200">
-                    <span className={`inline-block mr-1.5 px-1.5 py-0.5 rounded text-[10px] font-medium ${it.tipo==='produto'?'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400':'bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400'}`}>{it.tipo==='produto'?'PROD':'SVC'}</span>
-                    {it.descricao}
+                <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <td className="px-3 py-2 max-w-[200px] truncate" title={it.descricao}>{it.descricao}</td>
+                  <td className="px-3 py-2 text-center"><span className={`text-xs px-2 py-0.5 rounded-full font-medium ${it.tipo==='servico'?'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300':'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'}`}>{it.tipo==='servico'?'Serviço':'Peça'}</span></td>
+                  <td className="px-3 py-2 text-center text-gray-500 dark:text-gray-400">{it.unidade}</td>
+                  <td className="px-3 py-2 text-right text-gray-600 dark:text-gray-300">{Number(it.quantidade).toLocaleString('pt-BR',{maximumFractionDigits:3})}</td>
+                  <td className="px-3 py-2 text-right text-gray-600 dark:text-gray-300">{brl(it.valor_unitario)}</td>
+                  <td className="px-3 py-2 text-right font-semibold text-blue-600 dark:text-blue-400">{brl(it.valor_total)}</td>
+                  <td className="px-3 py-2 text-center whitespace-nowrap">
+                    <button onClick={()=>{setTipoItem(it.tipo);if(it.tipo==='produto'){setBuscaItem(it.descricao);setItemVlr(it.valor_unitario);setItemQtd(it.quantidade);setItemUnid(it.unidade);}else{setItemDesc(it.descricao);setItemVlr(it.valor_unitario);setItemQtd(it.quantidade);setItemUnid(it.unidade);}setForm(f=>({...f,itens:f.itens.filter((_,j)=>j!==i)}));}} className="p-1 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded text-blue-500 mr-1"><Edit2 className="w-3.5 h-3.5 inline"/></button>
+                    <button onClick={()=>setForm(f=>({...f,itens:f.itens.filter((_,j)=>j!==i)}))} className="p-1 hover:bg-red-50 dark:hover:bg-red-900/30 rounded text-red-400"><Trash2 className="w-3.5 h-3.5 inline"/></button>
                   </td>
-                  <td className="px-3 py-2 text-center text-gray-500">{it.unidade}</td>
-                  <td className="px-3 py-2 text-center text-gray-700 dark:text-gray-300">{it.quantidade}</td>
-                  <td className="px-3 py-2 text-right text-gray-700 dark:text-gray-300">{brl(it.valor_unitario)}</td>
-                  <td className="px-3 py-2 text-right font-medium text-gray-900 dark:text-white">{brl(it.valor_total)}</td>
-                  <td className="px-2 py-2 text-center"><button onClick={()=>setForm(f=>({...f,itens:f.itens.filter((_,j)=>j!==i)}))} className="text-gray-300 hover:text-red-500"><X size={13}/></button></td>
                 </tr>
               ))}
             </tbody>
-            <tfoot className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700"><tr>
-              <td colSpan={4} className="px-3 py-2 text-right text-gray-500 font-medium">Total</td>
-              <td className="px-3 py-2 text-right font-bold text-gray-900 dark:text-white">{brl(total)}</td>
-              <td></td>
-            </tr></tfoot>
           </table>
+          <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex justify-end">
+            <div className="space-y-1 text-sm w-48">
+              {form.itens.filter(i=>i.tipo==='produto').reduce((s,i)=>s+i.valor_total,0)>0&&<div className="flex justify-between text-gray-600 dark:text-gray-300"><span>Peças</span><span className="font-medium">{brl(form.itens.filter(i=>i.tipo==='produto').reduce((s,i)=>s+i.valor_total,0))}</span></div>}
+              {form.itens.filter(i=>i.tipo==='servico').reduce((s,i)=>s+i.valor_total,0)>0&&<div className="flex justify-between text-purple-700"><span>Serviços</span><span className="font-medium">{brl(form.itens.filter(i=>i.tipo==='servico').reduce((s,i)=>s+i.valor_total,0))}</span></div>}
+              <div className="flex justify-between items-center">
+                <label className="text-orange-600 dark:text-orange-400 text-xs font-medium">Desconto (R$)</label>
+                <input type="number" min="0" step="0.01" value={form.desconto??0}
+                  onChange={e=>{const d=Math.max(0,parseFloat(e.target.value)||0);setForm(f=>({...f,desconto:d}));}}
+                  className="w-24 text-right border border-orange-200 dark:border-orange-800 rounded-lg px-2 py-0.5 text-sm bg-white dark:bg-gray-700 outline-none focus:ring-1 focus:ring-orange-400"/>
+              </div>
+              <div className="flex justify-between font-bold text-blue-700 dark:text-blue-300 border-t border-gray-200 dark:border-gray-700 pt-1"><span>Total</span><span>{brl(total-(form.desconto??0))}</span></div>
+            </div>
+          </div>
         </div>
       ):(
-        <div className="text-center py-8 text-xs text-gray-400 border border-dashed border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800">
+        <div className="text-center py-8 text-sm text-gray-400 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800">
           Nenhum item adicionado. Use os campos acima para adicionar peças/produtos ou serviços.
         </div>
       )}
