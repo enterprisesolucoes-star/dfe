@@ -6,7 +6,7 @@ import type { Vendedor } from '../contexts/AppDataContext';
 interface ItemOS { id?:number; tipo:'produto'|'servico'; produto_id?:number; descricao:string; unidade:string; quantidade:number; valor_unitario:number; valor_total:number; }
 interface Receita { longe_od_esferico?:string; longe_od_cilindrico?:string; longe_od_eixo?:string; longe_od_dnp?:string; longe_od_altura?:string; longe_oe_esferico?:string; longe_oe_cilindrico?:string; longe_oe_eixo?:string; longe_oe_dnp?:string; longe_oe_altura?:string; perto_od_esferico?:string; perto_od_cilindrico?:string; perto_od_eixo?:string; perto_od_dnp?:string; perto_od_altura?:string; perto_od_adicao?:string; perto_oe_esferico?:string; perto_oe_cilindrico?:string; perto_oe_eixo?:string; perto_oe_dnp?:string; perto_oe_altura?:string; perto_oe_adicao?:string; d_maior?:string; horizontal?:string; vertical?:string; ponte?:string; tipo_armacao?:string; laboratorio?:string; observacoes?:string; }
 interface OS { id?:number; numero?:number; cliente_id?:string; cliente_nome?:string; cliente_doc?:string; cliente_fone?:string; vendedor_id?:string; status:string; previsao?:string; observacoes?:string; itens:ItemOS[]; receita?:Receita; total?:number; desconto?:number; }
-interface Props { clientes:Cliente[]; produtos:Produto[]; vendedores?:Vendedor[]; emitente:any; showAlert:(t:string,m:string)=>void; showConfirm:(t:string,m:string,cb:()=>void)=>void; fetchClientes?:(q:string)=>Promise<void>; fetchProdutosOtica?:(q:string)=>Promise<void>; onAfterSave?:()=>void; abrirFormInicial?:boolean; editandoOs?:any; }
+interface Props { clientes:Cliente[]; produtos:Produto[]; vendedores?:Vendedor[]; emitente:any; showAlert:(t:string,m:string)=>void; showConfirm:(t:string,m:string,cb:()=>void)=>void; fetchClientes?:(q:string)=>Promise<void>; fetchProdutosOtica?:(q:string)=>Promise<void>; onAfterSave?:()=>void; abrirFormInicial?:boolean; editandoOs?:any; onNavigate?:(tab:string,opts?:any)=>void; }
 
 const brl = (v:any) => Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const fmtDate = (s?:string) => s ? new Date(s+'T00:00:00').toLocaleDateString('pt-BR') : '';
@@ -61,7 +61,7 @@ const ModalFinalizar = ({os,onClose,showAlert}:{os:OS;onClose:(r:boolean)=>void;
   );
 };
 
-export const OrdemServicoOticaTab = ({clientes,produtos,vendedores=[],emitente,showAlert,showConfirm,fetchClientes,fetchProdutosOtica,onAfterSave,abrirFormInicial,editandoOs}:Props) => {
+export const OrdemServicoOticaTab = ({clientes,produtos,vendedores=[],emitente,showAlert,showConfirm,fetchClientes,fetchProdutosOtica,onAfterSave,abrirFormInicial,editandoOs,onNavigate}:Props) => {
   const [viewMode,setViewMode] = useState<'list'|'form'>(abrirFormInicial?'form':'list');
   useEffect(()=>{
     if(editandoOs&&abrirFormInicial){
@@ -424,7 +424,7 @@ Qualquer dúvida, estamos à disposição!`);
             {form.cliente_fone&&(<button type="button" onClick={abrirWaModal} className="flex items-center gap-1.5 px-2.5 py-1 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded-lg transition-colors"><MessageCircle size={13}/>WhatsApp</button>)}
             {loadingDebito&&<span className="flex items-center gap-1 text-xs text-gray-400"><RefreshCw size={11} className="animate-spin"/>Verificando...</span>}
             {!loadingDebito&&clienteDebito&&clienteDebito.total>0&&(
-              <span className="flex items-center gap-1.5 px-2.5 py-1 bg-red-500 text-white text-xs font-semibold rounded-lg">⚠️ Débito: {brl(clienteDebito.total)}</span>
+              <button type="button" onClick={()=>onNavigate?.('fin_receber',{busca:form.cliente_nome})} className="flex items-center gap-1.5 px-2.5 py-1 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer">⚠️ Débito: {brl(clienteDebito.total)}</button>
             )}
           </div>
         )}
