@@ -8,7 +8,7 @@ interface Receita { longe_od_esferico?:string; longe_od_cilindrico?:string; long
 interface OS { id?:number; numero?:number; cliente_id?:string; cliente_nome?:string; cliente_doc?:string; cliente_fone?:string; vendedor_id?:string; status:string; previsao?:string; observacoes?:string; itens:ItemOS[]; receita?:Receita; total?:number; desconto?:number; }
 interface Props { clientes:Cliente[]; produtos:Produto[]; vendedores?:Vendedor[]; emitente:any; showAlert:(t:string,m:string)=>void; showConfirm:(t:string,m:string,cb:()=>void)=>void; fetchClientes?:(q:string)=>Promise<void>; fetchProdutosOtica?:(q:string)=>Promise<void>; onAfterSave?:()=>void; abrirFormInicial?:boolean; editandoOs?:any; }
 
-const brl = (v:number) => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const brl = (v:any) => Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const fmtDate = (s?:string) => s ? new Date(s+'T00:00:00').toLocaleDateString('pt-BR') : '';
 const STATUS_COLORS:Record<string,string> = { Rascunho:'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300', Aberta:'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300', 'Em andamento':'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300', Concluída:'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300', Cancelada:'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400', Finalizada:'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300' };
 const REC0:Receita = {longe_od_esferico:'',longe_od_cilindrico:'',longe_od_eixo:'',longe_od_dnp:'',longe_od_altura:'',longe_oe_esferico:'',longe_oe_cilindrico:'',longe_oe_eixo:'',longe_oe_dnp:'',longe_oe_altura:'',perto_od_esferico:'',perto_od_cilindrico:'',perto_od_eixo:'',perto_od_dnp:'',perto_od_altura:'',perto_od_adicao:'',perto_oe_esferico:'',perto_oe_cilindrico:'',perto_oe_eixo:'',perto_oe_dnp:'',perto_oe_altura:'',perto_oe_adicao:'',d_maior:'',horizontal:'',vertical:'',ponte:'',tipo_armacao:'',laboratorio:'',observacoes:''};
@@ -137,7 +137,7 @@ export const OrdemServicoOticaTab = ({clientes,produtos,vendedores=[],emitente,s
   const [waPhone,setWaPhone] = useState('');
   const [waMensagem,setWaMensagem] = useState('');
   const [waSending,setWaSending] = useState(false);
-  const fetchDebito = async (clienteId:string) => {
+  const fetchDebito = async (clienteId:string|number) => {
     setLoadingDebito(true); setClienteDebito(null);
     try {
       const r=await fetch(`./api.php?action=debitos_cliente&cliente_id=${clienteId}`);
@@ -584,7 +584,7 @@ Qualquer dúvida, estamos à disposição!`);
                   <td className="px-3 py-2 max-w-[200px] truncate" title={it.descricao}>{it.descricao}</td>
                   <td className="px-3 py-2 text-center"><span className={`text-xs px-2 py-0.5 rounded-full font-medium ${it.tipo==='servico'?'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300':'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'}`}>{it.tipo==='servico'?'Serviço':'Peça'}</span></td>
                   <td className="px-3 py-2 text-center text-gray-500 dark:text-gray-400">{it.unidade}</td>
-                  <td className="px-3 py-2 text-right text-gray-600 dark:text-gray-300">{Number(it.quantidade).toLocaleString('pt-BR',{maximumFractionDigits:3})}</td>
+                  <td className="px-3 py-2 text-right text-gray-600 dark:text-gray-300">{Number(it.quantidade||0).toLocaleString('pt-BR',{maximumFractionDigits:3})}</td>
                   <td className="px-3 py-2 text-right text-gray-600 dark:text-gray-300">{brl(it.valor_unitario)}</td>
                   <td className="px-3 py-2 text-right font-semibold text-blue-600 dark:text-blue-400">{brl(it.valor_total)}</td>
                   <td className="px-3 py-2 text-center whitespace-nowrap">
