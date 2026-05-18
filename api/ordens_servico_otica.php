@@ -34,7 +34,8 @@ switch ($action) {
       if(!empty($rec)){
         $cols=['longe_od_esferico','longe_od_cilindrico','longe_od_eixo','longe_od_dnp','longe_od_altura','longe_oe_esferico','longe_oe_cilindrico','longe_oe_eixo','longe_oe_dnp','longe_oe_altura','perto_od_esferico','perto_od_cilindrico','perto_od_eixo','perto_od_dnp','perto_od_altura','perto_od_adicao','perto_oe_esferico','perto_oe_cilindrico','perto_oe_eixo','perto_oe_dnp','perto_oe_altura','perto_oe_adicao','d_maior','horizontal','vertical','ponte','tipo_armacao','laboratorio','observacoes'];
         $ph=implode(',',array_fill(0,count($cols),'?')); $upd=implode(',',array_map(fn($c)=>"$c=VALUES($c)",$cols)); $vals=array_map(fn($c)=>$rec[$c]??null,$cols);
-        $pdo->prepare("INSERT INTO ordens_servico_otica_receita (os_id,$ph) VALUES (?,$ph) ON DUPLICATE KEY UPDATE $upd")->execute(array_merge([$id],$vals,$vals));
+        $colList=implode(',',$cols);
+        $pdo->prepare("INSERT INTO ordens_servico_otica_receita (os_id,$colList) VALUES (?,$ph) ON DUPLICATE KEY UPDATE $upd")->execute(array_merge([$id],$vals));
       }
       $pdo->commit(); echo json_encode(['success'=>true,'id'=>$id]);
     } catch(Exception $e){ $pdo->rollBack(); echo json_encode(['success'=>false,'message'=>$e->getMessage()]); }
