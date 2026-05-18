@@ -135,7 +135,7 @@ const AdminPortal = () => {
     const payload: any = {
       ...form,
       usuario_dfe: Number(form.usuario_dfe ?? 2),
-              otica: Number(emp.otica ?? 0),
+              otica: Number(form.otica ?? 0),
       status: form.status || 'Ativo',
       tem_tef: Number(form.tem_tef) || 0,
       inscricao_estadual: ieValue,
