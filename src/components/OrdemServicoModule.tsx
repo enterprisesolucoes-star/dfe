@@ -53,13 +53,14 @@ const STATUS_OS_COLORS: Record<string, string> = {
 };
 
 export const OrdemServicoTab = ({
-  clientes, fetchClientes, fetchProdutos, produtos, vendedores, emitente, showAlert, showConfirm
+  clientes, fetchClientes, fetchProdutos, produtos, vendedores, emitente, showAlert, showConfirm, onNovaOsOtica
 }: {
   clientes: Cliente[];
   fetchClientes: (busca?: string) => Promise<void>;
   fetchProdutos: (busca?: string) => Promise<void>;
   produtos: Produto[];
   vendedores: Vendedor[];
+  onNovaOsOtica?: () => void;
   emitente: Emitente;
   showAlert: (t: string, m: string) => void;
   showConfirm: (t: string, m: string, fn: () => void) => void;
@@ -568,7 +569,7 @@ export const OrdemServicoTab = ({
           <input type="text" value={busca} onChange={e => setBusca(e.target.value)} placeholder="Nº OS ou nome..." className="pl-9 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none w-56" />
         </div>
         <div className="flex-1" />
-        <button onClick={() => openForm(null)} className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+        <button onClick={() => onNovaOsOtica ? onNovaOsOtica() : openForm(null)} className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
           <Wrench className="w-4 h-4" /> Nova OS
         </button>
       </div>
