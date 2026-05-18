@@ -2,7 +2,6 @@ import { SkeletonTable, EmptyState, Pagination } from './UIComponents';
 import { ClienteSearchInput } from './ClienteSearchInput';
 import { useAppData } from '../contexts/AppDataContext';
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { DollarSign, CheckCircle, Trash2, Search, TrendingUp, TrendingDown, Plus, RotateCcw, Edit2, FileText, Loader2, Copy, ExternalLink, MessageCircle, Send } from 'lucide-react';
 import { StatCard, Input } from './UIComponents';
 
@@ -296,7 +295,7 @@ export const BaixaModal = ({ titulo, emitente, onClose, onSuccess, showAlert }: 
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[300] p-4 backdrop-blur-sm">
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
         <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 flex items-center justify-between">
           <h3 className="font-bold text-gray-800 dark:text-gray-100 uppercase text-sm">Baixar {titulo.tipo === 'R' ? 'Recebimento' : 'Pagamento'}</h3>
           <span className="text-[10px] bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded font-bold">TITULO #{titulo.id}</span>
@@ -341,7 +340,7 @@ export const BaixaModal = ({ titulo, emitente, onClose, onSuccess, showAlert }: 
           <button onClick={onClose} className="flex-1 py-3 text-gray-500 dark:text-gray-400 font-bold text-xs uppercase">Cancelar</button>
           <button onClick={handleConfirmar} disabled={loading} className="flex-1 py-3 bg-blue-600 text-white font-bold text-xs uppercase rounded-xl">{loading ? 'Aguarde...' : 'Confirmar'}</button>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };
@@ -652,7 +651,7 @@ export const EditarTituloModal = ({ titulo, onClose, onSuccess, showAlert }: any
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[200] p-4 backdrop-blur-sm">
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden">
         <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex justify-between items-center">
           <div>
             <h3 className="font-bold text-gray-800 dark:text-gray-100 text-sm">Editar Título — {tipoTexto}</h3>
@@ -697,7 +696,7 @@ export const EditarTituloModal = ({ titulo, onClose, onSuccess, showAlert }: any
             {saving ? 'Salvando...' : 'Salvar'}
           </button>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };
@@ -821,8 +820,7 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
   if (savedIds.length > 0 && isBoleto) {
     return (
       <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[200] p-4 backdrop-blur-sm">
-        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-          className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden">
           <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-indigo-50 dark:bg-indigo-900/20 flex items-center gap-3">
             <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             <div>
@@ -850,15 +848,14 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
                 : <><FileText className="w-3.5 h-3.5" /> Gerar e Imprimir</>}
             </button>
           </div>
-        </motion.div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[200] p-4 backdrop-blur-sm">
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-        className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
         <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex justify-between items-center">
           <div>
             <h3 className="font-bold text-gray-800 dark:text-gray-100 text-sm">Novo Lançamento — Contas a {tipoTexto}</h3>
@@ -995,7 +992,7 @@ export const LancamentoManualModal = ({ tipo, onClose, onSuccess, showAlert }: a
             {saving ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Salvando...</> : 'Salvar'}
           </button>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };
@@ -1023,7 +1020,7 @@ export const ParcelamentoModal = ({ total, initialParcelas, onConfirm, onCancel 
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[300] p-4 backdrop-blur-sm">
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden">
         <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between bg-gray-50 dark:bg-gray-900">
           <h3 className="font-bold text-gray-800 dark:text-gray-100 uppercase text-xs">Parcelamento</h3>
           <span className="font-bold text-blue-600 dark:text-blue-400">Total: R$ {total.toFixed(2)}</span>
@@ -1050,7 +1047,7 @@ export const ParcelamentoModal = ({ total, initialParcelas, onConfirm, onCancel 
           <button onClick={onCancel} className="flex-1 py-3 bg-gray-700 dark:bg-gray-600 text-white text-sm font-semibold rounded-xl hover:bg-gray-600 dark:hover:bg-gray-500 transition-colors">Cancelar</button>
           <button onClick={() => onConfirm(parcelas)} disabled={Math.abs(tP - total) > 0.01} className="flex-1 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-md disabled:opacity-50">Salvar</button>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };
@@ -1120,7 +1117,7 @@ export const CaixaView = ({ emitente, showAlert, showConfirm }: { emitente: any,
     <div className="space-y-4">
       {showModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[300] p-4 backdrop-blur-sm">
-          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
             <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
               <h3 className="font-bold text-gray-800 dark:text-gray-100 uppercase text-sm">Lançamento Manual</h3>
             </div>
@@ -1149,7 +1146,7 @@ export const CaixaView = ({ emitente, showAlert, showConfirm }: { emitente: any,
               <button onClick={() => setShowModal(false)} className="flex-1 py-3 bg-gray-700 dark:bg-gray-600 text-white text-sm font-semibold rounded-xl hover:bg-gray-600 dark:hover:bg-gray-500 transition-colors">Cancelar</button>
               <button onClick={handleSalvar} disabled={savingMov} className="flex-1 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-md disabled:opacity-50">{savingMov ? 'Salvando...' : 'Salvar'}</button>
             </div>
-          </motion.div>
+          </div>
         </div>
       )}
 
