@@ -565,11 +565,6 @@ const AdminPortal = () => {
                         <p className="text-xs text-gray-400 dark:text-gray-500">Habilita tela de Ordem de Serviço para Ótica</p>
                       </div>
                     </label>
-                  </div><div>
-                        <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">Módulo Ótica</p>
-                        <p className="text-xs text-gray-400 dark:text-gray-500">Habilita tela de Ordem de Serviço para Ótica</p>
-                      </div>
-                    </label>
                   </div>
 
                 </div>
