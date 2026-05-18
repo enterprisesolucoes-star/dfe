@@ -344,7 +344,31 @@ Qualquer dúvida, estamos à disposição!`);
             <input type="text" placeholder="Telefone" value={form.cliente_fone||''} onChange={e=>setForm(f=>({...f,cliente_fone:e.target.value}))} className="px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none"/>
           </div>
         )}
-
+        {/* Vendedor / Status / Previsão / Obs */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+          <div>
+            <label className="text-xs text-gray-500 block mb-1">Vendedor</label>
+            <select value={form.vendedor_id||''} onChange={e=>setForm(f=>({...f,vendedor_id:e.target.value}))} className="w-full px-2 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none">
+              <option value="">Sem vendedor</option>{vendedores.map(v=><option key={v.id} value={v.id}>{v.nome}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="text-xs text-gray-500 block mb-1">Status</label>
+            <select value={form.status} onChange={e=>setForm(f=>({...f,status:e.target.value}))} className="w-full px-2 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none">
+              {['Rascunho','Aberta','Em andamento','Concluída','Cancelada','Finalizada'].map(s=><option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="text-xs text-gray-500 block mb-1">Previsão</label>
+            <input type="date" value={form.previsao||''} onChange={e=>setForm(f=>({...f,previsao:e.target.value}))} className="w-full px-2 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none"/>
+          </div>
+          <div className="col-span-2 sm:col-span-3">
+            <label className="text-xs text-gray-500 block mb-1">Observações</label>
+            <textarea rows={2} value={form.observacoes||''} onChange={e=>setForm(f=>({...f,observacoes:e.target.value}))} placeholder="Defeito relatado, peças necessárias, etc."
+              className="w-full px-2 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none resize-none"/>
+          </div>
+        </div>
+      </div>
 
       {/* Botão Receita */}
       <button onClick={()=>setReceitaOpen(r=>!r)}
