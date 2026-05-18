@@ -278,6 +278,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           certificadoSenha: data.certificado_senha || '',
           certificadoFileName: data.certificado_file_name || '',
           emailContador: data.email_contador || '',
+          otica: Number(data.otica || 0),
           temTef: Number(data.tem_tef) === 1,
           smtpHost: data.smtp_host || '',
           smtpPort: data.smtp_port ? Number(data.smtp_port) : 587,
