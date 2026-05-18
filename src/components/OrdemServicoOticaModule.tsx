@@ -348,13 +348,13 @@ Qualquer dúvida, estamos à disposição!`);
         </div>
       )}
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <button onClick={voltarLista} className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 px-3 py-1.5 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
-          ← Voltar
-        </button>
+      <div className="flex items-center justify-between">
         <span className="text-sm font-semibold text-gray-700 dark:text-gray-200 flex items-center gap-2">
           <Glasses size={15} className="text-blue-500"/>{form.id?`Editando OS #${form.numero||form.id}`:'Nova OS – Ótica'}
         </span>
+        <button onClick={voltarLista} className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 px-3 py-1.5 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+          <X size={14}/>Cancelar
+        </button>
       </div>
 
       {/* Cliente + Vendedor + Status + Previsão */}
