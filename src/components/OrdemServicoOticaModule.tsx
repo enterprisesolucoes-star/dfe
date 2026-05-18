@@ -151,7 +151,7 @@ Qualquer dúvida, estamos à disposição!`);
   const addItem = () => {
     if(tipoItem==='produto'&&!itemSel){showAlert('Atenção','Selecione um produto.');return;}
     if(tipoItem==='servico'&&!itemDesc.trim()){showAlert('Atenção','Informe a descrição.');return;}
-    const it:ItemOS={tipo:tipoItem,produto_id:tipoItem==='produto'?itemSel?.id:undefined,descricao:tipoItem==='produto'?(itemSel?.nome||''):itemDesc,unidade:itemUnid,quantidade:itemQtd,valor_unitario:itemVlr,valor_total:+(itemQtd*itemVlr).toFixed(2)};
+    const it:ItemOS={tipo:tipoItem,produto_id:tipoItem==='produto'?itemSel?.id:undefined,descricao:tipoItem==='produto'?((itemSel as any)?.descricao||(itemSel as any)?.nome||buscaItem||''):itemDesc,unidade:itemUnid,quantidade:itemQtd,valor_unitario:itemVlr,valor_total:+(itemQtd*itemVlr).toFixed(2)};
     setForm(f=>({...f,itens:[...f.itens,it]}));
     setItemSel(null);setBuscaItem('');setItemDesc('');setItemQtd(1);setItemVlr(0);setItemUnid('UN');
   };
@@ -346,31 +346,31 @@ Qualquer dúvida, estamos à disposição!`);
         )}
       </div>
 
-      {/* Vendedor / Status / Previsão */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-          <label className="text-xs text-gray-500 block mb-1">Vendedor</label>
-          <select value={form.vendedor_id||''} onChange={e=>setForm(f=>({...f,vendedor_id:e.target.value}))} className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none">
-            <option value="">Sem vendedor</option>{vendedores.map(v=><option key={v.id} value={v.id}>{v.nome}</option>)}
-          </select>
-        </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-          <label className="text-xs text-gray-500 block mb-1">Status</label>
-          <select value={form.status} onChange={e=>setForm(f=>({...f,status:e.target.value}))} className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none">
-            {['Rascunho','Aberta','Em andamento','Concluída','Cancelada','Finalizada'].map(s=><option key={s} value={s}>{s}</option>)}
-          </select>
-        </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-          <label className="text-xs text-gray-500 block mb-1">Previsão</label>
-          <input type="date" value={form.previsao||''} onChange={e=>setForm(f=>({...f,previsao:e.target.value}))} className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none"/>
-        </div>
-      </div>
-
-      {/* Observações */}
+      {/* Vendedor / Status / Previsão / Observações — mesmo bloco */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-        <label className="text-xs text-gray-500 block mb-1">Observações</label>
-        <textarea rows={2} value={form.observacoes||''} onChange={e=>setForm(f=>({...f,observacoes:e.target.value}))} placeholder="Defeito relatado, peças necessárias, etc."
-          className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none resize-none"/>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div>
+            <label className="text-xs text-gray-500 block mb-1">Vendedor</label>
+            <select value={form.vendedor_id||''} onChange={e=>setForm(f=>({...f,vendedor_id:e.target.value}))} className="w-full px-2 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none">
+              <option value="">Sem vendedor</option>{vendedores.map(v=><option key={v.id} value={v.id}>{v.nome}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="text-xs text-gray-500 block mb-1">Status</label>
+            <select value={form.status} onChange={e=>setForm(f=>({...f,status:e.target.value}))} className="w-full px-2 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none">
+              {['Rascunho','Aberta','Em andamento','Concluída','Cancelada','Finalizada'].map(s=><option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="text-xs text-gray-500 block mb-1">Previsão</label>
+            <input type="date" value={form.previsao||''} onChange={e=>setForm(f=>({...f,previsao:e.target.value}))} className="w-full px-2 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none"/>
+          </div>
+          <div className="col-span-2 sm:col-span-4">
+            <label className="text-xs text-gray-500 block mb-1">Observações</label>
+            <textarea rows={2} value={form.observacoes||''} onChange={e=>setForm(f=>({...f,observacoes:e.target.value}))} placeholder="Defeito relatado, peças necessárias, etc."
+              className="w-full px-2 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none resize-none"/>
+          </div>
+        </div>
       </div>
 
       {/* Botão Receita */}

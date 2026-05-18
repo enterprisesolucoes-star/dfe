@@ -461,6 +461,15 @@ switch ($action) {
         }
         break;
         
+    case 'debitos_cliente':
+      $cid = (int)($_GET['cliente_id'] ?? 0);
+      if(!$cid){ echo json_encode(['total'=>0,'qtd'=>0]); break; }
+      $st = $pdo->prepare("SELECT COUNT(*) as qtd, COALESCE(SUM(valor),0) as total FROM financeiro WHERE empresa_id=? AND cliente_id=? AND tipo='receber' AND status='pendente'");
+      $st->execute([$empresa_id, $cid]);
+      $row = $st->fetch(PDO::FETCH_ASSOC);
+      echo json_encode(['total'=>(float)$row['total'],'qtd'=>(int)$row['qtd']]);
+      break;
+
     case 'fin_resumo_dashboard':
         migrarTabelasFinanceiras($pdo);
         $hoje     = date('Y-m-d');

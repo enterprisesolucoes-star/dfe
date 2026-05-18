@@ -325,7 +325,7 @@ $modules = [
     'fin_baixar_titulo' => 'financeiro',
     'fin_excluir_titulo' => 'financeiro',
     'fin_estornar_titulo' => 'financeiro',
-    'fin_resumo_dashboard' => 'financeiro',
+    'debitos_cliente' => 'financeiro', 'fin_resumo_dashboard' => 'financeiro',
     'fin_listar_movimentos' => 'financeiro',
     'fin_salvar_movimento'  => 'financeiro',
     'fin_excluir_movimento' => 'financeiro',
