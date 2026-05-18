@@ -233,7 +233,8 @@ export const OrdemServicoTab = ({
     if (form.itens.length === 0) { showAlert('Atenção', 'Adicione pelo menos um item.'); return; }
     setSaving(true);
     try {
-      const res = await fetch('./api.php?action=salvar_os', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
+      const action = otica ? 'salvar_os_otica' : 'salvar_os';
+      const res = await fetch(`./api.php?action=${action}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
       const data = await res.json();
       if (data.success) { setViewMode('list'); fetchOrdens(); }
       else showAlert('Erro', data.message || 'Falha ao salvar.');
@@ -260,7 +261,8 @@ export const OrdemServicoTab = ({
   const handleEnviarEmail = async () => {
     if (!emailOs || !emailDest) return;
     setEmailSending(true);
-    const res = await fetch('./api.php?action=os_email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: emailOs.id, email: emailDest }) });
+    const action = otica ? 'os_otica_email' : 'os_email';
+    const res = await fetch(`./api.php?action=${action}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: emailOs.id, email: emailDest }) });
     const data = await res.json();
     setEmailSending(false);
     showAlert(data.success ? 'E-mail enviado' : 'Erro', data.message);
@@ -601,7 +603,7 @@ export const OrdemServicoTab = ({
                   <td className="px-4 py-3 text-gray-700 dark:text-gray-200 max-w-[180px] truncate">{os.cliente_nome || <span className="text-gray-400 dark:text-gray-500 italic">Sem cliente</span>}</td>
                   <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{fmtDt(os.data_criacao)}</td>
                   <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{fmtDt(os.previsao)}</td>
-                  <td className="px-4 py-3 text-right font-semibold text-blue-600 dark:text-blue-400">{fmtVal(otica ? ((os as any).total||0) : os.valor_total)}</td>
+                  <td className="px-4 py-3 text-right font-semibold text-blue-600 dark:text-blue-400">{fmtVal(Number(os.valor_total) || 0)}</td>
                   <td className="px-4 py-3"><span className={`text-xs px-2 py-1 rounded-full font-medium ${STATUS_OS_COLORS[os.status] ?? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>{os.status}</span></td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-center gap-1">
