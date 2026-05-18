@@ -793,19 +793,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => { setShowOticaForm(false);
           showConfirm={showConfirm}
         />
       );
-      case 'os_otica': return (
-        <OrdemServicoOticaTab
-          clientes={clientes}
-          fetchClientes={fetchClientes}
-          fetchProdutosOtica={fetchProdutos}
-          produtos={produtos}
-          vendedores={vendedores}
-          emitente={emitente}
-          showAlert={showAlert}
-          showConfirm={showConfirm}
-          onAfterSave={fetchProdutos}
-        />
-      );
+
     }
   };
 
