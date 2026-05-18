@@ -197,7 +197,7 @@ switch ($action) {
         $fields_map = [
             'razao_social', 'nome_fantasia', 'cnpj', 'crt', 'email', 'telefone', 'cep',
             'logradouro', 'numero', 'bairro', 'municipio', 'uf', 'status', 'usuario_dfe',
-            'codigo_municipio', 'ambiente', 'tem_tef', 'integracaowhatsapp', 'chavepix', 'api_dfe'
+            'codigo_municipio', 'ambiente', 'tem_tef', 'integracaowhatsapp', 'chavepix', 'api_dfe', 'otica'
         ];
         // Campos com nomes diferentes entre frontend e banco
         $special = [
