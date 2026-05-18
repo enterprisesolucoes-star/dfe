@@ -510,18 +510,7 @@ const AdminPortal = () => {
                           </select>
                           <p className="text-[10px] text-blue-500 mt-1 uppercase font-bold">Provedor de transmissão dos documentos fiscais</p>
                         </div>
-                        {/* Módulo Ótica */}
-                        <div className="mt-3 flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-                          <div>
-                            <div className="text-sm font-semibold text-gray-800 dark:text-gray-200">Módulo Ótica</div>
-                            <div className="text-xs text-gray-500 mt-0.5">Habilita tela de OS para Ótica</div>
-                          </div>
-                          <button type="button"
-                            onClick={() => set('otica', form.otica ? 0 : 1)}
-                            className={`relative w-11 h-6 rounded-full transition-colors duration-300 focus:outline-none ${form.otica ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'}`}>
-                            <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-300 ${form.otica ? 'translate-x-5' : 'translate-x-0'}`} />
-                          </button>
-                        </div>
+
                         </div>
                       )}
                     </div>
@@ -564,18 +553,22 @@ const AdminPortal = () => {
                     />
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Usada para gerar QR Code de cobrança via WhatsApp</p>
                   </div>
-              {/* Módulo Ótica */}
-              <div className="flex items-center justify-between p-3 mt-3 bg-gray-800/50 rounded-xl border border-gray-700">
-                <div>
-                  <div className="text-sm font-semibold text-gray-200">Módulo Ótica</div>
-                  <div className="text-xs text-gray-500 mt-0.5">Habilita tela de Ordem de Serviço para Ótica</div>
-                </div>
-                <button type="button"
-                  onClick={() => set('otica', form.otica ? 0 : 1)}
-                  className={`relative w-11 h-6 rounded-full transition-colors duration-300 focus:outline-none ${form.otica ? 'bg-blue-600' : 'bg-gray-600'}`}>
-                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-300 ${form.otica ? 'translate-x-5' : 'translate-x-0'}`} />
-                </button>
-              </div>
+                  {/* Módulo Ótica */}
+                  <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                    <label className="flex items-center gap-3 cursor-pointer select-none">
+                      <div
+                        onClick={() => set('otica', form.otica ? 0 : 1)}
+                        className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${form.otica ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'}`}
+                        style={{cursor:'pointer'}}>
+                        <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${form.otica ? 'translate-x-5' : 'translate-x-0'}`} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">Módulo Ótica</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">Habilita tela de Ordem de Serviço para Ótica</p>
+                      </div>
+                    </label>
+                  </div>
+
                 </div>
               )}
 
