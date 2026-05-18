@@ -308,6 +308,7 @@ switch ($action) {
 
     case 'dist_manifestar':
         try {
+
             $chave = $_GET['chave'] ?? '';
             $tipo  = (int)($_GET['tipo'] ?? 210210);
             $empresa = $pdo->prepare("SELECT * FROM empresas WHERE id = ?");
@@ -318,7 +319,6 @@ switch ($action) {
             $pfx = $config['certificado_pfx'];
             if (strpos($pfx, 'base64,') !== false) $pfx = base64_decode(explode('base64,', $pfx)[1]);
             elseif (base64_encode(base64_decode($pfx, true)) === $pfx) $pfx = base64_decode($pfx);
-
             $tools = new \NFePHP\NFe\Tools(json_encode($arr), \NFePHP\Common\Certificate::readPfx($pfx, $config['certificado_senha']));
             $res = $tools->sefazManifesta($chave, $tipo, ($tipo == 210210 ? 'Ciencia' : 'Confirmacao'), 1);
             $res = trim($res);
@@ -330,21 +330,23 @@ switch ($action) {
                 if (isset($matches[0])) $res = $matches[0];
             }
             
+            // Extrair retEnvEvento do envelope SOAP
+            if (preg_match('/<retEnvEvento[^>]*>(.*?)<\/retEnvEvento>/s', $res, $m)) {
+                $res = '<retEnvEvento xmlns="http://www.portalfiscal.inf.br/nfe">' . $m[1] . '</retEnvEvento>';
+            }
             $xmlRes = @simplexml_load_string($res, 'SimpleXMLElement', LIBXML_NOERROR | LIBXML_NOWARNING);
             if (!$xmlRes) {
-                // Grava log para diagnóstico
-                @file_put_contents('/var/log/dfe/debug_sefaz.log', "DATA: " . date('Y-m-d H:i:s') . "\nRESPOSTA: " . $res . "\n\n", FILE_APPEND);
-                throw new Exception("Resposta XML do manifesto é inválida. O log foi gerado para análise.");
+                throw new Exception("Resposta XML do manifesto é inválida.");
             }
-            
-            $cStat = (string)($xmlRes->xpath('//cStat')[0] ?? '');
+            $xmlRes->registerXPathNamespace('n', 'http://www.portalfiscal.inf.br/nfe');
+            $cStat = (string)($xmlRes->xpath('//*[local-name()="cStat"]')[0] ?? '');
             $xMotivo = (string)($xmlRes->xpath('//xMotivo')[0] ?? '');
             
-            if ($cStat == '135' || $cStat == '136') {
+            if (in_array($cStat, ['128', '135', '136'])) {
                 $pdo->prepare("UPDATE dfe_documentos SET manifesto = ? WHERE chave = ? AND empresa_id = ?")->execute([($tipo == 210210 ? 1 : 2), $chave, $empresaId]);
-                echo json_encode(['success' => true]);
+                echo json_encode(['success' => true, 'cStat' => $cStat, 'xMotivo' => $xMotivo]);
             } else echo json_encode(['success' => false, 'message' => "({$cStat}): {$xMotivo}"]);
-        } catch (Exception $e) { echo json_encode(['success' => false, 'message' => $e->getMessage()]); }
+        } catch (\Throwable $e) { echo json_encode(['success' => false, 'message' => $e->getMessage() ?: get_class($e) . ' linha ' . $e->getLine()]); }
         break;
 
     case 'dist_danfe':

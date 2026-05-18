@@ -121,7 +121,7 @@ const AdminPortal = () => {
       } catch (e) { console.error('usuarios:', e); }
       return;
     } else {
-      setForm({ status: 'Ativo', usuario_dfe: 2, ambiente: 2, crt: 1, tem_tef: 0, uf: 'GO' });
+      setForm({ status: 'Ativo', usuario_dfe: 2, ambiente: 2, crt: 1, tem_tef: 0, uf: 'GO', otica: 0 });
       buscarMunicipios('GO');
       setEmpresaId(null);
       setSmartPosList([]);
@@ -135,6 +135,7 @@ const AdminPortal = () => {
     const payload: any = {
       ...form,
       usuario_dfe: Number(form.usuario_dfe ?? 2),
+              otica: Number(emp.otica ?? 0),
       status: form.status || 'Ativo',
       tem_tef: Number(form.tem_tef) || 0,
       inscricao_estadual: ieValue,
@@ -508,6 +509,19 @@ const AdminPortal = () => {
                             <option value="unimake">Unimake</option>
                           </select>
                           <p className="text-[10px] text-blue-500 mt-1 uppercase font-bold">Provedor de transmissão dos documentos fiscais</p>
+                        </div>
+                        {/* Módulo Ótica */}
+                        <div className="mt-3 flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+                          <div>
+                            <div className="text-sm font-semibold text-gray-800 dark:text-gray-200">Módulo Ótica</div>
+                            <div className="text-xs text-gray-500 mt-0.5">Habilita tela de OS para Ótica</div>
+                          </div>
+                          <button type="button"
+                            onClick={() => set('otica', form.otica ? 0 : 1)}
+                            className={`relative w-11 h-6 rounded-full transition-colors duration-300 focus:outline-none ${form.otica ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'}`}>
+                            <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-300 ${form.otica ? 'translate-x-5' : 'translate-x-0'}`} />
+                          </button>
+                        </div>
                         </div>
                       )}
                     </div>

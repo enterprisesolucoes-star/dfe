@@ -1,0 +1,443 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Plus, Search, Edit2, Trash2, X, ChevronDown, User, Wrench, FileText, CheckCircle, Save, Send, Package, RefreshCw, Glasses } from 'lucide-react';
+
+interface Cliente { id: number; nome: string; documento?: string; telefone?: string; }
+interface Produto  { id: number; nome: string; codigo?: string; codigo_barras?: string; preco_venda?: number; unidade?: string; }
+interface Vendedor { id: number; nome: string; }
+interface ItemOS { id?: number; tipo: 'produto'|'servico'; produto_id?: number; descricao: string; unidade: string; quantidade: number; valor_unitario: number; valor_total: number; }
+interface Receita {
+  longe_od_esferico?:string; longe_od_cilindrico?:string; longe_od_eixo?:string; longe_od_dnp?:string; longe_od_altura?:string;
+  longe_oe_esferico?:string; longe_oe_cilindrico?:string; longe_oe_eixo?:string; longe_oe_dnp?:string; longe_oe_altura?:string;
+  perto_od_esferico?:string; perto_od_cilindrico?:string; perto_od_eixo?:string; perto_od_dnp?:string; perto_od_altura?:string; perto_od_adicao?:string;
+  perto_oe_esferico?:string; perto_oe_cilindrico?:string; perto_oe_eixo?:string; perto_oe_dnp?:string; perto_oe_altura?:string; perto_oe_adicao?:string;
+  d_maior?:string; horizontal?:string; vertical?:string; ponte?:string; tipo_armacao?:string; laboratorio?:string; observacoes?:string;
+}
+interface OS { id?:number; numero?:number; cliente_id?:string; cliente_nome?:string; cliente_doc?:string; cliente_fone?:string; vendedor_id?:string; status:string; previsao?:string; observacoes?:string; itens:ItemOS[]; receita?:Receita; total?:number; }
+interface Props { clientes:Cliente[]; produtos:Produto[]; vendedores?:Vendedor[]; emitente:any; showAlert:(t:string,m:string)=>void; showConfirm:(t:string,m:string,cb:()=>void)=>void; fetchClientes?:(q:string)=>void; onAfterSave?:()=>void; }
+
+const brl = (v:number) => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const fmtDate = (s?:string) => s ? new Date(s+'T00:00:00').toLocaleDateString('pt-BR') : '';
+const STATUS_COLORS:Record<string,string> = {
+  Rascunho:'bg-gray-500/20 text-gray-300 border border-gray-600',
+  Aberta:'bg-blue-500/20 text-blue-300 border border-blue-600',
+  'Em andamento':'bg-yellow-500/20 text-yellow-300 border border-yellow-600',
+  Concluída:'bg-green-500/20 text-green-300 border border-green-600',
+  Cancelada:'bg-red-500/20 text-red-300 border border-red-600',
+  Finalizada:'bg-purple-500/20 text-purple-300 border border-purple-600',
+};
+const REC0:Receita = {longe_od_esferico:'',longe_od_cilindrico:'',longe_od_eixo:'',longe_od_dnp:'',longe_od_altura:'',longe_oe_esferico:'',longe_oe_cilindrico:'',longe_oe_eixo:'',longe_oe_dnp:'',longe_oe_altura:'',perto_od_esferico:'',perto_od_cilindrico:'',perto_od_eixo:'',perto_od_dnp:'',perto_od_altura:'',perto_od_adicao:'',perto_oe_esferico:'',perto_oe_cilindrico:'',perto_oe_eixo:'',perto_oe_dnp:'',perto_oe_altura:'',perto_oe_adicao:'',d_maior:'',horizontal:'',vertical:'',ponte:'',tipo_armacao:'',laboratorio:'',observacoes:''};
+const F0 = ():OS => ({cliente_id:'',cliente_nome:'',cliente_doc:'',cliente_fone:'',vendedor_id:'',status:'Rascunho',previsao:'',observacoes:'',itens:[],receita:{...REC0}});
+
+const CI = ({value,onChange,w='w-20'}:{value:string;onChange:(v:string)=>void;w?:string}) => (
+  <input type="text" value={value} onChange={e=>onChange(e.target.value)}
+    className={`${w} px-1 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 outline-none text-center`}/>
+);
+
+const ModalFinalizar = ({os,onClose,showAlert}:{os:OS;onClose:(reload:boolean)=>void;showAlert:(t:string,m:string)=>void}) => {
+  const [opcao,setOpcao] = useState<'finalizar'|'nfce'|'nfe'>('finalizar');
+  const [loading,setLoading] = useState(false);
+  const confirmar = async () => {
+    setLoading(true);
+    try {
+      const action = opcao==='finalizar' ? 'salvar_os_otica' : opcao==='nfce' ? 'emitir_nfce_os' : 'emitir_nfe_os';
+      const body = opcao==='finalizar' ? {...os,status:'Finalizada'} : {os_id:os.id};
+      const r = await fetch(`./api.php?action=${action}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      const d = await r.json();
+      if(d.success){ showAlert('Sucesso', opcao==='finalizar'?'OS finalizada!':`${opcao==='nfce'?'NFC-e':'NF-e'} emitida! ${d.chave||''}`); onClose(true); }
+      else showAlert('Erro', d.message||'Falha.');
+    } catch { showAlert('Erro','Falha na requisição.'); }
+    setLoading(false);
+  };
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div className="bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-md p-6">
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-white font-semibold flex items-center gap-2"><CheckCircle size={18} className="text-green-400"/>Finalizar OS #{os.numero||os.id}</span>
+          <button onClick={()=>onClose(false)}><X size={18} className="text-gray-500 hover:text-white"/></button>
+        </div>
+        <p className="text-sm text-gray-400 mb-4">Como deseja concluir esta OS?</p>
+        <div className="space-y-2">
+          {([['finalizar','Apenas Finalizar','Marca como finalizada sem emitir nota'],['nfce','Emitir NFC-e','Emite Nota Fiscal de Consumidor e finaliza'],['nfe','Emitir NF-e','Emite Nota Fiscal Eletrônica e finaliza']] as [string,string,string][]).map(([v,l,d])=>(
+            <label key={v} className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${opcao===v?'border-blue-500 bg-blue-500/10':'border-gray-700 hover:border-gray-500'}`}>
+              <input type="radio" name="op" value={v} checked={opcao===v as any} onChange={()=>setOpcao(v as any)} className="mt-0.5 accent-blue-500"/>
+              <div><div className="text-sm font-medium text-white">{l}</div><div className="text-xs text-gray-500">{d}</div></div>
+            </label>
+          ))}
+        </div>
+        <div className="flex gap-3 mt-5">
+          <button onClick={()=>onClose(false)} className="flex-1 py-2 text-sm text-gray-400 border border-gray-700 rounded-xl hover:border-gray-500">Cancelar</button>
+          <button onClick={confirmar} disabled={loading} className="flex-1 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded-xl disabled:opacity-50 flex items-center justify-center gap-2">
+            {loading?<><RefreshCw size={14} className="animate-spin"/>Aguarde...</>:<><Send size={14}/>Confirmar</>}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const OrdemServicoOticaTab = ({clientes,produtos,vendedores=[],emitente,showAlert,showConfirm,fetchClientes,onAfterSave}:Props) => {
+  const [lista,setLista] = useState<OS[]>([]);
+  const [loading,setLoading] = useState(false);
+  const [busca,setBusca] = useState('');
+  const [filtroStatus,setFiltroStatus] = useState('');
+  const [di,setDi] = useState(()=>{const d=new Date();d.setDate(1);return d.toISOString().split('T')[0];});
+  const [df,setDf] = useState(()=>new Date().toISOString().split('T')[0]);
+  const [form,setForm] = useState<OS>(F0());
+  const [saving,setSaving] = useState(false);
+  const [receitaOpen,setReceitaOpen] = useState(false);
+  const [tipoItem,setTipoItem] = useState<'produto'|'servico'>('produto');
+  const [buscaItem,setBuscaItem] = useState('');
+  const [dropItem,setDropItem] = useState(false);
+  const [itemSel,setItemSel] = useState<Produto|null>(null);
+  const [itemQtd,setItemQtd] = useState(1);
+  const [itemVlr,setItemVlr] = useState(0);
+  const [itemUnid,setItemUnid] = useState('UN');
+  const [itemDesc,setItemDesc] = useState('');
+  const [buscaCli,setBuscaCli] = useState('');
+  const [dropCli,setDropCli] = useState(false);
+  const [modoCli,setModoCli] = useState<'cadastrado'|'manual'>('cadastrado');
+  const [modalFin,setModalFin] = useState<OS|null>(null);
+  const dropRef = useRef<HTMLDivElement>(null);
+
+  const fetchLista = async () => {
+    setLoading(true);
+    try { const r=await fetch(`./api.php?action=listar_os_otica&data_inicio=${di}&data_fim=${df}`); const d=await r.json(); setLista(Array.isArray(d)?d:[]); }
+    catch { setLista([]); }
+    setLoading(false);
+  };
+  useEffect(()=>{fetchLista();},[di,df]);
+  useEffect(()=>{
+    const h=(e:MouseEvent)=>{if(dropRef.current&&!dropRef.current.contains(e.target as Node))setDropItem(false);};
+    document.addEventListener('mousedown',h);return()=>document.removeEventListener('mousedown',h);
+  },[]);
+
+  const selCli = (id:string) => {
+    const c=clientes.find(x=>String(x.id)===id);
+    if(c){setForm(f=>({...f,cliente_id:String(c.id),cliente_nome:c.nome,cliente_doc:c.documento||'',cliente_fone:c.telefone||''}));setBuscaCli(c.nome);}
+    setDropCli(false);
+  };
+  const addItem = () => {
+    if(tipoItem==='produto'&&!itemSel){showAlert('Atenção','Selecione um produto.');return;}
+    if(tipoItem==='servico'&&!itemDesc.trim()){showAlert('Atenção','Informe a descrição.');return;}
+    const it:ItemOS={tipo:tipoItem,produto_id:tipoItem==='produto'?itemSel?.id:undefined,descricao:tipoItem==='produto'?(itemSel?.nome||''):itemDesc,unidade:itemUnid,quantidade:itemQtd,valor_unitario:itemVlr,valor_total:+(itemQtd*itemVlr).toFixed(2)};
+    setForm(f=>({...f,itens:[...f.itens,it]}));
+    setItemSel(null);setBuscaItem('');setItemDesc('');setItemQtd(1);setItemVlr(0);setItemUnid('UN');
+  };
+  const total = form.itens.reduce((s,i)=>s+i.valor_total,0);
+
+  const salvar = async () => {
+    if(!form.cliente_nome&&!form.cliente_id){showAlert('Atenção','Informe o cliente.');return;}
+    if(form.itens.length===0){showAlert('Atenção','Adicione ao menos um item.');return;}
+    setSaving(true);
+    try {
+      const r=await fetch('./api.php?action=salvar_os_otica',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...form,total})});
+      const d=await r.json();
+      if(d.success){showAlert('Sucesso',form.id?'OS atualizada!':'OS criada!');setForm(F0());setBuscaCli('');setReceitaOpen(false);fetchLista();onAfterSave?.();}
+      else showAlert('Erro',d.message||'Falha ao salvar.');
+    } catch{showAlert('Erro','Falha na requisição.');}
+    setSaving(false);
+  };
+  const excluir = (os:OS) => showConfirm('Excluir','Deseja excluir a OS #'+(os.numero||os.id)+'?',async()=>{
+    try{const r=await fetch('./api.php?action=excluir_os_otica',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:os.id})});const d=await r.json();if(d.success){showAlert('Sucesso','OS excluída.');fetchLista();}else showAlert('Erro',d.message||'Falha.');}catch{showAlert('Erro','Falha.');}
+  });
+  const editar = (os:OS) => { setForm({...os,receita:os.receita||{...REC0}});setBuscaCli(os.cliente_nome||'');setReceitaOpen(false);window.scrollTo({top:0,behavior:'smooth'}); };
+  const setR = (k:keyof Receita)=>(v:string)=>setForm(f=>({...f,receita:{...(f.receita||REC0),[k]:v}}));
+  const rec = form.receita||REC0;
+
+  const listaFiltrada = lista.filter(os=>{
+    const q=busca.toLowerCase();
+    return(!q||(os.cliente_nome||'').toLowerCase().includes(q)||String(os.numero||'').includes(q))&&(!filtroStatus||os.status===filtroStatus);
+  });
+
+  return (
+    <div className="flex flex-col gap-4 p-4">
+      {modalFin&&<ModalFinalizar os={modalFin} showAlert={showAlert} onClose={(r)=>{setModalFin(null);if(r)fetchLista();}}/>}
+
+      {/* ── FORMULÁRIO ── */}
+      <div className="bg-gray-900/80 border border-gray-700 rounded-2xl overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-3 bg-gray-800/50 border-b border-gray-700">
+          <span className="text-sm font-semibold text-white flex items-center gap-2">
+            <Glasses size={15} className="text-blue-400"/>{form.id?`Editando OS #${form.numero||form.id}`:'Nova OS – Ótica'}
+          </span>
+          {form.id&&<button onClick={()=>{setForm(F0());setBuscaCli('');setReceitaOpen(false);}} className="text-xs text-gray-400 hover:text-white flex items-center gap-1"><X size={13}/>Cancelar</button>}
+        </div>
+        <div className="p-5 space-y-4">
+
+          {/* Cliente */}
+          <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-semibold text-white flex items-center gap-2"><User size={14} className="text-blue-400"/>Cliente</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-400">Manual</span>
+                <button onClick={()=>setModoCli(m=>m==='cadastrado'?'manual':'cadastrado')}
+                  className={`relative w-10 h-5 rounded-full transition-colors duration-300 ${modoCli==='cadastrado'?'bg-blue-600':'bg-gray-600'}`}>
+                  <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-300 ${modoCli==='cadastrado'?'translate-x-5':'translate-x-0'}`}/>
+                </button>
+                <span className="text-xs text-gray-400">Cadastrado</span>
+              </div>
+            </div>
+            {modoCli==='cadastrado'?(
+              <div className="relative">
+                <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"/>
+                <input type="text" placeholder="Localizar por nome, documento ou celular..." value={buscaCli}
+                  onChange={e=>{setBuscaCli(e.target.value);setDropCli(true);clearTimeout((window as any)._ct);if(e.target.value.length>=2)(window as any)._ct=setTimeout(()=>fetchClientes?.(e.target.value),400);if(!e.target.value)setForm(f=>({...f,cliente_id:'',cliente_nome:''}));}}
+                  onFocus={()=>setDropCli(true)}
+                  className="w-full pl-9 pr-3 py-2 text-sm bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-blue-500 outline-none"/>
+                {dropCli&&clientes.filter(c=>!buscaCli||(c.nome||'').toLowerCase().includes(buscaCli.toLowerCase())||(c.documento||'').includes(buscaCli)).length>0&&(
+                  <div className="absolute z-30 left-0 right-0 top-full mt-1 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl max-h-48 overflow-y-auto">
+                    {clientes.filter(c=>!buscaCli||(c.nome||'').toLowerCase().includes(buscaCli.toLowerCase())||(c.documento||'').includes(buscaCli)).slice(0,10).map(c=>(
+                      <div key={c.id} onMouseDown={()=>selCli(String(c.id))} className="px-3 py-2 text-sm text-gray-200 hover:bg-gray-700 cursor-pointer">
+                        <div className="font-medium">{c.nome}</div>
+                        {c.documento&&<div className="text-xs text-gray-500">{c.documento}</div>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ):(
+              <div className="grid grid-cols-2 gap-2">
+                <input type="text" placeholder="Nome" value={form.cliente_nome||''} onChange={e=>setForm(f=>({...f,cliente_nome:e.target.value}))} className="col-span-2 px-3 py-2 text-sm bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-blue-500 outline-none"/>
+                <input type="text" placeholder="CPF/CNPJ" value={form.cliente_doc||''} onChange={e=>setForm(f=>({...f,cliente_doc:e.target.value}))} className="px-3 py-2 text-sm bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-blue-500 outline-none"/>
+                <input type="text" placeholder="Telefone" value={form.cliente_fone||''} onChange={e=>setForm(f=>({...f,cliente_fone:e.target.value}))} className="px-3 py-2 text-sm bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-blue-500 outline-none"/>
+              </div>
+            )}
+          </div>
+
+          {/* Vendedor / Status / Previsão */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div><label className="text-xs text-gray-400 block mb-1">Vendedor</label>
+              <select value={form.vendedor_id||''} onChange={e=>setForm(f=>({...f,vendedor_id:e.target.value}))} className="w-full px-3 py-2 text-sm bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-blue-500 outline-none">
+                <option value="">Sem vendedor</option>{vendedores.map(v=><option key={v.id} value={v.id}>{v.nome}</option>)}
+              </select></div>
+            <div><label className="text-xs text-gray-400 block mb-1">Status</label>
+              <select value={form.status} onChange={e=>setForm(f=>({...f,status:e.target.value}))} className="w-full px-3 py-2 text-sm bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-blue-500 outline-none">
+                {['Rascunho','Aberta','Em andamento','Concluída','Cancelada','Finalizada'].map(s=><option key={s} value={s}>{s}</option>)}
+              </select></div>
+            <div><label className="text-xs text-gray-400 block mb-1">Previsão</label>
+              <input type="date" value={form.previsao||''} onChange={e=>setForm(f=>({...f,previsao:e.target.value}))} className="w-full px-3 py-2 text-sm bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-blue-500 outline-none"/></div>
+          </div>
+
+          {/* Observações */}
+          <div><label className="text-xs text-gray-400 block mb-1">Observações</label>
+            <textarea rows={2} value={form.observacoes||''} onChange={e=>setForm(f=>({...f,observacoes:e.target.value}))} placeholder="Defeito relatado, peças necessárias, etc."
+              className="w-full px-3 py-2 text-sm bg-gray-800 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:border-blue-500 outline-none resize-none"/></div>
+
+          {/* Botão Receita */}
+          <button onClick={()=>setReceitaOpen(r=>!r)}
+            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all duration-200 ${receitaOpen?'bg-blue-600/20 border-blue-500 text-blue-300':'bg-gray-800/50 border-gray-700 text-gray-400 hover:border-gray-500 hover:text-gray-200'}`}>
+            <span className="flex items-center gap-2"><Glasses size={15}/>Receita Óptica</span>
+            <ChevronDown size={15} className={`transition-transform duration-300 ${receitaOpen?'rotate-180':''}`}/>
+          </button>
+
+          {/* Painel Receita */}
+          <div className="overflow-hidden transition-all duration-500" style={{maxHeight:receitaOpen?'900px':'0',opacity:receitaOpen?1:0}}>
+            <div className="p-4 bg-gray-800/60 rounded-xl border border-gray-700 space-y-3">
+              <div className="overflow-x-auto">
+                <table className="text-xs text-gray-300 w-full">
+                  <thead><tr>
+                    <th className="w-16 text-left text-gray-500 pb-1"></th>
+                    <th className="w-8 text-gray-500 pb-1"></th>
+                    {['Esférico','Cilíndrico','Eixo','DNP','Altura','Adição'].map(h=><th key={h} className="text-gray-400 pb-1 px-1 text-center font-medium">{h}</th>)}
+                  </tr></thead>
+                  <tbody>
+                    <tr>
+                      <td rowSpan={2} className="font-bold text-blue-400 pr-2 align-middle">LONGE</td>
+                      <td className="text-gray-400 pr-1 py-0.5 whitespace-nowrap">OD:</td>
+                      {(['longe_od_esferico','longe_od_cilindrico','longe_od_eixo','longe_od_dnp','longe_od_altura'] as (keyof Receita)[]).map(k=><td key={k} className="py-0.5 px-1"><CI value={rec[k]||''} onChange={setR(k)}/></td>)}
+                      <td className="py-0.5 px-1 text-center text-gray-600">—</td>
+                    </tr>
+                    <tr>
+                      <td className="text-gray-400 pr-1 py-0.5 whitespace-nowrap">OE:</td>
+                      {(['longe_oe_esferico','longe_oe_cilindrico','longe_oe_eixo','longe_oe_dnp','longe_oe_altura'] as (keyof Receita)[]).map(k=><td key={k} className="py-0.5 px-1"><CI value={rec[k]||''} onChange={setR(k)}/></td>)}
+                      <td className="py-0.5 px-1 text-center text-gray-600">—</td>
+                    </tr>
+                    <tr><td colSpan={8} className="py-1"></td></tr>
+                    <tr>
+                      <td rowSpan={2} className="font-bold text-green-400 pr-2 align-middle">PERTO</td>
+                      <td className="text-gray-400 pr-1 py-0.5 whitespace-nowrap">OD:</td>
+                      {(['perto_od_esferico','perto_od_cilindrico','perto_od_eixo','perto_od_dnp','perto_od_altura','perto_od_adicao'] as (keyof Receita)[]).map(k=><td key={k} className="py-0.5 px-1"><CI value={rec[k]||''} onChange={setR(k)}/></td>)}
+                    </tr>
+                    <tr>
+                      <td className="text-gray-400 pr-1 py-0.5 whitespace-nowrap">OE:</td>
+                      {(['perto_oe_esferico','perto_oe_cilindrico','perto_oe_eixo','perto_oe_dnp','perto_oe_altura','perto_oe_adicao'] as (keyof Receita)[]).map(k=><td key={k} className="py-0.5 px-1"><CI value={rec[k]||''} onChange={setR(k)}/></td>)}
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {([['d_maior','D. Maior'],['horizontal','Horizontal'],['vertical','Vertical'],['ponte','Ponte']] as [keyof Receita,string][]).map(([k,l])=>(
+                  <div key={k} className="flex items-center gap-1.5"><span className="text-xs text-gray-400 whitespace-nowrap">{l}</span><CI value={rec[k]||''} onChange={setR(k)} w="w-16"/></div>
+                ))}
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><label className="text-xs text-gray-400 block mb-1">Tipo de Armação</label>
+                  <input type="text" value={rec.tipo_armacao||''} onChange={e=>setR('tipo_armacao')(e.target.value)} className="w-full px-2 py-1.5 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 outline-none"/></div>
+                <div><label className="text-xs text-gray-400 block mb-1">Laboratório de Destino</label>
+                  <input type="text" value={rec.laboratorio||''} onChange={e=>setR('laboratorio')(e.target.value)} className="w-full px-2 py-1.5 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 outline-none"/></div>
+              </div>
+              <div><label className="text-xs text-gray-400 block mb-1">Observações da Receita</label>
+                <textarea rows={2} value={rec.observacoes||''} onChange={e=>setR('observacoes')(e.target.value)} className="w-full px-2 py-1.5 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 outline-none resize-none"/></div>
+            </div>
+          </div>
+
+          {/* Adicionar Item */}
+          <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-semibold text-white flex items-center gap-2"><Package size={14} className="text-blue-400"/>Adicionar Item</span>
+              <div className="flex rounded-lg overflow-hidden border border-gray-700">
+                {(['produto','servico'] as const).map(t=>(
+                  <button key={t} onClick={()=>{setTipoItem(t);setBuscaItem('');setItemSel(null);setItemDesc('');}}
+                    className={`px-3 py-1.5 text-xs font-medium transition-colors ${tipoItem===t?'bg-blue-600 text-white':'bg-gray-800 text-gray-400 hover:text-white'}`}>
+                    {t==='produto'?'Peça/Produto':'Serviço'}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2 items-end">
+              {tipoItem==='produto'?(
+                <div className="relative flex-1 min-w-48" ref={dropRef}>
+                  <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500"/>
+                  <input type="text" placeholder="Localizar por nome, código ou código de barras..." value={buscaItem}
+                    onChange={e=>{setBuscaItem(e.target.value);setDropItem(true);}} onFocus={()=>setDropItem(true)}
+                    className="w-full pl-8 pr-3 py-2 text-xs bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-blue-500 outline-none"/>
+                  {dropItem&&buscaItem.length>=1&&(
+                    <div className="absolute z-30 left-0 right-0 top-full mt-1 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl max-h-40 overflow-y-auto">
+                      {produtos.filter(p=>(p.nome||'').toLowerCase().includes(buscaItem.toLowerCase())||(p.codigo||'').toLowerCase().includes(buscaItem.toLowerCase())||(p.codigo_barras||'').includes(buscaItem)).slice(0,8).map(p=>(
+                        <div key={p.id} onMouseDown={()=>{setItemSel(p);setBuscaItem(p.nome);setItemVlr(p.preco_venda||0);setItemUnid(p.unidade||'UN');setDropItem(false);}}
+                          className="px-3 py-2 text-xs text-gray-200 hover:bg-gray-700 cursor-pointer flex justify-between">
+                          <span>{p.nome}{p.codigo&&<span className="text-gray-500 ml-2">#{p.codigo}</span>}</span>
+                          {p.preco_venda!=null&&<span className="text-green-400">{brl(p.preco_venda)}</span>}
+                        </div>
+                      ))}
+                      {produtos.filter(p=>(p.nome||'').toLowerCase().includes(buscaItem.toLowerCase())).length===0&&<div className="px-3 py-2 text-xs text-gray-500">Nenhum produto.</div>}
+                    </div>
+                  )}
+                </div>
+              ):(
+                <input type="text" placeholder="Descrição do serviço" value={itemDesc} onChange={e=>setItemDesc(e.target.value)}
+                  className="flex-1 min-w-48 px-3 py-2 text-xs bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-blue-500 outline-none"/>
+              )}
+              <div className="flex items-end gap-2">
+                <div><label className="text-[10px] text-gray-500 block mb-0.5">Unid.</label>
+                  <input type="text" value={itemUnid} onChange={e=>setItemUnid(e.target.value)} className="w-14 px-2 py-2 text-xs bg-gray-800 border border-gray-600 rounded-lg text-white text-center focus:border-blue-500 outline-none"/></div>
+                <div><label className="text-[10px] text-gray-500 block mb-0.5">Qtd</label>
+                  <input type="number" min={1} step={0.01} value={itemQtd} onChange={e=>setItemQtd(+e.target.value)} className="w-16 px-2 py-2 text-xs bg-gray-800 border border-gray-600 rounded-lg text-white text-center focus:border-blue-500 outline-none"/></div>
+                <div><label className="text-[10px] text-gray-500 block mb-0.5">Valor Unit.</label>
+                  <input type="number" min={0} step={0.01} value={itemVlr} onChange={e=>setItemVlr(+e.target.value)} className="w-24 px-2 py-2 text-xs bg-gray-800 border border-gray-600 rounded-lg text-white text-right focus:border-blue-500 outline-none"/></div>
+                <button onClick={addItem} className="px-4 py-2 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-1 whitespace-nowrap">
+                  <Plus size={13}/>Adicionar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Tabela Itens */}
+          {form.itens.length>0?(
+            <div className="rounded-xl border border-gray-700 overflow-hidden">
+              <table className="w-full text-xs">
+                <thead className="bg-gray-800/80"><tr>
+                  <th className="text-left px-3 py-2 text-gray-400 font-medium">Descrição</th>
+                  <th className="text-center px-3 py-2 text-gray-400 font-medium w-16">Unid.</th>
+                  <th className="text-center px-3 py-2 text-gray-400 font-medium w-16">Qtd</th>
+                  <th className="text-right px-3 py-2 text-gray-400 font-medium w-24">Unit.</th>
+                  <th className="text-right px-3 py-2 text-gray-400 font-medium w-24">Total</th>
+                  <th className="w-8"></th>
+                </tr></thead>
+                <tbody>
+                  {form.itens.map((it,i)=>(
+                    <tr key={i} className="border-t border-gray-800 hover:bg-gray-800/30">
+                      <td className="px-3 py-2 text-gray-200">
+                        <span className={`inline-block mr-1.5 px-1.5 py-0.5 rounded text-[10px] font-medium ${it.tipo==='produto'?'bg-blue-500/20 text-blue-400':'bg-green-500/20 text-green-400'}`}>{it.tipo==='produto'?'PROD':'SVC'}</span>
+                        {it.descricao}
+                      </td>
+                      <td className="px-3 py-2 text-center text-gray-400">{it.unidade}</td>
+                      <td className="px-3 py-2 text-center text-gray-300">{it.quantidade}</td>
+                      <td className="px-3 py-2 text-right text-gray-300">{brl(it.valor_unitario)}</td>
+                      <td className="px-3 py-2 text-right text-white font-medium">{brl(it.valor_total)}</td>
+                      <td className="px-2 py-2 text-center"><button onClick={()=>setForm(f=>({...f,itens:f.itens.filter((_,j)=>j!==i)}))} className="text-gray-600 hover:text-red-400"><X size={13}/></button></td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot className="bg-gray-800/60 border-t border-gray-700"><tr>
+                  <td colSpan={4} className="px-3 py-2 text-right text-gray-400 font-medium">Total</td>
+                  <td className="px-3 py-2 text-right text-white font-bold">{brl(total)}</td>
+                  <td></td>
+                </tr></tfoot>
+              </table>
+            </div>
+          ):(
+            <div className="text-center py-8 text-xs text-gray-600 border border-dashed border-gray-800 rounded-xl">
+              Nenhum item adicionado. Use os campos acima para adicionar peças/produtos ou serviços.
+            </div>
+          )}
+
+          {/* Salvar */}
+          <div className="flex justify-end gap-3 pt-1">
+            {form.id&&<button onClick={()=>{setForm(F0());setBuscaCli('');setReceitaOpen(false);}} className="px-4 py-2 text-sm text-gray-400 border border-gray-700 rounded-xl hover:border-gray-500">Cancelar</button>}
+            <button onClick={salvar} disabled={saving} className="px-6 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-xl disabled:opacity-50 flex items-center gap-2">
+              {saving?<><RefreshCw size={14} className="animate-spin"/>Salvando...</>:<><Save size={14}/>{form.id?'Atualizar OS':'Salvar OS'}</>}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── LISTA ── */}
+      <div className="bg-gray-900/80 border border-gray-700 rounded-2xl overflow-hidden">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 bg-gray-800/50 border-b border-gray-700">
+          <span className="text-sm font-semibold text-white flex items-center gap-2">
+            <Glasses size={15} className="text-blue-400"/>OS – Ótica
+            <span className="text-xs text-gray-500 bg-gray-800 px-2 py-0.5 rounded-full">{listaFiltrada.length}</span>
+          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <input type="date" value={di} onChange={e=>setDi(e.target.value)} className="px-2 py-1.5 text-xs bg-gray-800 border border-gray-700 rounded-lg text-gray-300 outline-none"/>
+            <span className="text-gray-600 text-xs">até</span>
+            <input type="date" value={df} onChange={e=>setDf(e.target.value)} className="px-2 py-1.5 text-xs bg-gray-800 border border-gray-700 rounded-lg text-gray-300 outline-none"/>
+            <div className="relative"><Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500"/>
+              <input type="text" placeholder="Buscar..." value={busca} onChange={e=>setBusca(e.target.value)} className="pl-8 pr-3 py-1.5 text-xs bg-gray-800 border border-gray-700 rounded-lg text-gray-300 placeholder-gray-600 outline-none w-36"/></div>
+            <select value={filtroStatus} onChange={e=>setFiltroStatus(e.target.value)} className="px-2 py-1.5 text-xs bg-gray-800 border border-gray-700 rounded-lg text-gray-300 outline-none">
+              <option value="">Todos</option>
+              {['Rascunho','Aberta','Em andamento','Concluída','Cancelada','Finalizada'].map(s=><option key={s} value={s}>{s}</option>)}
+            </select>
+            <button onClick={fetchLista} className="p-1.5 text-gray-400 hover:text-white bg-gray-800 border border-gray-700 rounded-lg"><RefreshCw size={13}/></button>
+          </div>
+        </div>
+        {loading?(
+          <div className="flex items-center justify-center py-16 text-gray-500 gap-2 text-sm"><RefreshCw size={16} className="animate-spin"/>Carregando...</div>
+        ):listaFiltrada.length===0?(
+          <div className="text-center py-16 text-gray-600 text-sm">Nenhuma OS encontrada.</div>
+        ):(
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-800/50 text-xs text-gray-400"><tr>
+                <th className="text-left px-4 py-3 font-medium">Nº</th>
+                <th className="text-left px-4 py-3 font-medium">Cliente</th>
+                <th className="text-center px-4 py-3 font-medium hidden md:table-cell">Previsão</th>
+                <th className="text-center px-4 py-3 font-medium">Status</th>
+                <th className="text-right px-4 py-3 font-medium">Total</th>
+                <th className="text-center px-4 py-3 font-medium w-24">Ações</th>
+              </tr></thead>
+              <tbody>
+                {listaFiltrada.map(os=>(
+                  <tr key={os.id} className="border-t border-gray-800/60 hover:bg-gray-800/20 transition-colors">
+                    <td className="px-4 py-3 text-gray-300 font-mono text-xs">#{os.numero||os.id}</td>
+                    <td className="px-4 py-3"><div className="text-gray-200 font-medium">{os.cliente_nome||'—'}</div>{os.cliente_doc&&<div className="text-xs text-gray-500">{os.cliente_doc}</div>}</td>
+                    <td className="px-4 py-3 text-center text-gray-400 text-xs hidden md:table-cell">{os.previsao?fmtDate(os.previsao):'—'}</td>
+                    <td className="px-4 py-3 text-center"><span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[os.status]||'bg-gray-700 text-gray-300'}`}>{os.status}</span></td>
+                    <td className="px-4 py-3 text-right text-white font-medium">{brl(os.total||0)}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-center gap-1">
+                        <button onClick={()=>editar(os)} className="p-1.5 text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"><Edit2 size={13}/></button>
+                        {os.status==='Concluída'&&<button onClick={()=>setModalFin(os)} className="p-1.5 text-gray-400 hover:text-green-400 hover:bg-green-500/10 rounded-lg transition-colors"><Send size={13}/></button>}
+                        <button onClick={()=>excluir(os)} className="p-1.5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><Trash2 size={13}/></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};

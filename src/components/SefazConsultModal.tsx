@@ -99,9 +99,7 @@ const SefazConsultModal = ({ onClose, onImportXml, showAlert, emitente, onUpdate
     setLoading(false);
   };
 
-  const handlePrintDanfe = (chave: string) => {
-    window.open(`./api.php?action=dist_danfe&chave=${chave}`, '_blank');
-  };
+
 
   const handleDownload = async (chave: string) => {
     setLoading(true);
@@ -204,9 +202,7 @@ const SefazConsultModal = ({ onClose, onImportXml, showAlert, emitente, onUpdate
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-center gap-1.5">
                       {/* Imprimir  —  sempre visível */}
-                      <button onClick={() => handlePrintDanfe(doc.chave)} title="Imprimir DANFE" className="p-1.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white transition-all flex-shrink-0">
-                        <Printer className="w-3.5 h-3.5" />
-                      </button>
+                      
                       {/* Ciência  —  espaço reservado para manter alinhamento */}
                       {Number(doc.manifesto) === 0 ? (
                         <button onClick={() => handleManifestar(doc.chave)} title="Dar Ciência" className="p-1.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-600 hover:text-white transition-all flex-shrink-0">

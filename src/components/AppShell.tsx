@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, BarChart, Bar } from 'recharts';
 import { ComprasTab, ImportXmlModal, CompraModal } from './ComprasModule';
 import { OrdemServicoTab } from './OrdemServicoModule';
+import { OrdemServicoOticaTab } from './OrdemServicoOticaModule';
 import { RelatoriosHub } from './RelatorioTefModule';
 import { StatCard, Input, TopProgressBar } from './UIComponents';
 import { FinanceiroView, CaixaView, BaixaModal, ParcelamentoModal } from './FinanceiroModule';
@@ -142,7 +143,7 @@ const AppShell: React.FC<{ session: Session; onLogout: () => void; onUpdateSessi
 
 // Se empresa não está configurada, força aba de configurações e bloqueia as demais
 useFormBehavior();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'vendas' | 'vendas_geral' | 'produtos' | 'clientes' | 'fornecedores' | 'compras' | 'orcamentos' | 'transportadores' | 'config' | 'ncm' | 'usuarios' | 'medidas' | 'bandeiras' | 'dfe_nfe' | 'dfe_nfe_geral' | 'dfe_nfe_parametros' | 'dfe_nfce_parametros' | 'reforma_tributaria' | 'config_empresa' | 'config_email' | 'config_smartpos' | 'config_integracao' | 'dfe_nfe_dados' | 'dfe_nfce_dados' | 'dfe_provedor' | 'empresa' | 'dfe_config' | 'fin_receber' | 'fin_pagar' | 'fin_caixa' | 'relatorios_tef' | 'vendedores' | 'comissoes' | 'pedidos' | 'cobranca_config' | 'cobranca_boletos' | 'cobranca_historico' | 'marketing'>(
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'vendas' | 'vendas_geral' | 'produtos' | 'clientes' | 'fornecedores' | 'compras' | 'orcamentos' | 'transportadores' | 'config' | 'ncm' | 'usuarios' | 'medidas' | 'bandeiras' | 'dfe_nfe' | 'dfe_nfe_geral' | 'dfe_nfe_parametros' | 'dfe_nfce_parametros' | 'reforma_tributaria' | 'config_empresa' | 'config_email' | 'config_smartpos' | 'config_integracao' | 'dfe_nfe_dados' | 'dfe_nfce_dados' | 'dfe_provedor' | 'empresa' | 'dfe_config' | 'fin_receber' | 'fin_pagar' | 'fin_caixa' | 'relatorios_tef' | 'vendedores' | 'comissoes' | 'pedidos' | 'cobranca_config' | 'cobranca_boletos' | 'cobranca_historico' | 'marketing' | 'os_otica'>(
   session.empresaConfigurada ? 'dashboard' : 'empresa'
 );
 const empresaBloqueada = !session.empresaConfigurada;
@@ -390,10 +391,10 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
 
   // Lazy loading de catálogos por aba
   useEffect(() => {
-    if (activeTab === 'produtos' || activeTab === 'vendas' || activeTab === 'pedidos' || activeTab === 'orcamentos' || activeTab === 'ordens_servico') fetchProdutos();
-    if (activeTab === 'clientes' || activeTab === 'pedidos' || activeTab === 'orcamentos' || activeTab === 'ordens_servico' || activeTab === 'dfe_nfe') fetchClientes();
+    if (activeTab === 'produtos' || activeTab === 'vendas' || activeTab === 'pedidos' || activeTab === 'orcamentos' || activeTab === 'ordens_servico' || activeTab === 'os_otica') fetchProdutos();
+    if (activeTab === 'clientes' || activeTab === 'pedidos' || activeTab === 'orcamentos' || activeTab === 'ordens_servico' || activeTab === 'os_otica' || activeTab === 'dfe_nfe') fetchClientes();
     if (activeTab === 'fornecedores') fetchFornecedores();
-    if (activeTab === 'vendedores' || activeTab === 'pedidos' || activeTab === 'orcamentos' || activeTab === 'ordens_servico') fetchVendedores();
+    if (activeTab === 'vendedores' || activeTab === 'pedidos' || activeTab === 'orcamentos' || activeTab === 'ordens_servico' || activeTab === 'os_otica') fetchVendedores();
     if (activeTab === 'transportadores') fetchTransportadores();
     if (activeTab === 'medidas') fetchMedidas();
     if (activeTab === 'bandeiras') fetchBandeiras();
@@ -751,7 +752,18 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
         />
       );
       case 'relatorios_tef': return <RelatoriosHub showAlert={showAlert} emitente={emitente} isFiscal={isFiscal} />;
-      case 'ordens_servico': return (
+      case 'ordens_servico': return emitente?.otica ? (
+        <OrdemServicoOticaTab
+          clientes={clientes}
+          fetchClientes={fetchClientes}
+          produtos={produtos}
+          vendedores={vendedores}
+          emitente={emitente}
+          showAlert={showAlert}
+          showConfirm={showConfirm}
+          onAfterSave={fetchProdutos}
+        />
+      ) : (
         <OrdemServicoTab
           clientes={clientes}
           fetchClientes={fetchClientes}
@@ -761,6 +773,18 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           emitente={emitente}
           showAlert={showAlert}
           showConfirm={showConfirm}
+        />
+      );
+      case 'os_otica': return (
+        <OrdemServicoOticaTab
+          clientes={clientes}
+          fetchClientes={fetchClientes}
+          produtos={produtos}
+          vendedores={vendedores}
+          emitente={emitente}
+          showAlert={showAlert}
+          showConfirm={showConfirm}
+          onAfterSave={fetchProdutos}
         />
       );
     }
@@ -965,7 +989,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
         )}
         <header className="bg-white dark:bg-gray-800 h-16 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-8">
           <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 capitalize">
-            {{ dashboard: 'Dashboard', fin_receber: 'Financeiro - Contas à Receber', fin_pagar: 'Financeiro - Contas à Pagar', fin_caixa: 'Financeiro - Movimento de Caixa', vendas: 'DFe - NFCe - Emissão', vendas_geral: 'DFe - NFCe - Geral', produtos: 'Produtos', clientes: 'Clientes', fornecedores: 'Fornecedores', compras: 'Compras', orcamentos: 'Orçamentos', ordens_servico: 'Ordem de Serviços', relatorios_tef: 'Relatórios do Sistema', config: 'Empresa', config_empresa: 'Empresa', config_email: 'Empresa', config_smartpos: 'Empresa', config_integracao: 'Integração', ncm: 'NCM / Tabela IBPT', usuarios: 'Usuários', vendedores: 'Vendedores', marketing: 'Marketing Sazonal', comissoes: 'Comissões', pedidos: 'Pedidos', cobranca_config: 'Cobrança - Configuração', cobranca_boletos: 'Cobrança - Boletos', cobranca_historico: 'Cobrança - Histórico', medidas: 'Medidas', bandeiras: 'Bandeiras de Cartão', dfe_nfe: 'DFe - NFe - Emissão', dfe_nfe_geral: 'DFe - NFe - Geral', dfe_nfce_parametros: 'DFe - NFCe - Parâmetros', dfe_nfe_parametros: 'DFe - NFe - Parâmetros', dfe_nfe_dados: 'DFe Configurações', dfe_nfce_dados: 'DFe Configurações', dfe_provedor: 'DFe Configurações', reforma_tributaria: 'Reforma Tributária', transportadores: 'Transportadores', empresa: 'Empresa', dfe_config: 'DFe Configurações' }[activeTab]}
+            {{ dashboard: 'Dashboard', fin_receber: 'Financeiro - Contas à Receber', fin_pagar: 'Financeiro - Contas à Pagar', fin_caixa: 'Financeiro - Movimento de Caixa', vendas: 'DFe - NFCe - Emissão', vendas_geral: 'DFe - NFCe - Geral', produtos: 'Produtos', clientes: 'Clientes', fornecedores: 'Fornecedores', compras: 'Compras', orcamentos: 'Orçamentos', ordens_servico: 'Ordem de Serviços', os_otica: 'OS – Ótica', relatorios_tef: 'Relatórios do Sistema', config: 'Empresa', config_empresa: 'Empresa', config_email: 'Empresa', config_smartpos: 'Empresa', config_integracao: 'Integração', ncm: 'NCM / Tabela IBPT', usuarios: 'Usuários', vendedores: 'Vendedores', marketing: 'Marketing Sazonal', comissoes: 'Comissões', pedidos: 'Pedidos', cobranca_config: 'Cobrança - Configuração', cobranca_boletos: 'Cobrança - Boletos', cobranca_historico: 'Cobrança - Histórico', medidas: 'Medidas', bandeiras: 'Bandeiras de Cartão', dfe_nfe: 'DFe - NFe - Emissão', dfe_nfe_geral: 'DFe - NFe - Geral', dfe_nfce_parametros: 'DFe - NFCe - Parâmetros', dfe_nfe_parametros: 'DFe - NFe - Parâmetros', dfe_nfe_dados: 'DFe Configurações', dfe_nfce_dados: 'DFe Configurações', dfe_provedor: 'DFe Configurações', reforma_tributaria: 'Reforma Tributária', transportadores: 'Transportadores', empresa: 'Empresa', dfe_config: 'DFe Configurações' }[activeTab]}
           </h2>
           <div className="flex items-center gap-4">
             {activeTab === 'dfe_nfe' && (
