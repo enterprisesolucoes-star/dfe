@@ -424,7 +424,7 @@ Qualquer dúvida, estamos à disposição!`);
             {form.cliente_fone&&(<button type="button" onClick={abrirWaModal} className="flex items-center gap-1.5 px-2.5 py-1 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded-lg transition-colors"><MessageCircle size={13}/>WhatsApp</button>)}
             {loadingDebito&&<span className="flex items-center gap-1 text-xs text-gray-400"><RefreshCw size={11} className="animate-spin"/>Verificando...</span>}
             {!loadingDebito&&clienteDebito&&clienteDebito.total>0&&(
-              <button type="button" onClick={()=>onNavigate?.('fin_receber',{busca:form.cliente_nome})} className="flex items-center gap-1.5 px-2.5 py-1 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer">⚠️ Débito: {brl(clienteDebito.total)}</button>
+              <button type="button" onClick={()=>onNavigate?.('fin_receber',{preset:{status:'Pendente',busca:form.cliente_nome,di:'2000-01-01'}})} className="flex items-center gap-1.5 px-2.5 py-1 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer">⚠️ Débito: {brl(clienteDebito.total)}</button>
             )}
           </div>
         )}

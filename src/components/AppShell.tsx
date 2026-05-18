@@ -768,7 +768,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => { setShowOticaForm(false);
             showConfirm={showConfirm}
             abrirFormInicial={true}
             editandoOs={editandoOsOtica}
-            onNavigate={(t:any,opts?:any)=>{if(opts?.busca)(window as any).__finBuscaCliente=opts.busca;handleSetActiveTab(t);}}
+            onNavigate={(t:any,opts?:any)=>{finNavPreset.current=opts?.preset??null;handleSetActiveTab(t);}}
             onAfterSave={() => { setShowOticaForm(false); setEditandoOsOtica(null); fetchProdutos(); }}
           />
         ) : (
