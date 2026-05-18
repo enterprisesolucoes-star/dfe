@@ -143,7 +143,8 @@ switch ($action) {
                 'tem_tef' => 'tem_tef',
                 'integracaowhatsapp' => 'integracaowhatsapp',
                 'chavepix' => 'chavepix',
-                'api_dfe' => 'api_dfe'
+                'api_dfe' => 'api_dfe',
+                'otica' => 'otica'
             ];
 
             foreach ($map as $db => $fr) {
