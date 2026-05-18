@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, BarChart, Bar } from 'recharts';
 import { DollarSign, CheckCircle, XCircle, TrendingDown, TrendingUp, RefreshCw, FileText, Wrench, Users, Package, AlertTriangle, Clock, Calendar } from 'lucide-react';
 import { StatCard, useCountUp, EmptyState } from './UIComponents';
