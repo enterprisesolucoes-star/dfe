@@ -510,8 +510,6 @@ const AdminPortal = () => {
                           </select>
                           <p className="text-[10px] text-blue-500 mt-1 uppercase font-bold">Provedor de transmissão dos documentos fiscais</p>
                         </div>
-
-                        </div>
                       )}
                     </div>
                     <div>
@@ -553,6 +551,7 @@ const AdminPortal = () => {
                     />
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Usada para gerar QR Code de cobrança via WhatsApp</p>
                   </div>
+                  {/* Modulo Otica */}
                   <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
                     <label className="flex items-center gap-3 cursor-pointer select-none">
                       <div onClick={() => set('otica', form.otica ? 0 : 1)}
