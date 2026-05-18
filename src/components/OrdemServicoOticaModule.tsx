@@ -322,6 +322,7 @@ Qualquer dúvida, estamos à disposição!`);
             )}
           </div>
         )}
+        )}
         {modoCli==='cadastrado'&&form.cliente_id&&(
           <div className="mt-2 space-y-2">
             <div className="flex items-center justify-between gap-2">
