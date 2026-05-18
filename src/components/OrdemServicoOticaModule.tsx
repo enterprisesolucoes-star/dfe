@@ -429,45 +429,75 @@ Qualquer dúvida, estamos à disposição!`);
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
         <div className="flex items-center justify-between mb-3">
           <span className="text-sm font-semibold text-gray-700 dark:text-gray-200 flex items-center gap-2"><Package size={14} className="text-blue-500"/>Adicionar Item</span>
-          <div className="flex rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 p-0.5 rounded-lg">
             {(['produto','servico'] as const).map(t=>(
               <button key={t} onClick={()=>{setTipoItem(t);setBuscaItem('');setItemSel(null);setItemDesc('');}}
-                className={`px-3 py-1.5 text-xs font-medium transition-colors ${tipoItem===t?'bg-blue-600 text-white':'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all duration-150 ${tipoItem===t?'bg-blue-600 text-white shadow-sm':'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>
                 {t==='produto'?'Peça/Produto':'Serviço'}
               </button>
             ))}
           </div>
         </div>
-        <div className="flex flex-wrap gap-2 items-end">
-          {tipoItem==='produto'?(
-            <div className="relative flex-1 min-w-48" ref={dropRef}>
-              <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400"/>
-              <input type="text" placeholder="Localizar por nome, código ou código de barras..." value={buscaItem}
-                onChange={e=>{const v=e.target.value;setBuscaItem(v);setItemSel(null);setDropItem(true);clearTimeout((window as any)._oticaProdTimer);if(v.length>=1)(window as any)._oticaProdTimer=setTimeout(()=>fetchProdutosOtica?.(v),300);else setDropItem(false);}} onFocus={()=>setDropItem(true)}
-                className="w-full pl-8 pr-3 py-2 text-xs border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none"/>
-              {dropItem&&buscaItem.length>=1&&(
-                <div className="absolute z-30 left-0 right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl max-h-40 overflow-y-auto">
-                  {produtos.length>0?produtos.slice(0,10).map(p=>(
-                    <div key={p.id} onMouseDown={()=>{setItemSel(p);setBuscaItem((p as any).descricao||p.nome||'');setItemVlr(Number((p as any).valorUnitario||(p as any).preco_venda||0));setItemUnid((p as any).unidadeComercial||(p as any).unidade||'UN');setDropItem(false);}}
-                      className="px-3 py-2 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer flex justify-between gap-2">
-                      <div><span className="font-medium">{(p as any).descricao||p.nome}</span>{(p as any).codigoInterno&&<span className="text-gray-400 ml-2">#{(p as any).codigoInterno}</span>}</div>
-                      <span className="text-green-500 font-semibold whitespace-nowrap">{brl(Number((p as any).valorUnitario||(p as any).preco_venda||0))}</span>
-                    </div>
-                  )):<div className="px-3 py-2 text-xs text-gray-400 text-center">Nenhum produto encontrado.</div>}
-                </div>
-              )}
+        {tipoItem==='produto'?(
+          <div className="flex gap-3 items-end flex-wrap">
+            <div className="flex-1 min-w-[260px] relative" ref={dropRef}>
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Buscar Peça/Produto</label>
+              <div className="relative">
+                <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/>
+                <input type="text" placeholder="Localizar por nome, código ou código de barras..." value={buscaItem}
+                  onChange={e=>{const v=e.target.value;setBuscaItem(v);setItemSel(null);setDropItem(true);clearTimeout((window as any)._oticaProdTimer);if(v.length>=1)(window as any)._oticaProdTimer=setTimeout(()=>fetchProdutosOtica?.(v),300);else setDropItem(false);}}
+                  onFocus={()=>setDropItem(true)}
+                  onKeyDown={e=>{if(e.key==='Enter'&&itemSel){e.preventDefault();(document.getElementById('otica-qtd') as HTMLInputElement)?.focus();}}}
+                  className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none"/>
+                {dropItem&&buscaItem.length>=1&&(
+                  <div className="absolute z-30 left-0 right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl max-h-48 overflow-y-auto">
+                    {produtos.length>0?produtos.slice(0,10).map(p=>(
+                      <div key={p.id} onMouseDown={()=>{setItemSel(p);setBuscaItem((p as any).descricao||p.nome||'');setItemVlr(Number((p as any).valorUnitario||(p as any).preco_venda||0));setItemUnid((p as any).unidadeComercial||(p as any).unidade||'UN');setDropItem(false);setTimeout(()=>(document.getElementById('otica-qtd') as HTMLInputElement)?.focus(),50);}}
+                        className="px-3 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/30 cursor-pointer flex justify-between gap-2 border-b border-gray-50 dark:border-gray-700 last:border-0">
+                        <div><span className="font-medium">{(p as any).descricao||p.nome}</span>{(p as any).codigoInterno&&<span className="text-gray-400 text-xs ml-2">#{(p as any).codigoInterno}</span>}</div>
+                        <span className="text-green-500 font-semibold whitespace-nowrap">{brl(Number((p as any).valorUnitario||(p as any).preco_venda||0))}</span>
+                      </div>
+                    )):<div className="px-3 py-4 text-sm text-gray-400 text-center">Nenhum produto encontrado.</div>}
+                  </div>
+                )}
+              </div>
+              {itemSel&&<p className="text-xs text-blue-600 dark:text-blue-400 mt-1 pl-1">✓ {(itemSel as any).descricao||itemSel.nome} — {brl(Number((itemSel as any).valorUnitario||0))}</p>}
             </div>
-          ):(
-            <input type="text" placeholder="Descrição do serviço" value={itemDesc} onChange={e=>setItemDesc(e.target.value)}
-              className="flex-1 min-w-48 px-3 py-2 text-xs border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none"/>
-          )}
-          <div className="flex items-end gap-2">
-            <div><label className="text-[10px] text-gray-400 block mb-0.5">Unid.</label><input type="text" value={itemUnid} onChange={e=>setItemUnid(e.target.value)} className="w-14 px-2 py-2 text-xs border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-center focus:ring-2 focus:ring-blue-500 outline-none"/></div>
-            <div><label className="text-[10px] text-gray-400 block mb-0.5">Qtd</label><input type="number" min={1} step={0.01} value={itemQtd} onChange={e=>setItemQtd(+e.target.value)} className="w-16 px-2 py-2 text-xs border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-center focus:ring-2 focus:ring-blue-500 outline-none"/></div>
-            <div><label className="text-[10px] text-gray-400 block mb-0.5">Valor Unit.</label><input type="number" min={0} step={0.01} value={itemVlr} onChange={e=>setItemVlr(+e.target.value)} className="w-24 px-2 py-2 text-xs border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-right focus:ring-2 focus:ring-blue-500 outline-none"/></div>
-            <button onClick={addItem} className="px-4 py-2 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-1 whitespace-nowrap"><Plus size={13}/>Adicionar</button>
+            <div className="w-16">
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Unid.</label>
+              <input type="text" value={itemUnid} onChange={e=>setItemUnid(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();(document.getElementById('otica-qtd') as HTMLInputElement)?.focus();}}} className="w-full px-2 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-center focus:ring-2 focus:ring-blue-500 outline-none"/>
+            </div>
+            <div className="w-20">
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Qtd</label>
+              <input id="otica-qtd" type="number" min={1} step={0.01} value={itemQtd} onChange={e=>setItemQtd(+e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();(document.getElementById('otica-vlr') as HTMLInputElement)?.focus();}}} onFocus={e=>e.target.select()} className="w-full px-2 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-center focus:ring-2 focus:ring-blue-500 outline-none"/>
+            </div>
+            <div className="w-28">
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Valor Unit.</label>
+              <input id="otica-vlr" type="number" min={0} step={0.01} value={itemVlr} onChange={e=>setItemVlr(+e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();addItem();setTimeout(()=>(document.querySelector('input[placeholder*="Localizar"]') as HTMLInputElement)?.focus(),100);}}} onFocus={e=>e.target.select()} className="w-full px-2 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-right focus:ring-2 focus:ring-blue-500 outline-none"/>
+            </div>
+            <button onClick={addItem} className="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap self-end mb-0"><Plus size={14}/>Adicionar</button>
           </div>
-        </div>
+        ):(
+          <div className="flex gap-3 items-end flex-wrap">
+            <div className="flex-1 min-w-[260px]">
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Descrição do Serviço</label>
+              <input type="text" placeholder="Ex: Consulta, Ajuste de armação..." value={itemDesc} onChange={e=>setItemDesc(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();(document.getElementById('otica-svc-qtd') as HTMLInputElement)?.focus();}}} className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-purple-500 outline-none"/>
+            </div>
+            <div className="w-16">
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Unid.</label>
+              <input type="text" value={itemUnid} onChange={e=>setItemUnid(e.target.value)} className="w-full px-2 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-center focus:ring-2 focus:ring-purple-500 outline-none"/>
+            </div>
+            <div className="w-20">
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Qtd</label>
+              <input id="otica-svc-qtd" type="number" min={1} step={0.01} value={itemQtd} onChange={e=>setItemQtd(+e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();(document.getElementById('otica-svc-vlr') as HTMLInputElement)?.focus();}}} onFocus={e=>e.target.select()} className="w-full px-2 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-center focus:ring-2 focus:ring-purple-500 outline-none"/>
+            </div>
+            <div className="w-28">
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Valor Unit.</label>
+              <input id="otica-svc-vlr" type="number" min={0} step={0.01} value={itemVlr} onChange={e=>setItemVlr(+e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();addItem();}}} onFocus={e=>e.target.select()} className="w-full px-2 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-right focus:ring-2 focus:ring-purple-500 outline-none"/>
+            </div>
+            <button onClick={addItem} className="px-4 py-2 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap self-end"><Plus size={14}/>Adicionar</button>
+          </div>
+        )}
       </div>
 
       {/* Tabela Itens */}
