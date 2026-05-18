@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Search, Edit2, Trash2, X, ChevronDown, User, CheckCircle, Save, Send, Package, RefreshCw, Glasses, Wrench, MessageCircle } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, X, ChevronDown, User, CheckCircle, Save, Send, Package, RefreshCw, Glasses, Wrench, MessageCircle, Printer, Mail } from 'lucide-react';
 import { Cliente, Produto } from '../types/nfce';
 import type { Vendedor } from '../contexts/AppDataContext';
 
@@ -84,6 +84,43 @@ export const OrdemServicoOticaTab = ({clientes,produtos,vendedores=[],emitente,s
   const [dropCli,setDropCli] = useState(false);
   const [modoCli,setModoCli] = useState<'cadastrado'|'manual'>('cadastrado');
   const [modalFin,setModalFin] = useState<OS|null>(null);
+  const [showEmailModal,setShowEmailModal] = useState(false);
+  const [emailOs,setEmailOs] = useState<OS|null>(null);
+  const [emailDest,setEmailDest] = useState('');
+  const [emailSending,setEmailSending] = useState(false);
+  const [waListTarget,setWaListTarget] = useState<OS|null>(null);
+  const [waListPhone,setWaListPhone] = useState('');
+  const [waListSending,setWaListSending] = useState(false);
+
+  const handlePrintOtica = async (id:number) => {
+    try {
+      const r = await fetch(`./api.php?action=os_pdf&id=${id}`);
+      if(!r.ok){showAlert('Erro','Não foi possível gerar o PDF.');return;}
+      const blob = await r.blob();
+      const url = URL.createObjectURL(blob);
+      window.open(url,'_blank');
+      setTimeout(()=>URL.revokeObjectURL(url),30000);
+    } catch{showAlert('Erro','Falha ao gerar PDF.');}
+  };
+
+  const handleEmailOtica = async () => {
+    if(!emailOs||!emailDest) return;
+    setEmailSending(true);
+    try {
+      const r = await fetch('./api.php?action=os_email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:emailOs.id,email:emailDest})});
+      const d = await r.json();
+      showAlert(d.success?'E-mail enviado':'Erro',d.message);
+      if(d.success){setShowEmailModal(false);setEmailDest('');}
+    } catch{showAlert('Erro','Falha ao enviar.');}
+    setEmailSending(false);
+  };
+
+  const enviarWaLista = (os:OS) => {
+    const phone = (os.cliente_fone||'').replace(/\D/g,'');
+    const num = String(os.numero||os.id||'').padStart(4,'0');
+    const msg = `OS Nº ${num} - ${os.cliente_nome||'Cliente'} - ${brl(os.total||0)}`;
+    window.open(`https://wa.me/55${phone}?text=${encodeURIComponent(msg)}`,'_blank');
+  };
   const dropRef = useRef<HTMLDivElement>(null);
   const [clienteDebito,setClienteDebito] = useState<{total:number;qtd:number}|null>(null);
   const [loadingDebito,setLoadingDebito] = useState(false);
@@ -232,6 +269,9 @@ Qualquer dúvida, estamos à disposição!`);
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">
                         <button onClick={()=>abrirForm(os)} title="Editar" className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition-colors"><Edit2 size={14}/></button>
+                        <button onClick={()=>handlePrintOtica(os.id!)} title="PDF" className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"><Printer size={14}/></button>
+                        <button onClick={()=>{setEmailOs(os);setEmailDest((os as any).cliente_email||'');setShowEmailModal(true);}} title="E-mail" className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-500/10 rounded-lg transition-colors"><Mail size={14}/></button>
+                        <button onClick={()=>enviarWaLista(os)} title="WhatsApp" className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-500/10 rounded-lg transition-colors"><MessageCircle size={14}/></button>
                         {os.status==='Concluída'&&<button onClick={()=>setModalFin(os)} title="Finalizar" className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-500/10 rounded-lg transition-colors"><Send size={14}/></button>}
                         <button onClick={()=>excluir(os)} title="Excluir" className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"><Trash2 size={14}/></button>
                       </div>
@@ -243,6 +283,24 @@ Qualquer dúvida, estamos à disposição!`);
           </div>
         )}
       </div>
+    {showEmailModal&&emailOs&&(
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[200]">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2"><Mail size={18} className="text-purple-600"/>Enviar por E-mail</h3>
+              <button onClick={()=>setShowEmailModal(false)} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"><X size={18} className="text-gray-400"/></button>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">OS Nº {String(emailOs.numero||emailOs.id||'').padStart(4,'0')}</p>
+            <input type="email" placeholder="E-mail do destinatário" value={emailDest} onChange={e=>setEmailDest(e.target.value)} className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 mb-4"/>
+            <div className="flex gap-3">
+              <button onClick={()=>setShowEmailModal(false)} className="flex-1 border border-gray-200 dark:border-gray-700 rounded-lg py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700">Cancelar</button>
+              <button onClick={handleEmailOtica} disabled={emailSending||!emailDest} className="flex-1 bg-purple-600 text-white rounded-lg py-2 text-sm hover:bg-purple-700 disabled:opacity-50 flex items-center justify-center gap-2">
+                {emailSending?<RefreshCw size={14} className="animate-spin"/>:<Mail size={14}/>}{emailSending?'Enviando...':'Enviar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 
