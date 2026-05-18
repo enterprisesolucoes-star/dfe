@@ -348,9 +348,10 @@ Qualquer dúvida, estamos à disposição!`);
         </span>
       </div>
 
-      {/* Cliente */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-        <div className="flex items-center justify-between mb-3">
+      {/* Cliente + Vendedor + Status + Previsão */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 space-y-3">
+        {/* Linha 1: Toggle + Busca/Manual + Vendedor + Status + Previsão */}
+        <div className="flex items-center justify-between mb-1">
           <span className="text-sm font-semibold text-gray-700 dark:text-gray-200 flex items-center gap-2"><User size={14} className="text-blue-500"/>Cliente</span>
           <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 p-0.5 rounded-lg">
             {(['cadastrado','manual'] as const).map(m=>(
@@ -361,71 +362,66 @@ Qualquer dúvida, estamos à disposição!`);
             ))}
           </div>
         </div>
-        {modoCli==='cadastrado'&&(
-          <div className="relative">
-            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/>
-            <input type="text" placeholder="Localizar por nome, documento ou celular..." value={buscaCli}
-              onChange={e=>{setBuscaCli(e.target.value);setDropCli(true);clearTimeout((window as any)._ct);if(e.target.value.length>=2)(window as any)._ct=setTimeout(()=>fetchClientes?.(e.target.value),400);if(!e.target.value)setForm(f=>({...f,cliente_id:'',cliente_nome:''}));}}
-              onFocus={()=>setDropCli(true)}
-              className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none"/>
-            {dropCli&&clientes.filter(c=>!buscaCli||(c.nome||'').toLowerCase().includes(buscaCli.toLowerCase())||(c as any).documento?.includes(buscaCli)).length>0&&(
-              <div className="absolute z-30 left-0 right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl max-h-48 overflow-y-auto">
-                {clientes.filter(c=>!buscaCli||(c.nome||'').toLowerCase().includes(buscaCli.toLowerCase())||(c as any).documento?.includes(buscaCli)).slice(0,10).map(c=>(
-                  <div key={c.id} onMouseDown={()=>selCli(String(c.id))} className="px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
-                    <div className="font-medium">{c.nome}</div>
-                    {(c as any).documento&&<div className="text-xs text-gray-400">{(c as any).documento}</div>}
+        <div className="grid grid-cols-12 gap-3">
+          {/* Cliente — col 1-5 */}
+          <div className="col-span-12 sm:col-span-5">
+            {modoCli==='cadastrado'?(
+              <div className="relative">
+                <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/>
+                <input type="text" placeholder="Localizar por nome, documento ou celular..." value={buscaCli}
+                  onChange={e=>{setBuscaCli(e.target.value);setDropCli(true);clearTimeout((window as any)._ct);if(e.target.value.length>=2)(window as any)._ct=setTimeout(()=>fetchClientes?.(e.target.value),400);if(!e.target.value)setForm(f=>({...f,cliente_id:'',cliente_nome:''}));}}
+                  onFocus={()=>setDropCli(true)}
+                  className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none"/>
+                {dropCli&&clientes.filter(c=>!buscaCli||(c.nome||'').toLowerCase().includes(buscaCli.toLowerCase())||(c as any).documento?.includes(buscaCli)).length>0&&(
+                  <div className="absolute z-30 left-0 right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl max-h-48 overflow-y-auto">
+                    {clientes.filter(c=>!buscaCli||(c.nome||'').toLowerCase().includes(buscaCli.toLowerCase())||(c as any).documento?.includes(buscaCli)).slice(0,10).map(c=>(
+                      <div key={c.id} onMouseDown={()=>selCli(String(c.id))} className="px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+                        <div className="font-medium">{c.nome}</div>
+                        {(c as any).documento&&<div className="text-xs text-gray-400">{(c as any).documento}</div>}
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
+              </div>
+            ):(
+              <div className="grid grid-cols-2 gap-2">
+                <input type="text" placeholder="Nome" value={form.cliente_nome||''} onChange={e=>setForm(f=>({...f,cliente_nome:e.target.value}))} className="col-span-2 px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none"/>
+                <input type="text" placeholder="CPF/CNPJ" value={form.cliente_doc||''} onChange={e=>setForm(f=>({...f,cliente_doc:e.target.value}))} className="px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none"/>
+                <input type="text" placeholder="Telefone" value={form.cliente_fone||''} onChange={e=>setForm(f=>({...f,cliente_fone:e.target.value}))} className="px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none"/>
               </div>
             )}
           </div>
-        )}
-        {modoCli==='cadastrado'&&form.cliente_id&&(
-          <div className="mt-2 space-y-2">
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-xs text-blue-600 dark:text-blue-400 pl-1">✓ {form.cliente_nome}{form.cliente_doc?` — ${form.cliente_doc}`:''}</p>
-              {form.cliente_fone&&(<button type="button" onClick={abrirWaModal} className="flex items-center gap-1.5 px-2.5 py-1 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded-lg transition-colors"><MessageCircle size={13}/>WhatsApp</button>)}
-            </div>
-            {loadingDebito&&<div className="flex items-center gap-1.5 text-xs text-gray-400 pl-1"><RefreshCw size={11} className="animate-spin"/>Verificando débitos...</div>}
-            {!loadingDebito&&clienteDebito&&clienteDebito.total>0&&(
-              <div className="flex items-center gap-3 px-3 py-2.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                <span className="text-lg shrink-0">⚠️</span>
-                <div><p className="text-xs font-semibold text-red-700 dark:text-red-400">Cliente com débito em aberto</p><p className="text-xs text-red-600 dark:text-red-400">{clienteDebito.qtd} {clienteDebito.qtd===1?'título':'títulos'} · Total: <span className="font-bold">{brl(clienteDebito.total)}</span></p></div>
-              </div>
-            )}
-          </div>
-        )}
-        {modoCli==='manual'&&(
-          <div className="grid grid-cols-2 gap-2 mt-2">
-            <input type="text" placeholder="Nome" value={form.cliente_nome||''} onChange={e=>setForm(f=>({...f,cliente_nome:e.target.value}))} className="col-span-2 px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none"/>
-            <input type="text" placeholder="CPF/CNPJ" value={form.cliente_doc||''} onChange={e=>setForm(f=>({...f,cliente_doc:e.target.value}))} className="px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none"/>
-            <input type="text" placeholder="Telefone" value={form.cliente_fone||''} onChange={e=>setForm(f=>({...f,cliente_fone:e.target.value}))} className="px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none"/>
-          </div>
-        )}
-        {/* Vendedor / Status / Previsão / Obs */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
-          <div>
-            <label className="text-xs text-gray-500 block mb-1">Vendedor</label>
-            <select value={form.vendedor_id||''} onChange={e=>setForm(f=>({...f,vendedor_id:e.target.value}))} className="w-full px-2 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none">
+          {/* Vendedor — col 6-8 */}
+          <div className="col-span-6 sm:col-span-3">
+            <select value={form.vendedor_id||''} onChange={e=>setForm(f=>({...f,vendedor_id:e.target.value}))} className="w-full px-2 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none">
               <option value="">Sem vendedor</option>{vendedores.map(v=><option key={v.id} value={v.id}>{v.nome}</option>)}
             </select>
           </div>
-          <div>
-            <label className="text-xs text-gray-500 block mb-1">Status</label>
-            <select value={form.status} onChange={e=>setForm(f=>({...f,status:e.target.value}))} className="w-full px-2 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none">
+          {/* Status — col 9-10 */}
+          <div className="col-span-6 sm:col-span-2">
+            <select value={form.status} onChange={e=>setForm(f=>({...f,status:e.target.value}))} className="w-full px-2 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none">
               {['Rascunho','Aberta','Em andamento','Concluída','Cancelada','Finalizada'].map(s=><option key={s} value={s}>{s}</option>)}
             </select>
           </div>
-          <div>
-            <label className="text-xs text-gray-500 block mb-1">Previsão</label>
-            <input type="date" value={form.previsao||''} onChange={e=>setForm(f=>({...f,previsao:e.target.value}))} className="w-full px-2 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none"/>
-          </div>
-          <div className="col-span-2 sm:col-span-3">
-            <label className="text-xs text-gray-500 block mb-1">Observações</label>
-            <textarea rows={2} value={form.observacoes||''} onChange={e=>setForm(f=>({...f,observacoes:e.target.value}))} placeholder="Defeito relatado, peças necessárias, etc."
-              className="w-full px-2 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none resize-none"/>
+          {/* Previsão — col 11-12 */}
+          <div className="col-span-6 sm:col-span-2">
+            <input type="date" value={form.previsao||''} onChange={e=>setForm(f=>({...f,previsao:e.target.value}))} className="w-full px-2 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none"/>
           </div>
         </div>
+        {/* Linha 2: Info cliente + WhatsApp + Débito */}
+        {modoCli==='cadastrado'&&form.cliente_id&&(
+          <div className="flex items-center gap-3 flex-wrap">
+            <p className="text-xs text-blue-600 dark:text-blue-400">✓ {form.cliente_nome}{form.cliente_doc?` — ${form.cliente_doc}`:''}</p>
+            {form.cliente_fone&&(<button type="button" onClick={abrirWaModal} className="flex items-center gap-1.5 px-2.5 py-1 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded-lg transition-colors"><MessageCircle size={13}/>WhatsApp</button>)}
+            {loadingDebito&&<span className="flex items-center gap-1 text-xs text-gray-400"><RefreshCw size={11} className="animate-spin"/>Verificando...</span>}
+            {!loadingDebito&&clienteDebito&&clienteDebito.total>0&&(
+              <span className="flex items-center gap-1.5 px-2.5 py-1 bg-red-500 text-white text-xs font-semibold rounded-lg">⚠️ Débito: {brl(clienteDebito.total)}</span>
+            )}
+          </div>
+        )}
+        {/* Observações */}
+        <textarea rows={2} value={form.observacoes||''} onChange={e=>setForm(f=>({...f,observacoes:e.target.value}))} placeholder="Observações: defeito relatado, peças necessárias, etc."
+          className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none resize-none"/>
       </div>
 
       {/* Botão Receita */}
