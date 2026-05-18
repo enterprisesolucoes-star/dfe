@@ -754,16 +754,16 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       );
       case 'relatorios_tef': return <RelatoriosHub showAlert={showAlert} emitente={emitente} isFiscal={isFiscal} />;
       case 'ordens_servico': return emitente?.otica ? (
-        <OrdemServicoOticaTab
+        <OrdemServicoTab
           clientes={clientes}
           fetchClientes={fetchClientes}
-          fetchProdutosOtica={fetchProdutos}
+          fetchProdutos={fetchProdutos}
           produtos={produtos}
           vendedores={vendedores}
           emitente={emitente}
           showAlert={showAlert}
           showConfirm={showConfirm}
-          onAfterSave={fetchProdutos}
+          onNovaOsOtica={() => handleSetActiveTab('os_otica')}
         />
       ) : (
         <OrdemServicoTab
