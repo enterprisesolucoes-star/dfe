@@ -151,6 +151,7 @@ const CONFIG_TABS = ['config', 'config_empresa', 'config_email', 'config_smartpo
 const [prevTab, setPrevTab] = useState<typeof activeTab>(session.empresaConfigurada ? 'dashboard' : 'empresa');
 
 const [showOticaForm, setShowOticaForm] = React.useState(false);
+const [editandoOsOtica, setEditandoOsOtica] = React.useState<any>(null);
 const handleSetActiveTab = (tab: typeof activeTab) => { setShowOticaForm(false);
   if (empresaBloqueada && !CONFIG_TABS.includes(tab)) return;
   setNavLoading(true);
@@ -766,7 +767,8 @@ const handleSetActiveTab = (tab: typeof activeTab) => { setShowOticaForm(false);
             showAlert={showAlert}
             showConfirm={showConfirm}
             abrirFormInicial={true}
-            onAfterSave={() => { setShowOticaForm(false); fetchProdutos(); }}
+            editandoOs={editandoOsOtica}
+            onAfterSave={() => { setShowOticaForm(false); setEditandoOsOtica(null); fetchProdutos(); }}
           />
         ) : (
         <OrdemServicoTab
@@ -779,7 +781,8 @@ const handleSetActiveTab = (tab: typeof activeTab) => { setShowOticaForm(false);
           showAlert={showAlert}
           showConfirm={showConfirm}
           otica={true}
-          onNovaOsOtica={() => setShowOticaForm(true)}
+          onNovaOsOtica={() => { setEditandoOsOtica(null); setShowOticaForm(true); }}
+          onEditarOsOtica={(os: any) => { setEditandoOsOtica(os); setShowOticaForm(true); }}
         />
         )
       ) : (

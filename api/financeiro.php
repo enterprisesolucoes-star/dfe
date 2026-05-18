@@ -464,7 +464,7 @@ switch ($action) {
     case 'debitos_cliente':
       $cid = (int)($_GET['cliente_id'] ?? 0);
       if(!$cid){ echo json_encode(['total'=>0,'qtd'=>0]); break; }
-      $st = $pdo->prepare("SELECT COUNT(*) as qtd, COALESCE(SUM(valor_total),0) as total FROM financeiro WHERE empresa_id=? AND cliente_id=? AND tipo='R' AND status='Pendente'");
+      $st = $pdo->prepare("SELECT COUNT(*) as qtd, COALESCE(SUM(valor_total),0) as total FROM financeiro WHERE empresa_id=? AND entidade_id=? AND tipo='R' AND status='Pendente'");
       $st->execute([$empresa_id, $cid]);
       $row = $st->fetch(PDO::FETCH_ASSOC);
       echo json_encode(['total'=>(float)$row['total'],'qtd'=>(int)$row['qtd']]);

@@ -53,7 +53,7 @@ const STATUS_OS_COLORS: Record<string, string> = {
 };
 
 export const OrdemServicoTab = ({
-  clientes, fetchClientes, fetchProdutos, produtos, vendedores, emitente, showAlert, showConfirm, onNovaOsOtica, otica
+  clientes, fetchClientes, fetchProdutos, produtos, vendedores, emitente, showAlert, showConfirm, onNovaOsOtica, onEditarOsOtica, otica
 }: {
   clientes: Cliente[];
   fetchClientes: (busca?: string) => Promise<void>;
@@ -61,6 +61,7 @@ export const OrdemServicoTab = ({
   produtos: Produto[];
   vendedores: Vendedor[];
   onNovaOsOtica?: () => void;
+  onEditarOsOtica?: (os: any) => void;
   otica?: boolean;
   emitente: Emitente;
   showAlert: (t: string, m: string) => void;
@@ -604,7 +605,7 @@ export const OrdemServicoTab = ({
                   <td className="px-4 py-3"><span className={`text-xs px-2 py-1 rounded-full font-medium ${STATUS_OS_COLORS[os.status] ?? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>{os.status}</span></td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-center gap-1">
-                      <button title="Editar" onClick={() => openForm(os)} className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400"><Edit className="w-4 h-4" /></button>
+                      <button title="Editar" onClick={() => otica && onEditarOsOtica ? onEditarOsOtica(os) : openForm(os)} className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400"><Edit className="w-4 h-4" /></button>
                       <button title="PDF" onClick={() => handlePrint(os.id!)} className="p-1.5 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300"><Printer className="w-4 h-4" /></button>
                       <button title="E-mail" onClick={() => { setEmailOs(os); setEmailDest(os.cliente_email || ''); setShowEmail(true); }} className="p-1.5 hover:bg-purple-50 rounded-lg text-purple-600"><Mail className="w-4 h-4" /></button>
                       {!!(emitente as any).integracaowhatsapp && <button title="WhatsApp" onClick={() => { const num = String(os.numero ?? '').padStart(4,'0'); const val = 'R$ ' + Number(os.valor_total).toLocaleString('pt-BR',{minimumFractionDigits:2}); setWaTarget({ id: os.id!, action: 'os_pdf', filename: `os_${num}.pdf`, caption: `OS No ${num} - ${os.cliente_nome || 'Cliente'} - ${val}`, phone: (os.cliente_telefone || '').replace(/\D/g,'') }); }} className="p-1.5 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-lg text-green-600 dark:text-green-400"><MessageCircle className="w-4 h-4" /></button>}
