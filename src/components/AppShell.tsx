@@ -765,6 +765,7 @@ const handleSetActiveTab = (tab: typeof activeTab) => { setShowOticaForm(false);
             emitente={emitente}
             showAlert={showAlert}
             showConfirm={showConfirm}
+            abrirFormInicial={true}
             onAfterSave={() => { setShowOticaForm(false); fetchProdutos(); }}
           />
         ) : (
