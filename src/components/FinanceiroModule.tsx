@@ -347,13 +347,14 @@ export const BaixaModal = ({ titulo, emitente, onClose, onSuccess, showAlert }: 
 };
 
 // ─── Componente de Listagem Financeiro ───────────────────────────────────────
-export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobrancaAtiva = false, initPreset = null }: { tipo: 'R' | 'P', emitente: any, showAlert: any, showConfirm: any, cobrancaAtiva?: boolean, initPreset?: string | null }) => {
+export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobrancaAtiva = false, initPreset = null }: { tipo: 'R' | 'P', emitente: any, showAlert: any, showConfirm: any, cobrancaAtiva?: boolean, initPreset?: any }) => {
   const [titulos, setTitulos] = useState<any[]>([]);
   const [totPendente, setTotPendente] = useState(0);
   const [totPago, setTotPago] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [filtroStatus, setFiltroStatus] = useState<'Pendente' | 'Pago' | ''>(initPreset === 'vencidas' ? 'Pendente' : '');
+  const [filtroStatus, setFiltroStatus] = useState<'Pendente' | 'Pago' | ''>(initPreset?.status || (initPreset === 'vencidas' ? 'Pendente' : ''));
   const [di, setDi] = useState(() => {
+    if(initPreset?.di) return initPreset.di;
     if (initPreset === 'vencidas') return '2020-01-01';
     const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`;
   });
@@ -361,7 +362,7 @@ export const FinanceiroView = ({ tipo, emitente, showAlert, showConfirm, cobranc
     if (initPreset === 'vencidas') return new Date(Date.now() - 86400000).toISOString().split('T')[0];
     return new Date().toISOString().split('T')[0];
   });
-  const [busca, setBusca] = useState('');
+  const [busca, setBusca] = useState(initPreset?.busca || '');
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({ total: 0, pages: 0 });
