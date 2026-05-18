@@ -16,9 +16,7 @@ export default defineConfig(({ mode }) => {
         includeAssets: ['icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'],
         manifest: false, // usamos o manifest.webmanifest estático em /public
         workbox: {
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
-          skipWaiting: true,
-          clientsClaim: true,
+          globPatterns: ['**/*.{css,html,ico,png,svg,webmanifest}'],
           skipWaiting: true,
           clientsClaim: true,
           navigateFallbackDenylist: [/api\.php/],
@@ -32,6 +30,11 @@ export default defineConfig(({ mode }) => {
               urlPattern: /\/api\.php.*/i,
               handler: 'NetworkOnly',
               options: { cacheName: 'api-cache' },
+            },
+            {
+              urlPattern: /\.js$/i,
+              handler: 'NetworkFirst',
+              options: { cacheName: 'js-cache', expiration: { maxEntries: 50, maxAgeSeconds: 60 } },
             },
           ],
         },
