@@ -291,6 +291,7 @@ $modules = [
     'listar_os_otica' => 'ordens_servico_otica', 'salvar_os_otica' => 'ordens_servico_otica',
     'excluir_os_otica' => 'ordens_servico_otica', 'emitir_nfe_os' => 'ordens_servico_otica', 'emitir_nfce_os' => 'ordens_servico_otica',
     'excluir_os' => 'ordens_servico', 'os_pdf' => 'ordens_servico', 'os_email' => 'ordens_servico',
+    'os_otica_pdf' => 'ordens_servico_otica', 'os_otica_email' => 'ordens_servico_otica',
     'vendas' => 'vendas', 'emitir' => 'vendas', 'cancelar' => 'vendas', 'excluir_venda' => 'vendas',
     'transmitir_contingencia' => 'vendas', 'danfe' => 'vendas', 'danfe_contingencia' => 'vendas',
     'transmitir_lote_contingencia' => 'vendas', 'baixar_xml_lote' => 'vendas', 'enviar_xml_contador' => 'vendas', 'nfce_buscar_email_cliente' => 'vendas', 'nfce_download_xml' => 'vendas', 'enviar_email_doc' => 'vendas',

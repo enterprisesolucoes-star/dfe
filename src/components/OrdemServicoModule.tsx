@@ -603,7 +603,7 @@ export const OrdemServicoTab = ({
                   <td className="px-4 py-3 text-gray-700 dark:text-gray-200 max-w-[180px] truncate">{os.cliente_nome || <span className="text-gray-400 dark:text-gray-500 italic">Sem cliente</span>}</td>
                   <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{fmtDt(os.data_criacao)}</td>
                   <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{fmtDt(os.previsao)}</td>
-                  <td className="px-4 py-3 text-right font-semibold text-blue-600 dark:text-blue-400">{fmtVal(Number(os.valor_total) || 0)}</td>
+                  <td className="px-4 py-3 text-right font-semibold text-blue-600 dark:text-blue-400">{fmtVal(Number((os as any).total ?? os.valor_total) || 0)}</td>
                   <td className="px-4 py-3"><span className={`text-xs px-2 py-1 rounded-full font-medium ${STATUS_OS_COLORS[os.status] ?? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>{os.status}</span></td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-center gap-1">
