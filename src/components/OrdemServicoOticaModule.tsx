@@ -303,7 +303,7 @@ Qualquer dúvida, estamos à disposição!`);
             ))}
           </div>
         </div>
-        {modoCli==='cadastrado'?(
+        {modoCli==='cadastrado'&&(
           <div className="relative">
             <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/>
             <input type="text" placeholder="Localizar por nome, documento ou celular..." value={buscaCli}
