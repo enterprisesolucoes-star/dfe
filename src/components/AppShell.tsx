@@ -150,7 +150,8 @@ const empresaBloqueada = !session.empresaConfigurada;
 const CONFIG_TABS = ['config', 'config_empresa', 'config_email', 'config_smartpos', 'config_integracao', 'dfe_nfe_dados', 'dfe_nfce_dados', 'dfe_provedor', 'empresa', 'dfe_config'];
 const [prevTab, setPrevTab] = useState<typeof activeTab>(session.empresaConfigurada ? 'dashboard' : 'empresa');
 
-const handleSetActiveTab = (tab: typeof activeTab) => {
+const [showOticaForm, setShowOticaForm] = React.useState(false);
+const handleSetActiveTab = (tab: typeof activeTab) => { setShowOticaForm(false);
   if (empresaBloqueada && !CONFIG_TABS.includes(tab)) return;
   setNavLoading(true);
   setTimeout(() => setNavLoading(false), 350);
@@ -754,6 +755,19 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
       );
       case 'relatorios_tef': return <RelatoriosHub showAlert={showAlert} emitente={emitente} isFiscal={isFiscal} />;
       case 'ordens_servico': return emitente?.otica ? (
+        showOticaForm ? (
+          <OrdemServicoOticaTab
+            clientes={clientes}
+            fetchClientes={fetchClientes}
+            fetchProdutosOtica={fetchProdutos}
+            produtos={produtos}
+            vendedores={vendedores}
+            emitente={emitente}
+            showAlert={showAlert}
+            showConfirm={showConfirm}
+            onAfterSave={() => { setShowOticaForm(false); fetchProdutos(); }}
+          />
+        ) : (
         <OrdemServicoTab
           clientes={clientes}
           fetchClientes={fetchClientes}
@@ -764,8 +778,9 @@ const handleSetActiveTab = (tab: typeof activeTab) => {
           showAlert={showAlert}
           showConfirm={showConfirm}
           otica={true}
-          onNovaOsOtica={() => handleSetActiveTab('os_otica')}
+          onNovaOsOtica={() => setShowOticaForm(true)}
         />
+        )
       ) : (
         <OrdemServicoTab
           clientes={clientes}
